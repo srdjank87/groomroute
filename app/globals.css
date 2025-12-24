@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth scrolling */
+html,
+body {
+  scroll-behavior: smooth !important;
+}
+
+/* Smooth progress transitions */
+progress::-webkit-progress-value {
+  transition: 0.6s width ease-out;
+}
+
+@layer utilities {
+  .btn-gradient {
+    background-image: linear-gradient(
+      60deg,
+      #f79533,
+      #f37055,
+      #ef4e7b,
+      #a166ab,
+      #5073b8,
+      #1098ad,
+      #07b39b,
+      #6fba82
+    );
+    background-size: 300% 300%;
+    color: white;
+  }
+
+  .btn-gradient:hover {
+    filter: saturate(1.2);
+    animation: shimmer 3s ease-out infinite alternate;
+  }
+
+  .animate-opacity {
+    animation: opacity 0.25s ease-in-out;
+  }
+
+  .animate-appearFromRight {
+    animation: appearFromRight 300ms ease-in-out;
+  }
+
+  .animate-wiggle {
+    animation: wiggle 1.5s ease-in-out infinite;
+  }
+
+  .animate-popup {
+    animation: popup 0.25s ease-in-out;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 3s ease-out infinite alternate;
+  }
+}
+
+/* Keyframes */
+@keyframes opacity {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes appearFromRight {
+  0% {
+    opacity: 0.3;
+    transform: translate(15%, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0);
+  }
+}
+
+@keyframes wiggle {
+  0%, 20%, 80%, 100% { transform: rotate(0deg); }
+  30%, 60% { transform: rotate(-2deg); }
+  40%, 70% { transform: rotate(2deg); }
+  45% { transform: rotate(-4deg); }
+  55% { transform: rotate(4deg); }
+}
+
+@keyframes popup {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 0 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@layer base {
+  .btn {
+    text-transform: capitalize;
+  }
+}

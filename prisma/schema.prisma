@@ -1,0 +1,359 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Authentication and account management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?  // Hashed password
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  role      UserRole @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([accountId])
+}
+
+enum UserRole {
+  ADMIN
+  GROOMER
+  VIEWER
+}
+
+// Tenant / Business account
+model Account {
+  id              String            @id @default(cuid())
+  name            String
+  timezone        String            @default("America/New_York")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  users           User[]
+  groomers        Groomer[]
+  customers       Customer[]
+  appointments    Appointment[]
+  routes          Route[]
+  messageTemplates MessageTemplate[]
+
+  @@index([createdAt])
+}
+
+// Groomer (person/vehicle)
+model Groomer {
+  id                String        @id @default(cuid())
+  accountId         String
+  account           Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name              String
+  email             String?
+  phone             String?
+  baseAddress       String
+  baseLat           Float?
+  baseLng           Float?
+  geocodeStatus     GeocodeStatus @default(PENDING)
+  workingHoursStart String?       // HH:mm format
+  workingHoursEnd   String?       // HH:mm format
+  isActive          Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  appointments      Appointment[]
+  routes            Route[]
+
+  @@index([accountId])
+  @@index([accountId, isActive])
+}
+
+enum GeocodeStatus {
+  PENDING
+  OK
+  PARTIAL
+  FAILED
+}
+
+// Customer
+model Customer {
+  id                 String              @id @default(cuid())
+  accountId          String
+  account            Account             @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name               String
+  email              String?
+  phone              String?
+  address            String
+  city               String?
+  state              String?
+  zipCode            String?
+  lat                Float?
+  lng                Float?
+  geocodeStatus      GeocodeStatus       @default(PENDING)
+  // MVP Breakage Fix #1: Address validation & location intelligence
+  addressNotes       String?             @db.Text // Gate codes, parking instructions
+  accessInstructions String?             @db.Text // How to access property
+  locationVerified   Boolean             @default(false) // Groomer confirmed on first visit
+  notes              String?             @db.Text
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  pets               Pet[]
+  appointments       Appointment[]
+  messages           Message[]
+  waitlistEntries    CustomerWaitlist[]
+
+  @@index([accountId])
+  @@index([accountId, createdAt])
+}
+
+// Pet
+model Pet {
+  id                String             @id @default(cuid())
+  customerId        String
+  customer          Customer           @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  name              String
+  breed             String?
+  species           String?            // dog, cat, etc.
+  weight            Float?             // in lbs or kg
+  ageYears          Int?
+  notes             String?            @db.Text
+  groomingNotes     String?            @db.Text
+  behaviorNotes     String?            @db.Text
+  // MVP Breakage Fix #2: Behavior warnings & special handling
+  behaviorFlags     BehaviorFlag[]
+  equipmentRequired EquipmentRequired[]
+  specialHandling   String?            @db.Text
+  canBookSolo       Boolean            @default(true) // False if requires 2-person handling
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  appointments      Appointment[]
+
+  @@index([customerId])
+}
+
+enum BehaviorFlag {
+  FRIENDLY
+  ANXIOUS
+  AGGRESSIVE
+  BITE_RISK
+  MUZZLE_REQUIRED
+  TWO_PERSON_REQUIRED
+}
+
+enum EquipmentRequired {
+  MUZZLE
+  TABLE_EXTENDER
+  HEAVY_DUTY_DRYER
+  EXTRA_TOWELS
+  SENSITIVE_SKIN_PRODUCTS
+}
+
+// Appointment
+model Appointment {
+  id              String            @id @default(cuid())
+  accountId       String
+  account         Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  groomerId       String
+  groomer         Groomer           @relation(fields: [groomerId], references: [id], onDelete: Cascade)
+  customerId      String
+  customer        Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  petId           String?
+  pet             Pet?              @relation(fields: [petId], references: [id], onDelete: SetNull)
+  startAt         DateTime
+  serviceMinutes  Int               @default(60)
+  status          AppointmentStatus @default(BOOKED)
+  appointmentType AppointmentType   @default(FULL_GROOM)
+  earliestStart   DateTime?         // Optional time window
+  latestEnd       DateTime?         // Optional time window
+  notes           String?           @db.Text
+  internalNotes   String?           @db.Text
+  price           Float?
+  // MVP Breakage Fix #3: Automated communication
+  reminderSent24hr  Boolean @default(false)
+  reminderSent2hr   Boolean @default(false)
+  customerConfirmed Boolean @default(false)
+  confirmedAt       DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  routeStops      RouteStop[]
+  messages        Message[]
+
+  @@index([accountId])
+  @@index([groomerId])
+  @@index([customerId])
+  @@index([accountId, groomerId, startAt])
+  @@index([startAt])
+}
+
+enum AppointmentStatus {
+  BOOKED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentType {
+  FULL_GROOM
+  BATH_ONLY
+  NAIL_TRIM
+  FACE_FEET_FANNY
+  SQUEEZE_IN // Quick service for filling gaps (MVP Breakage Fix #4)
+  ADDON
+}
+
+// Route (daily driving plan)
+model Route {
+  id                  String                 @id @default(cuid())
+  accountId           String
+  account             Account                @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  groomerId           String
+  groomer             Groomer                @relation(fields: [groomerId], references: [id], onDelete: Cascade)
+  routeDate           DateTime               @db.Date // Date only
+  startTime           DateTime?
+  endTime             DateTime?
+  totalDriveMinutes   Int?
+  totalDistanceMeters Int?
+  // MVP Breakage Fix #5: Route efficiency analytics
+  totalServiceMinutes Int?
+  efficiencyScore     Float?                 // 0-100, higher = better (work time / total time)
+  estimatedGasCost    Float?
+  status              RouteStatus            @default(DRAFT)
+  provider            String?                // google | mapbox | custom
+  polyline            String?                @db.Text // Encoded polyline for map display
+  metadata            Json?                  // Store any additional provider response data
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  stops               RouteStop[]
+  gapFillNotifications GapFillNotification[]
+
+  @@unique([groomerId, routeDate])
+  @@index([accountId])
+  @@index([groomerId])
+  @@index([groomerId, routeDate])
+}
+
+enum RouteStatus {
+  DRAFT
+  PUBLISHED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// RouteStop (individual stop in a route)
+model RouteStop {
+  id                     String       @id @default(cuid())
+  routeId                String
+  route                  Route        @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  appointmentId          String?
+  appointment            Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  sequence               Int          // 1, 2, 3, etc.
+  arrivalTime            DateTime?
+  departureTime          DateTime?
+  driveMinutesFromPrev   Int?
+  distanceMetersFromPrev Int?
+  stopType               StopType     @default(APPOINTMENT)
+  address                String?      // For non-appointment stops
+  lat                    Float?
+  lng                    Float?
+  notes                  String?      @db.Text
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  @@index([routeId])
+  @@index([appointmentId])
+  @@index([routeId, sequence])
+}
+
+enum StopType {
+  START_BASE
+  APPOINTMENT
+  BREAK
+  END_BASE
+}
+
+// MVP Breakage Fix #3: Messaging system
+model Message {
+  id             String       @id @default(cuid())
+  accountId      String
+  customerId     String
+  customer       Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  appointmentId  String?
+  appointment    Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  messageType    MessageType
+  content        String       @db.Text
+  sentAt         DateTime     @default(now())
+  deliveryStatus String?      // sent, delivered, failed
+  errorMessage   String?
+
+  @@index([accountId])
+  @@index([customerId])
+  @@index([appointmentId])
+  @@index([sentAt])
+}
+
+enum MessageType {
+  REMINDER_24HR
+  REMINDER_2HR
+  ON_MY_WAY
+  RUNNING_LATE
+  CONFIRMATION_REQUEST
+  GAP_FILL_OFFER
+  CUSTOM
+}
+
+model MessageTemplate {
+  id        String      @id @default(cuid())
+  accountId String
+  account   Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name      String      // "24hr Reminder", "On My Way", etc.
+  type      MessageType
+  content   String      @db.Text // Can include variables: {customerName}, {time}, {eta}
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([accountId])
+  @@index([accountId, type])
+}
+
+// MVP Breakage Fix #4: Gap-fill system
+model CustomerWaitlist {
+  id             String   @id @default(cuid())
+  accountId      String
+  customerId     String
+  customer       Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  preferredDays  String[] // ["MONDAY", "TUESDAY"]
+  preferredTimes String[] // ["MORNING", "AFTERNOON"]
+  flexibleTiming Boolean  @default(true)
+  maxDistance    Int?     // Miles willing to travel from home
+  notifyViaSMS   Boolean  @default(true)
+  notifyViaEmail Boolean  @default(true)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([accountId])
+  @@index([customerId])
+  @@index([accountId, isActive])
+}
+
+model GapFillNotification {
+  id             String   @id @default(cuid())
+  accountId      String
+  routeId        String
+  route          Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  gapStartTime   DateTime
+  gapEndTime     DateTime
+  customersSent  Int      @default(0)
+  bookingsGained Int      @default(0)
+  sentAt         DateTime @default(now())
+
+  @@index([accountId])
+  @@index([routeId])
+}
