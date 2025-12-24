@@ -186,7 +186,7 @@ export default function Home() {
                 </div>
 
                 <div className="rounded-full px-4 py-3 text-center text-sm" style={{backgroundColor: 'rgba(239, 68, 68, 0.1)'}}>
-                  You spend your day apologizing and sending "running late" texts
+                  You spend your day apologizing and sending &ldquo;running late&rdquo; texts
                 </div>
 
                 <div className="flex justify-center">
@@ -210,7 +210,7 @@ export default function Home() {
 
               <div className="space-y-3">
                 <div className="rounded-full px-4 py-3 text-center text-sm" style={{backgroundColor: 'rgba(34, 197, 94, 0.1)'}}>
-                  Click "Optimize My Day" - appointments reorder by location
+                  Click &ldquo;Optimize My Day&rdquo; - appointments reorder by location
                 </div>
 
                 <div className="flex justify-center">
