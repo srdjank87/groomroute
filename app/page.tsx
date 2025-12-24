@@ -455,28 +455,33 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Solo Groomer */}
+            {/* Starter */}
             <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
               <div className="card-body">
-                <div className="badge badge-neutral mb-2">SOLO GROOMER</div>
+                <div className="badge badge-neutral mb-2">STARTER</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">$39</span>
+                  <span className="text-4xl font-bold">$99</span>
                   <span className="text-sm opacity-70">/month</span>
                 </div>
 
+                <p className="text-sm mb-4 italic opacity-80">
+                  Perfect if you just want your day to run smoother without changing your whole system.
+                </p>
+
                 <ul className="space-y-2 mb-6">
                   {[
-                    "1 groomer/van",
-                    "Unlimited customers",
-                    "Route optimization",
-                    "Automated messaging",
-                    "Review requests",
+                    "One-click route optimization",
+                    "Accurate ETAs for every stop",
+                    "Address validation + pin confirmation",
+                    "Basic SMS confirmations",
+                    "Safety flags & special handling warnings",
+                    "Route rebuild on schedule changes",
                   ].map((item) => (
-                    <li className="flex gap-2 items-center" key={item}>
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="text-success size-5">
+                    <li className="flex gap-2 items-start" key={item}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="text-success size-5 flex-shrink-0 mt-0.5">
                         <path fillRule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
                       </svg>
-                      {item}
+                      <span className="text-sm">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -486,33 +491,38 @@ export default function Home() {
                     Start Free Trial
                   </Link>
                 </div>
-                <div className="text-sm text-center opacity-70 mt-2">or $390/year (save $78)</div>
+                <div className="text-sm text-center opacity-70 mt-2">or $950/year (save $238)</div>
               </div>
             </div>
 
-            {/* Growing Team - POPULAR */}
+            {/* Growth - POPULAR */}
             <div className="card bg-primary text-primary-content shadow-2xl border-4 border-primary transform scale-105">
               <div className="card-body">
                 <div className="badge badge-secondary mb-2">MOST POPULAR</div>
-                <div className="badge badge-neutral mb-2 text-neutral-content">GROWING TEAM</div>
+                <div className="badge badge-neutral mb-2 text-neutral-content">GROWTH</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">$99</span>
+                  <span className="text-4xl font-bold">$179</span>
                   <span className="text-sm opacity-90">/month</span>
                 </div>
 
+                <p className="text-sm mb-4 italic opacity-90">
+                  The sweet spot. Automation + calm days so you spend less time explaining and more time grooming.
+                </p>
+
                 <ul className="space-y-2 mb-6">
                   {[
-                    "2-5 groomers/vans",
-                    "Everything in Solo",
-                    "Team coordination",
-                    "Multi-route optimization",
-                    "Priority support",
+                    "Everything in Starter",
+                    "Automatic ETA updates when running late",
+                    "\"Running behind\" one-tap delay management",
+                    "Strong communication automation",
+                    "Better day predictability",
+                    "Improved calm + professionalism",
                   ].map((item) => (
-                    <li className="flex gap-2 items-center" key={item}>
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-5">
+                    <li className="flex gap-2 items-start" key={item}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-5 flex-shrink-0 mt-0.5">
                         <path fillRule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
                       </svg>
-                      {item}
+                      <span className="text-sm">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -522,32 +532,39 @@ export default function Home() {
                     Start Free Trial
                   </Link>
                 </div>
-                <div className="text-sm text-center opacity-90 mt-2">or $990/year (save $198)</div>
+                <div className="text-sm text-center opacity-90 mt-2">or $1,700/year (save $448)</div>
               </div>
             </div>
 
-            {/* Professional Fleet */}
+            {/* Pro */}
             <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
               <div className="card-body">
-                <div className="badge badge-neutral mb-2">PROFESSIONAL FLEET</div>
+                <div className="badge badge-neutral mb-2">PRO</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">$199</span>
+                  <span className="text-4xl font-bold">$279</span>
                   <span className="text-sm opacity-70">/month</span>
                 </div>
 
+                <p className="text-sm mb-4 italic opacity-80">
+                  Maximize utilization, keep your calendar full, and turn last-minute gaps into real revenue.
+                </p>
+
                 <ul className="space-y-2 mb-6">
                   {[
-                    "6+ groomers/vans",
-                    "Everything in Growing Team",
-                    "Advanced analytics",
-                    "Custom integrations",
-                    "Dedicated support",
+                    "Everything in Growth",
+                    "Gap-fill & cancellation recovery engine",
+                    "Waitlist + smart suggestion tools",
+                    "Rebooking automation",
+                    "No-show prevention workflows",
+                    "Priority support",
+                    "Multi-groomer team support",
+                    "Advanced route analytics & trends",
                   ].map((item) => (
-                    <li className="flex gap-2 items-center" key={item}>
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="text-success size-5">
+                    <li className="flex gap-2 items-start" key={item}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="text-success size-5 flex-shrink-0 mt-0.5">
                         <path fillRule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
                       </svg>
-                      {item}
+                      <span className="text-sm">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -557,7 +574,7 @@ export default function Home() {
                     Start Free Trial
                   </Link>
                 </div>
-                <div className="text-sm text-center opacity-70 mt-2">or $1,990/year (save $398)</div>
+                <div className="text-sm text-center opacity-70 mt-2">or $2,650/year (save $698)</div>
               </div>
             </div>
           </div>
@@ -584,6 +601,16 @@ export default function Home() {
             <div className="collapse collapse-plus bg-base-100">
               <input type="radio" name="faq-accordion" defaultChecked />
               <div className="collapse-title text-xl font-medium">
+                Is it worth the price?
+              </div>
+              <div className="collapse-content">
+                <p>Most groomers save 45–90 minutes per day, recover $200–$400/month from cancellations, and reduce stress significantly. If GroomRoute doesn&apos;t noticeably improve your day within the first few weeks, you can cancel anytime.</p>
+              </div>
+            </div>
+
+            <div className="collapse collapse-plus bg-base-100">
+              <input type="radio" name="faq-accordion" />
+              <div className="collapse-title text-xl font-medium">
                 Do I need to be tech-savvy?
               </div>
               <div className="collapse-content">
@@ -607,7 +634,7 @@ export default function Home() {
                 Does this replace my current scheduler?
               </div>
               <div className="collapse-content">
-                <p>You can use GroomRoute alongside your current tool or gradually replace it — totally up to you.</p>
+                <p>GroomRoute works great alongside your existing system — or can gradually replace parts of it over time.</p>
               </div>
             </div>
 
@@ -617,7 +644,7 @@ export default function Home() {
                 How fast will I see results?
               </div>
               <div className="collapse-content">
-                <p>Most groomers notice a calmer, more efficient day in their first week.</p>
+                <p>Most groomers feel immediate clarity within the first week — sometimes the first day.</p>
               </div>
             </div>
           </div>
