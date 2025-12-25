@@ -56,26 +56,26 @@ export default function Home() {
 
       {/* HERO */}
       <section className="hero bg-base-200 py-20">
-        <div className="hero-content flex-col lg:flex-row-reverse gap-12">
-          <div className="flex-1 flex justify-center">
-            <Image
-              src="/images/hero-groomroute.png"
-              alt="GroomRoute - Mobile grooming route optimization"
-              width={500}
-              height={500}
-              className="rounded-lg"
-              priority
-            />
-          </div>
-          <div className="flex-1 text-center lg:text-left">
-            <p className="text-sm font-semibold text-primary mb-2">Save up to 90 minutes per day without changing your routine</p>
-            <h1 className="text-5xl lg:text-6xl font-bold mb-6">
+        <div className="hero-content max-w-4xl">
+          <div className="text-center">
+            <h1 className="text-5xl lg:text-6xl font-bold mb-4">
               Run your grooming day with one tap.
             </h1>
-            <p className="text-xl mb-8 leading-relaxed">
+            <p className="text-sm font-semibold text-primary mb-6">Save up to 90 minutes per day without changing your routine</p>
+            <p className="text-xl mb-8 leading-relaxed max-w-2xl mx-auto">
               Optimize your route, keep customers informed, and stay calm — even when things change.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-4">
+            <div className="flex justify-center mb-8">
+              <Image
+                src="/images/hero-groomroute.png"
+                alt="GroomRoute - Mobile grooming route optimization"
+                width={500}
+                height={500}
+                className="rounded-lg"
+                priority
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
               <Link href="/auth/signup" className="btn btn-gradient btn-lg">
                 Start Free Trial
               </Link>
@@ -132,67 +132,101 @@ export default function Home() {
       {/* BEFORE / AFTER */}
       <section className="py-20 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">
-              What Your Day Looks Like <strong>Before vs After GroomRoute</strong>
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-12">
             {/* BEFORE */}
-            <div className="rounded-xl p-8 bg-base-200 border-2 border-error">
-              <p className="text-center text-2xl font-bold mb-6 text-error">BEFORE</p>
+            <div className="rounded-3xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-pink-50 p-8">
+              <h3 className="text-2xl font-bold mb-6 text-center">Before GroomRoute</h3>
 
-              <ul className="space-y-4">
-                <li className="flex gap-3 items-start">
-                  <XCircle className="w-5 h-5 text-error flex-shrink-0 mt-1" />
-                  <span>Chaos</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <XCircle className="w-5 h-5 text-error flex-shrink-0 mt-1" />
-                  <span>Zig-zagging</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <XCircle className="w-5 h-5 text-error flex-shrink-0 mt-1" />
-                  <span>Constant &ldquo;Where are you?&rdquo;</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <XCircle className="w-5 h-5 text-error flex-shrink-0 mt-1" />
-                  <span>Stress</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <XCircle className="w-5 h-5 text-error flex-shrink-0 mt-1" />
-                  <span>Guessing</span>
-                </li>
-              </ul>
+              <div className="space-y-3">
+                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
+                  <p className="text-sm text-gray-700">Ops constantly checks Shopify, inbox, and spreadsheets</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
+                  <p className="text-sm text-gray-700">Every edit, cancel, or tag change triggers re-downloads and rework</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
+                  <p className="text-sm text-gray-700">Address fixes and SKU issues surface too late - inside the WMS</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
+                  <p className="text-sm text-gray-700">Virtual bundles and missing SKU data break fulfillment flows</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
+                  <p className="text-sm text-gray-700">Peak volume turns small changes into operational fires</p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex items-center gap-2 justify-center">
+                <XCircle className="w-5 h-5 text-red-500" />
+                <p className="text-sm text-gray-600">Result: constant noise, rushed fixes, avoidable mistakes.</p>
+              </div>
             </div>
 
             {/* AFTER */}
-            <div className="rounded-xl p-8 bg-base-200 border-2 border-success">
-              <p className="text-center text-2xl font-bold mb-6 text-success">AFTER</p>
+            <div className="rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-8">
+              <h3 className="text-2xl font-bold mb-6 text-center">With GroomRoute</h3>
 
-              <ul className="space-y-4">
-                <li className="flex gap-3 items-start">
-                  <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-1" />
-                  <span>Predictable</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-1" />
-                  <span>Efficient</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-1" />
-                  <span>Customers calm</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-1" />
-                  <span>You calm</span>
-                </li>
-                <li className="flex gap-3 items-start">
-                  <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-1" />
-                  <span>Your day makes sense</span>
-                </li>
-              </ul>
+              <div className="space-y-3">
+                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
+                  <p className="text-sm text-gray-700">Routes optimized instantly with one tap</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
+                  <p className="text-sm text-gray-700">Customers automatically informed of accurate ETAs</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
+                  <p className="text-sm text-gray-700">Running late? One tap updates everyone automatically</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
+                  <p className="text-sm text-gray-700">Skip stops, rebuild schedules - all instantly handled</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
+                  <p className="text-sm text-gray-700">Stay calm and in control throughout your day</p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex items-center gap-2 justify-center">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                <p className="text-sm text-gray-600">Result: calmer ops, cleaner data, fewer escalations.</p>
+              </div>
             </div>
           </div>
         </div>
