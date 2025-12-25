@@ -28,6 +28,12 @@ export default function Home() {
             <Link href="#features" className="link link-hover">
               Features
             </Link>
+            <Link href="#before-after" className="link link-hover">
+              Before/After
+            </Link>
+            <Link href="#testimonials" className="link link-hover">
+              Testimonials
+            </Link>
             <Link href="#pricing" className="link link-hover">
               Pricing
             </Link>
@@ -55,10 +61,10 @@ export default function Home() {
       </header>
 
       {/* HERO */}
-      <section className="hero bg-base-200 py-20">
+      <section className="hero bg-base-200 py-8">
         <div className="hero-content max-w-6xl w-full">
           <div className="text-center w-full">
-            <div className="flex justify-center mb-10">
+            <div className="flex justify-center mb-8">
               <Image
                 src="/images/hero-groomroute.png"
                 alt="GroomRoute - Mobile grooming route optimization"
@@ -86,7 +92,7 @@ export default function Home() {
       </section>
 
       {/* ONE-TAP PHILOSOPHY */}
-      <section className="py-24 px-6 bg-base-100">
+      <section className="py-12 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-4 text-center">
             Built for life in a grooming van — not an office.
@@ -130,7 +136,7 @@ export default function Home() {
       </section>
 
       {/* BEFORE / AFTER */}
-      <section className="py-20 px-6 bg-base-100">
+      <section id="before-after" className="py-12 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12">
             {/* BEFORE */}
@@ -186,7 +192,7 @@ export default function Home() {
 
               <div className="mt-6 flex items-center gap-2 justify-center">
                 <XCircle className="w-5 h-5 text-red-500" />
-                <p className="text-sm text-gray-600">Result: ending the day exhausted</p>
+                <p className="text-base font-bold text-gray-700">Result: Ending the day exhausted</p>
               </div>
             </div>
 
@@ -243,7 +249,7 @@ export default function Home() {
 
               <div className="mt-6 flex items-center gap-2 justify-center">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <p className="text-sm text-gray-600">Result: ending the day proud and in control</p>
+                <p className="text-base font-bold text-gray-700">Result: Ending the day proud and in control</p>
               </div>
             </div>
           </div>
@@ -251,7 +257,7 @@ export default function Home() {
       </section>
 
       {/* FEATURES - ONE TAP LIFESAVERS */}
-      <section className="py-24 px-6 bg-base-100" id="features">
+      <section className="py-12 px-6 bg-base-100" id="features">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold mb-4">
@@ -332,12 +338,34 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS - EMOTIONAL */}
-      <section className="py-24 px-6 bg-base-100">
+      <section id="testimonials" className="py-12 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-5xl font-bold mb-4">
               Calmer days. Real results.
             </h2>
+          </div>
+
+          {/* Video Testimonials Placeholder */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="aspect-video bg-base-300 rounded-xl flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-4xl mb-2">▶</div>
+                <p className="text-sm opacity-70">Video Testimonial 1</p>
+              </div>
+            </div>
+            <div className="aspect-video bg-base-300 rounded-xl flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-4xl mb-2">▶</div>
+                <p className="text-sm opacity-70">Video Testimonial 2</p>
+              </div>
+            </div>
+            <div className="aspect-video bg-base-300 rounded-xl flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-4xl mb-2">▶</div>
+                <p className="text-sm opacity-70">Video Testimonial 3</p>
+              </div>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -397,10 +425,9 @@ export default function Home() {
       </section>
 
       {/* PRICING */}
-      <section className="py-24 px-6 bg-base-200" id="pricing">
+      <section className="py-12 px-6 bg-base-200" id="pricing">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="badge badge-primary badge-lg mb-4">PRICING</div>
+          <div className="text-center mb-12">
             <h2 className="text-5xl font-bold mb-4">
               Choose your calm
             </h2>
@@ -537,7 +564,7 @@ export default function Home() {
       </section>
 
       {/* OUR PROMISE */}
-      <section className="py-20 px-6 bg-base-100">
+      <section className="py-12 px-6 bg-base-100">
         <div className="max-w-3xl mx-auto">
           <div className="card bg-gradient-to-br from-success/10 to-success/5 border-2 border-success/20 shadow-xl">
             <div className="card-body text-center">
