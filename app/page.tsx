@@ -199,7 +199,7 @@ export default function Home() {
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Customers asking &ldquo;Where are you?&rdquo;</span>
+                    <span>Customers asking &quot;Where are you?&quot;</span>
                   </p>
                 </div>
 
@@ -309,7 +309,7 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &ldquo;Optimize Route&rdquo; - Your day makes sense.
+                      One tap: &quot;Optimize Route&quot; - Your day makes sense.
                     </h3>
                     <p className="text-lg opacity-90">
                       No manual planning. No guessing. GroomRoute reorders your stops by location - saving you 45-90 minutes every single day.
@@ -334,7 +334,7 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &ldquo;Running Late&rdquo; - Everyone instantly knows.
+                      One tap: &quot;Running Late&quot; - Everyone instantly knows.
                     </h3>
                     <p className="text-lg opacity-90">
                       No typing. No juggling messages. GroomRoute recalculates and informs customers for you - so you can keep working.
@@ -359,7 +359,7 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &ldquo;Start Driving&rdquo; - Navigation opens instantly.
+                      One tap: &quot;Start Driving&quot; - Navigation opens instantly.
                     </h3>
                     <p className="text-lg opacity-90">
                       No copying addresses. No app switching. Your entire route loads in Google Maps or Apple Maps - ready to go.
@@ -452,7 +452,7 @@ export default function Home() {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <p className="text-lg mb-4">
-                  &ldquo;I don&apos;t stress about being behind anymore.&rdquo;
+                  &quot;I don&apos;t stress about being behind anymore.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -465,7 +465,7 @@ export default function Home() {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <p className="text-lg mb-4">
-                  &ldquo;I finish the day feeling in control.&rdquo;
+                  &quot;I finish the day feeling in control.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -478,7 +478,7 @@ export default function Home() {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <p className="text-lg mb-4">
-                  &ldquo;This is the first software built like we actually work.&rdquo;
+                  &quot;This is the first software built like we actually work.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -491,7 +491,7 @@ export default function Home() {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <p className="text-lg mb-4">
-                  &ldquo;My whole day changed. Less chaos, more money.&rdquo;
+                  &quot;My whole day changed. Less chaos, more money.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -513,7 +513,7 @@ export default function Home() {
             </h2>
 
             {/* Pricing Toggle */}
-            <div className="flex justify-center items-center gap-4 mt-8">
+            <div className="flex justify-center items-center gap-4 mt-8 p-4 border-2 border-base-300 rounded-lg bg-base-100 inline-flex mx-auto">
               <span className={`text-lg font-medium ${!isYearly ? 'text-primary' : 'opacity-60'}`}>Monthly</span>
               <input
                 type="checkbox"
