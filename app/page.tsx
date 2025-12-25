@@ -56,25 +56,25 @@ export default function Home() {
 
       {/* HERO */}
       <section className="hero bg-base-200 py-20">
-        <div className="hero-content max-w-4xl">
+        <div className="hero-content max-w-5xl">
           <div className="text-center">
             <h1 className="text-5xl lg:text-6xl font-bold mb-4">
               Run your grooming day with one tap.
             </h1>
-            <p className="text-sm font-semibold text-primary mb-6">Save up to 90 minutes per day without changing your routine</p>
-            <p className="text-xl mb-8 leading-relaxed max-w-2xl mx-auto">
-              Optimize your route, keep customers informed, and stay calm — even when things change.
-            </p>
+            <p className="text-sm font-semibold text-primary mb-8">Save up to 90 minutes per day without changing your routine</p>
             <div className="flex justify-center mb-8">
               <Image
                 src="/images/hero-groomroute.png"
                 alt="GroomRoute - Mobile grooming route optimization"
-                width={500}
-                height={500}
-                className="rounded-lg"
+                width={800}
+                height={800}
+                className="rounded-lg w-full max-w-3xl"
                 priority
               />
             </div>
+            <p className="text-xl mb-8 leading-relaxed max-w-2xl mx-auto">
+              Optimize your route, keep customers informed, and stay calm — even when things change.
+            </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
               <Link href="/auth/signup" className="btn btn-gradient btn-lg">
                 Start Free Trial
