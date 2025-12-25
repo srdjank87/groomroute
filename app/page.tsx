@@ -73,9 +73,9 @@ export default function Home() {
               <Image
                 src="/images/hero-groomroute.png"
                 alt="GroomRoute - Mobile grooming route optimization"
-                width={1000}
-                height={1000}
-                className="rounded-lg w-full max-w-4xl"
+                width={1200}
+                height={1200}
+                className="rounded-lg w-full max-w-5xl"
                 priority
               />
             </div>
@@ -150,7 +150,7 @@ export default function Home() {
 
               <div className="mb-6">
                 <Image
-                  src="/images/groom-before.jpg"
+                  src="/images/groom-before.png"
                   alt="Before GroomRoute - Stressed mobile groomer"
                   width={400}
                   height={300}
@@ -207,7 +207,7 @@ export default function Home() {
 
               <div className="mb-6">
                 <Image
-                  src="/images/groom-after.jpg"
+                  src="/images/groom-after.png"
                   alt="With GroomRoute - Happy mobile groomer"
                   width={400}
                   height={300}
@@ -631,13 +631,28 @@ export default function Home() {
               <p className="text-lg mb-2">
                 If GroomRoute doesn&apos;t make your days calmer and more profitable within the first few weeks…
               </p>
-              <p className="text-2xl font-bold mb-4" style={{ color: '#A5744A' }}>
+              <p className="text-2xl font-bold mb-4 text-base-content">
                 you shouldn&apos;t pay for it.
               </p>
               <p className="text-sm opacity-80">
                 No contracts. Cancel anytime.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* END IMAGE */}
+      <section className="py-12 px-6 bg-base-200">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-center">
+            <Image
+              src="/images/end-image.jpg"
+              alt="GroomRoute - Making your grooming day easier"
+              width={1200}
+              height={600}
+              className="rounded-lg w-full max-w-5xl"
+            />
           </div>
         </div>
       </section>
