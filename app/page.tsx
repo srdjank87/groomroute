@@ -277,7 +277,7 @@ export default function Home() {
                 <div className="flex flex-col lg:flex-row gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/optimize-route.jpg"
+                      src="/images/optimize-route.png"
                       alt="Optimize Route"
                       width={400}
                       height={300}
@@ -352,7 +352,7 @@ export default function Home() {
                 <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/fill-cancellation.jpg"
+                      src="/images/fill-cancellation.png"
                       alt="Fill Cancellation"
                       width={400}
                       height={300}
