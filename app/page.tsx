@@ -332,7 +332,7 @@ export default function Home() {
                       One tap: &ldquo;Running Late&rdquo; - Everyone instantly knows.
                     </h3>
                     <p className="text-lg opacity-90">
-                      No typing. No juggling messages. GroomRoute recalculates and informs customers for you — so you can keep working.
+                      No typing. No juggling messages. GroomRoute recalculates and informs customers for you - so you can keep working.
                     </p>
                   </div>
                 </div>
@@ -357,7 +357,7 @@ export default function Home() {
                       One tap: &ldquo;Start Driving&rdquo; - Navigation opens instantly.
                     </h3>
                     <p className="text-lg opacity-90">
-                      No copying addresses. No app switching. Your entire route loads in Google Maps or Apple Maps — ready to go.
+                      No copying addresses. No app switching. Your entire route loads in Google Maps or Apple Maps - ready to go.
                     </p>
                   </div>
                 </div>
