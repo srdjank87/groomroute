@@ -642,38 +642,34 @@ export default function Home() {
         </div>
       </section>
 
-      {/* END IMAGE */}
-      <section className="py-12 px-6 bg-base-200">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-center">
-            <Image
-              src="/images/end-image.jpg"
-              alt="GroomRoute - Making your grooming day easier"
-              width={1200}
-              height={600}
-              className="rounded-lg w-full max-w-5xl"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* FINAL CTA */}
+      {/* FINAL CTA WITH IMAGE */}
       <section className="py-20 px-6 bg-base-100">
-        <div className="max-w-4xl mx-auto">
-          <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl">
-            <div className="card-body items-center text-center">
-              <h2 className="card-title text-4xl mb-4">
-                Ready for calmer, more profitable days?
-              </h2>
-              <p className="text-lg mb-6">
-                One tap. Your whole day changes.
-              </p>
-              <div className="card-actions">
-                <Link href="/auth/signup" className="btn btn-gradient btn-lg">
-                  Start Free Trial
-                </Link>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl">
+              <div className="card-body items-center text-center">
+                <h2 className="card-title text-4xl mb-4">
+                  Ready for calmer, more profitable days?
+                </h2>
+                <p className="text-lg mb-6">
+                  One tap. Your whole day changes.
+                </p>
+                <div className="card-actions">
+                  <Link href="/auth/signup" className="btn btn-gradient btn-lg">
+                    Start Free Trial
+                  </Link>
+                </div>
+                <p className="text-sm opacity-70 mt-4">No credit card required. Cancel anytime.</p>
               </div>
-              <p className="text-sm opacity-70 mt-4">No credit card required. Cancel anytime.</p>
+            </div>
+            <div className="flex justify-center">
+              <Image
+                src="/images/end-image.jpg"
+                alt="GroomRoute - Making your grooming day easier"
+                width={600}
+                height={400}
+                className="rounded-lg w-full max-w-lg"
+              />
             </div>
           </div>
         </div>
