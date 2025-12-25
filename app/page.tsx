@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Zap, MessageSquare, XCircle, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
 
 const GroomRoute = () => (
   <span>GroomRoute</span>
@@ -11,6 +14,8 @@ const GroomRouteLogo = () => (
 );
 
 export default function Home() {
+  const [isYearly, setIsYearly] = useState(false);
+
   return (
     <main>
       {/* HEADER */}
@@ -506,6 +511,20 @@ export default function Home() {
             <h2 className="text-5xl font-bold mb-4">
               Choose your calm
             </h2>
+
+            {/* Pricing Toggle */}
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <span className={`text-lg font-medium ${!isYearly ? 'text-primary' : 'opacity-60'}`}>Monthly</span>
+              <input
+                type="checkbox"
+                className="toggle toggle-primary"
+                checked={isYearly}
+                onChange={() => setIsYearly(!isYearly)}
+              />
+              <span className={`text-lg font-medium ${isYearly ? 'text-primary' : 'opacity-60'}`}>
+                Yearly <span className="badge badge-success badge-sm ml-1">Save up to 20%</span>
+              </span>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -514,9 +533,10 @@ export default function Home() {
               <div className="card-body">
                 <div className="badge badge-neutral mb-2">STARTER</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">$99</span>
-                  <span className="text-sm opacity-70">/month</span>
+                  <span className="text-4xl font-bold">${isYearly ? '950' : '99'}</span>
+                  <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
+                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$79/month billed annually</div>}
 
                 <p className="text-sm mb-4 italic opacity-80">
                   Make your day make sense
@@ -544,7 +564,6 @@ export default function Home() {
                     Start my calm day
                   </Link>
                 </div>
-                <div className="text-sm text-center opacity-70 mt-2">or $950/year</div>
               </div>
             </div>
 
@@ -554,9 +573,10 @@ export default function Home() {
                 <div className="badge badge-secondary mb-2">MOST POPULAR</div>
                 <div className="badge badge-neutral mb-2 text-neutral-content">GROWTH</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">$179</span>
-                  <span className="text-sm opacity-90">/month</span>
+                  <span className="text-4xl font-bold">${isYearly ? '1,700' : '179'}</span>
+                  <span className="text-sm opacity-90">/{isYearly ? 'year' : 'month'}</span>
                 </div>
+                {isYearly && <div className="text-xs opacity-90 -mt-3 mb-2">$142/month billed annually</div>}
 
                 <p className="text-sm mb-4 italic opacity-90">
                   Automation + calm days
@@ -584,7 +604,6 @@ export default function Home() {
                     Make my day easier
                   </Link>
                 </div>
-                <div className="text-sm text-center opacity-90 mt-2">or $1,700/year</div>
               </div>
             </div>
 
@@ -593,9 +612,10 @@ export default function Home() {
               <div className="card-body">
                 <div className="badge badge-neutral mb-2">PRO</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">$279</span>
-                  <span className="text-sm opacity-70">/month</span>
+                  <span className="text-4xl font-bold">${isYearly ? '2,650' : '279'}</span>
+                  <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
+                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$221/month billed annually</div>}
 
                 <p className="text-sm mb-4 italic opacity-80">
                   Maximize utilization without stress
@@ -624,7 +644,6 @@ export default function Home() {
                     Show me my better route
                   </Link>
                 </div>
-                <div className="text-sm text-center opacity-70 mt-2">or $2,650/year</div>
               </div>
             </div>
           </div>
