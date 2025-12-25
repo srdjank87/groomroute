@@ -517,7 +517,7 @@ export default function Home() {
               <span className={`text-lg font-medium ${!isYearly ? 'text-primary' : 'opacity-60'}`}>Monthly</span>
               <input
                 type="checkbox"
-                className="toggle toggle-primary"
+                className="toggle toggle-primary border-2 border-base-300"
                 checked={isYearly}
                 onChange={() => setIsYearly(!isYearly)}
               />
