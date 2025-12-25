@@ -82,7 +82,7 @@ export default function Home() {
             <h1 className="text-5xl lg:text-6xl font-bold mb-4">
               Run your grooming day with one tap.
             </h1>
-            <p className="text-sm font-semibold mb-8" style={{ color: '#A5744A' }}>Save up to 90 minutes per day without changing your routine</p>
+            <p className="text-sm font-semibold mb-8 text-blue-600">Save up to 90 minutes per day without changing your routine</p>
             <p className="text-xl mb-8 leading-relaxed max-w-2xl mx-auto">
               Optimize your route, keep customers informed, and stay calm — even when things change.
             </p>
@@ -109,8 +109,8 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(165, 116, 74, 0.1)' }}>
-                  <MapPin className="w-8 h-8" style={{ color: '#A5744A' }} />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center bg-base-300">
+                  <MapPin className="w-8 h-8 text-base-content" />
                 </div>
               </div>
               <h3 className="text-xl font-bold mb-2">One tap to plan your day</h3>
@@ -119,8 +119,8 @@ export default function Home() {
 
             <div className="text-center">
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(165, 116, 74, 0.1)' }}>
-                  <Zap className="w-8 h-8" style={{ color: '#A5744A' }} />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center bg-base-300">
+                  <Zap className="w-8 h-8 text-base-content" />
                 </div>
               </div>
               <h3 className="text-xl font-bold mb-2">One tap when things go wrong</h3>
@@ -129,8 +129,8 @@ export default function Home() {
 
             <div className="text-center">
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(165, 116, 74, 0.1)' }}>
-                  <MessageSquare className="w-8 h-8" style={{ color: '#A5744A' }} />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center bg-base-300">
+                  <MessageSquare className="w-8 h-8 text-base-content" />
                 </div>
               </div>
               <h3 className="text-xl font-bold mb-2">One tap to stay in control</h3>
@@ -323,19 +323,19 @@ export default function Home() {
       </section>
 
       {/* PROOF BAR */}
-      <section className="py-12 px-6" style={{ background: 'linear-gradient(to right, rgba(165, 116, 74, 0.1), rgba(165, 116, 74, 0.05))' }}>
+      <section className="py-12 px-6 bg-base-200">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold mb-2" style={{ color: '#A5744A' }}>45–90 mins/day</div>
+              <div className="text-4xl font-bold mb-2">45–90 mins/day</div>
               <p className="text-sm opacity-80">Time saved</p>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2" style={{ color: '#A5744A' }}>$200–$400/month</div>
+              <div className="text-4xl font-bold mb-2">$200–$400/month</div>
               <p className="text-sm opacity-80">Revenue recovered</p>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2" style={{ color: '#A5744A' }}>80% reduction</div>
+              <div className="text-4xl font-bold mb-2">80% reduction</div>
               <p className="text-sm opacity-80">In stress calls</p>
             </div>
           </div>
@@ -479,7 +479,7 @@ export default function Home() {
             </div>
 
             {/* Growth - POPULAR */}
-            <div className="card shadow-2xl border-4 transform scale-105" style={{ backgroundColor: '#A5744A', color: 'white', borderColor: '#A5744A' }}>
+            <div className="card shadow-2xl border-4 transform scale-105" style={{ backgroundColor: '#3b82f6', color: 'white', borderColor: '#3b82f6' }}>
               <div className="card-body">
                 <div className="badge badge-secondary mb-2">MOST POPULAR</div>
                 <div className="badge badge-neutral mb-2 text-neutral-content">GROWTH</div>
