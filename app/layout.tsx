@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "GroomRoute - Smart Routing for Mobile Pet Groomers",
   description: "Optimize your grooming routes, reduce drive time, and serve more clients with GroomRoute.",
+  icons: {
+    icon: "/images/icon.svg",
+  },
 };
 
 export default function RootLayout({

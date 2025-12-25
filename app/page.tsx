@@ -17,11 +17,16 @@ export default function Home() {
       <header className="border-b border-base-300 bg-base-100">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
-              <span className="font-bold text-lg">
-                <GroomRouteLogo />
-              </span>
-            </div>
+            <Image
+              src="/images/icon.svg"
+              alt="GroomRoute"
+              width={32}
+              height={32}
+              className="w-8 h-8"
+            />
+            <span className="font-bold text-lg">
+              <GroomRouteLogo />
+            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm">
