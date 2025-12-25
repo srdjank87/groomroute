@@ -271,51 +271,103 @@ export default function Home() {
           </div>
 
           <div className="space-y-12">
-            {/* Feature 1 */}
+            {/* Feature 1 - Image Left */}
             <div className="card bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 shadow-xl">
               <div className="card-body">
-                <h3 className="text-2xl font-bold mb-3">
-                  One tap: &ldquo;Optimize Route&rdquo; → Your day makes sense.
-                </h3>
-                <p className="text-lg opacity-90">
-                  No manual planning. No guessing. GroomRoute reorders your stops by location — saving you 45-90 minutes every single day.
-                </p>
+                <div className="flex flex-col lg:flex-row gap-6 items-center">
+                  <div className="lg:w-1/3">
+                    <Image
+                      src="/images/optimize-route.jpg"
+                      alt="Optimize Route"
+                      width={400}
+                      height={300}
+                      className="rounded-lg w-full"
+                    />
+                  </div>
+                  <div className="lg:w-2/3">
+                    <h3 className="text-2xl font-bold mb-3">
+                      One tap: &ldquo;Optimize Route&rdquo; → Your day makes sense.
+                    </h3>
+                    <p className="text-lg opacity-90">
+                      No manual planning. No guessing. GroomRoute reorders your stops by location — saving you 45-90 minutes every single day.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Feature 2 */}
+            {/* Feature 2 - Image Right */}
             <div className="card bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 shadow-xl">
               <div className="card-body">
-                <h3 className="text-2xl font-bold mb-3">
-                  One tap: &ldquo;Running Late&rdquo; → Everyone instantly knows.
-                </h3>
-                <p className="text-lg opacity-90">
-                  No typing. No juggling messages. GroomRoute recalculates and informs customers for you — so you can keep working.
-                </p>
+                <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
+                  <div className="lg:w-1/3">
+                    <Image
+                      src="/images/running-late.jpg"
+                      alt="Running Late"
+                      width={400}
+                      height={300}
+                      className="rounded-lg w-full"
+                    />
+                  </div>
+                  <div className="lg:w-2/3">
+                    <h3 className="text-2xl font-bold mb-3">
+                      One tap: &ldquo;Running Late&rdquo; → Everyone instantly knows.
+                    </h3>
+                    <p className="text-lg opacity-90">
+                      No typing. No juggling messages. GroomRoute recalculates and informs customers for you — so you can keep working.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Feature 3 */}
+            {/* Feature 3 - Image Left */}
             <div className="card bg-gradient-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-200 shadow-xl">
               <div className="card-body">
-                <h3 className="text-2xl font-bold mb-3">
-                  One tap: &ldquo;Start Driving&rdquo; → Navigation opens instantly.
-                </h3>
-                <p className="text-lg opacity-90">
-                  No copying addresses. No app switching. Your entire route loads in Google Maps or Apple Maps — ready to go.
-                </p>
+                <div className="flex flex-col lg:flex-row gap-6 items-center">
+                  <div className="lg:w-1/3">
+                    <Image
+                      src="/images/start-driving.jpg"
+                      alt="Start Driving"
+                      width={400}
+                      height={300}
+                      className="rounded-lg w-full"
+                    />
+                  </div>
+                  <div className="lg:w-2/3">
+                    <h3 className="text-2xl font-bold mb-3">
+                      One tap: &ldquo;Start Driving&rdquo; → Navigation opens instantly.
+                    </h3>
+                    <p className="text-lg opacity-90">
+                      No copying addresses. No app switching. Your entire route loads in Google Maps or Apple Maps — ready to go.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Feature 4 */}
+            {/* Feature 4 - Image Right */}
             <div className="card bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 shadow-xl">
               <div className="card-body">
-                <h3 className="text-2xl font-bold mb-3">
-                  One tap: Fill cancellation gaps automatically.
-                </h3>
-                <p className="text-lg opacity-90">
-                  Last-minute cancellation? GroomRoute finds nearby customers on your waitlist and offers them the slot. Recover $200-400/month you&apos;d otherwise lose.
-                </p>
+                <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
+                  <div className="lg:w-1/3">
+                    <Image
+                      src="/images/fill-cancellation.jpg"
+                      alt="Fill Cancellation"
+                      width={400}
+                      height={300}
+                      className="rounded-lg w-full"
+                    />
+                  </div>
+                  <div className="lg:w-2/3">
+                    <h3 className="text-2xl font-bold mb-3">
+                      One tap: Fill cancellation gaps automatically.
+                    </h3>
+                    <p className="text-lg opacity-90">
+                      Last-minute cancellation? GroomRoute finds nearby customers on your waitlist and offers them the slot. Recover $200-400/month you&apos;d otherwise lose.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
