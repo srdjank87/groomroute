@@ -56,22 +56,22 @@ export default function Home() {
 
       {/* HERO */}
       <section className="hero bg-base-200 py-20">
-        <div className="hero-content max-w-5xl">
-          <div className="text-center">
+        <div className="hero-content max-w-6xl w-full">
+          <div className="text-center w-full">
+            <div className="flex justify-center mb-10">
+              <Image
+                src="/images/hero-groomroute.png"
+                alt="GroomRoute - Mobile grooming route optimization"
+                width={1000}
+                height={1000}
+                className="rounded-lg w-full max-w-4xl"
+                priority
+              />
+            </div>
             <h1 className="text-5xl lg:text-6xl font-bold mb-4">
               Run your grooming day with one tap.
             </h1>
             <p className="text-sm font-semibold text-primary mb-8">Save up to 90 minutes per day without changing your routine</p>
-            <div className="flex justify-center mb-8">
-              <Image
-                src="/images/hero-groomroute.png"
-                alt="GroomRoute - Mobile grooming route optimization"
-                width={800}
-                height={800}
-                className="rounded-lg w-full max-w-3xl"
-                priority
-              />
-            </div>
             <p className="text-xl mb-8 leading-relaxed max-w-2xl mx-auto">
               Optimize your route, keep customers informed, and stay calm — even when things change.
             </p>
@@ -139,7 +139,7 @@ export default function Home() {
 
               <div className="space-y-3">
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Ops constantly checks Shopify, inbox, and spreadsheets</p>
+                  <p className="text-sm text-gray-700">Constantly behind schedule</p>
                 </div>
 
                 <div className="flex justify-center">
@@ -147,7 +147,7 @@ export default function Home() {
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Every edit, cancel, or tag change triggers re-downloads and rework</p>
+                  <p className="text-sm text-gray-700">Guessing arrival times</p>
                 </div>
 
                 <div className="flex justify-center">
@@ -155,7 +155,7 @@ export default function Home() {
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Address fixes and SKU issues surface too late - inside the WMS</p>
+                  <p className="text-sm text-gray-700">Customers asking &ldquo;Where are you?&rdquo;</p>
                 </div>
 
                 <div className="flex justify-center">
@@ -163,7 +163,7 @@ export default function Home() {
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Virtual bundles and missing SKU data break fulfillment flows</p>
+                  <p className="text-sm text-gray-700">Routes that don&rsquo;t make sense</p>
                 </div>
 
                 <div className="flex justify-center">
@@ -171,7 +171,15 @@ export default function Home() {
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Peak volume turns small changes into operational fires</p>
+                  <p className="text-sm text-gray-700">Cancellations hurt your income</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
+                  <p className="text-sm text-gray-700">Ending the day exhausted</p>
                 </div>
               </div>
 
@@ -187,7 +195,7 @@ export default function Home() {
 
               <div className="space-y-3">
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Routes optimized instantly with one tap</p>
+                  <p className="text-sm text-gray-700">Calm, predictable days</p>
                 </div>
 
                 <div className="flex justify-center">
@@ -195,7 +203,7 @@ export default function Home() {
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Customers automatically informed of accurate ETAs</p>
+                  <p className="text-sm text-gray-700">Clear ETAs for every stop</p>
                 </div>
 
                 <div className="flex justify-center">
@@ -203,7 +211,7 @@ export default function Home() {
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Running late? One tap updates everyone automatically</p>
+                  <p className="text-sm text-gray-700">Customers always in the loop</p>
                 </div>
 
                 <div className="flex justify-center">
@@ -211,7 +219,7 @@ export default function Home() {
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Skip stops, rebuild schedules - all instantly handled</p>
+                  <p className="text-sm text-gray-700">Smart routes that just work</p>
                 </div>
 
                 <div className="flex justify-center">
@@ -219,7 +227,15 @@ export default function Home() {
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Stay calm and in control throughout your day</p>
+                  <p className="text-sm text-gray-700">More filled appointments, more income</p>
+                </div>
+
+                <div className="flex justify-center">
+                  <span className="text-gray-400">↓</span>
+                </div>
+
+                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
+                  <p className="text-sm text-gray-700">Ending the day proud and in control</p>
                 </div>
               </div>
 
