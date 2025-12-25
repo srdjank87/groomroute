@@ -137,55 +137,56 @@ export default function Home() {
             <div className="rounded-3xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-pink-50 p-8">
               <h3 className="text-2xl font-bold mb-6 text-center">Before GroomRoute</h3>
 
+              <div className="mb-6">
+                <Image
+                  src="/images/groom-before.jpg"
+                  alt="Before GroomRoute - Stressed mobile groomer"
+                  width={400}
+                  height={300}
+                  className="rounded-xl w-full"
+                />
+              </div>
+
               <div className="space-y-3">
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Constantly behind schedule</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
-                </div>
-
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Guessing arrival times</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    <span>Constantly behind schedule</span>
+                  </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Customers asking &ldquo;Where are you?&rdquo;</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
-                </div>
-
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Routes that don&rsquo;t make sense</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    <span>Guessing arrival times</span>
+                  </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Cancellations hurt your income</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    <span>Customers asking &ldquo;Where are you?&rdquo;</span>
+                  </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-sm text-gray-700">Ending the day exhausted</p>
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    <span>Routes that don&rsquo;t make sense</span>
+                  </p>
+                </div>
+
+                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    <span>Cancellations hurt your income</span>
+                  </p>
                 </div>
               </div>
 
               <div className="mt-6 flex items-center gap-2 justify-center">
                 <XCircle className="w-5 h-5 text-red-500" />
-                <p className="text-sm text-gray-600">Result: constant noise, rushed fixes, avoidable mistakes.</p>
+                <p className="text-sm text-gray-600">Result: ending the day exhausted</p>
               </div>
             </div>
 
@@ -193,55 +194,56 @@ export default function Home() {
             <div className="rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-8">
               <h3 className="text-2xl font-bold mb-6 text-center">With GroomRoute</h3>
 
+              <div className="mb-6">
+                <Image
+                  src="/images/groom-after.jpg"
+                  alt="With GroomRoute - Happy mobile groomer"
+                  width={400}
+                  height={300}
+                  className="rounded-xl w-full"
+                />
+              </div>
+
               <div className="space-y-3">
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Calm, predictable days</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
-                </div>
-
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Clear ETAs for every stop</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    <span>Calm, predictable days</span>
+                  </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Customers always in the loop</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
-                </div>
-
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Smart routes that just work</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    <span>Clear ETAs for every stop</span>
+                  </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">More filled appointments, more income</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <span className="text-gray-400">↓</span>
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    <span>Customers always in the loop</span>
+                  </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-sm text-gray-700">Ending the day proud and in control</p>
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    <span>Smart routes that just work</span>
+                  </p>
+                </div>
+
+                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
+                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    <span>More filled appointments, more income</span>
+                  </p>
                 </div>
               </div>
 
               <div className="mt-6 flex items-center gap-2 justify-center">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <p className="text-sm text-gray-600">Result: calmer ops, cleaner data, fewer escalations.</p>
+                <p className="text-sm text-gray-600">Result: ending the day proud and in control</p>
               </div>
             </div>
           </div>
