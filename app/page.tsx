@@ -99,6 +99,12 @@ export default function Home() {
               </Link>
             </div>
             <p className="text-sm opacity-70">No credit card • Setup in minutes • Works on your phone</p>
+            <p className="text-sm opacity-60 mt-4">
+              Prefer to talk to a real human first?{" "}
+              <Link href="/book-demo" className="link link-hover underline">
+                Book a 15-minute friendly walkthrough →
+              </Link>
+            </p>
           </div>
         </div>
       </section>
