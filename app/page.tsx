@@ -65,11 +65,12 @@ export default function Home() {
         </div>
       </header>
 
-      {/* HERO */}
+      {/* HERO - Desktop: Image above text, Mobile: Text first */}
       <section className="hero bg-base-200 py-8">
         <div className="hero-content max-w-6xl w-full">
           <div className="text-center w-full">
-            <div className="flex justify-center mb-8">
+            {/* Desktop: Show image above headline */}
+            <div className="hidden lg:flex justify-center mb-8">
               <Image
                 src="/images/hero-groomroute.png"
                 alt="GroomRoute - Mobile grooming route optimization"
@@ -79,6 +80,7 @@ export default function Home() {
                 priority
               />
             </div>
+
             <h1 className="text-5xl lg:text-6xl font-bold mb-4">
               Run your grooming day with one tap.
             </h1>
@@ -92,6 +94,22 @@ export default function Home() {
               </Link>
             </div>
             <p className="text-sm opacity-70">No credit card • Setup in minutes • Works on your phone</p>
+          </div>
+        </div>
+      </section>
+
+      {/* MOBILE HERO IMAGE - Only visible on mobile, placed after hero text */}
+      <section className="lg:hidden bg-base-200 pb-8 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-center">
+            <Image
+              src="/images/hero-groomroute-mobile.png"
+              alt="GroomRoute - Mobile grooming route optimization"
+              width={800}
+              height={800}
+              className="rounded-lg w-full"
+              priority
+            />
           </div>
         </div>
       </section>
