@@ -66,7 +66,7 @@ export default function Home() {
       </header>
 
       {/* HERO - Desktop: Image above text, Mobile: Text first */}
-      <section className="hero bg-base-200 py-8">
+      <section className="hero bg-base-200 py-8 lg:py-8">
         <div className="hero-content max-w-6xl w-full">
           <div className="text-center w-full">
             {/* Desktop: Show image above headline */}
@@ -85,8 +85,8 @@ export default function Home() {
               Run your grooming day with one tap.
             </h1>
             <p className="text-sm font-semibold mb-8 text-blue-600">Save up to 90 minutes per day without changing your routine</p>
-            <p className="text-xl mb-8 leading-relaxed max-w-2xl mx-auto">
-              Optimize your route, keep customers informed, and stay calm — even when things change.
+            <p className="text-xl mb-12 lg:mb-8 leading-relaxed max-w-2xl mx-auto">
+              Optimize your route, keep customers informed, and stay calm - even when things change.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
               <Link href="/auth/signup" className="btn btn-gradient btn-lg">
@@ -99,7 +99,7 @@ export default function Home() {
       </section>
 
       {/* MOBILE HERO IMAGE - Only visible on mobile, placed after hero text */}
-      <section className="lg:hidden bg-base-200 pb-8 px-6">
+      <section className="lg:hidden bg-base-200 pb-6 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-center">
             <Image
@@ -115,10 +115,10 @@ export default function Home() {
       </section>
 
       {/* ONE-TAP PHILOSOPHY */}
-      <section className="py-12 px-6 bg-base-100">
+      <section className="py-8 lg:py-12 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-4 text-center">
-            Built for life in a grooming van — not an office.
+            Built for life in a grooming van - not an office.
           </h2>
           <p className="text-center text-lg opacity-70 mb-16 max-w-2xl mx-auto">
             You work in noise, motion, and time pressure. GroomRoute is the fast, calm control center you need.
@@ -152,14 +152,14 @@ export default function Home() {
                 </div>
               </div>
               <h3 className="text-xl font-bold mb-2">One tap to stay in control</h3>
-              <p className="text-base opacity-80">Start navigation, skip stops, rebuild schedules — instantly.</p>
+              <p className="text-base opacity-80">Start navigation, skip stops, rebuild schedules - instantly.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* BEFORE / AFTER */}
-      <section id="before-after" className="py-12 px-6 bg-base-100">
+      <section id="before-after" className="py-8 lg:py-12 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12">
             {/* BEFORE */}
@@ -280,7 +280,7 @@ export default function Home() {
       </section>
 
       {/* FEATURES - ONE TAP LIFESAVERS */}
-      <section className="py-12 px-6 bg-base-100" id="features">
+      <section className="py-8 lg:py-12 px-6 bg-base-100" id="features">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold mb-4">
@@ -304,10 +304,10 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &ldquo;Optimize Route&rdquo; → Your day makes sense.
+                      One tap: &ldquo;Optimize Route&rdquo; - Your day makes sense.
                     </h3>
                     <p className="text-lg opacity-90">
-                      No manual planning. No guessing. GroomRoute reorders your stops by location — saving you 45-90 minutes every single day.
+                      No manual planning. No guessing. GroomRoute reorders your stops by location - saving you 45-90 minutes every single day.
                     </p>
                   </div>
                 </div>
@@ -329,7 +329,7 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &ldquo;Running Late&rdquo; → Everyone instantly knows.
+                      One tap: &ldquo;Running Late&rdquo; - Everyone instantly knows.
                     </h3>
                     <p className="text-lg opacity-90">
                       No typing. No juggling messages. GroomRoute recalculates and informs customers for you — so you can keep working.
@@ -354,7 +354,7 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &ldquo;Start Driving&rdquo; → Navigation opens instantly.
+                      One tap: &ldquo;Start Driving&rdquo; - Navigation opens instantly.
                     </h3>
                     <p className="text-lg opacity-90">
                       No copying addresses. No app switching. Your entire route loads in Google Maps or Apple Maps — ready to go.
@@ -393,7 +393,7 @@ export default function Home() {
       </section>
 
       {/* PROOF BAR */}
-      <section className="py-12 px-6 bg-base-200">
+      <section className="py-8 lg:py-12 px-6 bg-base-200">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
@@ -413,7 +413,7 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS - EMOTIONAL */}
-      <section id="testimonials" className="py-12 px-6 bg-base-100">
+      <section id="testimonials" className="py-8 lg:py-12 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-5xl font-bold mb-4">
@@ -500,7 +500,7 @@ export default function Home() {
       </section>
 
       {/* PRICING */}
-      <section className="py-12 px-6 bg-base-200" id="pricing">
+      <section className="py-8 lg:py-12 px-6 bg-base-200" id="pricing">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-5xl font-bold mb-4">
@@ -639,7 +639,7 @@ export default function Home() {
       </section>
 
       {/* OUR PROMISE */}
-      <section className="py-12 px-6 bg-base-100">
+      <section className="py-8 lg:py-12 px-6 bg-base-100">
         <div className="max-w-3xl mx-auto">
           <div className="card bg-gradient-to-br from-success/10 to-success/5 border-2 border-success/20 shadow-xl">
             <div className="card-body text-center">
@@ -661,10 +661,20 @@ export default function Home() {
       </section>
 
       {/* FINAL CTA WITH IMAGE */}
-      <section className="py-20 px-6 bg-base-100">
+      <section className="py-8 lg:py-20 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
-            <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl">
+            {/* Mobile: Image first, Desktop: CTA first */}
+            <div className="flex justify-center lg:order-2">
+              <Image
+                src="/images/end-image.jpg"
+                alt="GroomRoute - Making your grooming day easier"
+                width={600}
+                height={400}
+                className="rounded-lg w-full max-w-lg"
+              />
+            </div>
+            <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl lg:order-1">
               <div className="card-body items-center text-center">
                 <h2 className="card-title text-4xl mb-4">
                   Ready for calmer, more profitable days?
@@ -679,15 +689,6 @@ export default function Home() {
                 </div>
                 <p className="text-sm opacity-70 mt-4">No credit card required. Cancel anytime.</p>
               </div>
-            </div>
-            <div className="flex justify-center">
-              <Image
-                src="/images/end-image.jpg"
-                alt="GroomRoute - Making your grooming day easier"
-                width={600}
-                height={400}
-                className="rounded-lg w-full max-w-lg"
-              />
             </div>
           </div>
         </div>
