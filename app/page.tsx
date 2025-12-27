@@ -93,13 +93,13 @@ export default function Home() {
             <p className="text-xl mb-12 lg:mb-8 leading-relaxed max-w-2xl mx-auto">
               Optimize your route, keep customers informed, and stay calm - even when things change.
             </p>
-            <p className="text-sm font-semibold mb-8 text-blue-600">Save up to 90 minutes per day without changing your routine</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
               <Link href="/auth/signup" className="btn btn-gradient btn-lg">
                 Start Free Trial
               </Link>
             </div>
             <p className="text-sm opacity-70">No credit card • Setup in minutes • Works on your phone</p>
+            <p className="text-sm font-semibold text-blue-600 mt-4">Save up to 90 minutes per day without changing your routine</p>
             <p className="text-sm opacity-60 mt-4">
               Prefer to talk to a real human first?{" "}
               <Link href="/book-demo" className="link link-hover underline">
