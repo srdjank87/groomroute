@@ -89,10 +89,11 @@ export default function Home() {
             <h1 className="text-5xl lg:text-6xl font-bold mb-4">
               Run your grooming day with one tap.
             </h1>
-            <p className="text-sm font-semibold mb-8 text-blue-600">Save up to 90 minutes per day without changing your routine</p>
+            
             <p className="text-xl mb-12 lg:mb-8 leading-relaxed max-w-2xl mx-auto">
               Optimize your route, keep customers informed, and stay calm - even when things change.
             </p>
+            <p className="text-sm font-semibold mb-8 text-blue-600">Save up to 90 minutes per day without changing your routine</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
               <Link href="/auth/signup" className="btn btn-gradient btn-lg">
                 Start Free Trial
@@ -519,7 +520,7 @@ export default function Home() {
             </h2>
 
             {/* Pricing Toggle */}
-            <div className="flex justify-center items-center gap-4 mt-8 p-4 border-2 border-base-300 rounded-lg bg-base-100 inline-flex mx-auto">
+            <div className="justify-center items-center gap-4 mt-8 p-4 border-2 border-base-300 rounded-lg bg-base-100 inline-flex mx-auto">
               <span className={`text-lg font-medium ${!isYearly ? 'text-primary' : 'opacity-60'}`}>Monthly</span>
               <input
                 type="checkbox"
