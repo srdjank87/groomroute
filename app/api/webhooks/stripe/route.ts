@@ -84,9 +84,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Get subscription details
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-  // Extract the period end date
-  const periodEnd = subscription.current_period_end
-    ? new Date((subscription.current_period_end as number) * 1000)
+  // Extract the period end date with type assertion
+  const currentPeriodEnd = (subscription as any).current_period_end;
+  const periodEnd = currentPeriodEnd
+    ? new Date(currentPeriodEnd * 1000)
     : null;
 
   await prisma.account.update({
@@ -127,9 +128,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     status = "INCOMPLETE";
   }
 
-  // Extract the period end date
-  const periodEnd = subscription.current_period_end
-    ? new Date((subscription.current_period_end as number) * 1000)
+  // Extract the period end date with type assertion
+  const currentPeriodEnd = (subscription as any).current_period_end;
+  const periodEnd = currentPeriodEnd
+    ? new Date(currentPeriodEnd * 1000)
     : null;
 
   await prisma.account.update({
@@ -178,9 +180,10 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     return;
   }
 
-  // Extract the period end date
-  const periodEnd = subscription.current_period_end
-    ? new Date((subscription.current_period_end as number) * 1000)
+  // Extract the period end date with type assertion
+  const currentPeriodEnd = (subscription as any).current_period_end;
+  const periodEnd = currentPeriodEnd
+    ? new Date(currentPeriodEnd * 1000)
     : null;
 
   // Update to ACTIVE if payment succeeded after trial
