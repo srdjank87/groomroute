@@ -82,14 +82,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 
   // Get subscription details
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription;
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
   await prisma.account.update({
     where: { id: accountId },
     data: {
       stripeSubscriptionId: subscriptionId,
       subscriptionStatus: "TRIAL",
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd: subscription.current_period_end
+        ? new Date(subscription.current_period_end * 1000)
+        : null,
     },
   });
 
@@ -129,7 +131,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       subscriptionStatus: status,
       subscriptionPlan: plan,
       billingCycle: billing,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd: subscription.current_period_end
+        ? new Date(subscription.current_period_end * 1000)
+        : null,
     },
   });
 
@@ -161,7 +165,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     return;
   }
 
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription;
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   const accountId = subscription.metadata?.accountId;
 
   if (!accountId) {
@@ -173,7 +177,9 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     where: { id: accountId },
     data: {
       subscriptionStatus: "ACTIVE",
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd: subscription.current_period_end
+        ? new Date(subscription.current_period_end * 1000)
+        : null,
     },
   });
 
@@ -187,7 +193,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     return;
   }
 
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription;
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   const accountId = subscription.metadata?.accountId;
 
   if (!accountId) {
