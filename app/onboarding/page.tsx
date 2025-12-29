@@ -89,7 +89,7 @@ export default function OnboardingPage() {
             Welcome to GroomRoute!
           </h1>
           <p className="text-gray-600">
-            Let's set up your account in just a few steps
+            Let&apos;s set up your account in just a few steps
           </p>
         </div>
 
@@ -115,7 +115,7 @@ export default function OnboardingPage() {
                 Your Contact Information
               </h2>
               <p className="text-gray-600 mb-4">
-                We'll use this to contact you about your grooming business.
+                We&apos;ll use this to contact you about your grooming business.
               </p>
 
               <div>

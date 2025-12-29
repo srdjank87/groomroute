@@ -225,7 +225,7 @@ export default function Home() {
 
               <div className="mt-6 flex items-center gap-2 justify-center">
                 <XCircle className="w-5 h-5 text-red-500" />
-                <p className="text-base font-bold text-gray-700">Result: Work that doesn't feel sustainable</p>
+                <p className="text-base font-bold text-gray-700">Result: Work that doesn&apos;t feel sustainable</p>
               </div>
             </div>
 
@@ -310,7 +310,7 @@ export default function Home() {
                       One-Tap Optimized Routes — Built for the Real World
                     </h3>
                     <p className="text-lg opacity-90">
-                      GroomRoute doesn't just reorder stops — it helps you plan smarter days. Save 45–90 minutes daily, reduce mileage, and stop driving all over town. Supports "area days" so you can work one neighborhood at a time.
+                      GroomRoute doesn&apos;t just reorder stops — it helps you plan smarter days. Save 45–90 minutes daily, reduce mileage, and stop driving all over town. Supports &quot;area days&quot; so you can work one neighborhood at a time.
                     </p>
                   </div>
                 </div>
@@ -383,7 +383,7 @@ export default function Home() {
                       Understands Dog Size, Workload & Your Physical Capacity
                     </h3>
                     <p className="text-lg opacity-90 mb-4">
-                      Big dogs take more time. Doodles are a universe of their own. Some days you have a bather — some days you don't. GroomRoute actually understands that and helps you plan sustainable days that don't break your body or brain.
+                      Big dogs take more time. Doodles are a universe of their own. Some days you have a bather — some days you don&apos;t. GroomRoute actually understands that and helps you plan sustainable days that don&apos;t break your body or brain.
                     </p>
                     <ul className="space-y-2">
                       <li className="flex items-start gap-2">

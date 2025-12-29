@@ -14,7 +14,7 @@ export default function DashboardPage() {
           Welcome back{session?.user?.name ? `, ${session.user.name}` : ""}!
         </h1>
         <p className="text-gray-600 mt-1">
-          Here's what's happening with your grooming business today.
+          Here&apos;s what&apos;s happening with your grooming business today.
         </p>
       </div>
 
@@ -27,7 +27,7 @@ export default function DashboardPage() {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">
-                Today's Appointments
+                Today&apos;s Appointments
               </p>
               <p className="text-2xl font-bold text-gray-900">0</p>
             </div>
@@ -55,7 +55,7 @@ export default function DashboardPage() {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">
-                This Week's Routes
+                This Week&apos;s Routes
               </p>
               <p className="text-2xl font-bold text-gray-900">0</p>
             </div>
