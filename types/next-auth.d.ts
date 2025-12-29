@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole, SubscriptionStatus, SubscriptionPlan } from "@prisma/client";
 import NextAuth, { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
@@ -7,6 +7,10 @@ declare module "next-auth" {
       id: string;
       accountId: string;
       role: UserRole;
+      subscriptionStatus?: SubscriptionStatus;
+      subscriptionPlan?: SubscriptionPlan;
+      currentPeriodEnd?: string;
+      trialEndsAt?: string;
     } & DefaultSession["user"];
   }
 
@@ -20,5 +24,9 @@ declare module "next-auth/jwt" {
   interface JWT {
     accountId: string;
     role: UserRole;
+    subscriptionStatus?: SubscriptionStatus;
+    subscriptionPlan?: SubscriptionPlan;
+    currentPeriodEnd?: string;
+    trialEndsAt?: string;
   }
 }

@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { UserRole, SubscriptionStatus, SubscriptionPlan } from "@prisma/client";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -81,9 +82,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = token.sub as string;
         session.user.accountId = token.accountId as string;
-        session.user.role = token.role as string;
-        session.user.subscriptionStatus = token.subscriptionStatus as string;
-        session.user.subscriptionPlan = token.subscriptionPlan as string;
+        session.user.role = token.role as UserRole;
+        session.user.subscriptionStatus = token.subscriptionStatus as SubscriptionStatus | undefined;
+        session.user.subscriptionPlan = token.subscriptionPlan as SubscriptionPlan | undefined;
         session.user.currentPeriodEnd = token.currentPeriodEnd as string | undefined;
         session.user.trialEndsAt = token.trialEndsAt as string | undefined;
       }

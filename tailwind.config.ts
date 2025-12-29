@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+// @ts-ignore - DaisyUI doesn't have TypeScript definitions
 import daisyui from "daisyui";
 
 const config: Config = {

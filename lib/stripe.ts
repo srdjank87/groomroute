@@ -1,11 +1,10 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not defined in environment variables");
-}
+// Allow build without Stripe key (will fail at runtime if used without key)
+const stripeKey = process.env.STRIPE_SECRET_KEY || "sk_test_placeholder";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-12-18.acacia",
+export const stripe = new Stripe(stripeKey, {
+  apiVersion: "2025-12-15.clover",
   typescript: true,
 });
 
