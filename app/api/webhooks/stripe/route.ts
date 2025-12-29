@@ -84,14 +84,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Get subscription details
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
+  // Extract the period end date
+  const periodEnd = subscription.current_period_end
+    ? new Date((subscription.current_period_end as number) * 1000)
+    : null;
+
   await prisma.account.update({
     where: { id: accountId },
     data: {
       stripeSubscriptionId: subscriptionId,
       subscriptionStatus: "TRIAL",
-      currentPeriodEnd: subscription.current_period_end
-        ? new Date(subscription.current_period_end * 1000)
-        : null,
+      currentPeriodEnd: periodEnd,
     },
   });
 
@@ -124,6 +127,11 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     status = "INCOMPLETE";
   }
 
+  // Extract the period end date
+  const periodEnd = subscription.current_period_end
+    ? new Date((subscription.current_period_end as number) * 1000)
+    : null;
+
   await prisma.account.update({
     where: { id: accountId },
     data: {
@@ -131,9 +139,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       subscriptionStatus: status,
       subscriptionPlan: plan,
       billingCycle: billing,
-      currentPeriodEnd: subscription.current_period_end
-        ? new Date(subscription.current_period_end * 1000)
-        : null,
+      currentPeriodEnd: periodEnd,
     },
   });
 
@@ -172,14 +178,17 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     return;
   }
 
+  // Extract the period end date
+  const periodEnd = subscription.current_period_end
+    ? new Date((subscription.current_period_end as number) * 1000)
+    : null;
+
   // Update to ACTIVE if payment succeeded after trial
   await prisma.account.update({
     where: { id: accountId },
     data: {
       subscriptionStatus: "ACTIVE",
-      currentPeriodEnd: subscription.current_period_end
-        ? new Date(subscription.current_period_end * 1000)
-        : null,
+      currentPeriodEnd: periodEnd,
     },
   });
 
