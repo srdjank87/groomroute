@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 
-type OnboardingStep = "groomer" | "address" | "hours" | "complete";
+type OnboardingStep = "groomer" | "address" | "hours" | "plan" | "complete";
 
 export default function OnboardingPage() {
   const { data: session, status } = useSession();
@@ -27,6 +27,11 @@ export default function OnboardingPage() {
   const [hoursData, setHoursData] = useState({
     workingHoursStart: "08:00",
     workingHoursEnd: "17:00",
+  });
+
+  const [planData, setPlanData] = useState({
+    plan: "STARTER" as "STARTER" | "GROWTH" | "PRO",
+    billing: "MONTHLY" as "MONTHLY" | "YEARLY",
   });
 
   if (status === "loading") {
@@ -54,10 +59,16 @@ export default function OnboardingPage() {
 
   const handleHoursSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCurrentStep("plan");
+  };
+
+  const handlePlanSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/onboarding", {
+      // First, complete onboarding
+      const onboardingResponse = await fetch("/api/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -67,16 +78,32 @@ export default function OnboardingPage() {
         }),
       });
 
-      if (!response.ok) {
-        const data = await response.json();
+      if (!onboardingResponse.ok) {
+        const data = await onboardingResponse.json();
         throw new Error(data.error || "Failed to complete onboarding");
       }
 
-      toast.success("Setup complete! Welcome to GroomRoute");
-      router.push("/dashboard");
+      // Then, create Stripe checkout session
+      const checkoutResponse = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: planData.plan,
+          billing: planData.billing,
+        }),
+      });
+
+      if (!checkoutResponse.ok) {
+        const data = await checkoutResponse.json();
+        throw new Error(data.error || "Failed to create checkout session");
+      }
+
+      const { url } = await checkoutResponse.json();
+
+      // Redirect to Stripe Checkout
+      window.location.href = url;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -99,11 +126,14 @@ export default function OnboardingPage() {
             <li className={`step ${currentStep !== "groomer" ? "step-primary" : ""}`}>
               Groomer Profile
             </li>
-            <li className={`step ${["hours", "complete"].includes(currentStep) ? "step-primary" : ""}`}>
+            <li className={`step ${["hours", "plan", "complete"].includes(currentStep) ? "step-primary" : ""}`}>
               Base Address
             </li>
-            <li className={`step ${currentStep === "complete" ? "step-primary" : ""}`}>
+            <li className={`step ${["plan", "complete"].includes(currentStep) ? "step-primary" : ""}`}>
               Working Hours
+            </li>
+            <li className={`step ${currentStep === "complete" ? "step-primary" : ""}`}>
+              Choose Plan
             </li>
           </ul>
         </div>
@@ -265,6 +295,173 @@ export default function OnboardingPage() {
                     </>
                   ) : (
                     "Complete Setup"
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {currentStep === "plan" && (
+            <form onSubmit={handlePlanSubmit} className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Choose Your Plan
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Start with a 14-day free trial. No credit card required during trial.
+              </p>
+
+              {/* Billing Toggle */}
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <span className={`text-sm font-medium ${planData.billing === "MONTHLY" ? "text-gray-900" : "text-gray-500"}`}>
+                  Monthly
+                </span>
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary"
+                  checked={planData.billing === "YEARLY"}
+                  onChange={(e) => setPlanData({ ...planData, billing: e.target.checked ? "YEARLY" : "MONTHLY" })}
+                />
+                <span className={`text-sm font-medium ${planData.billing === "YEARLY" ? "text-gray-900" : "text-gray-500"}`}>
+                  Yearly
+                  <span className="ml-1 text-xs text-green-600">(Save 20%)</span>
+                </span>
+              </div>
+
+              {/* Plan Cards */}
+              <div className="grid gap-4">
+                {/* Starter Plan */}
+                <label
+                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all ${
+                    planData.plan === "STARTER"
+                      ? "border-primary bg-blue-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="plan"
+                    value="STARTER"
+                    checked={planData.plan === "STARTER"}
+                    onChange={(e) => setPlanData({ ...planData, plan: e.target.value as "STARTER" | "GROWTH" | "PRO" })}
+                    className="sr-only"
+                  />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">Starter</h3>
+                      <p className="text-sm text-gray-600 mt-1">Perfect for solo groomers</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-gray-900">
+                        ${planData.billing === "MONTHLY" ? "79" : "79"}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {planData.billing === "MONTHLY" ? "/month" : "/month"}
+                      </div>
+                      {planData.billing === "YEARLY" && (
+                        <div className="text-xs text-green-600">
+                          $950/year (save $200)
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </label>
+
+                {/* Growth Plan */}
+                <label
+                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all ${
+                    planData.plan === "GROWTH"
+                      ? "border-primary bg-blue-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="plan"
+                    value="GROWTH"
+                    checked={planData.plan === "GROWTH"}
+                    onChange={(e) => setPlanData({ ...planData, plan: e.target.value as "STARTER" | "GROWTH" | "PRO" })}
+                    className="sr-only"
+                  />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">Growth</h3>
+                      <p className="text-sm text-gray-600 mt-1">For growing businesses</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-gray-900">
+                        ${planData.billing === "MONTHLY" ? "179" : "142"}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {planData.billing === "MONTHLY" ? "/month" : "/month"}
+                      </div>
+                      {planData.billing === "YEARLY" && (
+                        <div className="text-xs text-green-600">
+                          $1,700/year (save $448)
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </label>
+
+                {/* Pro Plan */}
+                <label
+                  className={`border-2 rounded-xl p-6 cursor-pointer transition-all ${
+                    planData.plan === "PRO"
+                      ? "border-primary bg-blue-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="plan"
+                    value="PRO"
+                    checked={planData.plan === "PRO"}
+                    onChange={(e) => setPlanData({ ...planData, plan: e.target.value as "STARTER" | "GROWTH" | "PRO" })}
+                    className="sr-only"
+                  />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">Pro</h3>
+                      <p className="text-sm text-gray-600 mt-1">For established teams</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-gray-900">
+                        ${planData.billing === "MONTHLY" ? "279" : "221"}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {planData.billing === "MONTHLY" ? "/month" : "/month"}
+                      </div>
+                      {planData.billing === "YEARLY" && (
+                        <div className="text-xs text-green-600">
+                          $2,650/year (save $698)
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep("hours")}
+                  className="btn btn-ghost flex-1"
+                  disabled={isLoading}
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary flex-1"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <span className="loading loading-spinner"></span>
+                      Starting trial...
+                    </>
+                  ) : (
+                    "Start Free Trial"
                   )}
                 </button>
               </div>
