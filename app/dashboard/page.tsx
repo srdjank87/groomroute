@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Users, Calendar, Route, Plus } from "lucide-react";
+import TrialStatus from "@/components/TrialStatus";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -17,6 +18,9 @@ export default function DashboardPage() {
           Here&apos;s what&apos;s happening with your grooming business today.
         </p>
       </div>
+
+      {/* Trial/Subscription Status */}
+      <TrialStatus />
 
       {/* Quick stats */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
