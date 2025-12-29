@@ -49,11 +49,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.accountId = user.accountId;
         token.role = user.role;
       }
+
+      // Fetch fresh subscription data on each request
+      if (token.accountId && (trigger === "update" || !token.subscriptionStatus)) {
+        const account = await prisma.account.findUnique({
+          where: { id: token.accountId as string },
+          select: {
+            subscriptionStatus: true,
+            subscriptionPlan: true,
+            currentPeriodEnd: true,
+            trialEndsAt: true,
+          },
+        });
+
+        if (account) {
+          token.subscriptionStatus = account.subscriptionStatus;
+          token.subscriptionPlan = account.subscriptionPlan;
+          token.currentPeriodEnd = account.currentPeriodEnd?.toISOString();
+          token.trialEndsAt = account.trialEndsAt?.toISOString();
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -61,6 +82,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub as string;
         session.user.accountId = token.accountId as string;
         session.user.role = token.role as string;
+        session.user.subscriptionStatus = token.subscriptionStatus as string;
+        session.user.subscriptionPlan = token.subscriptionPlan as string;
+        session.user.currentPeriodEnd = token.currentPeriodEnd as string | undefined;
+        session.user.trialEndsAt = token.trialEndsAt as string | undefined;
       }
       return session;
     },
