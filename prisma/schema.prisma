@@ -35,6 +35,14 @@ model Account {
   id              String            @id @default(cuid())
   name            String
   timezone        String            @default("America/New_York")
+  // Subscription & Billing
+  subscriptionPlan     SubscriptionPlan @default(TRIAL)
+  billingCycle         BillingCycle     @default(MONTHLY)
+  trialEndsAt          DateTime?        // 14 days from signup
+  subscriptionStatus   SubscriptionStatus @default(TRIAL)
+  stripeCustomerId     String?          @unique
+  stripeSubscriptionId String?          @unique
+  currentPeriodEnd     DateTime?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   users           User[]
@@ -45,6 +53,29 @@ model Account {
   messageTemplates MessageTemplate[]
 
   @@index([createdAt])
+  @@index([subscriptionStatus])
+  @@index([trialEndsAt])
+}
+
+enum SubscriptionPlan {
+  TRIAL
+  STARTER
+  GROWTH
+  PRO
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  TRIAL           // Free 14-day trial
+  ACTIVE          // Paid and active
+  PAST_DUE        // Payment failed
+  CANCELED        // User canceled
+  INCOMPLETE      // Stripe subscription incomplete
+  EXPIRED         // Trial expired, no payment
 }
 
 // Groomer (person/vehicle)

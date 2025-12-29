@@ -89,17 +89,22 @@ export default function Home() {
             <h1 className="text-5xl lg:text-6xl font-bold mb-4">
               Run your grooming day with one tap.
             </h1>
-            
-            <p className="text-xl mb-12 lg:mb-8 leading-relaxed max-w-2xl mx-auto">
-              Optimize your route, keep customers informed, and stay calm - even when things change.
+
+            <p className="text-xl mb-6 lg:mb-4 leading-relaxed max-w-3xl mx-auto">
+              The only mobile grooming app built to make your workday calmer, smarter, and more profitable — with one-tap routing, crisis rescue, and a system that actually understands how demanding grooming really is.
             </p>
+
+            <p className="text-base mb-12 lg:mb-8 opacity-80 italic max-w-2xl mx-auto">
+              Smart enough to know the difference between a chihuahua day and a doodle day.
+            </p>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
               <Link href="/auth/signup" className="btn btn-gradient btn-lg">
                 Start Free Trial
               </Link>
             </div>
-            <p className="text-sm opacity-70">No credit card • Setup in minutes • Works on your phone</p>
-            <p className="text-sm font-semibold text-blue-600 mt-4">Save up to 90 minutes per day without changing your routine</p>
+            <p className="text-sm opacity-70">14-day free trial. Cancel anytime. Card required.</p>
+            <p className="text-sm font-semibold text-blue-600 mt-4">Save 45–90 minutes daily without changing your routine</p>
             <p className="text-sm opacity-60 mt-4">
               Prefer to talk to a real human first?{" "}
               <Link href="/book-demo" className="link link-hover underline">
@@ -192,42 +197,35 @@ export default function Home() {
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Constantly behind schedule</span>
+                    <span>Days stacked with too many big dogs</span>
                   </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Guessing arrival times</span>
+                    <span>Driving everywhere, wasting fuel + time</span>
                   </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Customers asking &quot;Where are you?&quot;</span>
+                    <span>No-shows destroy your income</span>
                   </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Routes that don&rsquo;t make sense</span>
-                  </p>
-                </div>
-
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Cancellations hurt your income</span>
+                    <span>Your body and brain are exhausted</span>
                   </p>
                 </div>
               </div>
 
               <div className="mt-6 flex items-center gap-2 justify-center">
                 <XCircle className="w-5 h-5 text-red-500" />
-                <p className="text-base font-bold text-gray-700">Result: Ending the day exhausted</p>
+                <p className="text-base font-bold text-gray-700">Result: Work that doesn't feel sustainable</p>
               </div>
             </div>
 
@@ -249,42 +247,35 @@ export default function Home() {
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Calm, predictable days</span>
+                    <span>Balanced days that protect your body</span>
                   </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Clear ETAs for every stop</span>
+                    <span>Tight, efficient routes</span>
                   </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Customers always in the loop</span>
+                    <span>Automatic cancellation recovery</span>
                   </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Smart routes that just work</span>
-                  </p>
-                </div>
-
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>More filled appointments, more income</span>
+                    <span>Your work finally feels sustainable</span>
                   </p>
                 </div>
               </div>
 
               <div className="mt-6 flex items-center gap-2 justify-center">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <p className="text-base font-bold text-gray-700">Result: Ending the day proud and in control</p>
+                <p className="text-base font-bold text-gray-700">Result: Calmer days, stronger income, sustainable work</p>
               </div>
             </div>
           </div>
@@ -316,10 +307,10 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &quot;Optimize Route&quot; - Your day makes sense.
+                      One-Tap Optimized Routes — Built for the Real World
                     </h3>
                     <p className="text-lg opacity-90">
-                      No manual planning. No guessing. GroomRoute reorders your stops by location - saving you 45-90 minutes every single day.
+                      GroomRoute doesn't just reorder stops — it helps you plan smarter days. Save 45–90 minutes daily, reduce mileage, and stop driving all over town. Supports "area days" so you can work one neighborhood at a time.
                     </p>
                   </div>
                 </div>
@@ -344,7 +335,7 @@ export default function Home() {
                       One tap: &quot;Running Late&quot; - Everyone instantly knows.
                     </h3>
                     <p className="text-lg opacity-90">
-                      No typing. No juggling messages. GroomRoute recalculates and informs customers for you - so you can keep working.
+                      GroomRoute updates clients instantly, professionally, and kindly — without you panic-texting between stops. Keep your focus on the dog in front of you.
                     </p>
                   </div>
                 </div>
@@ -376,6 +367,43 @@ export default function Home() {
               </div>
             </div>
 
+            {/* NEW Feature - Workload Intelligence - Image Right */}
+            <div className="card bg-gradient-to-br from-amber-50 to-yellow-100 border-2 border-amber-300 shadow-xl">
+              <div className="card-body">
+                <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
+                  <div className="lg:w-1/3 flex items-center justify-center">
+                    <div className="text-center p-8">
+                      <div className="text-6xl mb-4">🐕</div>
+                      <div className="text-2xl font-bold">vs</div>
+                      <div className="text-6xl mt-4">🐩</div>
+                    </div>
+                  </div>
+                  <div className="lg:w-2/3">
+                    <h3 className="text-2xl font-bold mb-3">
+                      Understands Dog Size, Workload & Your Physical Capacity
+                    </h3>
+                    <p className="text-lg opacity-90 mb-4">
+                      Big dogs take more time. Doodles are a universe of their own. Some days you have a bather — some days you don't. GroomRoute actually understands that and helps you plan sustainable days that don't break your body or brain.
+                    </p>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <span>Set comfort limits (max big dogs/day)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <span>Auto-flag danger days</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <span>Adjust workload if an assistant is helping</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Feature 4 - Image Right */}
             <div className="card bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 shadow-xl">
               <div className="card-body">
@@ -391,10 +419,10 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: Fill cancellation gaps automatically.
+                      Cancellations Happen. GroomRoute Helps You Recover Lost Revenue.
                     </h3>
                     <p className="text-lg opacity-90">
-                      Last-minute cancellation? GroomRoute finds nearby customers on your waitlist and offers them the slot. Recover $200-400/month you&apos;d otherwise lose.
+                      When someone bails last-minute, GroomRoute helps turn that loss into opportunity by automatically filling gaps with nearby waitlist clients. Recover $200-400/month you&apos;d otherwise lose.
                     </p>
                   </div>
                 </div>
@@ -419,6 +447,64 @@ export default function Home() {
             <div>
               <div className="text-4xl font-bold mb-2">80% reduction</div>
               <p className="text-sm opacity-80">In stress calls</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CALM CONTROL - CRISIS MANAGEMENT */}
+      <section className="py-8 lg:py-12 px-6 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl font-bold mb-6">
+              Meet Calm Control — Your Safety Net for When Grooming Life Gets Messy
+            </h2>
+            <p className="text-xl max-w-4xl mx-auto leading-relaxed opacity-90">
+              GroomRoute&apos;s Calm Control Center doesn&apos;t just react — it thinks with you. Whether your day collapses, clients cancel, traffic wrecks your schedule, or you realize you accidentally booked a nightmare day… GroomRoute helps you stabilize everything with clarity and confidence.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Rescue My Day */}
+            <div className="card bg-white border-2 border-blue-200 shadow-xl">
+              <div className="card-body">
+                <div className="text-5xl mb-4 text-center">🛟</div>
+                <h3 className="card-title text-2xl mb-3 justify-center">
+                  Rescue My Day
+                </h3>
+                <p className="text-base opacity-90 text-center">
+                  Behind schedule? Traffic disaster? Two giant doodles back-to-back?
+                </p>
+                <p className="text-base font-medium mt-2 text-center">
+                  GroomRoute gives you 2–3 smart rescue plans with new routes, messaging handled, and your sanity intact.
+                </p>
+              </div>
+            </div>
+
+            {/* Body & Burnout Protection */}
+            <div className="card bg-white border-2 border-blue-200 shadow-xl">
+              <div className="card-body">
+                <div className="text-5xl mb-4 text-center">💪</div>
+                <h3 className="card-title text-2xl mb-3 justify-center">
+                  Body & Burnout Protection
+                </h3>
+                <p className="text-base opacity-90 text-center">
+                  Grooming is physically demanding. GroomRoute watches your workload patterns, warns when you&apos;ve built a &quot;danger day,&quot; and helps protect you from burnout.
+                </p>
+              </div>
+            </div>
+
+            {/* Offline Safety Snapshot */}
+            <div className="card bg-white border-2 border-blue-200 shadow-xl">
+              <div className="card-body">
+                <div className="text-5xl mb-4 text-center">🚧</div>
+                <h3 className="card-title text-2xl mb-3 justify-center">
+                  Offline Safety Snapshot
+                </h3>
+                <p className="text-base opacity-90 text-center">
+                  Lose signal? Phone meltdown? GroomRoute stores your day offline so you can keep working without panic.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -567,7 +653,7 @@ export default function Home() {
                 </ul>
 
                 <div className="card-actions">
-                  <Link href="/auth/signup" className="btn btn-outline btn-block border-2">
+                  <Link href={`/auth/signup?plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
                     Start my calm day
                   </Link>
                 </div>
@@ -607,7 +693,7 @@ export default function Home() {
                 </ul>
 
                 <div className="card-actions">
-                  <Link href="/auth/signup" className="btn btn-secondary btn-block text-secondary-content">
+                  <Link href={`/auth/signup?plan=growth&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-secondary btn-block text-secondary-content">
                     Make my day easier
                   </Link>
                 </div>
@@ -647,7 +733,7 @@ export default function Home() {
                 </ul>
 
                 <div className="card-actions">
-                  <Link href="/auth/signup" className="btn btn-outline btn-block border-2">
+                  <Link href={`/auth/signup?plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
                     Show me my better route
                   </Link>
                 </div>
@@ -659,7 +745,84 @@ export default function Home() {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span>All plans include a 14-day free trial. No credit card required.</span>
+            <span>Every plan includes a 14-day free trial. Cancel anytime before it ends.</span>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ SECTION */}
+      <section className="py-8 lg:py-12 px-6 bg-base-100">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold mb-8 text-center">
+            Common Questions
+          </h2>
+
+          <div className="space-y-4">
+            {/* FAQ 1 */}
+            <div className="collapse collapse-plus bg-base-200">
+              <input type="radio" name="faq-accordion" defaultChecked />
+              <div className="collapse-title text-xl font-medium">
+                Do I need a credit card to start my trial?
+              </div>
+              <div className="collapse-content">
+                <p>Yes — this helps keep trials focused on real grooming businesses. You won&apos;t be charged during your trial and can cancel anytime before it ends.</p>
+              </div>
+            </div>
+
+            {/* FAQ 2 */}
+            <div className="collapse collapse-plus bg-base-200">
+              <input type="radio" name="faq-accordion" />
+              <div className="collapse-title text-xl font-medium">
+                Will I be charged immediately?
+              </div>
+              <div className="collapse-content">
+                <p>No. Your entire 14-day trial is completely free. You&apos;ll only be charged after your trial ends if you choose to continue.</p>
+              </div>
+            </div>
+
+            {/* FAQ 3 */}
+            <div className="collapse collapse-plus bg-base-200">
+              <input type="radio" name="faq-accordion" />
+              <div className="collapse-title text-xl font-medium">
+                Can I cancel anytime?
+              </div>
+              <div className="collapse-content">
+                <p>Yes — instantly, without awkwardness. No contracts, no commitments. If GroomRoute isn&apos;t making your days calmer and more profitable, you shouldn&apos;t pay for it.</p>
+              </div>
+            </div>
+
+            {/* FAQ 4 */}
+            <div className="collapse collapse-plus bg-base-200">
+              <input type="radio" name="faq-accordion" />
+              <div className="collapse-title text-xl font-medium">
+                What happens after my trial ends?
+              </div>
+              <div className="collapse-content">
+                <p>After 14 days, you&apos;ll be charged for the plan you selected during signup. You can cancel before then or change your plan at any time from your account settings.</p>
+              </div>
+            </div>
+
+            {/* FAQ 5 */}
+            <div className="collapse collapse-plus bg-base-200">
+              <input type="radio" name="faq-accordion" />
+              <div className="collapse-title text-xl font-medium">
+                Does GroomRoute work offline?
+              </div>
+              <div className="collapse-content">
+                <p>Yes! GroomRoute stores your day offline so you can access your schedule, client details, and route even when you lose signal or have connectivity issues.</p>
+              </div>
+            </div>
+
+            {/* FAQ 6 */}
+            <div className="collapse collapse-plus bg-base-200">
+              <input type="radio" name="faq-accordion" />
+              <div className="collapse-title text-xl font-medium">
+                Can I switch plans later?
+              </div>
+              <div className="collapse-content">
+                <p>Absolutely! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and we&apos;ll prorate the billing accordingly.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -672,8 +835,11 @@ export default function Home() {
               <h2 className="card-title text-3xl mb-4 justify-center">
                 Our Promise
               </h2>
-              <p className="text-lg mb-2">
-                If GroomRoute doesn&apos;t make your days calmer and more profitable within the first few weeks…
+              <p className="text-lg mb-4 leading-relaxed">
+                We don&apos;t just promise efficiency — we promise calmer days, smarter decisions, stronger income, and a work life that feels sustainable again.
+              </p>
+              <p className="text-xl font-bold mb-2 text-base-content">
+                If GroomRoute doesn&apos;t deliver on that promise…
               </p>
               <p className="text-2xl font-bold mb-4 text-base-content">
                 you shouldn&apos;t pay for it.
@@ -713,7 +879,7 @@ export default function Home() {
                     Start Free Trial
                   </Link>
                 </div>
-                <p className="text-sm opacity-70 mt-4">No credit card required. Cancel anytime.</p>
+                <p className="text-sm opacity-70 mt-4">14-day free trial. Cancel anytime. Card required.</p>
               </div>
             </div>
           </div>
