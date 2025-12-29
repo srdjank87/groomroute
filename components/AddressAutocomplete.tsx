@@ -2,6 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 
+// Declare global google namespace for TypeScript
+declare global {
+  interface Window {
+    google?: typeof google;
+  }
+}
+
 interface AddressAutocompleteProps {
   value: string;
   onChange: (address: string) => void;
