@@ -11,11 +11,13 @@ import {
   Settings,
   LogOut,
   Menu,
+  Heart,
 } from "lucide-react";
 import { useState } from "react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Calm Center", href: "/calm", icon: Heart, special: true },
   { name: "Customers", href: "/app/customers", icon: Users },
   { name: "Appointments", href: "/app/appointments", icon: Calendar },
   { name: "Routes", href: "/app/routes", icon: RouteIcon },
@@ -68,7 +70,9 @@ export default function DashboardLayout({
                         href={item.href}
                         onClick={() => setSidebarOpen(false)}
                         className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                          isActive
+                          item.special && !isActive
+                            ? "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-700 hover:from-pink-100 hover:to-purple-100 border border-pink-200"
+                            : isActive
                             ? "bg-primary text-white"
                             : "text-gray-700 hover:bg-gray-100"
                         }`}
@@ -100,7 +104,9 @@ export default function DashboardLayout({
                     <Link
                       href={item.href}
                       className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                        isActive
+                        item.special && !isActive
+                          ? "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-700 hover:from-pink-100 hover:to-purple-100 border border-pink-200"
+                          : isActive
                           ? "bg-primary text-white"
                           : "text-gray-700 hover:bg-gray-100"
                       }`}
