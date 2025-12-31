@@ -52,10 +52,12 @@ export default function DashboardLayout({
           subscriptionStatus === "INCOMPLETE" ||
           subscriptionStatus === "EXPIRED") {
         setIsRedirecting(true);
-        router.replace("/auth/signup?error=subscription_required");
+        console.log("Subscription check failed:", subscriptionStatus);
+        // Force redirect using window.location for immediate navigation
+        window.location.href = "/auth/signup?error=subscription_required";
       }
     }
-  }, [status, session, router]);
+  }, [status, session]);
 
   if (status === "loading") {
     return (
