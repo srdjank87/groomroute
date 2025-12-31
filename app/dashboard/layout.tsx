@@ -38,6 +38,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Check if user has completed Stripe checkout
   useEffect(() => {
@@ -50,7 +51,8 @@ export default function DashboardLayout({
       if (!subscriptionStatus ||
           subscriptionStatus === "INCOMPLETE" ||
           subscriptionStatus === "EXPIRED") {
-        router.push("/auth/signup?error=subscription_required");
+        setIsRedirecting(true);
+        router.replace("/auth/signup?error=subscription_required");
       }
     }
   }, [status, session, router]);
@@ -74,8 +76,15 @@ export default function DashboardLayout({
        session.user.subscriptionStatus === "INCOMPLETE" ||
        session.user.subscriptionStatus === "EXPIRED")) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg"></span>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-100">
+        <div className="text-center max-w-md px-6">
+          <div className="mb-4">
+            <span className="loading loading-spinner loading-lg text-[#A5744A]"></span>
+          </div>
+          <p className="text-gray-700 font-medium">
+            {isRedirecting ? "Redirecting to complete your subscription..." : "Checking your subscription..."}
+          </p>
+        </div>
       </div>
     );
   }

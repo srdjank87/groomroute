@@ -56,8 +56,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role;
       }
 
-      // Fetch fresh subscription data on each request
-      if (token.accountId && (trigger === "update" || !token.subscriptionStatus)) {
+      // Always fetch fresh subscription data when user logs in or token is updated
+      // This ensures we always have the latest subscription status
+      if (token.accountId) {
         const account = await prisma.account.findUnique({
           where: { id: token.accountId as string },
           select: {
