@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -48,22 +48,7 @@ function NewAppointmentContent() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
 
-  // Fetch customers
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
-  // Pre-select customer if provided
-  useEffect(() => {
-    if (preSelectedCustomerId && customers.length > 0) {
-      const customer = customers.find((c) => c.id === preSelectedCustomerId);
-      if (customer) {
-        selectCustomer(customer);
-      }
-    }
-  }, [preSelectedCustomerId, customers]);
-
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     try {
       const response = await fetch(`/api/customers?search=${searchQuery}`);
       if (response.ok) {
@@ -73,20 +58,36 @@ function NewAppointmentContent() {
     } catch (error) {
       console.error("Failed to fetch customers:", error);
     }
-  };
+  }, [searchQuery]);
 
+  const selectCustomer = useCallback((customer: Customer) => {
+    setSelectedCustomer(customer);
+    setAppointmentData((prev) => ({ ...prev, customerId: customer.id }));
+    setCurrentStep("pet");
+  }, []);
+
+  // Fetch customers on mount
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
+
+  // Pre-select customer if provided
+  useEffect(() => {
+    if (preSelectedCustomerId && customers.length > 0) {
+      const customer = customers.find((c) => c.id === preSelectedCustomerId);
+      if (customer) {
+        selectCustomer(customer);
+      }
+    }
+  }, [preSelectedCustomerId, customers, selectCustomer]);
+
+  // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchCustomers();
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const selectCustomer = (customer: Customer) => {
-    setSelectedCustomer(customer);
-    setAppointmentData({ ...appointmentData, customerId: customer.id });
-    setCurrentStep("pet");
-  };
+  }, [fetchCustomers]);
 
   const selectPet = (pet: Pet) => {
     setSelectedPet(pet);
