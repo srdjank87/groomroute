@@ -45,7 +45,12 @@ function DashboardContent() {
     async function handleSetup() {
       const setupSuccess = searchParams.get("setup") === "success";
 
-      if (setupSuccess && session?.user) {
+      // Wait for session to be loaded
+      if (!session?.user) {
+        return;
+      }
+
+      if (setupSuccess) {
         setIsGeneratingSample(true);
 
         try {
@@ -61,6 +66,8 @@ function DashboardContent() {
             // Fetch dashboard data
             await fetchDashboardData();
           } else {
+            const errorData = await response.json();
+            console.error("Sample data generation failed:", errorData);
             // If sample data already exists or generation failed, just fetch data
             await fetchDashboardData();
           }
@@ -70,7 +77,7 @@ function DashboardContent() {
         } finally {
           setIsGeneratingSample(false);
         }
-      } else if (session?.user) {
+      } else {
         await fetchDashboardData();
       }
     }
@@ -202,7 +209,7 @@ function DashboardContent() {
           </p>
           <Link
             href="/app/appointments"
-            className="btn btn-primary btn-lg"
+            className="btn btn-lg bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 font-semibold"
           >
             <Plus className="h-5 w-5" />
             Schedule Appointment
@@ -260,9 +267,9 @@ function DashboardContent() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Link
               href="/app/appointments"
-              className="flex flex-col items-center gap-2 p-4 border-2 border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-center"
+              className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/30 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors text-center"
             >
-              <div className="p-3 bg-blue-500 rounded-full">
+              <div className="p-3 bg-[#A5744A] rounded-full">
                 <Plus className="h-6 w-6 text-white" />
               </div>
               <span className="font-semibold text-sm text-gray-900">New Appointment</span>
@@ -270,30 +277,30 @@ function DashboardContent() {
 
             <Link
               href="/app/customers"
-              className="flex flex-col items-center gap-2 p-4 border-2 border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center"
+              className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/20 rounded-lg hover:bg-orange-50 transition-colors text-center"
             >
-              <div className="p-3 bg-gray-200 rounded-full">
-                <Plus className="h-6 w-6 text-gray-700" />
+              <div className="p-3 bg-[#A5744A]/20 rounded-full">
+                <Plus className="h-6 w-6 text-[#8B6239]" />
               </div>
               <span className="font-semibold text-sm text-gray-900">Add Customer</span>
             </Link>
 
             <Link
               href="/app/routes"
-              className="flex flex-col items-center gap-2 p-4 border-2 border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center"
+              className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/20 rounded-lg hover:bg-orange-50 transition-colors text-center"
             >
-              <div className="p-3 bg-gray-200 rounded-full">
-                <Navigation className="h-6 w-6 text-gray-700" />
+              <div className="p-3 bg-[#A5744A]/20 rounded-full">
+                <Navigation className="h-6 w-6 text-[#8B6239]" />
               </div>
               <span className="font-semibold text-sm text-gray-900">View Routes</span>
             </Link>
 
             <Link
               href="/app/appointments"
-              className="flex flex-col items-center gap-2 p-4 border-2 border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-center"
+              className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/20 rounded-lg hover:bg-orange-50 transition-colors text-center"
             >
-              <div className="p-3 bg-gray-200 rounded-full">
-                <CheckCircle className="h-6 w-6 text-gray-700" />
+              <div className="p-3 bg-[#A5744A]/20 rounded-full">
+                <CheckCircle className="h-6 w-6 text-[#8B6239]" />
               </div>
               <span className="font-semibold text-sm text-gray-900">Complete Job</span>
             </Link>
