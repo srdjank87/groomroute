@@ -14,13 +14,24 @@ export default auth((req) => {
     nextUrl.pathname.startsWith("/onboarding");
   const isSubscriptionRoute = nextUrl.pathname.startsWith("/subscription");
 
-  // Allow access to auth routes
+  // Allow access to auth routes for unauthenticated users
   if (isAuthRoute && !isAuthenticated) {
     return NextResponse.next();
   }
 
-  // Redirect authenticated users away from auth routes
+  // Redirect authenticated users away from auth routes UNLESS they have incomplete subscription
   if (isAuthRoute && isAuthenticated) {
+    const subscriptionStatus = (req.auth?.user as any)?.subscriptionStatus;
+
+    // Allow access to signup page if subscription is incomplete or expired
+    if (
+      nextUrl.pathname === "/auth/signup" &&
+      (subscriptionStatus === "INCOMPLETE" || subscriptionStatus === "EXPIRED" || !subscriptionStatus)
+    ) {
+      return NextResponse.next();
+    }
+
+    // Otherwise redirect to dashboard
     return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 
