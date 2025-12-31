@@ -61,8 +61,8 @@ function SignUpForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          plan: formData.plan.toUpperCase(),
-          billing: formData.billing.toUpperCase(),
+          plan: formData.plan.toLowerCase(),
+          billing: formData.billing.toLowerCase(),
         }),
       });
 
@@ -82,7 +82,7 @@ function SignUpForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-100 px-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
@@ -95,17 +95,17 @@ function SignUpForm() {
           </div>
 
           {/* Selected Plan Badge */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mb-6 p-4 bg-orange-50 border border-[#A5744A]/30 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Selected Plan</p>
-                <p className="text-base font-bold text-blue-700 capitalize">
+                <p className="text-base font-bold text-[#A5744A] capitalize">
                   {selectedPlan} - {selectedBilling === "yearly" ? "Yearly" : "Monthly"}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold text-blue-700">14-day free trial</p>
-                <Link href="/#pricing" className="text-xs text-blue-600 hover:underline">
+                <p className="text-sm font-semibold text-[#A5744A]">14-day free trial</p>
+                <Link href="/#pricing" className="text-xs text-[#A5744A] hover:underline">
                   Change plan
                 </Link>
               </div>
@@ -121,7 +121,7 @@ function SignUpForm() {
                 id="name"
                 type="text"
                 required
-                className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-50"
+                className="input input-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20 bg-gray-50"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 disabled={isLoading}
@@ -136,7 +136,7 @@ function SignUpForm() {
                 id="businessName"
                 type="text"
                 required
-                className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-50"
+                className="input input-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20 bg-gray-50"
                 value={formData.businessName}
                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                 disabled={isLoading}
@@ -151,7 +151,7 @@ function SignUpForm() {
                 id="email"
                 type="email"
                 required
-                className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
+                className="input input-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20 bg-white"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 disabled={isLoading}
@@ -167,7 +167,7 @@ function SignUpForm() {
                 type="password"
                 required
                 minLength={8}
-                className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
+                className="input input-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20 bg-white"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 disabled={isLoading}
@@ -180,7 +180,7 @@ function SignUpForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary w-full text-white bg-blue-600 hover:bg-blue-700 border-0 font-semibold"
+              className="btn btn-primary w-full text-white bg-[#A5744A] hover:bg-[#8B6239] border-0 font-semibold"
             >
               {isLoading ? (
                 <>
@@ -210,7 +210,7 @@ function SignUpForm() {
 export default function SignUpPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-100">
         <span className="loading loading-spinner loading-lg"></span>
       </div>
     }>

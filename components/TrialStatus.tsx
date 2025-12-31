@@ -106,7 +106,7 @@ export default function TrialStatus() {
             onClick={handleUpgrade}
             disabled={isLoading}
             className={`btn btn-sm border-0 text-white font-semibold ${
-              isWarning ? "bg-yellow-600 hover:bg-yellow-700" : "bg-blue-600 hover:bg-blue-700"
+              isWarning ? "bg-yellow-600 hover:bg-yellow-700" : "bg-[#A5744A] hover:bg-[#8B6239]"
             }`}
           >
             {isLoading ? (

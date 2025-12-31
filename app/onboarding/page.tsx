@@ -78,7 +78,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -126,7 +126,7 @@ export default function OnboardingPage() {
                 </p>
               </div>
 
-              <button type="submit" className="btn btn-primary w-full text-white bg-blue-600 hover:bg-blue-700 border-0">
+              <button type="submit" className="btn btn-primary w-full text-white bg-[#A5744A] hover:bg-[#8B6239] border-0">
                 Continue
               </button>
             </form>
@@ -149,7 +149,7 @@ export default function OnboardingPage() {
                   <input
                     type="time"
                     required
-                    className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    className="input input-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20"
                     value={hoursData.workingHoursStart}
                     onChange={(e) => setHoursData({ ...hoursData, workingHoursStart: e.target.value })}
                   />
@@ -162,7 +162,7 @@ export default function OnboardingPage() {
                   <input
                     type="time"
                     required
-                    className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    className="input input-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20"
                     value={hoursData.workingHoursEnd}
                     onChange={(e) => setHoursData({ ...hoursData, workingHoursEnd: e.target.value })}
                   />
@@ -180,7 +180,7 @@ export default function OnboardingPage() {
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-primary flex-1 text-white bg-blue-600 hover:bg-blue-700 border-0"
+                  className="btn btn-primary flex-1 text-white bg-[#A5744A] hover:bg-[#8B6239] border-0"
                   disabled={isLoading}
                 >
                   {isLoading ? (

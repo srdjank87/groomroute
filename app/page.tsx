@@ -50,7 +50,7 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link href="/auth/login" className="btn btn-ghost btn-sm">
+            <Link href="/auth/signin" className="btn btn-ghost btn-sm">
               Sign In
             </Link>
 
@@ -104,7 +104,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="text-sm opacity-70">14-day free trial. Cancel anytime. Card required.</p>
-            <p className="text-sm font-semibold text-blue-600 mt-4">Save 45–90 minutes daily without changing your routine</p>
+            <p className="text-sm font-semibold text-[#A5744A] mt-4">Save 45–90 minutes daily without changing your routine</p>
             <p className="text-sm opacity-60 mt-4">
               Prefer to talk to a real human first?{" "}
               <Link href="/book-demo" className="link link-hover underline">
@@ -293,7 +293,7 @@ export default function Home() {
 
           <div className="space-y-12">
             {/* Feature 1 - Image Left */}
-            <div className="card bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 shadow-xl">
+            <div className="card bg-gradient-to-br from-orange-50 to-amber-100 border-2 border-[#A5744A]/30 shadow-xl">
               <div className="card-body">
                 <div className="flex flex-col lg:flex-row gap-6 items-center">
                   <div className="lg:w-1/3">
@@ -453,7 +453,7 @@ export default function Home() {
       </section>
 
       {/* CALM CONTROL - CRISIS MANAGEMENT */}
-      <section className="py-8 lg:py-12 px-6 bg-gradient-to-br from-blue-50 to-indigo-100">
+      <section className="py-8 lg:py-12 px-6 bg-gradient-to-br from-orange-50 to-amber-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-5xl font-bold mb-6">
@@ -661,7 +661,7 @@ export default function Home() {
             </div>
 
             {/* Growth - POPULAR */}
-            <div className="card shadow-2xl border-4 transform scale-105" style={{ backgroundColor: '#3b82f6', color: 'white', borderColor: '#3b82f6' }}>
+            <div className="card shadow-2xl border-4 transform scale-105" style={{ backgroundColor: '#A5744A', color: 'white', borderColor: '#A5744A' }}>
               <div className="card-body">
                 <div className="badge badge-secondary mb-2">MOST POPULAR</div>
                 <div className="badge badge-neutral mb-2 text-neutral-content">GROWTH</div>
