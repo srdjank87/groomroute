@@ -123,7 +123,7 @@ function DashboardContent() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/app/routes"
-                  className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0"
+                  className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0 font-semibold"
                 >
                   View Sample Route
                 </Link>
@@ -134,7 +134,7 @@ function DashboardContent() {
                       window.location.reload();
                     }
                   }}
-                  className="btn btn-sm btn-ghost border border-white/30 hover:bg-white/10"
+                  className="btn btn-sm bg-white/20 text-white border-2 border-white/40 hover:bg-white/30 hover:border-white/60 font-semibold"
                 >
                   Clear Sample Data
                 </button>

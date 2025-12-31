@@ -123,16 +123,16 @@ export default function OnboardingPage() {
         {/* Progress Steps */}
         <div className="mb-8">
           <ul className="steps steps-horizontal w-full">
-            <li className={`step ${currentStep !== "groomer" ? "step-primary" : ""}`}>
+            <li className={`step ${["groomer", "address", "hours", "plan"].includes(currentStep) ? "step-primary" : ""}`}>
               Groomer Profile
             </li>
-            <li className={`step ${["hours", "plan", "complete"].includes(currentStep) ? "step-primary" : ""}`}>
+            <li className={`step ${["address", "hours", "plan"].includes(currentStep) ? "step-primary" : ""}`}>
               Base Address
             </li>
-            <li className={`step ${["plan", "complete"].includes(currentStep) ? "step-primary" : ""}`}>
+            <li className={`step ${["hours", "plan"].includes(currentStep) ? "step-primary" : ""}`}>
               Working Hours
             </li>
-            <li className={`step ${currentStep === "complete" ? "step-primary" : ""}`}>
+            <li className={`step ${currentStep === "plan" ? "step-primary" : ""}`}>
               Choose Plan
             </li>
           </ul>
@@ -185,14 +185,14 @@ export default function OnboardingPage() {
                 </label>
                 <input
                   type="tel"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                   placeholder="(555) 123-4567"
                   value={groomerData.phone}
                   onChange={(e) => setGroomerData({ ...groomerData, phone: e.target.value })}
                 />
               </div>
 
-              <button type="submit" className="btn btn-primary w-full">
+              <button type="submit" className="btn btn-primary w-full text-white bg-blue-600 hover:bg-blue-700 border-0">
                 Continue
               </button>
             </form>
@@ -226,11 +226,11 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setCurrentStep("groomer")}
-                  className="btn btn-ghost flex-1"
+                  className="btn btn-ghost flex-1 border-2 border-gray-300"
                 >
                   Back
                 </button>
-                <button type="submit" className="btn btn-primary flex-1">
+                <button type="submit" className="btn btn-primary flex-1 text-white bg-blue-600 hover:bg-blue-700 border-0">
                   Continue
                 </button>
               </div>
@@ -254,7 +254,7 @@ export default function OnboardingPage() {
                   <input
                     type="time"
                     required
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                     value={hoursData.workingHoursStart}
                     onChange={(e) => setHoursData({ ...hoursData, workingHoursStart: e.target.value })}
                   />
@@ -267,7 +267,7 @@ export default function OnboardingPage() {
                   <input
                     type="time"
                     required
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                     value={hoursData.workingHoursEnd}
                     onChange={(e) => setHoursData({ ...hoursData, workingHoursEnd: e.target.value })}
                   />
@@ -278,14 +278,14 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setCurrentStep("address")}
-                  className="btn btn-ghost flex-1"
+                  className="btn btn-ghost flex-1 border-2 border-gray-300"
                   disabled={isLoading}
                 >
                   Back
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-primary flex-1"
+                  className="btn btn-primary flex-1 text-white bg-blue-600 hover:bg-blue-700 border-0"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -294,7 +294,7 @@ export default function OnboardingPage() {
                       Completing setup...
                     </>
                   ) : (
-                    "Complete Setup"
+                    "Continue"
                   )}
                 </button>
               </div>
@@ -317,13 +317,13 @@ export default function OnboardingPage() {
                 </span>
                 <input
                   type="checkbox"
-                  className="toggle toggle-primary"
+                  className="toggle toggle-primary border-2 border-blue-600 [--tglbg:theme(colors.blue.600)] checked:bg-blue-600 checked:border-blue-600"
                   checked={planData.billing === "YEARLY"}
                   onChange={(e) => setPlanData({ ...planData, billing: e.target.checked ? "YEARLY" : "MONTHLY" })}
                 />
                 <span className={`text-sm font-medium ${planData.billing === "YEARLY" ? "text-gray-900" : "text-gray-500"}`}>
                   Yearly
-                  <span className="ml-1 text-xs text-green-600">(Save 20%)</span>
+                  <span className="ml-1 text-xs text-green-600 font-semibold">(Save 20%)</span>
                 </span>
               </div>
 
@@ -445,14 +445,14 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setCurrentStep("hours")}
-                  className="btn btn-ghost flex-1"
+                  className="btn btn-ghost flex-1 border-2 border-gray-300"
                   disabled={isLoading}
                 >
                   Back
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-primary flex-1"
+                  className="btn btn-primary flex-1 text-white bg-blue-600 hover:bg-blue-700 border-0"
                   disabled={isLoading}
                 >
                   {isLoading ? (

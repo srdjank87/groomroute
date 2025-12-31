@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   LayoutDashboard,
   Users,
@@ -15,9 +16,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+const GroomRouteLogo = () => (
+  <span>Groom<span style={{ color: '#A5744A' }}>Route</span></span>
+);
+
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Calm Center", href: "/calm", icon: Heart, special: true },
+  { name: "Calm Center", href: "/dashboard/calm", icon: Heart, special: true },
   { name: "Customers", href: "/app/customers", icon: Users },
   { name: "Appointments", href: "/app/appointments", icon: Calendar },
   { name: "Routes", href: "/app/routes", icon: RouteIcon },
@@ -57,8 +62,15 @@ export default function DashboardLayout({
             onClick={() => setSidebarOpen(false)}
           ></div>
           <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
-            <div className="flex h-16 items-center gap-x-4 px-6 border-b border-gray-200">
-              <h1 className="text-xl font-bold text-primary">GroomRoute</h1>
+            <div className="flex h-16 items-center gap-x-3 px-6 border-b border-gray-200">
+              <Image
+                src="/images/icon.svg"
+                alt="GroomRoute"
+                width={32}
+                height={32}
+                className="w-8 h-8"
+              />
+              <h1 className="text-xl font-bold"><GroomRouteLogo /></h1>
             </div>
             <nav className="flex flex-1 flex-col p-4">
               <ul role="list" className="space-y-1">
@@ -92,8 +104,15 @@ export default function DashboardLayout({
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white border-r border-gray-200">
-          <div className="flex h-16 items-center gap-x-4 px-6 border-b border-gray-200">
-            <h1 className="text-xl font-bold text-primary">GroomRoute</h1>
+          <div className="flex h-16 items-center gap-x-3 px-6 border-b border-gray-200">
+            <Image
+              src="/images/icon.svg"
+              alt="GroomRoute"
+              width={32}
+              height={32}
+              className="w-8 h-8"
+            />
+            <h1 className="text-xl font-bold"><GroomRouteLogo /></h1>
           </div>
           <nav className="flex flex-1 flex-col p-4">
             <ul role="list" className="space-y-1">
