@@ -192,7 +192,20 @@ export default function DashboardLayout({
             <Menu className="h-6 w-6" />
           </button>
 
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end items-center">
+          {/* Mobile logo - centered */}
+          <div className="flex flex-1 lg:hidden items-center justify-center gap-x-2">
+            <Image
+              src="/images/icon.svg"
+              alt="GroomRoute"
+              width={28}
+              height={28}
+              className="w-7 h-7"
+            />
+            <h1 className="text-lg font-bold"><GroomRouteLogo /></h1>
+          </div>
+
+          {/* Desktop - right aligned user info */}
+          <div className="hidden lg:flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end items-center">
             <div className="flex items-center gap-x-4">
               <span className="text-sm text-gray-700">
                 {session?.user?.name || session?.user?.email}
@@ -206,6 +219,14 @@ export default function DashboardLayout({
               </button>
             </div>
           </div>
+
+          {/* Mobile logout button */}
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="lg:hidden -m-2.5 p-2.5 text-gray-700"
+          >
+            <LogOut className="h-5 w-5" />
+          </button>
         </div>
 
         {/* Page content */}
