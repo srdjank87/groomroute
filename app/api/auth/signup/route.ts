@@ -33,10 +33,6 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await hash(validatedData.password, 12);
 
-    // Calculate trial end date (14 days from now)
-    const trialEndsAt = new Date();
-    trialEndsAt.setDate(trialEndsAt.getDate() + 14);
-
     // Map plan string to enum
     const planMap: Record<string, "STARTER" | "GROWTH" | "PRO"> = {
       starter: "STARTER",
@@ -51,15 +47,15 @@ export async function POST(request: NextRequest) {
 
     // Create account and user in a transaction
     const result = await prisma.$transaction(async (tx) => {
-      // Create account with subscription details
+      // Create account with INCOMPLETE status - will be updated by Stripe webhook
       const account = await tx.account.create({
         data: {
           name: validatedData.businessName,
           timezone: validatedData.timezone,
           subscriptionPlan: planMap[validatedData.plan],
           billingCycle: billingMap[validatedData.billing],
-          subscriptionStatus: "TRIAL",
-          trialEndsAt: trialEndsAt,
+          subscriptionStatus: "INCOMPLETE", // User must complete Stripe checkout
+          trialEndsAt: null, // Will be set after Stripe checkout
         },
       });
 

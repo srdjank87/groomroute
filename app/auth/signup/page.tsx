@@ -15,6 +15,14 @@ function SignUpForm() {
   const selectedPlan = searchParams.get("plan") || "growth";
   const selectedBilling = searchParams.get("billing") || "monthly";
 
+  // Show error message if redirected from dashboard
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "subscription_required") {
+      toast.error("Please complete payment to access your dashboard.");
+    }
+  }, [searchParams]);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",

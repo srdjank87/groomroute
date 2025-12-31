@@ -14,7 +14,7 @@ import {
   Menu,
   Heart,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const GroomRouteLogo = () => (
   <span>Groom<span style={{ color: '#A5744A' }}>Route</span></span>
@@ -39,6 +39,22 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Check if user has completed Stripe checkout
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      const subscriptionStatus = session.user.subscriptionStatus;
+
+      // If user has no subscription status or is in incomplete state, redirect to signup
+      // Allow TRIAL, ACTIVE, PAST_DUE, and CANCELED (grace period)
+      // Block access if: no status, INCOMPLETE, or EXPIRED
+      if (!subscriptionStatus ||
+          subscriptionStatus === "INCOMPLETE" ||
+          subscriptionStatus === "EXPIRED") {
+        router.push("/auth/signup?error=subscription_required");
+      }
+    }
+  }, [status, session, router]);
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -50,6 +66,18 @@ export default function DashboardLayout({
   if (status === "unauthenticated") {
     router.push("/auth/signin");
     return null;
+  }
+
+  // Block rendering if subscription check fails
+  if (session?.user &&
+      (!session.user.subscriptionStatus ||
+       session.user.subscriptionStatus === "INCOMPLETE" ||
+       session.user.subscriptionStatus === "EXPIRED")) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
   }
 
   return (

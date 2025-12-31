@@ -90,12 +90,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     ? new Date(currentPeriodEnd * 1000)
     : null;
 
+  // Calculate trial end date (14 days from now)
+  const trialEndsAt = new Date();
+  trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+
   await prisma.account.update({
     where: { id: accountId },
     data: {
       stripeSubscriptionId: subscriptionId,
       subscriptionStatus: "TRIAL",
       currentPeriodEnd: periodEnd,
+      trialEndsAt: trialEndsAt,
     },
   });
 
