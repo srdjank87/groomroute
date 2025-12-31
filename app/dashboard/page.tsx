@@ -200,17 +200,17 @@ function DashboardContent() {
           <div className="grid grid-cols-2 gap-3">
             <Link
               href="/app/routes"
-              className="btn btn-lg bg-white text-blue-600 hover:bg-gray-100 border-0 flex-1"
+              className="btn btn-md bg-white text-blue-600 hover:bg-gray-100 border-0 flex-1 gap-2"
             >
-              <Navigation className="h-5 w-5" />
-              Start Navigation
+              <Navigation className="h-4 w-4" />
+              <span className="text-sm">Start Navigation</span>
             </Link>
             <Link
               href="/app/appointments"
-              className="btn btn-lg btn-ghost border border-white/30 hover:bg-white/10 flex-1"
+              className="btn btn-md btn-ghost border border-white/30 hover:bg-white/10 flex-1 gap-2"
             >
-              <Calendar className="h-5 w-5" />
-              View Schedule
+              <Calendar className="h-4 w-4" />
+              <span className="text-sm">View Schedule</span>
             </Link>
           </div>
         </div>
