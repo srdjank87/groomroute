@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Plus, Search, Calendar } from "lucide-react";
 
@@ -25,14 +25,7 @@ export default function CustomersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchCustomers();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/customers?search=${searchQuery}`);
@@ -45,7 +38,14 @@ export default function CustomersPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchCustomers();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [fetchCustomers]);
 
   return (
     <div className="max-w-4xl mx-auto pb-20">

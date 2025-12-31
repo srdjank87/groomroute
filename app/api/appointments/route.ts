@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { AppointmentType } from "@prisma/client";
 
 const appointmentSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
@@ -116,7 +117,7 @@ export async function POST(req: NextRequest) {
         petId: validatedData.petId || null,
         groomerId: groomer.id,
         startAt,
-        appointmentType: validatedData.serviceType,
+        appointmentType: validatedData.serviceType as AppointmentType,
         serviceMinutes: validatedData.serviceMinutes,
         price: validatedData.price,
         notes: validatedData.notes || null,

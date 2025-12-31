@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Plus, Calendar, MapPin, Clock } from "lucide-react";
 import { format } from "date-fns";
@@ -31,11 +31,7 @@ export default function AppointmentsPage() {
     new Date().toISOString().split("T")[0]
   );
 
-  useEffect(() => {
-    fetchAppointments();
-  }, [selectedDate]);
-
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/appointments?date=${selectedDate}`);
@@ -48,7 +44,11 @@ export default function AppointmentsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedDate]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments]);
 
   const getServiceTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
