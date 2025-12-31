@@ -170,7 +170,7 @@ function DashboardContent() {
 
       {/* Hero Section - Today's Route */}
       {stats?.hasData && stats.nextAppointment ? (
-        <div className="bg-gradient-to-br from-[#C4915E] to-[#A5744A] rounded-xl shadow-lg text-white p-6 mb-6">
+        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg text-white p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Next Stop</h2>
             <div className="badge badge-lg bg-white/20 border-0 text-white">
@@ -200,7 +200,7 @@ function DashboardContent() {
           <div className="grid grid-cols-2 gap-3">
             <Link
               href="/app/routes"
-              className="btn btn-lg bg-white text-[#A5744A] hover:bg-gray-100 border-0 flex-1"
+              className="btn btn-lg bg-white text-blue-600 hover:bg-gray-100 border-0 flex-1"
             >
               <Navigation className="h-5 w-5" />
               Start Navigation
