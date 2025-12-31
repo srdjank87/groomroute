@@ -23,15 +23,16 @@ export default auth((req) => {
   if (isAuthRoute && isAuthenticated) {
     const subscriptionStatus = (req.auth?.user as any)?.subscriptionStatus;
 
-    // Allow access to signup page if subscription is incomplete or expired
+    // Allow access to auth pages if subscription is incomplete or expired
+    // This allows users to complete their subscription or sign in with a different account
     if (
-      nextUrl.pathname === "/auth/signup" &&
+      (nextUrl.pathname === "/auth/signup" || nextUrl.pathname === "/auth/signin") &&
       (subscriptionStatus === "INCOMPLETE" || subscriptionStatus === "EXPIRED" || !subscriptionStatus)
     ) {
       return NextResponse.next();
     }
 
-    // Otherwise redirect to dashboard
+    // Otherwise redirect to dashboard (user has valid subscription)
     return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 
