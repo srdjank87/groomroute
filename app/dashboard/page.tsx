@@ -170,7 +170,7 @@ function DashboardContent() {
 
       {/* Hero Section - Today's Route */}
       {stats?.hasData && stats.nextAppointment ? (
-        <div className="bg-gradient-to-br from-[#A5744A] to-[#8B6239] rounded-xl shadow-lg text-white p-6 mb-6">
+        <div className="bg-gradient-to-br from-[#C4915E] to-[#A5744A] rounded-xl shadow-lg text-white p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Next Stop</h2>
             <div className="badge badge-lg bg-white/20 border-0 text-white">
