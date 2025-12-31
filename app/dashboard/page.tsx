@@ -283,7 +283,7 @@ function DashboardContent() {
         <div className="p-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Link
-              href="/app/appointments"
+              href="/app/appointments/new"
               className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/30 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors text-center"
             >
               <div className="p-3 bg-[#A5744A] rounded-full">
@@ -293,7 +293,7 @@ function DashboardContent() {
             </Link>
 
             <Link
-              href="/app/customers"
+              href="/app/customers/new"
               className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/20 rounded-lg hover:bg-orange-50 transition-colors text-center"
             >
               <div className="p-3 bg-[#A5744A]/20 rounded-full">

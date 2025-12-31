@@ -1,0 +1,408 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ChevronLeft, Check, ChevronDown, ChevronUp } from "lucide-react";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
+import toast from "react-hot-toast";
+
+export default function NewCustomerPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showAddressNotes, setShowAddressNotes] = useState(false);
+  const [showPetSection, setShowPetSection] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+
+  const [formData, setFormData] = useState({
+    // Customer info
+    name: "",
+    phone: "",
+    email: "",
+    // Address
+    address: "",
+    addressNotes: "",
+    accessInstructions: "",
+    // Pet (optional)
+    petName: "",
+    species: "dog",
+    breed: "",
+    weight: "",
+    behaviorFlags: [] as string[],
+    specialHandling: "",
+    // Notes
+    notes: "",
+  });
+
+  const behaviorOptions = [
+    { value: "FRIENDLY", label: "Friendly", emoji: "😊" },
+    { value: "ANXIOUS", label: "Anxious", emoji: "😰" },
+    { value: "AGGRESSIVE", label: "Aggressive", emoji: "⚠️" },
+    { value: "BITE_RISK", label: "Bite Risk", emoji: "🦷" },
+    { value: "MUZZLE_REQUIRED", label: "Muzzle Required", emoji: "🏥" },
+  ];
+
+  const toggleBehaviorFlag = (flag: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      behaviorFlags: prev.behaviorFlags.includes(flag)
+        ? prev.behaviorFlags.filter((f) => f !== flag)
+        : [...prev.behaviorFlags, flag],
+    }));
+  };
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    setFormData({ ...formData, phone: formatted });
+  };
+
+  const handleSubmit = async (e: React.FormEvent, action: "save" | "saveAndBook") => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.address) {
+      toast.error("Please fill in customer name and address");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to save customer");
+      }
+
+      const data = await response.json();
+      toast.success("Customer saved successfully!");
+
+      if (action === "saveAndBook") {
+        router.push(`/app/appointments/new?customerId=${data.customer.id}`);
+      } else {
+        router.push("/app/customers");
+      }
+    } catch (error) {
+      console.error("Save customer error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to save customer");
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-24">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+          <button
+            onClick={() => router.back()}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <h1 className="text-xl font-bold text-gray-900">New Customer</h1>
+        </div>
+      </div>
+
+      {/* Form */}
+      <form className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        {/* Customer Info Section */}
+        <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Customer Information</h2>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="input input-bordered w-full h-12 text-base"
+              placeholder="Customer name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Phone
+            </label>
+            <input
+              type="tel"
+              value={formData.phone}
+              onChange={handlePhoneChange}
+              className="input input-bordered w-full h-12 text-base"
+              placeholder="(555) 123-4567"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="input input-bordered w-full h-12 text-base"
+              placeholder="customer@example.com"
+            />
+          </div>
+        </div>
+
+        {/* Address Section */}
+        <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Address</h2>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Street Address <span className="text-red-500">*</span>
+            </label>
+            <AddressAutocomplete
+              value={formData.address}
+              onChange={(address) => setFormData({ ...formData, address })}
+              placeholder="Start typing address..."
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Start typing and select from suggestions for accurate routing
+            </p>
+          </div>
+
+          {/* Address Notes Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowAddressNotes(!showAddressNotes)}
+            className="flex items-center gap-2 text-sm text-[#A5744A] font-medium hover:text-[#8B6239]"
+          >
+            {showAddressNotes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            Add gate code or parking instructions
+          </button>
+
+          {showAddressNotes && (
+            <div className="space-y-4 pt-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Address Notes
+                </label>
+                <textarea
+                  value={formData.addressNotes}
+                  onChange={(e) => setFormData({ ...formData, addressNotes: e.target.value })}
+                  className="textarea textarea-bordered w-full text-base"
+                  rows={2}
+                  placeholder="Gate code, parking spot, etc."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Access Instructions
+                </label>
+                <textarea
+                  value={formData.accessInstructions}
+                  onChange={(e) => setFormData({ ...formData, accessInstructions: e.target.value })}
+                  className="textarea textarea-bordered w-full text-base"
+                  rows={2}
+                  placeholder="Side gate, backyard access, etc."
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Pet Section (Optional) */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <button
+            type="button"
+            onClick={() => setShowPetSection(!showPetSection)}
+            className="w-full flex items-center justify-between"
+          >
+            <div className="text-left">
+              <h2 className="text-lg font-semibold text-gray-900">Add Pet</h2>
+              <p className="text-sm text-gray-500">Optional - you can add pets later</p>
+            </div>
+            {showPetSection ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+          </button>
+
+          {showPetSection && (
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Pet Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.petName}
+                  onChange={(e) => setFormData({ ...formData, petName: e.target.value })}
+                  className="input input-bordered w-full h-12 text-base"
+                  placeholder="Max, Bella, etc."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Species
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, species: "dog" })}
+                    className={`p-4 rounded-lg border-2 transition-colors ${
+                      formData.species === "dog"
+                        ? "border-[#A5744A] bg-orange-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="text-3xl mb-1">🐕</div>
+                    <div className="text-sm font-medium">Dog</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, species: "cat" })}
+                    className={`p-4 rounded-lg border-2 transition-colors ${
+                      formData.species === "cat"
+                        ? "border-[#A5744A] bg-orange-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="text-3xl mb-1">🐈</div>
+                    <div className="text-sm font-medium">Cat</div>
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Breed
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.breed}
+                    onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
+                    className="input input-bordered w-full h-12 text-base"
+                    placeholder="Golden Retriever"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Weight (lbs)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.weight}
+                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                    className="input input-bordered w-full h-12 text-base"
+                    placeholder="65"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Behavior
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {behaviorOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => toggleBehaviorFlag(option.value)}
+                      className={`px-4 py-2 rounded-lg border-2 transition-colors text-sm font-medium ${
+                        formData.behaviorFlags.includes(option.value)
+                          ? "border-[#A5744A] bg-orange-50 text-[#8B6239]"
+                          : "border-gray-200 text-gray-700 hover:border-gray-300"
+                      }`}
+                    >
+                      <span className="mr-1">{option.emoji}</span>
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Special Handling Notes
+                </label>
+                <textarea
+                  value={formData.specialHandling}
+                  onChange={(e) => setFormData({ ...formData, specialHandling: e.target.value })}
+                  className="textarea textarea-bordered w-full text-base"
+                  rows={3}
+                  placeholder="Any special handling requirements..."
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Notes Section (Optional) */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <button
+            type="button"
+            onClick={() => setShowNotes(!showNotes)}
+            className="w-full flex items-center justify-between"
+          >
+            <div className="text-left">
+              <h2 className="text-lg font-semibold text-gray-900">Internal Notes</h2>
+              <p className="text-sm text-gray-500">For your reference only</p>
+            </div>
+            {showNotes ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+          </button>
+
+          {showNotes && (
+            <div className="mt-4">
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                className="textarea textarea-bordered w-full text-base"
+                rows={4}
+                placeholder="Billing preferences, special requests, etc."
+              />
+            </div>
+          )}
+        </div>
+      </form>
+
+      {/* Fixed Bottom Actions */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:pl-64">
+        <div className="max-w-3xl mx-auto flex gap-3">
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e, "save")}
+            disabled={isLoading}
+            className="btn flex-1 h-12 bg-white border-2 border-[#A5744A] text-[#A5744A] hover:bg-orange-50"
+          >
+            {isLoading ? <span className="loading loading-spinner"></span> : "Save Customer"}
+          </button>
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e, "saveAndBook")}
+            disabled={isLoading}
+            className="btn flex-1 h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
+          >
+            {isLoading ? <span className="loading loading-spinner"></span> : (
+              <>
+                <Check className="h-4 w-4" />
+                Save & Book Appointment
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
