@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { stripe, STRIPE_PLANS, PlanType, BillingType } from "@/lib/stripe";
+import { stripe, getStripePlans, PlanType, BillingType } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
@@ -13,6 +13,9 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { plan, billing } = body as { plan: PlanType; billing: BillingType };
+
+    // Get Stripe plans at runtime to ensure env vars are loaded
+    const STRIPE_PLANS = getStripePlans();
 
     // Validate plan and billing
     if (!STRIPE_PLANS[plan] || !STRIPE_PLANS[plan][billing]) {

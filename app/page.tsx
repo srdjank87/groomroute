@@ -661,7 +661,7 @@ export default function Home() {
             </div>
 
             {/* Growth - POPULAR */}
-            <div className="card shadow-2xl border-4 transform scale-105" style={{ backgroundColor: '#A5744A', color: 'white', borderColor: '#A5744A' }}>
+            <div className="card shadow-2xl border-4 transform scale-105" style={{ backgroundColor: '#3b82f6', color: 'white', borderColor: '#3b82f6' }}>
               <div className="card-body">
                 <div className="badge badge-secondary mb-2">MOST POPULAR</div>
                 <div className="badge badge-neutral mb-2 text-neutral-content">GROWTH</div>

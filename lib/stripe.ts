@@ -8,39 +8,44 @@ export const stripe = new Stripe(stripeKey, {
   typescript: true,
 });
 
-// Stripe pricing configuration
-export const STRIPE_PLANS = {
-  starter: {
-    monthly: {
-      priceId: process.env.STRIPE_STARTER_MONTHLY_PRICE_ID || "",
-      amount: 7900, // $79.00
+// Stripe pricing configuration - using a function to ensure env vars are read at runtime
+export function getStripePlans() {
+  return {
+    starter: {
+      monthly: {
+        priceId: process.env.STRIPE_STARTER_MONTHLY_PRICE_ID || "",
+        amount: 7900, // $79.00
+      },
+      yearly: {
+        priceId: process.env.STRIPE_STARTER_YEARLY_PRICE_ID || "",
+        amount: 95000, // $950.00 (updated to match landing page)
+      },
     },
-    yearly: {
-      priceId: process.env.STRIPE_STARTER_YEARLY_PRICE_ID || "",
-      amount: 95000, // $950.00 (updated to match landing page)
+    growth: {
+      monthly: {
+        priceId: process.env.STRIPE_GROWTH_MONTHLY_PRICE_ID || "",
+        amount: 17900, // $179.00
+      },
+      yearly: {
+        priceId: process.env.STRIPE_GROWTH_YEARLY_PRICE_ID || "",
+        amount: 170000, // $1,700.00
+      },
     },
-  },
-  growth: {
-    monthly: {
-      priceId: process.env.STRIPE_GROWTH_MONTHLY_PRICE_ID || "",
-      amount: 17900, // $179.00
+    pro: {
+      monthly: {
+        priceId: process.env.STRIPE_PRO_MONTHLY_PRICE_ID || "",
+        amount: 27900, // $279.00
+      },
+      yearly: {
+        priceId: process.env.STRIPE_PRO_YEARLY_PRICE_ID || "",
+        amount: 265000, // $2,650.00
+      },
     },
-    yearly: {
-      priceId: process.env.STRIPE_GROWTH_YEARLY_PRICE_ID || "",
-      amount: 170000, // $1,700.00
-    },
-  },
-  pro: {
-    monthly: {
-      priceId: process.env.STRIPE_PRO_MONTHLY_PRICE_ID || "",
-      amount: 27900, // $279.00
-    },
-    yearly: {
-      priceId: process.env.STRIPE_PRO_YEARLY_PRICE_ID || "",
-      amount: 265000, // $2,650.00
-    },
-  },
-} as const;
+  } as const;
+}
+
+// For backwards compatibility, export as constant too
+export const STRIPE_PLANS = getStripePlans();
 
 export type PlanType = keyof typeof STRIPE_PLANS;
 export type BillingType = "monthly" | "yearly";
