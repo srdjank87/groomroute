@@ -8,7 +8,7 @@ import { format } from "date-fns";
 interface Appointment {
   id: string;
   startAt: string;
-  endAt: string;
+  serviceMinutes: number;
   appointmentType: string;
   price: number;
   status: string;
@@ -162,7 +162,13 @@ export default function AppointmentsPage() {
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   {format(new Date(appointment.startAt), "h:mm a")} -{" "}
-                  {format(new Date(appointment.endAt), "h:mm a")}
+                  {format(
+                    new Date(
+                      new Date(appointment.startAt).getTime() +
+                        appointment.serviceMinutes * 60000
+                    ),
+                    "h:mm a"
+                  )}
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />

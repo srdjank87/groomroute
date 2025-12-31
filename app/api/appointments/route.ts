@@ -74,41 +74,35 @@ export async function POST(req: NextRequest) {
     const startAt = new Date(`${validatedData.date}T${validatedData.time}`);
 
     // Check for scheduling conflicts (same groomer, overlapping time)
-    const endAt = new Date(startAt.getTime() + validatedData.serviceMinutes * 60000);
-
-    const conflictingAppt = await prisma.appointment.findFirst({
+    // Get all appointments for this groomer on the same day
+    const existingAppointments = await prisma.appointment.findMany({
       where: {
         groomerId: groomer.id,
         status: {
           notIn: ["CANCELLED", "NO_SHOW"],
         },
-        OR: [
-          {
-            // New appointment starts during existing appointment
-            AND: [
-              { startAt: { lte: startAt } },
-              { endAt: { gt: startAt } },
-            ],
-          },
-          {
-            // New appointment ends during existing appointment
-            AND: [
-              { startAt: { lt: endAt } },
-              { endAt: { gte: endAt } },
-            ],
-          },
-          {
-            // New appointment completely contains existing appointment
-            AND: [
-              { startAt: { gte: startAt } },
-              { endAt: { lte: endAt } },
-            ],
-          },
-        ],
+        startAt: {
+          gte: new Date(startAt.getFullYear(), startAt.getMonth(), startAt.getDate()),
+          lt: new Date(startAt.getFullYear(), startAt.getMonth(), startAt.getDate() + 1),
+        },
       },
     });
 
-    if (conflictingAppt) {
+    // Check for conflicts manually
+    const newEndTime = startAt.getTime() + validatedData.serviceMinutes * 60000;
+    const hasConflict = existingAppointments.some((appt) => {
+      const apptEndTime = new Date(appt.startAt).getTime() + appt.serviceMinutes * 60000;
+      const apptStartTime = new Date(appt.startAt).getTime();
+
+      // Check if appointments overlap
+      return (
+        (startAt.getTime() >= apptStartTime && startAt.getTime() < apptEndTime) || // New starts during existing
+        (newEndTime > apptStartTime && newEndTime <= apptEndTime) || // New ends during existing
+        (startAt.getTime() <= apptStartTime && newEndTime >= apptEndTime) // New contains existing
+      );
+    });
+
+    if (hasConflict) {
       return NextResponse.json(
         { error: "This time slot conflicts with an existing appointment" },
         { status: 400 }
@@ -122,12 +116,12 @@ export async function POST(req: NextRequest) {
         petId: validatedData.petId || null,
         groomerId: groomer.id,
         startAt,
-        endAt,
         appointmentType: validatedData.serviceType,
         serviceMinutes: validatedData.serviceMinutes,
         price: validatedData.price,
         notes: validatedData.notes || null,
         status: "SCHEDULED",
+        accountId,
       },
       include: {
         customer: true,
