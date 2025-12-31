@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { BehaviorFlag } from "@prisma/client";
 
 const customerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
             species: validatedData.species || "dog",
             breed: validatedData.breed || null,
             weight: validatedData.weight ? parseFloat(validatedData.weight) : null,
-            behaviorFlags: validatedData.behaviorFlags || [],
+            behaviorFlags: (validatedData.behaviorFlags || []) as BehaviorFlag[],
             specialHandling: validatedData.specialHandling || null,
           },
         });
