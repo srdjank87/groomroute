@@ -83,8 +83,8 @@ export async function POST(request: NextRequest) {
         accountId: account.id,
         userId: session.user.id,
       },
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?setup=success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/onboarding?payment=canceled`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/onboarding`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/auth/signup?payment=canceled`,
       allow_promotion_codes: true,
     });
 

@@ -55,13 +55,13 @@ export default function Home() {
             </Link>
 
             <Link
-              href="/auth/signup"
+              href="/auth/signup?plan=growth&billing=monthly"
               className="btn btn-gradient btn-sm hidden sm:inline-flex items-center"
             >
               Start Free Trial
             </Link>
             <Link
-              href="/auth/signup"
+              href="/auth/signup?plan=growth&billing=monthly"
               className="btn btn-gradient btn-sm sm:hidden inline-flex items-center"
             >
               Get Started
@@ -99,7 +99,7 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
-              <Link href="/auth/signup" className="btn btn-gradient btn-lg">
+              <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
                 Start Free Trial
               </Link>
             </div>
@@ -875,7 +875,7 @@ export default function Home() {
                   One tap. Your whole day changes.
                 </p>
                 <div className="card-actions">
-                  <Link href="/auth/signup" className="btn btn-gradient btn-lg">
+                  <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
                     Start Free Trial
                   </Link>
                 </div>

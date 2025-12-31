@@ -11,8 +11,8 @@ function SignUpForm() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Get plan and billing from URL params
-  const selectedPlan = searchParams.get("plan") || "starter";
+  // Get plan and billing from URL params (default to Growth Monthly)
+  const selectedPlan = searchParams.get("plan") || "growth";
   const selectedBilling = searchParams.get("billing") || "monthly";
 
   const [formData, setFormData] = useState({
@@ -30,19 +30,18 @@ function SignUpForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/signup", {
+      // Create account
+      const signupResponse = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const signupData = await signupResponse.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create account");
+      if (!signupResponse.ok) {
+        throw new Error(signupData.error || "Failed to create account");
       }
-
-      toast.success("Account created successfully!");
 
       // Auto-login after signup
       const signInResult = await signIn("credentials", {
@@ -54,12 +53,30 @@ function SignUpForm() {
       if (signInResult?.error) {
         toast.error("Account created but login failed. Please login manually.");
         router.push("/auth/signin");
-      } else {
-        router.push("/onboarding");
+        return;
       }
+
+      // Create Stripe checkout session
+      const checkoutResponse = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: formData.plan.toUpperCase(),
+          billing: formData.billing.toUpperCase(),
+        }),
+      });
+
+      if (!checkoutResponse.ok) {
+        const checkoutData = await checkoutResponse.json();
+        throw new Error(checkoutData.error || "Failed to create checkout session");
+      }
+
+      const { url } = await checkoutResponse.json();
+
+      // Redirect to Stripe Checkout
+      window.location.href = url;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -81,14 +98,14 @@ function SignUpForm() {
           <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-700">Selected Plan</p>
-                <p className="text-lg font-bold text-primary capitalize">
-                  {selectedPlan} - {selectedBilling === "yearly" ? "Annual" : "Monthly"}
+                <p className="text-sm text-gray-600">Selected Plan</p>
+                <p className="text-base font-bold text-blue-700 capitalize">
+                  {selectedPlan} - {selectedBilling === "yearly" ? "Yearly" : "Monthly"}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-600">14-day free trial</p>
-                <Link href="/#pricing" className="text-xs text-primary hover:underline">
+                <p className="text-sm font-semibold text-blue-700">14-day free trial</p>
+                <Link href="/#pricing" className="text-xs text-blue-600 hover:underline">
                   Change plan
                 </Link>
               </div>
@@ -104,7 +121,7 @@ function SignUpForm() {
                 id="name"
                 type="text"
                 required
-                className="input input-bordered w-full"
+                className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-50"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 disabled={isLoading}
@@ -119,7 +136,7 @@ function SignUpForm() {
                 id="businessName"
                 type="text"
                 required
-                className="input input-bordered w-full"
+                className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-50"
                 value={formData.businessName}
                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                 disabled={isLoading}
@@ -134,7 +151,7 @@ function SignUpForm() {
                 id="email"
                 type="email"
                 required
-                className="input input-bordered w-full"
+                className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 disabled={isLoading}
@@ -150,7 +167,7 @@ function SignUpForm() {
                 type="password"
                 required
                 minLength={8}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 disabled={isLoading}
@@ -163,7 +180,7 @@ function SignUpForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary w-full"
+              className="btn btn-primary w-full text-white bg-blue-600 hover:bg-blue-700 border-0 font-semibold"
             >
               {isLoading ? (
                 <>
