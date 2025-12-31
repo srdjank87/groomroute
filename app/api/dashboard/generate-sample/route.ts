@@ -112,11 +112,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingSampleData) {
+      console.log("Sample data already exists for accountId", accountId);
       return NextResponse.json(
         { error: "Sample data already exists" },
         { status: 400 }
       );
     }
+
+    console.log("No existing sample data found, proceeding to generate...");
 
     // Get the first groomer for this account
     const groomer = await prisma.groomer.findFirst({
@@ -127,11 +130,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (!groomer) {
+      console.error("Sample data generation failed: No groomer found for accountId", accountId);
       return NextResponse.json(
         { error: "No groomer found. Please complete onboarding first." },
         { status: 400 }
       );
     }
+
+    console.log("Found groomer:", groomer.id, "for account:", accountId);
 
     // Create sample customers, pets, and appointments for today
     const today = new Date();

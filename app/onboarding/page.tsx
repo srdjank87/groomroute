@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -15,10 +15,21 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [groomerData, setGroomerData] = useState({
-    name: session?.user?.name || "",
-    email: session?.user?.email || "",
+    name: "",
+    email: "",
     phone: "",
   });
+
+  // Update groomer data when session loads
+  useEffect(() => {
+    if (session?.user) {
+      setGroomerData({
+        name: session.user.name || "",
+        email: session.user.email || "",
+        phone: "",
+      });
+    }
+  }, [session]);
 
   const [addressData, setAddressData] = useState({
     baseAddress: "",
@@ -92,7 +103,7 @@ export default function OnboardingPage() {
         {/* Progress Steps */}
         <div className="mb-8">
           <ul className="steps steps-horizontal w-full">
-            <li className={`step ${["address", "hours"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
+            <li className={`step ${currentStep === "hours" ? "step-primary" : ""} text-gray-700 font-medium`}>
               Base Address
             </li>
             <li className={`step ${currentStep === "hours" ? "step-primary" : ""} text-gray-700 font-medium`}>

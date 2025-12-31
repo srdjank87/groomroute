@@ -45,12 +45,16 @@ function DashboardContent() {
     async function handleSetup() {
       const setupSuccess = searchParams.get("setup") === "success";
 
+      console.log("Dashboard setup - session:", session?.user?.email, "setupSuccess:", setupSuccess);
+
       // Wait for session to be loaded
       if (!session?.user) {
+        console.log("Waiting for session to load...");
         return;
       }
 
       if (setupSuccess) {
+        console.log("Generating sample data...");
         setIsGeneratingSample(true);
 
         try {
@@ -59,7 +63,11 @@ function DashboardContent() {
             method: "POST",
           });
 
+          console.log("Sample data response status:", response.status);
+
           if (response.ok) {
+            const data = await response.json();
+            console.log("Sample data created:", data);
             toast.success("Welcome! We've created sample appointments to show you GroomRoute in action.");
             // Remove the setup query param
             window.history.replaceState({}, "", "/dashboard");
@@ -68,7 +76,15 @@ function DashboardContent() {
           } else {
             const errorData = await response.json();
             console.error("Sample data generation failed:", errorData);
-            // If sample data already exists or generation failed, just fetch data
+
+            // If no groomer found, redirect to onboarding
+            if (errorData.error?.includes("No groomer found")) {
+              console.log("No groomer found, redirecting to onboarding");
+              window.location.href = "/onboarding";
+              return;
+            }
+
+            // If sample data already exists or other error, just fetch data
             await fetchDashboardData();
           }
         } catch (error) {
@@ -78,6 +94,7 @@ function DashboardContent() {
           setIsGeneratingSample(false);
         }
       } else {
+        console.log("No setup flag, fetching dashboard data normally");
         await fetchDashboardData();
       }
     }
