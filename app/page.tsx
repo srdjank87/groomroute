@@ -71,17 +71,17 @@ export default function Home() {
       </header>
 
       {/* HERO - Image above text on all screen sizes */}
-      <section className="hero bg-base-200 py-8 lg:py-8">
+      <section className="hero bg-base-200 py-6 lg:py-6">
         <div className="hero-content max-w-6xl w-full">
           <div className="text-center w-full">
             {/* Hero image - shown above headline on all screens */}
-            <div className="flex justify-center mb-6 lg:mb-8">
+            <div className="flex justify-center mb-4 lg:mb-6">
               <Image
                 src="/images/hero.jpg"
                 alt="GroomRoute app showing optimized route with 54 minutes saved in mobile grooming van"
                 width={1200}
                 height={675}
-                className="rounded-lg w-full max-w-5xl shadow-2xl"
+                className="rounded-lg w-full max-w-3xl lg:max-w-4xl shadow-2xl"
                 priority
               />
             </div>
