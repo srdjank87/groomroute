@@ -71,45 +71,45 @@ export default function Home() {
       </header>
 
       {/* HERO - Image above text on all screen sizes */}
-      <section className="hero bg-base-200 py-6 lg:py-6">
+      <section className="hero bg-base-200 py-4 lg:py-4">
         <div className="hero-content max-w-6xl w-full">
           <div className="text-center w-full">
             {/* Hero image - shown above headline on all screens */}
-            <div className="flex justify-center mb-4 lg:mb-6">
+            <div className="flex justify-center mb-3 lg:mb-4">
               <Image
                 src="/images/hero.jpg"
                 alt="GroomRoute app showing optimized route with 54 minutes saved in mobile grooming van"
                 width={1200}
                 height={675}
-                className="rounded-lg w-full max-w-3xl lg:max-w-4xl shadow-2xl"
+                className="rounded-lg w-full max-w-2xl lg:max-w-3xl shadow-2xl"
                 priority
               />
             </div>
 
-            <h1 className="text-5xl lg:text-6xl font-bold mb-4">
+            <h1 className="text-4xl lg:text-5xl font-bold mb-3">
               Stop driving yourself to exhaustion.
             </h1>
 
-            <p className="text-xl mb-6 lg:mb-4 leading-relaxed max-w-3xl mx-auto">
+            <p className="text-lg lg:text-xl mb-4 lg:mb-3 leading-relaxed max-w-3xl mx-auto">
               The first mobile grooming app that understands your workload isn&apos;t just about time—it&apos;s about protecting your body, sanity, and income.
             </p>
 
-            <div className="max-w-2xl mx-auto mb-8 lg:mb-6 space-y-3">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-lg text-left">Save 45–90 min/day with smart routing that respects your energy</p>
+            <div className="max-w-2xl mx-auto mb-4 lg:mb-4 space-y-2">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
+                <p className="text-base lg:text-lg text-left">Save 45–90 min/day with smart routing that respects your energy</p>
               </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-lg text-left">Auto-notify customers when life happens—no panic texting</p>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
+                <p className="text-base lg:text-lg text-left">Auto-notify customers when life happens—no panic texting</p>
               </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-lg text-left">Protect your body with workload intelligence (chihuahua days ≠ doodle days)</p>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
+                <p className="text-base lg:text-lg text-left">Protect your body with workload intelligence (chihuahua days ≠ doodle days)</p>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-3">
               <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
                 Start Free Trial
               </Link>
