@@ -77,11 +77,11 @@ export default function Home() {
             {/* Desktop: Show image above headline */}
             <div className="hidden lg:flex justify-center mb-8">
               <Image
-                src="/images/hero-groomroute.png"
-                alt="GroomRoute - Mobile grooming route optimization"
+                src="/images/hero.jpg"
+                alt="GroomRoute app showing optimized route with 54 minutes saved in mobile grooming van"
                 width={1200}
-                height={1200}
-                className="rounded-lg w-full max-w-5xl"
+                height={675}
+                className="rounded-lg w-full max-w-5xl shadow-2xl"
                 priority
               />
             </div>
@@ -127,11 +127,11 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-center">
             <Image
-              src="/images/hero-groomroute-mobile.png"
-              alt="GroomRoute - Mobile grooming route optimization"
+              src="/images/hero.jpg"
+              alt="GroomRoute app showing optimized route with 54 minutes saved in mobile grooming van"
               width={800}
-              height={800}
-              className="rounded-lg w-full"
+              height={450}
+              className="rounded-lg w-full shadow-2xl"
               priority
             />
           </div>
