@@ -87,37 +87,30 @@ export default function Home() {
             </div>
 
             <h1 className="text-5xl lg:text-6xl font-bold mb-4">
-              Stop driving yourself to exhaustion.
+              Run your grooming day with one tap.
             </h1>
 
             <p className="text-xl mb-6 lg:mb-4 leading-relaxed max-w-3xl mx-auto">
-              The first mobile grooming app that understands your workload isn&apos;t just about time—it&apos;s about protecting your body, sanity, and income.
+              The only mobile grooming app built to make your workday calmer, smarter, and more profitable — with one-tap routing, crisis rescue, and a system that actually understands how demanding grooming really is.
             </p>
 
-            <div className="max-w-2xl mx-auto mb-8 lg:mb-6 space-y-3">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-lg text-left">Save 45–90 min/day with smart routing that respects your energy</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-lg text-left">Auto-notify customers when life happens—no panic texting</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-lg text-left">Protect your body with workload intelligence (chihuahua days ≠ doodle days)</p>
-              </div>
-            </div>
+            <p className="text-base mb-12 lg:mb-8 opacity-80 italic max-w-2xl mx-auto">
+              Smart enough to know the difference between a chihuahua day and a doodle day.
+            </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
               <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
                 Start Free Trial
               </Link>
-              <Link href="/book-demo" className="btn btn-outline btn-lg border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white">
-                Book a Demo
-              </Link>
             </div>
-            <p className="text-sm opacity-70">14-day free trial • Cancel anytime • Built by groomers who get it</p>
+            <p className="text-sm opacity-70">14-day free trial. Cancel anytime. Card required.</p>
+            <p className="text-sm font-semibold text-[#A5744A] mt-4">Save 45–90 minutes daily without changing your routine</p>
+            <p className="text-sm opacity-60 mt-4">
+              Prefer to talk to a real human first?{" "}
+              <Link href="/book-demo" className="link link-hover underline">
+                Book a 15-minute friendly walkthrough →
+              </Link>
+            </p>
           </div>
         </div>
       </section>
@@ -134,46 +127,6 @@ export default function Home() {
               className="rounded-lg w-full"
               priority
             />
-          </div>
-        </div>
-      </section>
-
-      {/* IDENTITY PROOF - Built for Groomers */}
-      <section className="py-12 px-6 bg-gradient-to-br from-amber-50 to-orange-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold mb-4">
-              Finally: Software that doesn&apos;t treat you like a &quot;dog washer&quot;
-            </h2>
-            <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-              GroomRoute was built after 200+ hours of research with professional mobile groomers. We studied your daily struggles, learned what corporate shops get wrong, and built something that actually respects the skill and physical demands of your work.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-5xl mb-4 text-center">🐩</div>
-              <h3 className="text-xl font-bold mb-3 text-center">Understands Doodles</h3>
-              <p className="text-base text-gray-700 text-center">
-                We know a 75-pound doodle isn&apos;t the same as a 75-pound lab. Workload intelligence that gets it.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-5xl mb-4 text-center">💪</div>
-              <h3 className="text-xl font-bold mb-3 text-center">Protects Your Body</h3>
-              <p className="text-base text-gray-700 text-center">
-                Prevents back-to-back heavy dogs that wreck your back and energy. This is a career, not a burnout job.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-5xl mb-4 text-center">🤝</div>
-              <h3 className="text-xl font-bold mb-3 text-center">Built With You</h3>
-              <p className="text-base text-gray-700 text-center">
-                Designed by studying real groomers&apos; daily struggles—not corporate templates or generic SaaS.
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -652,44 +605,6 @@ export default function Home() {
               Choose your calm
             </h2>
 
-            {/* ROI Value Prop */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 max-w-3xl mx-auto mb-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Your ROI in 30 seconds
-              </h3>
-              <div className="text-left space-y-2 text-gray-700">
-                <p className="flex justify-between">
-                  <span>⏱️ Time saved per day:</span>
-                  <strong>60 minutes</strong>
-                </p>
-                <p className="flex justify-between">
-                  <span>📅 Working days per month:</span>
-                  <strong>20 days</strong>
-                </p>
-                <p className="flex justify-between">
-                  <span>💰 Your hourly rate:</span>
-                  <strong>$75/hour</strong>
-                </p>
-                <div className="border-t-2 border-green-300 my-3"></div>
-                <p className="flex justify-between text-lg">
-                  <span>Monthly value from time saved:</span>
-                  <strong className="text-green-600">$1,500</strong>
-                </p>
-                <p className="flex justify-between text-lg">
-                  <span>GroomRoute Growth plan:</span>
-                  <strong>$179/month</strong>
-                </p>
-                <div className="border-t-2 border-green-300 my-3"></div>
-                <p className="flex justify-between text-2xl font-bold">
-                  <span>Your net gain:</span>
-                  <strong className="text-green-700">$1,321/month</strong>
-                </p>
-                <p className="text-center text-sm text-gray-600 mt-3">
-                  That&apos;s an <strong>8.4x return</strong> on your investment—and we haven&apos;t even counted gap-fill revenue recovery yet.
-                </p>
-              </div>
-            </div>
-
             {/* Pricing Toggle */}
             <div className="justify-center items-center gap-4 mt-8 p-4 border-2 border-base-300 rounded-lg bg-base-100 inline-flex mx-auto">
               <span className={`text-lg font-medium ${!isYearly ? 'text-primary' : 'opacity-60'}`}>Monthly</span>
@@ -831,24 +746,6 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <span>Every plan includes a 14-day free trial. Cancel anytime before it ends.</span>
-          </div>
-        </div>
-      </section>
-
-      {/* MONEY-BACK GUARANTEE */}
-      <section className="py-8 lg:py-12 px-6 bg-gradient-to-br from-emerald-50 to-green-50">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white border-4 border-green-500 rounded-2xl shadow-2xl p-8 text-center">
-            <div className="text-6xl mb-4">✓</div>
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-              30-Day Money-Back Guarantee
-            </h2>
-            <p className="text-xl mb-4 text-gray-700">
-              If GroomRoute doesn&apos;t save you at least <strong>30 minutes in your first week</strong>, email us and we&apos;ll refund 100%.
-            </p>
-            <p className="text-base text-gray-600">
-              No questions asked. No hoops to jump through. We&apos;re that confident you&apos;ll love the calm control it brings to your day.
-            </p>
           </div>
         </div>
       </section>
