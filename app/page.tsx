@@ -70,12 +70,12 @@ export default function Home() {
         </div>
       </header>
 
-      {/* HERO - Desktop: Image above text, Mobile: Text first */}
+      {/* HERO - Image above text on all screen sizes */}
       <section className="hero bg-base-200 py-8 lg:py-8">
         <div className="hero-content max-w-6xl w-full">
           <div className="text-center w-full">
-            {/* Desktop: Show image above headline */}
-            <div className="hidden lg:flex justify-center mb-8">
+            {/* Hero image - shown above headline on all screens */}
+            <div className="flex justify-center mb-6 lg:mb-8">
               <Image
                 src="/images/hero.jpg"
                 alt="GroomRoute app showing optimized route with 54 minutes saved in mobile grooming van"
@@ -118,22 +118,6 @@ export default function Home() {
               </Link>
             </div>
             <p className="text-sm opacity-70">14-day free trial • Cancel anytime • Built by groomers who get it</p>
-          </div>
-        </div>
-      </section>
-
-      {/* MOBILE HERO IMAGE - Only visible on mobile, placed after hero text */}
-      <section className="lg:hidden bg-base-200 pb-6 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-center">
-            <Image
-              src="/images/hero.jpg"
-              alt="GroomRoute app showing optimized route with 54 minutes saved in mobile grooming van"
-              width={800}
-              height={450}
-              className="rounded-lg w-full shadow-2xl"
-              priority
-            />
           </div>
         </div>
       </section>
