@@ -976,7 +976,7 @@ export default function Home() {
       <section className="py-8 lg:py-20 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-center">
-            <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl max-w-2xl w-full overflow-hidden">
+            <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl max-w-5xl w-full overflow-hidden">
               {/* Hero Image - inside card, above content */}
               <figure>
                 <Image
