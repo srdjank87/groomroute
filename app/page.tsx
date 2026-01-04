@@ -91,7 +91,7 @@ export default function Home() {
             </h1>
 
             <p className="text-lg lg:text-xl mb-4 lg:mb-3 leading-relaxed max-w-3xl mx-auto">
-              The first mobile grooming app that understands your workload isn&apos;t just about time—it&apos;s about protecting your body, sanity, and income.
+              The first mobile grooming app that understands your workload isn&apos;t just about time - it&apos;s about protecting your body, sanity, and income.
             </p>
 
             {/* CTAs - Above bullets on mobile, below on desktop */}
@@ -107,11 +107,11 @@ export default function Home() {
             <div className="max-w-2xl mx-auto mb-4 lg:mb-4 space-y-2">
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-base lg:text-lg text-left">Save 45–90 min/day with smart routing that respects your energy</p>
+                <p className="text-base lg:text-lg text-left">Save 45-90 min/day with smart routing that respects your energy</p>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-base lg:text-lg text-left">Auto-notify customers when life happens—no panic texting</p>
+                <p className="text-base lg:text-lg text-left">Auto-notify customers when life happens - no panic texting</p>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
@@ -166,7 +166,7 @@ export default function Home() {
               <div className="text-5xl mb-4 text-center">🤝</div>
               <h3 className="text-xl font-bold mb-3 text-center">Built With You</h3>
               <p className="text-base text-gray-700 text-center">
-                Designed by studying real groomers&apos; daily struggles—not corporate templates or generic SaaS.
+                Designed by studying real groomers&apos; daily struggles - not corporate templates or generic SaaS.
               </p>
             </div>
           </div>
@@ -318,7 +318,7 @@ export default function Home() {
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Customers always informed—without you juggling messages</span>
+                    <span>Customers always informed - without you juggling messages</span>
                   </p>
                 </div>
               </div>
@@ -357,10 +357,10 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One-Tap Optimized Routes — Turn Chaos Into a Calm, Profitable Day
+                      One-Tap Optimized Routes - Turn Chaos Into a Calm, Profitable Day
                     </h3>
                     <p className="text-lg opacity-90">
-                      GroomRoute doesn&apos;t just reorder stops — it builds real-world plans that match how groomers actually work. Save <strong>45–90 minutes a day</strong>, reduce mileage, and stop zig-zag driving all over town. Supports dedicated <strong>&quot;area days,&quot;</strong> so you can stay local, work efficiently, and finish your day with energy left.
+                      GroomRoute doesn&apos;t just reorder stops - it builds real-world plans that match how groomers actually work. Save <strong>45-90 minutes a day</strong>, reduce mileage, and stop zig-zag driving all over town. Supports dedicated <strong>&quot;area days,&quot;</strong> so you can stay local, work efficiently, and finish your day with energy left.
                     </p>
                   </div>
                 </div>
@@ -382,11 +382,11 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One Tap: &quot;Running Late&quot; — Clients Instantly Know. You Stay Stress-Free.
+                      One Tap: &quot;Running Late&quot; - Clients Instantly Know. You Stay Stress-Free.
                     </h3>
                     <p className="text-lg opacity-90">
                       Running behind shouldn&apos;t mean panic texting and feeling unprofessional.<br />
-                      With GroomRoute, your clients get an <strong>instant, kind, professional update</strong> — without you stopping to type. You stay focused on the dog in front of you, while your business continues to look polished and reliable.
+                      With GroomRoute, your clients get an <strong>instant, kind, professional update</strong> - without you stopping to type. You stay focused on the dog in front of you, while your business continues to look polished and reliable.
                     </p>
                   </div>
                 </div>
@@ -408,11 +408,11 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One Tap: &quot;Start Driving&quot; — Navigation Loads. You Go. Done.
+                      One Tap: &quot;Start Driving&quot; - Navigation Loads. You Go. Done.
                     </h3>
                     <p className="text-lg opacity-90">
                       No copying addresses. No juggling screenshots. No confusion.<br />
-                      Tap once and your <strong>entire route instantly loads</strong> into Google Maps or Apple Maps so you can just drive — confidently and efficiently.
+                      Tap once and your <strong>entire route instantly loads</strong> into Google Maps or Apple Maps so you can just drive - confidently and efficiently.
                     </p>
                   </div>
                 </div>
@@ -437,7 +437,7 @@ export default function Home() {
                       Understands Dog Size, Workload & Your Physical Capacity
                     </h3>
                     <p className="text-lg opacity-90 mb-4">
-                      Big dogs take more time. Doodles are their own universe. Some days you have help — some days you don&apos;t. GroomRoute actually understands that and helps you plan <strong>sustainable days</strong> that protect your body, your brain, and your love for grooming.
+                      Big dogs take more time. Doodles are their own universe. Some days you have help - some days you don&apos;t. GroomRoute actually understands that and helps you plan <strong>sustainable days</strong> that protect your body, your brain, and your love for grooming.
                     </p>
                     <ul className="space-y-2">
                       <li className="flex items-start gap-2">
@@ -476,7 +476,7 @@ export default function Home() {
                       Cancellations Happen. GroomRoute Turns Them Into Income.
                     </h3>
                     <p className="text-lg opacity-90">
-                      Last-minute cancellations used to mean stress and lost money. GroomRoute automatically fills gaps with waitlist clients nearby, helping you recover <strong>$200–$400/month</strong> you&apos;d normally lose — without lifting a finger.
+                      Last-minute cancellations used to mean stress and lost money. GroomRoute automatically fills gaps with waitlist clients nearby, helping you recover <strong>$200-$400/month</strong> you&apos;d normally lose - without lifting a finger.
                     </p>
                   </div>
                 </div>
@@ -491,11 +491,11 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold mb-2">45–90 mins/day</div>
+              <div className="text-4xl font-bold mb-2">45-90 mins/day</div>
               <p className="text-sm opacity-80">Time saved</p>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">$200–$400/month</div>
+              <div className="text-4xl font-bold mb-2">$200-$400/month</div>
               <p className="text-sm opacity-80">Revenue recovered</p>
             </div>
             <div>
@@ -511,7 +511,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-5xl font-bold mb-6">
-              Meet Calm Control — Your Safety Net for When Grooming Life Gets Messy
+              Meet Calm Control - Your Safety Net for When Grooming Life Gets Messy
             </h2>
 
             {/* Calm Control Image */}
@@ -526,10 +526,10 @@ export default function Home() {
             </div>
 
             <p className="text-xl max-w-4xl mx-auto leading-relaxed opacity-90">
-              When your day collapses, a client cancels, traffic wrecks your schedule, or you suddenly realize you booked a nightmare lineup… GroomRoute doesn&apos;t just react — <strong>it thinks with you</strong>.
+              When your day collapses, a client cancels, traffic wrecks your schedule, or you suddenly realize you booked a nightmare lineup… GroomRoute doesn&apos;t just react - <strong>it thinks with you</strong>.
             </p>
             <p className="text-lg max-w-4xl mx-auto leading-relaxed opacity-90 mt-4">
-              Calm Control helps you stabilize your day with smart rescue plans, clear decisions, and confidence — so you stay calm, professional, and in control.
+              Calm Control helps you stabilize your day with smart rescue plans, clear decisions, and confidence - so you stay calm, professional, and in control.
             </p>
           </div>
 
@@ -545,7 +545,7 @@ export default function Home() {
                   Behind schedule? Traffic disaster? Two giant doodles back-to-back?
                 </p>
                 <p className="text-base font-medium mt-2 text-center">
-                  GroomRoute gives you 2–3 smart rescue plans with new routes, messaging handled, and your sanity intact.
+                  GroomRoute gives you 2-3 smart rescue plans with new routes, messaging handled, and your sanity intact.
                 </p>
               </div>
             </div>
@@ -707,7 +707,7 @@ export default function Home() {
                   <strong className="text-green-700">$1,321/month</strong>
                 </p>
                 <p className="text-center text-sm text-gray-600 mt-3">
-                  That&apos;s an <strong>8.4x return</strong> on your investment—and we haven&apos;t even counted gap-fill revenue recovery yet.
+                  That&apos;s an <strong>8.4x return</strong> on your investment - and we haven&apos;t even counted gap-fill revenue recovery yet.
                 </p>
               </div>
             </div>
@@ -890,7 +890,7 @@ export default function Home() {
                 Do I need a credit card to start my trial?
               </div>
               <div className="collapse-content">
-                <p>Yes — this helps keep trials focused on real grooming businesses. You won&apos;t be charged during your trial and can cancel anytime before it ends.</p>
+                <p>Yes - this helps keep trials focused on real grooming businesses. You won&apos;t be charged during your trial and can cancel anytime before it ends.</p>
               </div>
             </div>
 
@@ -912,7 +912,7 @@ export default function Home() {
                 Can I cancel anytime?
               </div>
               <div className="collapse-content">
-                <p>Yes — instantly, without awkwardness. No contracts, no commitments. If GroomRoute isn&apos;t making your days calmer and more profitable, you shouldn&apos;t pay for it.</p>
+                <p>Yes - instantly, without awkwardness. No contracts, no commitments. If GroomRoute isn&apos;t making your days calmer and more profitable, you shouldn&apos;t pay for it.</p>
               </div>
             </div>
 
@@ -961,7 +961,7 @@ export default function Home() {
                 Our Promise
               </h2>
               <p className="text-lg mb-4 leading-relaxed">
-                We don&apos;t just promise efficiency — we promise calmer days, smarter decisions, stronger income, and a work life that feels sustainable again.
+                We don&apos;t just promise efficiency - we promise calmer days, smarter decisions, stronger income, and a work life that feels sustainable again.
               </p>
               <p className="text-xl font-bold mb-2 text-base-content">
                 If GroomRoute doesn&apos;t deliver on that promise…
