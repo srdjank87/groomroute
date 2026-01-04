@@ -348,10 +348,10 @@ export default function Home() {
                 <div className="flex flex-col lg:flex-row gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/optimize-route.png"
-                      alt="Optimize Route"
+                      src="/images/onetap-route.jpg"
+                      alt="Professional groomer using GroomRoute app outside organized van with Golden Retriever"
                       width={400}
-                      height={300}
+                      height={400}
                       className="rounded-lg w-full"
                     />
                   </div>
@@ -373,10 +373,10 @@ export default function Home() {
                 <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/running-late.jpg"
-                      alt="Running Late"
+                      src="/images/onetap-runninglate.jpg"
+                      alt="Groomer using phone inside mobile grooming van while working with Golden Retriever"
                       width={400}
-                      height={300}
+                      height={400}
                       className="rounded-lg w-full"
                     />
                   </div>
@@ -398,10 +398,10 @@ export default function Home() {
                 <div className="flex flex-col lg:flex-row gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/start-driving.jpg"
-                      alt="Start Driving"
+                      src="/images/onetap-startdriving.jpg"
+                      alt="Groomer viewing today's route on GroomRoute app in driver's seat with Golden Retriever"
                       width={400}
-                      height={300}
+                      height={400}
                       className="rounded-lg w-full"
                     />
                   </div>
@@ -421,12 +421,14 @@ export default function Home() {
             <div className="card bg-gradient-to-br from-amber-50 to-yellow-100 border-2 border-amber-300 shadow-xl">
               <div className="card-body">
                 <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
-                  <div className="lg:w-1/3 flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <div className="text-6xl mb-4">🐕</div>
-                      <div className="text-2xl font-bold">vs</div>
-                      <div className="text-6xl mt-4">🐩</div>
-                    </div>
+                  <div className="lg:w-1/3">
+                    <Image
+                      src="/images/onetap-dogsize.jpg"
+                      alt="Groomer working with large doodle on grooming table with pile of brushed fur"
+                      width={400}
+                      height={400}
+                      className="rounded-lg w-full"
+                    />
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
@@ -454,16 +456,16 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Feature 4 - Image Right */}
+            {/* Feature 5 - Image Left (alternating pattern) */}
             <div className="card bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 shadow-xl">
               <div className="card-body">
-                <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
+                <div className="flex flex-col lg:flex-row gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/fill-cancellation.png"
-                      alt="Fill Cancellation"
+                      src="/images/onetap-cancellations.jpg"
+                      alt="Mobile grooming van interior with whiteboard showing cancellation rebooked"
                       width={400}
-                      height={300}
+                      height={400}
                       className="rounded-lg w-full"
                     />
                   </div>
@@ -509,6 +511,18 @@ export default function Home() {
             <h2 className="text-5xl font-bold mb-6">
               Meet Calm Control — Your Safety Net for When Grooming Life Gets Messy
             </h2>
+
+            {/* Calm Control Image */}
+            <div className="flex justify-center mb-8">
+              <Image
+                src="/images/calmcontrol.jpg"
+                alt="Wide view of organized mobile grooming van interior with professional groomer and small dog"
+                width={1200}
+                height={675}
+                className="rounded-xl w-full max-w-4xl shadow-2xl"
+              />
+            </div>
+
             <p className="text-xl max-w-4xl mx-auto leading-relaxed opacity-90">
               GroomRoute&apos;s Calm Control Center doesn&apos;t just react — it thinks with you. Whether your day collapses, clients cancel, traffic wrecks your schedule, or you realize you accidentally booked a nightmare day… GroomRoute helps you stabilize everything with clarity and confidence.
             </p>
@@ -961,31 +975,35 @@ export default function Home() {
       {/* FINAL CTA WITH IMAGE */}
       <section className="py-8 lg:py-20 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            {/* Mobile: Image first, Desktop: CTA first */}
-            <div className="flex justify-center lg:order-2">
+          <div className="space-y-8">
+            {/* Hero Image - 16:9 ratio, full width */}
+            <div className="flex justify-center">
               <Image
-                src="/images/end-image.jpg"
-                alt="GroomRoute - Making your grooming day easier"
-                width={600}
-                height={400}
-                className="rounded-lg w-full max-w-lg"
+                src="/images/final-cta.jpg"
+                alt="Happy mobile groomer with Golden Retriever outside grooming van - your future with GroomRoute"
+                width={1200}
+                height={675}
+                className="rounded-xl w-full shadow-2xl"
               />
             </div>
-            <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl lg:order-1">
-              <div className="card-body items-center text-center">
-                <h2 className="card-title text-4xl mb-4">
-                  Ready for calmer, more profitable days?
-                </h2>
-                <p className="text-lg mb-6">
-                  One tap. Your whole day changes.
-                </p>
-                <div className="card-actions">
-                  <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
-                    Start Free Trial
-                  </Link>
+
+            {/* CTA Card - centered below image */}
+            <div className="flex justify-center">
+              <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl max-w-2xl w-full">
+                <div className="card-body items-center text-center">
+                  <h2 className="card-title text-4xl mb-4">
+                    Ready for calmer, more profitable days?
+                  </h2>
+                  <p className="text-lg mb-6">
+                    One tap. Your whole day changes.
+                  </p>
+                  <div className="card-actions">
+                    <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
+                      Start Free Trial
+                    </Link>
+                  </div>
+                  <p className="text-sm opacity-70 mt-4">14-day free trial. Cancel anytime. Card required.</p>
                 </div>
-                <p className="text-sm opacity-70 mt-4">14-day free trial. Cancel anytime. Card required.</p>
               </div>
             </div>
           </div>
