@@ -218,14 +218,14 @@ export default function Home() {
       </section>
 
       {/* BEFORE / AFTER */}
-      <section id="before-after" className="py-8 lg:py-12 px-6 bg-base-100">
+      <section id="before-after" className="py-8 lg:py-12 px-3 lg:px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-12">
             {/* BEFORE */}
-            <div className="rounded-3xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-pink-50 p-8">
-              <h3 className="text-2xl font-bold mb-6 text-center">Before GroomRoute</h3>
+            <div className="rounded-3xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-pink-50 p-4 lg:p-8">
+              <h3 className="text-2xl font-bold mb-4 lg:mb-6 text-center">Before GroomRoute</h3>
 
-              <div className="mb-6">
+              <div className="mb-4 lg:mb-6">
                 <Image
                   src="/images/before.jpg"
                   alt="Before GroomRoute - Exhausted mobile groomer sitting in van surrounded by chaos"
@@ -235,51 +235,51 @@ export default function Home() {
                 />
               </div>
 
-              <p className="text-lg font-semibold text-gray-800 text-center mb-4 italic">
+              <p className="text-base lg:text-lg font-semibold text-gray-800 text-center mb-3 lg:mb-4 italic">
                 The day doesn&apos;t feel like it&apos;s yours anymore.
               </p>
 
-              <div className="space-y-3">
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <div className="space-y-2 lg:space-y-3">
+                <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
+                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                    <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
                     <span>Too many big dogs back-to-back</span>
                   </p>
                 </div>
 
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
+                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                    <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
                     <span>Too much driving, burning time and fuel</span>
                   </p>
                 </div>
 
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
+                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                    <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
                     <span>No-shows hit your income and your confidence</span>
                   </p>
                 </div>
 
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
+                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                    <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
                     <span>By the end of the day, your body aches… and your brain is exhausted</span>
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 text-center">
-                <p className="text-sm font-semibold text-gray-600 mb-1">Result:</p>
-                <p className="text-lg font-bold text-red-700">Work that doesn&apos;t feel sustainable anymore.</p>
+              <div className="mt-4 lg:mt-6 text-center">
+                <p className="text-xs lg:text-sm font-semibold text-gray-600 mb-1">Result:</p>
+                <p className="text-base lg:text-lg font-bold text-red-700">Work that doesn&apos;t feel sustainable anymore.</p>
               </div>
             </div>
 
             {/* AFTER */}
-            <div className="rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-8">
-              <h3 className="text-2xl font-bold mb-6 text-center">With GroomRoute</h3>
+            <div className="rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-4 lg:p-8">
+              <h3 className="text-2xl font-bold mb-4 lg:mb-6 text-center">With GroomRoute</h3>
 
-              <div className="mb-6">
+              <div className="mb-4 lg:mb-6">
                 <Image
                   src="/images/after.jpg"
                   alt="With GroomRoute - Confident mobile groomer standing in organized van with tablet"
@@ -289,43 +289,43 @@ export default function Home() {
                 />
               </div>
 
-              <p className="text-lg font-semibold text-gray-800 text-center mb-4 italic">
+              <p className="text-base lg:text-lg font-semibold text-gray-800 text-center mb-3 lg:mb-4 italic">
                 Your day finally makes sense again.
               </p>
 
-              <div className="space-y-3">
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+              <div className="space-y-2 lg:space-y-3">
+                <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
+                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                    <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
                     <span>Balanced schedules that protect your body</span>
                   </p>
                 </div>
 
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
+                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                    <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
                     <span>Routes that are tight, efficient, and stress-free</span>
                   </p>
                 </div>
 
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
+                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                    <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
                     <span>Automatic cancellation recovery when plans change</span>
                   </p>
                 </div>
 
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
+                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                    <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
                     <span>Customers always informed - without you juggling messages</span>
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 text-center">
-                <p className="text-sm font-semibold text-gray-600 mb-1">Result:</p>
-                <p className="text-lg font-bold text-emerald-700">Calmer days. Stronger income.<br />Work that finally feels sustainable.</p>
+              <div className="mt-4 lg:mt-6 text-center">
+                <p className="text-xs lg:text-sm font-semibold text-gray-600 mb-1">Result:</p>
+                <p className="text-base lg:text-lg font-bold text-emerald-700">Calmer days. Stronger income.<br />Work that finally feels sustainable.</p>
               </div>
             </div>
           </div>
