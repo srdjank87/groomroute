@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { AppointmentType, AppointmentStatus } from "@prisma/client";
+import { canAddAppointment } from "@/lib/feature-helpers";
 
 const appointmentSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
@@ -26,6 +27,45 @@ export async function POST(req: NextRequest) {
     const accountId = session.user.accountId;
     const body = await req.json();
     const validatedData = appointmentSchema.parse(body);
+
+    // Get account to check subscription plan
+    const account = await prisma.account.findUnique({
+      where: { id: accountId },
+      select: { subscriptionPlan: true },
+    });
+
+    if (!account) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    }
+
+    // Check current month appointment count
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    const currentMonthAppointments = await prisma.appointment.count({
+      where: {
+        accountId,
+        startAt: {
+          gte: startOfMonth,
+          lte: endOfMonth,
+        },
+      },
+    });
+
+    // Check if user can add more appointments based on their plan
+    const canAdd = await canAddAppointment(account, currentMonthAppointments);
+
+    if (!canAdd.allowed) {
+      return NextResponse.json(
+        {
+          error: canAdd.message,
+          upgradeRequired: true,
+          suggestedPlan: "GROWTH"
+        },
+        { status: 403 }
+      );
+    }
 
     // Get the groomer for this account
     const groomer = await prisma.groomer.findFirst({

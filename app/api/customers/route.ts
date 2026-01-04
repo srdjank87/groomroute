@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { BehaviorFlag } from "@prisma/client";
+import { canAddCustomer } from "@/lib/feature-helpers";
 
 const customerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -32,6 +33,35 @@ export async function POST(req: NextRequest) {
     const accountId = session.user.accountId;
     const body = await req.json();
     const validatedData = customerSchema.parse(body);
+
+    // Get account to check subscription plan
+    const account = await prisma.account.findUnique({
+      where: { id: accountId },
+      select: { subscriptionPlan: true },
+    });
+
+    if (!account) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    }
+
+    // Check current customer count
+    const currentCustomerCount = await prisma.customer.count({
+      where: { accountId },
+    });
+
+    // Check if user can add more customers based on their plan
+    const canAdd = await canAddCustomer(account, currentCustomerCount);
+
+    if (!canAdd.allowed) {
+      return NextResponse.json(
+        {
+          error: canAdd.message,
+          upgradeRequired: true,
+          suggestedPlan: "GROWTH"
+        },
+        { status: 403 }
+      );
+    }
 
     // Create customer in transaction (with optional pet)
     const result = await prisma.$transaction(async (tx) => {
