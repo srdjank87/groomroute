@@ -222,17 +222,22 @@ export default function AppointmentsPage() {
               <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
-                  {new Date(appointment.startAt).toLocaleTimeString("en-US", {
-                    hour: "numeric",
-                    minute: "2-digit"
-                  })} -{" "}
-                  {new Date(
-                    new Date(appointment.startAt).getTime() +
-                      appointment.serviceMinutes * 60000
-                  ).toLocaleTimeString("en-US", {
-                    hour: "numeric",
-                    minute: "2-digit"
-                  })}
+                  {(() => {
+                    const date = new Date(appointment.startAt);
+                    const hours = date.getUTCHours();
+                    const minutes = date.getUTCMinutes();
+                    const endDate = new Date(date.getTime() + appointment.serviceMinutes * 60000);
+                    const endHours = endDate.getUTCHours();
+                    const endMinutes = endDate.getUTCMinutes();
+
+                    const formatTime = (h: number, m: number) => {
+                      const period = h >= 12 ? 'PM' : 'AM';
+                      const hour12 = h % 12 || 12;
+                      return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
+                    };
+
+                    return `${formatTime(hours, minutes)} - ${formatTime(endHours, endMinutes)}`;
+                  })()}
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
@@ -339,17 +344,22 @@ export default function AppointmentsPage() {
                 <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
-                    {new Date(appointment.startAt).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "2-digit"
-                    })} -{" "}
-                    {new Date(
-                      new Date(appointment.startAt).getTime() +
-                        appointment.serviceMinutes * 60000
-                    ).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "2-digit"
-                    })}
+                    {(() => {
+                      const date = new Date(appointment.startAt);
+                      const hours = date.getUTCHours();
+                      const minutes = date.getUTCMinutes();
+                      const endDate = new Date(date.getTime() + appointment.serviceMinutes * 60000);
+                      const endHours = endDate.getUTCHours();
+                      const endMinutes = endDate.getUTCMinutes();
+
+                      const formatTime = (h: number, m: number) => {
+                        const period = h >= 12 ? 'PM' : 'AM';
+                        const hour12 = h % 12 || 12;
+                        return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
+                      };
+
+                      return `${formatTime(hours, minutes)} - ${formatTime(endHours, endMinutes)}`;
+                    })()}
                   </div>
                   <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4" />

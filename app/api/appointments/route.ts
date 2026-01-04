@@ -112,10 +112,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Combine date and time into DateTime
-    // Parse as local time by creating a date object with explicit components
-    const [year, month, day] = validatedData.date.split('-').map(Number);
-    const [hours, minutes] = validatedData.time.split(':').map(Number);
-    const startAt = new Date(year, month - 1, day, hours, minutes, 0, 0);
+    // Create date string without timezone to be interpreted as UTC
+    // This ensures the time is stored exactly as entered
+    const dateTimeString = `${validatedData.date}T${validatedData.time}:00.000Z`;
+    const startAt = new Date(dateTimeString);
 
     // Check for scheduling conflicts (same groomer, overlapping time)
     // Get all appointments for this groomer on the same day
