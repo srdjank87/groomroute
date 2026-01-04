@@ -10,6 +10,7 @@ interface MapPreviewProps {
   showMap?: boolean;
   locationVerified?: boolean;
   onVerifyLocation?: () => void;
+  onGeocodeAddress?: () => void;
   isVerifying?: boolean;
 }
 
@@ -21,6 +22,7 @@ export default function MapPreview({
   showMap = true,
   locationVerified = false,
   onVerifyLocation,
+  onGeocodeAddress,
   isVerifying = false,
 }: MapPreviewProps) {
   if (!lat || !lng || (geocodeStatus !== "OK" && geocodeStatus !== "PARTIAL")) {
@@ -29,12 +31,26 @@ export default function MapPreview({
         <div className="flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h4 className="font-medium text-yellow-900">Location Not Verified</h4>
+            <h4 className="font-medium text-yellow-900">Location Not Geocoded</h4>
             <p className="text-sm text-yellow-700 mt-1">
               {geocodeStatus === "FAILED"
                 ? "Unable to find this address on the map. Please verify the address is correct."
-                : "Location verification pending..."}
+                : "Click the button to find this address on the map."}
             </p>
+            {onGeocodeAddress && (
+              <button
+                onClick={onGeocodeAddress}
+                disabled={isVerifying}
+                className="btn btn-sm h-8 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1 mt-3"
+              >
+                {isVerifying ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  <MapPin className="h-4 w-4" />
+                )}
+                Find Location on Map
+              </button>
+            )}
           </div>
         </div>
       </div>

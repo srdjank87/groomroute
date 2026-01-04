@@ -163,6 +163,44 @@ export default function CustomerEditPage() {
     }
   };
 
+  const handleGeocodeAddress = async () => {
+    setIsVerifying(true);
+    try {
+      const response = await fetch("/api/geocode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: customer?.address }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.lat && data.lng) {
+        // Update customer with geocoded coordinates
+        const updateResponse = await fetch(`/api/customers/${customerId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            address: customer?.address, // Triggers re-geocoding on backend
+          }),
+        });
+
+        if (updateResponse.ok) {
+          toast.success("Address geocoded successfully!");
+          fetchCustomer();
+        } else {
+          toast.error("Failed to save location");
+        }
+      } else {
+        toast.error("Could not find this address on the map. Please check the address.");
+      }
+    } catch (error) {
+      console.error("Failed to geocode address:", error);
+      toast.error("Failed to geocode address");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   const handleVerifyLocation = async () => {
     setIsVerifying(true);
     try {
@@ -296,6 +334,7 @@ export default function CustomerEditPage() {
                 geocodeStatus={customer.geocodeStatus ?? undefined}
                 locationVerified={customer.locationVerified}
                 onVerifyLocation={handleVerifyLocation}
+                onGeocodeAddress={handleGeocodeAddress}
                 isVerifying={isVerifying}
               />
             </div>
