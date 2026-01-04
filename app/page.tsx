@@ -510,7 +510,7 @@ export default function Home() {
       <section className="py-8 lg:py-12 px-6 bg-gradient-to-br from-orange-50 to-amber-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-5xl font-bold mb-6 leading-tight">
+            <h2 className="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
               Meet Calm Control - Your Safety Net for When Grooming Life Gets Messy
             </h2>
 
@@ -707,20 +707,20 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Starter */}
-            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="card-body !p-5">
+            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow h-full">
+              <div className="p-5 flex flex-col h-full">
                 <div className="badge badge-neutral mb-2">STARTER</div>
-                <div className="mb-2">
+                <div className="mb-4">
                   <span className="text-4xl font-bold">${isYearly ? '890' : '89'}</span>
                   <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-70 -mt-1 mb-2">$74/month billed annually (save ~17%)</div>}
+                {isYearly && <div className="text-xs opacity-70 -mt-1 mb-4">$74/month billed annually <strong>(save ~17%)</strong></div>}
 
-                <p className="text-sm mb-3 italic opacity-80">
+                <p className="text-sm italic opacity-90 mb-4">
                   Solo groomer getting started
                 </p>
 
-                <ul className="space-y-1.5 mb-3 flex-grow">
+                <ul className="space-y-1.5">
                   {[
                     "One-tap route optimization",
                     "One-tap navigation",
@@ -740,7 +740,7 @@ export default function Home() {
                   ))}
                 </ul>
 
-                <div className="card-actions mt-auto">
+                <div className="mt-auto pt-3">
                   <Link href={`/auth/signup?plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
                     Start Free Trial
                   </Link>
@@ -757,7 +757,7 @@ export default function Home() {
                   <span className="text-4xl font-bold">${isYearly ? '1,790' : '179'}</span>
                   <span className="text-sm opacity-90">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-90 -mt-3 mb-2">$149/month billed annually (save ~17%)</div>}
+                {isYearly && <div className="text-xs opacity-90 -mt-3 mb-2">$149/month billed annually <strong>(save ~17%)</strong></div>}
 
                 <p className="text-sm mb-4 italic opacity-90">
                   Professional groomer scaling up
@@ -794,20 +794,20 @@ export default function Home() {
             </div>
 
             {/* Pro */}
-            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="card-body !p-5">
+            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow h-full">
+              <div className="p-5 flex flex-col h-full">
                 <div className="badge badge-neutral mb-2">PRO</div>
-                <div className="mb-2">
+                <div className="mb-4">
                   <span className="text-4xl font-bold">${isYearly ? '3,290' : '329'}</span>
                   <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-70 -mt-1 mb-2">$274/month billed annually (save ~17%)</div>}
+                {isYearly && <div className="text-xs opacity-70 -mt-1 mb-4">$274/month billed annually <strong>(save ~17%)</strong></div>}
 
-                <p className="text-sm mb-3 italic opacity-80">
+                <p className="text-sm italic opacity-90 mb-4">
                   Multi-van operation
                 </p>
 
-                <ul className="space-y-1.5 mb-3 flex-grow">
+                <ul className="space-y-1.5">
                   {[
                     "Everything in Growth, PLUS:",
                     "Multi-groomer/multi-van support",
@@ -826,7 +826,7 @@ export default function Home() {
                   ))}
                 </ul>
 
-                <div className="card-actions mt-auto">
+                <div className="mt-auto pt-3">
                   <Link href={`/auth/signup?plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
                     Start Free Trial
                   </Link>

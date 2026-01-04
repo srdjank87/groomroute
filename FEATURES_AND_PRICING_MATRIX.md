@@ -209,11 +209,47 @@ These features are explicitly promised in multiple places on the landing page an
 
 ---
 
+#### 8. Offline Safety Snapshot (PWA)
+
+**Landing Page Promises:**
+- "Lose signal? Phone meltdown? GroomRoute stores your day offline so you can keep working without panic."
+- Mobile groomers often work in areas with poor signal
+- From MARKET_INSIGHTS: "Every extra click is expensive" - assume groomer is tired, juggling dog, bad signal
+
+**Technical Requirements:**
+- [ ] Convert GroomRoute to Progressive Web App (PWA)
+- [ ] Web App Manifest for installable home screen app
+- [ ] Service Worker for offline support
+- [ ] Cache app shell (JS, CSS, UI)
+- [ ] Today's schedule caching in IndexedDB
+- [ ] Read-only offline mode with banner: "Offline Safety Snapshot - Last updated at: [TIME]"
+- [ ] View today's appointments, addresses, notes, dog info while offline
+- [ ] Copy addresses for GPS navigation while offline
+- [ ] Disable online-only features with tooltip: "Needs internet - available when you're back online"
+- [ ] Auto-sync when connection returns
+- [ ] Toast notification: "Synced! Your schedule is up to date"
+- [ ] API endpoint: `/api/today-snapshot` for cacheable daily data
+
+**Offline-Only Features:**
+- ✅ View schedule
+- ✅ View appointments
+- ✅ View customer/dog info
+- ✅ View addresses & notes
+- ✅ Copy address to clipboard
+- ❌ Send "Running Late" (disabled)
+- ❌ Rescue My Day (disabled)
+- ❌ Re-optimize route (disabled)
+- ❌ Messaging (disabled)
+
+**Pricing Tier:** ALL (Critical infrastructure feature)
+
+---
+
 ### 🟡 **HIGH PRIORITY - P1 (Launch + 30 Days)**
 
 Features that strengthen core value props but aren't explicitly shown in screenshots.
 
-#### 8. Customer & Pet Management
+#### 9. Customer & Pet Management
 
 **Landing Page Promises:**
 - (Implied by all appointment/routing features)
@@ -229,7 +265,7 @@ Features that strengthen core value props but aren't explicitly shown in screens
 
 ---
 
-#### 9. Professional Communication Templates
+#### 10. Professional Communication Templates
 
 **Landing Page Promises:**
 - "Instant, kind, professional update"
@@ -250,7 +286,7 @@ Features that strengthen core value props but aren't explicitly shown in screens
 
 ---
 
-#### 10. End-of-Day Analytics & Proof
+#### 11. End-of-Day Analytics & Proof
 
 **Landing Page Promises:**
 - "45-90 mins/day time saved"
@@ -276,7 +312,7 @@ Features that strengthen core value props but aren't explicitly shown in screens
 
 Features that enhance the core experience but are less critical for initial launch.
 
-#### 11. Growth & Stability Program
+#### 12. Growth & Stability Program
 
 **Landing Page Promises:**
 - (Mentioned in MARKET_INSIGHTS.md as optional add-on)
@@ -294,7 +330,7 @@ Features that enhance the core experience but are less critical for initial laun
 
 ---
 
-#### 12. Appointment Conflict Detection
+#### 13. Appointment Conflict Detection
 
 **Landing Page Promises:**
 - (Already implemented in route.ts)
@@ -308,7 +344,7 @@ Features that enhance the core experience but are less critical for initial laun
 
 ---
 
-#### 13. Service Type & Pricing Management
+#### 14. Service Type & Pricing Management
 
 **Landing Page Promises:**
 - (Implied by appointment system)
@@ -332,7 +368,7 @@ Features that enhance the core experience but are less critical for initial laun
 
 Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 
-#### 14. Stress-Aware Scheduling
+#### 15. Stress-Aware Scheduling
 
 **From MARKET_INSIGHTS.md:**
 - Energy-first day design
@@ -352,7 +388,7 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 
 ---
 
-#### 15. Professional Confidence Toolkit
+#### 16. Professional Confidence Toolkit
 
 **From MARKET_INSIGHTS.md:**
 - Context-aware safety tips
@@ -368,7 +404,7 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 
 ---
 
-#### 16. End-of-Day Calm Reflection
+#### 17. End-of-Day Calm Reflection
 
 **From MARKET_INSIGHTS.md:**
 - Summary of wins and value delivered
@@ -386,7 +422,7 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 
 ---
 
-#### 17. Equipment / Van Issue Logging
+#### 18. Equipment / Van Issue Logging
 
 **From MARKET_INSIGHTS.md:**
 - Lightweight issue tracking
@@ -555,8 +591,14 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 4. Basic appointment scheduling
 5. Calendar import (ICS/CSV)
 6. Skip stop functionality
+7. **Offline Safety Snapshot (PWA)**
+   - Convert to Progressive Web App
+   - Cache today's schedule locally (IndexedDB)
+   - Read-only offline mode with banner
+   - Auto-sync when online returns
+   - Installable home screen app
 
-**Goal:** Essential tier is fully functional. Growth tier is mostly functional (minus automation features).
+**Goal:** Starter tier is fully functional. Growth tier is mostly functional (minus automation features). App works reliably in areas with poor mobile signal.
 
 ---
 
