@@ -166,32 +166,30 @@ export default function CustomerEditPage() {
   const handleGeocodeAddress = async () => {
     setIsVerifying(true);
     try {
-      const response = await fetch("/api/geocode", {
-        method: "POST",
+      // Geocode the address using backend
+      const updateResponse = await fetch(`/api/customers/${customerId}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: customer?.address }),
+        body: JSON.stringify({
+          forceGeocode: true, // Force re-geocoding even if address hasn't changed
+        }),
       });
 
-      const data = await response.json();
+      if (updateResponse.ok) {
+        const data = await updateResponse.json();
 
-      if (data.success && data.lat && data.lng) {
-        // Update customer with geocoded coordinates
-        const updateResponse = await fetch(`/api/customers/${customerId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            address: customer?.address, // Triggers re-geocoding on backend
-          }),
-        });
-
-        if (updateResponse.ok) {
-          toast.success("Address geocoded successfully!");
-          fetchCustomer();
+        // Check if geocoding was successful
+        if (data.customer?.geocodeStatus === "OK") {
+          toast.success("Location found on map!");
+        } else if (data.customer?.geocodeStatus === "FAILED") {
+          toast.error("Could not find this address on the map. Please check the address.");
         } else {
-          toast.error("Failed to save location");
+          toast.success("Address updated!");
         }
+
+        fetchCustomer();
       } else {
-        toast.error("Could not find this address on the map. Please check the address.");
+        toast.error("Failed to geocode address");
       }
     } catch (error) {
       console.error("Failed to geocode address:", error);

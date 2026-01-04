@@ -12,6 +12,7 @@ const updateCustomerSchema = z.object({
   addressNotes: z.string().optional(),
   accessInstructions: z.string().optional(),
   locationVerified: z.boolean().optional(),
+  forceGeocode: z.boolean().optional(), // Force re-geocoding even if address unchanged
 });
 
 // GET single customer
@@ -94,16 +95,23 @@ export async function PATCH(
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
 
-    // Geocode if address changed
+    // Geocode if address changed or forceGeocode is true
     let geocodeData = {};
-    if (validatedData.address && validatedData.address !== existingCustomer.address) {
-      const geocodeResult = await geocodeAddress(validatedData.address);
+    const shouldGeocode =
+      (validatedData.address && validatedData.address !== existingCustomer.address) ||
+      (validatedData.forceGeocode && existingCustomer.address);
+
+    if (shouldGeocode) {
+      const addressToGeocode = validatedData.address || existingCustomer.address;
+      const geocodeResult = await geocodeAddress(addressToGeocode);
       geocodeData = {
-        address: validatedData.address,
+        ...(validatedData.address && { address: validatedData.address }),
         lat: geocodeResult.success ? geocodeResult.lat : null,
         lng: geocodeResult.success ? geocodeResult.lng : null,
         geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
-        locationVerified: false, // Reset verification when address changes
+        ...(validatedData.address && validatedData.address !== existingCustomer.address && {
+          locationVerified: false, // Reset verification when address changes
+        }),
       };
     }
 
