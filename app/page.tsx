@@ -357,10 +357,10 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One-Tap Optimized Routes — Built for the Real World
+                      One-Tap Optimized Routes — Turn Chaos Into a Calm, Profitable Day
                     </h3>
                     <p className="text-lg opacity-90">
-                      GroomRoute doesn&apos;t just reorder stops — it helps you plan smarter days. Save 45–90 minutes daily, reduce mileage, and stop driving all over town. Supports &quot;area days&quot; so you can work one neighborhood at a time.
+                      GroomRoute doesn&apos;t just reorder stops — it builds real-world plans that match how groomers actually work. Save <strong>45–90 minutes a day</strong>, reduce mileage, and stop zig-zag driving all over town. Supports dedicated <strong>&quot;area days,&quot;</strong> so you can stay local, work efficiently, and finish your day with energy left.
                     </p>
                   </div>
                 </div>
@@ -382,10 +382,11 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &quot;Running Late&quot; - Everyone instantly knows.
+                      One Tap: &quot;Running Late&quot; — Clients Instantly Know. You Stay Stress-Free.
                     </h3>
                     <p className="text-lg opacity-90">
-                      GroomRoute updates clients instantly, professionally, and kindly — without you panic-texting between stops. Keep your focus on the dog in front of you.
+                      Running behind shouldn&apos;t mean panic texting and feeling unprofessional.<br />
+                      With GroomRoute, your clients get an <strong>instant, kind, professional update</strong> — without you stopping to type. You stay focused on the dog in front of you, while your business continues to look polished and reliable.
                     </p>
                   </div>
                 </div>
@@ -407,10 +408,11 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &quot;Start Driving&quot; - Navigation opens instantly.
+                      One Tap: &quot;Start Driving&quot; — Navigation Loads. You Go. Done.
                     </h3>
                     <p className="text-lg opacity-90">
-                      No copying addresses. No app switching. Your entire route loads in Google Maps or Apple Maps - ready to go.
+                      No copying addresses. No juggling screenshots. No confusion.<br />
+                      Tap once and your <strong>entire route instantly loads</strong> into Google Maps or Apple Maps so you can just drive — confidently and efficiently.
                     </p>
                   </div>
                 </div>
@@ -435,7 +437,7 @@ export default function Home() {
                       Understands Dog Size, Workload & Your Physical Capacity
                     </h3>
                     <p className="text-lg opacity-90 mb-4">
-                      Big dogs take more time. Doodles are a universe of their own. Some days you have a bather — some days you don&apos;t. GroomRoute actually understands that and helps you plan sustainable days that don&apos;t break your body or brain.
+                      Big dogs take more time. Doodles are their own universe. Some days you have help — some days you don&apos;t. GroomRoute actually understands that and helps you plan <strong>sustainable days</strong> that protect your body, your brain, and your love for grooming.
                     </p>
                     <ul className="space-y-2">
                       <li className="flex items-start gap-2">
@@ -444,11 +446,11 @@ export default function Home() {
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                        <span>Auto-flag danger days</span>
+                        <span>Auto-flag exhausting &quot;danger days&quot;</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                        <span>Adjust workload if an assistant is helping</span>
+                        <span>Adjust workload instantly if an assistant is helping</span>
                       </li>
                     </ul>
                   </div>
@@ -471,10 +473,10 @@ export default function Home() {
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      Cancellations Happen. GroomRoute Helps You Recover Lost Revenue.
+                      Cancellations Happen. GroomRoute Turns Them Into Income.
                     </h3>
                     <p className="text-lg opacity-90">
-                      When someone bails last-minute, GroomRoute helps turn that loss into opportunity by automatically filling gaps with nearby waitlist clients. Recover $200-400/month you&apos;d otherwise lose.
+                      Last-minute cancellations used to mean stress and lost money. GroomRoute automatically fills gaps with waitlist clients nearby, helping you recover <strong>$200–$400/month</strong> you&apos;d normally lose — without lifting a finger.
                     </p>
                   </div>
                 </div>
@@ -524,7 +526,10 @@ export default function Home() {
             </div>
 
             <p className="text-xl max-w-4xl mx-auto leading-relaxed opacity-90">
-              GroomRoute&apos;s Calm Control Center doesn&apos;t just react — it thinks with you. Whether your day collapses, clients cancel, traffic wrecks your schedule, or you realize you accidentally booked a nightmare day… GroomRoute helps you stabilize everything with clarity and confidence.
+              When your day collapses, a client cancels, traffic wrecks your schedule, or you suddenly realize you booked a nightmare lineup… GroomRoute doesn&apos;t just react — <strong>it thinks with you</strong>.
+            </p>
+            <p className="text-lg max-w-4xl mx-auto leading-relaxed opacity-90 mt-4">
+              Calm Control helps you stabilize your day with smart rescue plans, clear decisions, and confidence — so you stay calm, professional, and in control.
             </p>
           </div>
 
@@ -993,14 +998,14 @@ export default function Home() {
                   Ready for calmer, more profitable days?
                 </h2>
                 <p className="text-lg mb-6">
-                  One tap. Your whole day changes.
+                  One tap. Less stress. Better routes. Protected revenue. Stronger business.
                 </p>
                 <div className="card-actions">
                   <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
                     Start Free Trial
                   </Link>
                 </div>
-                <p className="text-sm opacity-70 mt-4">14-day free trial. Cancel anytime. Card required.</p>
+                <p className="text-sm opacity-70 mt-4">14-day free trial. Cancel anytime. No commitment stress. Card required.</p>
               </div>
             </div>
           </div>
