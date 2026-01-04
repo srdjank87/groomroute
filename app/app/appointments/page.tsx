@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
@@ -33,6 +33,8 @@ export default function AppointmentsPage() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+
+  const dateInputRef = useRef<HTMLInputElement>(null);
 
   const fetchAppointments = useCallback(async () => {
     setIsLoading(true);
@@ -143,14 +145,18 @@ export default function AppointmentsPage() {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Select Date
         </label>
-        <label className="cursor-pointer block">
+        <div
+          className="cursor-pointer"
+          onClick={() => dateInputRef.current?.showPicker?.()}
+        >
           <input
+            ref={dateInputRef}
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
             className="input input-bordered w-full h-12 cursor-pointer"
           />
-        </label>
+        </div>
       </div>
 
       {/* Appointments List */}

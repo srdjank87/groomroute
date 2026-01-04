@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -47,6 +47,9 @@ function NewAppointmentContent() {
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+
+  const dateInputRef = useRef<HTMLInputElement>(null);
+  const timeInputRef = useRef<HTMLInputElement>(null);
 
   const fetchCustomers = useCallback(async () => {
     try {
@@ -337,8 +340,12 @@ function NewAppointmentContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Date <span className="text-red-500">*</span>
                 </label>
-                <label className="cursor-pointer block">
+                <div
+                  className="cursor-pointer"
+                  onClick={() => dateInputRef.current?.showPicker?.()}
+                >
                   <input
+                    ref={dateInputRef}
                     type="date"
                     value={appointmentData.date}
                     onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
@@ -346,22 +353,26 @@ function NewAppointmentContent() {
                     className="input input-bordered w-full h-12 text-base cursor-pointer"
                     required
                   />
-                </label>
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Time <span className="text-red-500">*</span>
                 </label>
-                <label className="cursor-pointer block">
+                <div
+                  className="cursor-pointer"
+                  onClick={() => timeInputRef.current?.showPicker?.()}
+                >
                   <input
+                    ref={timeInputRef}
                     type="time"
                     value={appointmentData.time}
                     onChange={(e) => setAppointmentData({ ...appointmentData, time: e.target.value })}
                     className="input input-bordered w-full h-12 text-base cursor-pointer"
                     required
                   />
-                </label>
+                </div>
                 <p className="text-xs text-gray-500 mt-1">
                   Select your preferred arrival time
                 </p>
