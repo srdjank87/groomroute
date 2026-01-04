@@ -222,14 +222,17 @@ export default function AppointmentsPage() {
               <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
-                  {format(new Date(appointment.startAt), "h:mm a")} -{" "}
-                  {format(
-                    new Date(
-                      new Date(appointment.startAt).getTime() +
-                        appointment.serviceMinutes * 60000
-                    ),
-                    "h:mm a"
-                  )}
+                  {new Date(appointment.startAt).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit"
+                  })} -{" "}
+                  {new Date(
+                    new Date(appointment.startAt).getTime() +
+                      appointment.serviceMinutes * 60000
+                  ).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit"
+                  })}
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
@@ -336,14 +339,17 @@ export default function AppointmentsPage() {
                 <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
-                    {format(new Date(appointment.startAt), "h:mm a")} -{" "}
-                    {format(
-                      new Date(
-                        new Date(appointment.startAt).getTime() +
-                          appointment.serviceMinutes * 60000
-                      ),
-                      "h:mm a"
-                    )}
+                    {new Date(appointment.startAt).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit"
+                    })} -{" "}
+                    {new Date(
+                      new Date(appointment.startAt).getTime() +
+                        appointment.serviceMinutes * 60000
+                    ).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit"
+                    })}
                   </div>
                   <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4" />

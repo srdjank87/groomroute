@@ -57,6 +57,13 @@ interface Customer {
   appointments: Appointment[];
 }
 
+const formatAppointmentType = (type: string) => {
+  return type
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export default function CustomerEditPage() {
   const router = useRouter();
   const params = useParams();
@@ -381,7 +388,7 @@ export default function CustomerEditPage() {
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="btn h-12 btn-error text-white gap-2"
+            className="btn h-12 px-4 btn-error text-white gap-2"
           >
             {isDeleting ? (
               <span className="loading loading-spinner loading-sm"></span>
@@ -495,7 +502,7 @@ export default function CustomerEditPage() {
                       </div>
                       <div className="flex gap-3 text-sm text-gray-600">
                         <span>{date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</span>
-                        <span>• {appointment.appointmentType}</span>
+                        <span>• {formatAppointmentType(appointment.appointmentType)}</span>
                         {appointment.pet && <span>• {appointment.pet.name}</span>}
                         <span>• ${appointment.price}</span>
                       </div>

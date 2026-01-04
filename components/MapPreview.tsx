@@ -68,7 +68,7 @@ export default function MapPreview({
           <div className="flex items-center gap-2">
             <CheckCircle className={`h-5 w-5 ${locationVerified ? 'text-green-600' : 'text-blue-600'}`} />
             <p className={`text-sm font-medium ${locationVerified ? 'text-green-900' : 'text-blue-900'}`}>
-              {locationVerified ? 'Location verified by groomer' : 'Location found on map'}
+              {locationVerified ? 'Location verified' : 'Location found on map'}
             </p>
           </div>
           {!locationVerified && onVerifyLocation && (

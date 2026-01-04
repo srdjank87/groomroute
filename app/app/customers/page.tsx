@@ -143,7 +143,7 @@ export default function CustomersPage() {
                     e.preventDefault();
                     window.location.href = `/app/appointments/new?customerId=${customer.id}`;
                   }}
-                  className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
+                  className="btn btn-sm h-9 px-4 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
                 >
                   Book Appointment
                 </button>
