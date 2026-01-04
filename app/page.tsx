@@ -592,7 +592,7 @@ export default function Home() {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <p className="text-lg mb-4 italic">
-                  &quot;I used to end my day completely wrecked—physically and mentally. GroomRoute helped me build sustainable days that don&apos;t destroy my body. I actually have energy left at the end of the week now.&quot;
+                  &quot;Honestly? I was burning out hard. Back hurt, brain was mush by 3pm. GroomRoute&apos;s workload thing actually gets that a day with 4 doodles isn&apos;t the same as 4 chihuahuas. My body doesn&apos;t hate me anymore.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -605,7 +605,7 @@ export default function Home() {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <p className="text-lg mb-4 italic">
-                  &quot;The running late feature is a game-changer. Instead of panic-texting while trying to dry a dog, I tap one button and everyone&apos;s informed. I stay professional without the stress.&quot;
+                  &quot;The running late button saved my sanity. I used to stress SO HARD about texting everyone while I&apos;m elbow-deep in a giant poodle. Now it&apos;s just... handled. Clients don&apos;t even complain because the message goes out instantly. Best feature hands down.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -618,7 +618,7 @@ export default function Home() {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <p className="text-lg mb-4 italic">
-                  &quot;I was losing $300+ a month to last-minute cancellations. Now GroomRoute fills those gaps automatically with my waitlist. That alone paid for itself three times over.&quot;
+                  &quot;Last-minute cancellations were KILLING my income. Like $250-350 gone every month, just poof. The gap-fill thing is insane—it actually texts my waitlist and fills the slot. I&apos;ve recovered probably $800 in two months. That&apos;s real money.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -631,7 +631,7 @@ export default function Home() {
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
                 <p className="text-lg mb-4 italic">
-                  &quot;This is the first app that actually gets it. It understands that three doodles in a row will wreck my back, and helps me avoid those nightmare days before they happen.&quot;
+                  &quot;Finally, software that doesn&apos;t feel like it was built by someone who&apos;s never groomed a day in their life. It knows I can&apos;t do 3 giant breeds back-to-back without wrecking myself. Feels like it was designed BY a groomer.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
