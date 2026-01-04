@@ -241,28 +241,28 @@ export default function Home() {
 
               <div className="space-y-2 lg:space-y-3">
                 <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
-                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
                     <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
                     <span>Too many big dogs back-to-back</span>
                   </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
-                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
                     <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
                     <span>Too much driving, burning time and fuel</span>
                   </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
-                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
                     <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
                     <span>No-shows hit your income and your confidence</span>
                   </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
-                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
                     <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
                     <span>By the end of the day, your body aches… and your brain is exhausted</span>
                   </p>
@@ -295,28 +295,28 @@ export default function Home() {
 
               <div className="space-y-2 lg:space-y-3">
                 <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
-                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
                     <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
                     <span>Balanced schedules that protect your body</span>
                   </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
-                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
                     <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
                     <span>Routes that are tight, efficient, and stress-free</span>
                   </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
-                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
                     <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
                     <span>Automatic cancellation recovery when plans change</span>
                   </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
-                  <p className="text-sm lg:text-base text-gray-700 text-center flex items-center justify-center gap-2 lg:gap-3">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
                     <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
                     <span>Customers always informed - without you juggling messages</span>
                   </p>
