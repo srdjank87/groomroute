@@ -235,39 +235,43 @@ export default function Home() {
                 />
               </div>
 
+              <p className="text-lg font-semibold text-gray-800 text-center mb-4 italic">
+                The day doesn&apos;t feel like it&apos;s yours anymore.
+              </p>
+
               <div className="space-y-3">
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Days stacked with too many big dogs</span>
+                    <span>Too many big dogs back-to-back</span>
                   </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Driving everywhere, wasting fuel + time</span>
+                    <span>Too much driving, burning time and fuel</span>
                   </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>No-shows destroy your income</span>
+                    <span>No-shows hit your income and your confidence</span>
                   </p>
                 </div>
 
                 <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Your body and brain are exhausted</span>
+                    <span>By the end of the day, your body aches… and your brain is exhausted</span>
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center gap-2 justify-center">
-                <XCircle className="w-5 h-5 text-red-500" />
-                <p className="text-base font-bold text-gray-700">Result: Work that doesn&apos;t feel sustainable</p>
+              <div className="mt-6 text-center">
+                <p className="text-sm font-semibold text-gray-600 mb-1">Result:</p>
+                <p className="text-lg font-bold text-red-700">Work that doesn&apos;t feel sustainable anymore.</p>
               </div>
             </div>
 
@@ -285,39 +289,43 @@ export default function Home() {
                 />
               </div>
 
+              <p className="text-lg font-semibold text-gray-800 text-center mb-4 italic">
+                Your day finally makes sense again.
+              </p>
+
               <div className="space-y-3">
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Balanced days that protect your body</span>
+                    <span>Balanced schedules that protect your body</span>
                   </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Tight, efficient routes</span>
+                    <span>Routes that are tight, efficient, and stress-free</span>
                   </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Automatic cancellation recovery</span>
+                    <span>Automatic cancellation recovery when plans change</span>
                   </p>
                 </div>
 
                 <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
                   <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Your work finally feels sustainable</span>
+                    <span>Customers always informed—without you juggling messages</span>
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center gap-2 justify-center">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <p className="text-base font-bold text-gray-700">Result: Calmer days, stronger income, sustainable work</p>
+              <div className="mt-6 text-center">
+                <p className="text-sm font-semibold text-gray-600 mb-1">Result:</p>
+                <p className="text-lg font-bold text-emerald-700">Calmer days. Stronger income.<br />Work that finally feels sustainable.</p>
               </div>
             </div>
           </div>
