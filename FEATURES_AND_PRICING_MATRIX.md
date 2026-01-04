@@ -404,7 +404,7 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 
 ## Pricing Tier Feature Matrix
 
-### 💎 **ESSENTIAL - $89/month**
+### 💎 **STARTER - $89/month**
 
 **Target User:** Solo groomer, 1-3 appointments/day, just starting or part-time
 
@@ -416,18 +416,32 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 - ✅ Skip stop functionality
 - ✅ Basic calendar import (ICS/CSV)
 - ✅ Appointment conflict detection
-- ❌ Running late automation (manual only)
+- ✅ **SMS messaging (shared number)** - Immediate access, no A2P delays
+- ✅ **Calm Inbox** - Intelligent reply classification
+- ✅ **Auto-reply classification** - "OK" and "Thanks" auto-resolved
+- ✅ Basic analytics
+- ✅ Email support
+- ❌ Running late automation
 - ❌ Workload intelligence
 - ❌ Cancellation gap fill
-- ❌ Calm Control features
-- ❌ Communication templates
-- ❌ Analytics & reporting
+- ❌ Dedicated business SMS number
+- ❌ Message templates
+- ❌ Calm Control advanced features
+- ❌ Advanced analytics
 
 **Limitations:**
 - Max 50 customers
 - Max 100 appointments/month
-- No SMS/email automation
+- 500 SMS messages/month
+- Shared SMS sender number (messages include business name in content)
 - No advanced scheduling features
+
+**SMS Messaging:**
+- Uses platform-wide verified sender identity
+- Replies routed to correct business inbox
+- Full Calm Inbox experience
+- Supports single send and bulk notifications
+- Auto-classification of customer replies
 
 ---
 
@@ -435,9 +449,10 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 
 **Target User:** Professional mobile groomer, 4-8 appointments/day, sustainable business
 
-**Everything in Essential, PLUS:**
+**Everything in Starter, PLUS:**
 
 - ✅ **Unlimited customers & appointments**
+- ✅ **Dedicated Business SMS Number** - Your own number, 24-72hr provisioning
 - ✅ **Running Late Automation** (SMS/email)
 - ✅ **Workload & Dog Size Intelligence**
   - Dog size tracking
@@ -455,6 +470,11 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 - ✅ **Professional Communication Templates**
   - SMS/email template library
   - Custom template editor
+  - One-tap replies
+- ✅ **Bulk Notifications**
+  - Shift day messaging
+  - Route adjust notifications
+  - Waitlist fill blast
 - ✅ **Google Calendar Two-Way Sync**
 - ✅ **End-of-Day Analytics**
   - Time saved tracking
@@ -462,6 +482,14 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
   - Efficiency metrics
 - ✅ **Area Days Support**
 - ✅ **Professional Confidence Toolkit**
+- ✅ **Priority Support**
+
+**SMS Messaging Upgrade:**
+- Dedicated phone number provisioned after upgrade
+- Automatic switchover (no disruption)
+- Higher deliverability and trust
+- Customers recognize your number
+- 2,000 SMS messages/month included
 
 **Key Value Props:**
 - ROI: $1,321/month net gain (based on 60 min/day saved @ $75/hr)
@@ -471,7 +499,7 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
 
 ---
 
-### 🏢 **SCALE - $329/month**
+### 🏢 **PRO - $329/month**
 
 **Target User:** Multi-van operation, team management, 10+ appointments/day
 
@@ -495,7 +523,7 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
   - Maintenance tracking
   - Issue pattern detection
   - Export capabilities
-- ✅ **Priority Support**
+- ✅ **Premium Support**
   - Dedicated account manager
   - Phone support
   - Custom onboarding
@@ -503,28 +531,14 @@ Features from MARKET_INSIGHTS.md that strengthen product-market fit.
   - Custom integrations
   - Third-party software connections
 
+**SMS Messaging:**
+- 10,000 SMS messages/month included
+- Multi-number support (one per groomer/van)
+
 **Key Value Props:**
 - ROI scales with team size
 - Team efficiency optimization
 - Business-level insights and reporting
-
----
-
-## Optional Add-Ons (All Tiers)
-
-### 📈 Growth & Stability Program
-
-**Pricing:** $299/month (in addition to base plan)
-
-**Features:**
-- Local ad campaign setup and management
-- Postcard campaign design and execution
-- Route density optimization consulting
-- New customer acquisition tracking
-- Slow day filling strategy
-- Monthly strategy call
-
-**Target User:** Groomers struggling to fill their calendar or build route density
 
 ---
 

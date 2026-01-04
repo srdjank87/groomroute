@@ -733,22 +733,25 @@ export default function Home() {
               <div className="card-body">
                 <div className="badge badge-neutral mb-2">STARTER</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '950' : '99'}</span>
+                  <span className="text-4xl font-bold">${isYearly ? '890' : '89'}</span>
                   <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$79/month billed annually</div>}
+                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$74/month billed annually (save ~17%)</div>}
 
                 <p className="text-sm mb-4 italic opacity-80">
-                  Make your day make sense
+                  Solo groomer getting started
                 </p>
 
                 <ul className="space-y-2 mb-6">
                   {[
-                    "One-click route optimization",
-                    "Accurate ETAs for every stop",
-                    "Address validation",
-                    "Basic SMS confirmations",
-                    "Safety flags",
+                    "One-tap route optimization",
+                    "One-tap navigation",
+                    "Up to 50 customers",
+                    "100 appointments/month",
+                    "SMS messaging (shared number)",
+                    "Calm Inbox",
+                    "Basic analytics",
+                    "Email support",
                   ].map((item) => (
                     <li className="flex gap-2 items-start" key={item}>
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="text-success size-5 flex-shrink-0 mt-0.5">
@@ -761,7 +764,7 @@ export default function Home() {
 
                 <div className="card-actions">
                   <Link href={`/auth/signup?plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
-                    Start my calm day
+                    Start Free Trial
                   </Link>
                 </div>
               </div>
@@ -773,22 +776,27 @@ export default function Home() {
                 <div className="badge badge-secondary mb-2">MOST POPULAR</div>
                 <div className="badge badge-neutral mb-2 text-neutral-content">GROWTH</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '1,700' : '179'}</span>
+                  <span className="text-4xl font-bold">${isYearly ? '1,790' : '179'}</span>
                   <span className="text-sm opacity-90">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-90 -mt-3 mb-2">$142/month billed annually</div>}
+                {isYearly && <div className="text-xs opacity-90 -mt-3 mb-2">$149/month billed annually (save ~17%)</div>}
 
                 <p className="text-sm mb-4 italic opacity-90">
-                  Automation + calm days
+                  Professional groomer scaling up
                 </p>
 
                 <ul className="space-y-2 mb-6">
                   {[
-                    "Everything in Starter",
-                    "One-tap \"Running Late\" updates",
-                    "Automatic ETA recalculation",
-                    "Communication automation",
-                    "Calm control center",
+                    "Everything in Starter, PLUS:",
+                    "Unlimited customers & appointments",
+                    "Dedicated business SMS number",
+                    "Running Late automation",
+                    "Workload intelligence",
+                    "Cancellation gap fill ($200-$400/mo)",
+                    "Calm Control Center",
+                    "Message templates",
+                    "End-of-day analytics",
+                    "Priority support",
                   ].map((item) => (
                     <li className="flex gap-2 items-start" key={item}>
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-5 flex-shrink-0 mt-0.5">
@@ -801,7 +809,7 @@ export default function Home() {
 
                 <div className="card-actions">
                   <Link href={`/auth/signup?plan=growth&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-secondary btn-block text-secondary-content">
-                    Make my day easier
+                    Start Free Trial
                   </Link>
                 </div>
               </div>
@@ -812,23 +820,24 @@ export default function Home() {
               <div className="card-body">
                 <div className="badge badge-neutral mb-2">PRO</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '2,650' : '279'}</span>
+                  <span className="text-4xl font-bold">${isYearly ? '3,290' : '329'}</span>
                   <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$221/month billed annually</div>}
+                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$274/month billed annually (save ~17%)</div>}
 
                 <p className="text-sm mb-4 italic opacity-80">
-                  Maximize utilization without stress
+                  Multi-van operation
                 </p>
 
                 <ul className="space-y-2 mb-6">
                   {[
-                    "Everything in Growth",
-                    "Gap-fill automation",
-                    "Waitlist management",
-                    "Rebooking automation",
-                    "Multi-groomer support",
-                    "Advanced analytics",
+                    "Everything in Growth, PLUS:",
+                    "Multi-groomer/multi-van support",
+                    "Team calendar view",
+                    "Per-groomer analytics",
+                    "Equipment & van issue logging",
+                    "Phone support",
+                    "Dedicated account manager",
                   ].map((item) => (
                     <li className="flex gap-2 items-start" key={item}>
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="text-success size-5 flex-shrink-0 mt-0.5">
@@ -841,7 +850,7 @@ export default function Home() {
 
                 <div className="card-actions">
                   <Link href={`/auth/signup?plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
-                    Show me my better route
+                    Start Free Trial
                   </Link>
                 </div>
               </div>
