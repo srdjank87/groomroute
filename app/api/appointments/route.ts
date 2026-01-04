@@ -203,6 +203,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const date = searchParams.get("date"); // YYYY-MM-DD format
     const customerId = searchParams.get("customerId");
+    const all = searchParams.get("all") === "true";
 
     // Get groomer for this account
     const groomer = await prisma.groomer.findFirst({
@@ -221,20 +222,23 @@ export async function GET(req: NextRequest) {
       groomerId: groomer.id,
     };
 
-    if (date) {
-      const startOfDay = new Date(date);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(date);
-      endOfDay.setHours(23, 59, 59, 999);
+    // If 'all' is not set, apply date/customer filters
+    if (!all) {
+      if (date) {
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setHours(23, 59, 59, 999);
 
-      where.startAt = {
-        gte: startOfDay,
-        lte: endOfDay,
-      };
-    }
+        where.startAt = {
+          gte: startOfDay,
+          lte: endOfDay,
+        };
+      }
 
-    if (customerId) {
-      where.customerId = customerId;
+      if (customerId) {
+        where.customerId = customerId;
+      }
     }
 
     const appointments = await prisma.appointment.findMany({
@@ -244,8 +248,9 @@ export async function GET(req: NextRequest) {
         pet: true,
       },
       orderBy: {
-        startAt: "asc",
+        startAt: all ? "desc" : "asc", // Descending for 'all', ascending for date-specific
       },
+      ...(all && { take: 100 }), // Limit to 100 most recent when fetching all
     });
 
     return NextResponse.json({ appointments });

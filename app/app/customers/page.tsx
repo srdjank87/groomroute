@@ -106,9 +106,10 @@ export default function CustomersPage() {
       ) : (
         <div className="space-y-3">
           {customers.map((customer) => (
-            <div
+            <Link
               key={customer.id}
-              className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4"
+              href={`/app/customers/${customer.id}`}
+              className="block bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 cursor-pointer"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
@@ -137,14 +138,17 @@ export default function CustomersPage() {
                   </span>
                 </div>
 
-                <Link
-                  href={`/app/appointments/new?customerId=${customer.id}`}
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = `/app/appointments/new?customerId=${customer.id}`;
+                  }}
                   className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
                 >
                   Book Appointment
-                </Link>
+                </button>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

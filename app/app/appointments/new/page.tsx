@@ -170,10 +170,10 @@ function NewAppointmentContent() {
           </div>
 
           {/* Progress Steps */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center flex-1">
-                <div className="flex flex-col items-center flex-1">
+              <div key={step.id} className="flex items-center" style={{ flex: index === steps.length - 1 ? '0 0 auto' : '1 1 0%' }}>
+                <div className="flex flex-col items-center">
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                       step.active
@@ -189,7 +189,7 @@ function NewAppointmentContent() {
                       index + 1
                     )}
                   </div>
-                  <span className="text-xs mt-1 text-gray-600">{step.label}</span>
+                  <span className="text-xs mt-1 text-gray-600 whitespace-nowrap">{step.label}</span>
                 </div>
                 {index < steps.length - 1 && (
                   <div
@@ -337,27 +337,31 @@ function NewAppointmentContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Date <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="date"
-                  value={appointmentData.date}
-                  onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
-                  min={tomorrowStr}
-                  className="input input-bordered w-full h-12 text-base"
-                  required
-                />
+                <label className="cursor-pointer block">
+                  <input
+                    type="date"
+                    value={appointmentData.date}
+                    onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
+                    min={tomorrowStr}
+                    className="input input-bordered w-full h-12 text-base cursor-pointer"
+                    required
+                  />
+                </label>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Time <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="time"
-                  value={appointmentData.time}
-                  onChange={(e) => setAppointmentData({ ...appointmentData, time: e.target.value })}
-                  className="input input-bordered w-full h-12 text-base"
-                  required
-                />
+                <label className="cursor-pointer block">
+                  <input
+                    type="time"
+                    value={appointmentData.time}
+                    onChange={(e) => setAppointmentData({ ...appointmentData, time: e.target.value })}
+                    className="input input-bordered w-full h-12 text-base cursor-pointer"
+                    required
+                  />
+                </label>
                 <p className="text-xs text-gray-500 mt-1">
                   Select your preferred arrival time
                 </p>
