@@ -105,9 +105,9 @@ export default function DashboardLayout({
               <Image
                 src="/images/icon.svg"
                 alt="GroomRoute"
-                width={32}
-                height={32}
-                className="w-8 h-8"
+                width={16}
+                height={16}
+                className="w-6 h-6"
               />
               <h1 className="text-xl font-bold"><GroomRouteLogo /></h1>
             </div>
