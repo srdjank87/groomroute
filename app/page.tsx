@@ -94,6 +94,16 @@ export default function Home() {
               The first mobile grooming app that understands your workload isn&apos;t just about time—it&apos;s about protecting your body, sanity, and income.
             </p>
 
+            {/* CTAs - Above bullets on mobile, below on desktop */}
+            <div className="lg:hidden flex flex-col gap-3 mb-4">
+              <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
+                Start Free Trial
+              </Link>
+              <Link href="/book-demo" className="btn btn-outline btn-lg border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white">
+                Book a Demo
+              </Link>
+            </div>
+
             <div className="max-w-2xl mx-auto mb-4 lg:mb-4 space-y-2">
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
@@ -109,7 +119,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-3">
+            {/* CTAs - Below bullets on desktop */}
+            <div className="hidden lg:flex flex-col sm:flex-row gap-3 justify-center mb-3">
               <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
                 Start Free Trial
               </Link>
@@ -117,7 +128,7 @@ export default function Home() {
                 Book a Demo
               </Link>
             </div>
-            <p className="text-sm opacity-70">14-day free trial • Cancel anytime • Built by groomers who get it</p>
+            <p className="text-sm opacity-70 hidden lg:block">14-day free trial • Cancel anytime • Built by groomers who get it</p>
           </div>
         </div>
       </section>
