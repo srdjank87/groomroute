@@ -495,8 +495,8 @@ export default function Home() {
               <p className="text-sm opacity-80">Time saved</p>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">$200-$400/month</div>
-              <p className="text-sm opacity-80">Revenue recovered</p>
+              <div className="text-4xl font-bold mb-2">25-40% more capacity</div>
+              <p className="text-sm opacity-80">Without working longer days</p>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">80% reduction</div>
