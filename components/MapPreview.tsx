@@ -57,8 +57,14 @@ export default function MapPreview({
     );
   }
 
-  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005},${lat - 0.005},${lng + 0.005},${lat + 0.005}&layer=mapnik&marker=${lat},${lng}`;
-  const linkUrl = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}`;
+  // Use Google Maps for linking
+  const linkUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+
+  // Google Maps Embed API URL
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const embedUrl = apiKey
+    ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${lat},${lng}&zoom=16`
+    : null;
 
   return (
     <div className="space-y-3">
@@ -95,14 +101,15 @@ export default function MapPreview({
       </div>
 
       {/* Map Preview */}
-      {showMap && (
+      {showMap && embedUrl && (
         <div className="relative rounded-lg overflow-hidden border border-gray-200">
           <iframe
             title="Location Preview"
-            src={mapUrl}
+            src={embedUrl}
             className="w-full h-64"
             style={{ border: 0 }}
             loading="lazy"
+            allowFullScreen
           />
           <a
             href={linkUrl}
@@ -114,6 +121,25 @@ export default function MapPreview({
             Open in Maps
           </a>
         </div>
+      )}
+
+      {/* Fallback if no API key */}
+      {showMap && !embedUrl && (
+        <a
+          href={linkUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block relative rounded-lg overflow-hidden border-2 border-gray-200 hover:border-[#A5744A] transition-colors group"
+        >
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 text-center">
+            <MapPin className="h-12 w-12 text-[#A5744A] mx-auto mb-3" />
+            <p className="text-sm font-medium text-gray-900 mb-1">View Location on Map</p>
+            <p className="text-xs text-gray-600 flex items-center justify-center gap-1">
+              <ExternalLink className="h-3 w-3" />
+              Opens in Google Maps
+            </p>
+          </div>
+        </a>
       )}
 
       {/* Coordinates */}

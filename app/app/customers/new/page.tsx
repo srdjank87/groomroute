@@ -215,34 +215,33 @@ export default function NewCustomerPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Street Address <span className="text-red-500">*</span>
             </label>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <AddressAutocomplete
-                  value={formData.address}
-                  onChange={(address) => {
-                    setFormData({ ...formData, address });
-                    setGeocodedLocation(null); // Reset preview when address changes
-                  }}
-                  placeholder="Start typing address..."
-                  required
-                />
-              </div>
-              <button
-                type="button"
-                onClick={handlePreviewLocation}
-                disabled={!formData.address || isGeocoding}
-                className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
-              >
-                {isGeocoding ? (
-                  <span className="loading loading-spinner loading-sm"></span>
-                ) : (
-                  <MapPin className="h-5 w-5" />
-                )}
-                Preview
-              </button>
-            </div>
+            <AddressAutocomplete
+              value={formData.address}
+              onChange={(address) => {
+                setFormData({ ...formData, address });
+                setGeocodedLocation(null); // Reset preview when address changes manually
+              }}
+              onPlaceSelected={async (place) => {
+                // Auto-geocode when address is selected from autocomplete
+                if (place.geometry?.location && place.formatted_address) {
+                  const lat = place.geometry.location.lat();
+                  const lng = place.geometry.location.lng();
+
+                  setFormData({ ...formData, address: place.formatted_address });
+                  setGeocodedLocation({
+                    lat,
+                    lng,
+                    status: "OK",
+                  });
+                  toast.success("Location found!");
+                }
+              }}
+              placeholder="Start typing address..."
+              required
+              className="input input-bordered w-full h-12 text-base"
+            />
             <p className="text-xs text-gray-500 mt-1">
-              Click &quot;Preview&quot; to see the location on a map
+              Select an address from the dropdown to see it on the map
             </p>
           </div>
 

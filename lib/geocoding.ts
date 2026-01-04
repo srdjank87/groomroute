@@ -1,8 +1,7 @@
 /**
  * Geocoding Service
  *
- * Currently uses OpenStreetMap Nominatim (free, no API key needed)
- * Can be swapped to Google Maps Geocoding API when ready
+ * Uses Google Maps Geocoding API for accurate address lookup
  */
 
 export interface GeocodingResult {
@@ -14,21 +13,12 @@ export interface GeocodingResult {
 }
 
 /**
- * Geocode an address using OpenStreetMap Nominatim
- * Free tier: Rate limited to 1 request/second
- *
- * To use Google Maps instead:
- * 1. Add GOOGLE_MAPS_API_KEY to .env
- * 2. Uncomment geocodeWithGoogle function
- * 3. Call geocodeWithGoogle instead of geocodeWithNominatim
+ * Geocode an address using Google Maps Geocoding API
  */
 export async function geocodeAddress(address: string): Promise<GeocodingResult> {
   try {
-    // Use OpenStreetMap Nominatim (free)
-    return await geocodeWithNominatim(address);
-
-    // Or use Google Maps (requires API key)
-    // return await geocodeWithGoogle(address);
+    // Use Google Maps Geocoding API
+    return await geocodeWithGoogle(address);
   } catch (error) {
     console.error("Geocoding error:", error);
     return {
@@ -39,7 +29,42 @@ export async function geocodeAddress(address: string): Promise<GeocodingResult> 
 }
 
 /**
- * Geocode using OpenStreetMap Nominatim (FREE)
+ * Geocode using Google Maps Geocoding API
+ */
+async function geocodeWithGoogle(address: string): Promise<GeocodingResult> {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("GOOGLE_MAPS_API_KEY not configured");
+  }
+
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+    address
+  )}&key=${apiKey}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (data.status !== "OK" || !data.results || data.results.length === 0) {
+    return {
+      success: false,
+      error: data.status === "ZERO_RESULTS" ? "Address not found" : "Geocoding failed",
+    };
+  }
+
+  const result = data.results[0];
+  const location = result.geometry.location;
+
+  return {
+    success: true,
+    lat: location.lat,
+    lng: location.lng,
+    formattedAddress: result.formatted_address,
+  };
+}
+
+/**
+ * Geocode using OpenStreetMap Nominatim (FREE - fallback option)
  */
 async function geocodeWithNominatim(address: string): Promise<GeocodingResult> {
   const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
@@ -79,57 +104,15 @@ async function geocodeWithNominatim(address: string): Promise<GeocodingResult> {
 }
 
 /**
- * Geocode using Google Maps Geocoding API (PAID - requires API key)
- * Uncomment and use when ready to switch to Google Maps
- */
-/*
-async function geocodeWithGoogle(address: string): Promise<GeocodingResult> {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-
-  if (!apiKey) {
-    throw new Error("GOOGLE_MAPS_API_KEY not configured");
-  }
-
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-    address
-  )}&key=${apiKey}`;
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  if (data.status !== "OK" || !data.results || data.results.length === 0) {
-    return {
-      success: false,
-      error: data.status === "ZERO_RESULTS" ? "Address not found" : "Geocoding failed",
-    };
-  }
-
-  const result = data.results[0];
-  const location = result.geometry.location;
-
-  return {
-    success: true,
-    lat: location.lat,
-    lng: location.lng,
-    formattedAddress: result.formatted_address,
-  };
-}
-*/
-
-/**
- * Generate a static map image URL (for previewing location)
- * Uses OpenStreetMap tiles - free, no API key needed
+ * Generate a Google Maps URL for viewing a location
  */
 export function getStaticMapUrl(lat: number, lng: number, zoom: number = 15): string {
-  // For now, return a link to OpenStreetMap
-  // This can be replaced with Google Maps Static API or Mapbox Static Images API
-  return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=${zoom}/${lat}/${lng}`;
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 }
 
 /**
- * Generate an embeddable map iframe URL
- * Uses OpenStreetMap - free
+ * Generate a Google Maps URL for embedding or viewing
  */
 export function getEmbedMapUrl(lat: number, lng: number, zoom: number = 15): string {
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01},${lat - 0.01},${lng + 0.01},${lat + 0.01}&layer=mapnik&marker=${lat},${lng}`;
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 }
