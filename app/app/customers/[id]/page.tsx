@@ -71,10 +71,6 @@ export default function CustomerEditPage() {
     accessInstructions: "",
   });
 
-  useEffect(() => {
-    fetchCustomer();
-  }, [customerId]);
-
   const fetchCustomer = async () => {
     try {
       const response = await fetch(`/api/customers/${customerId}`);
@@ -100,6 +96,11 @@ export default function CustomerEditPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCustomer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customerId]);
 
   const handleSave = async () => {
     if (!formData.name || !formData.address) {

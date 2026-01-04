@@ -116,7 +116,7 @@ export default function TodaysRoutePage() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Today's Route</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Today&apos;s Route</h1>
         <p className="text-gray-600">{appointments.length} appointments • {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
       </div>
 

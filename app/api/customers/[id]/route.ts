@@ -15,7 +15,7 @@ const updateCustomerSchema = z.object({
 // GET single customer
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -25,7 +25,7 @@ export async function GET(
     }
 
     const accountId = session.user.accountId;
-    const customerId = params.id;
+    const { id: customerId } = await params;
 
     const customer = await prisma.customer.findFirst({
       where: {
@@ -66,7 +66,7 @@ export async function GET(
 // PATCH - Update customer
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -76,7 +76,7 @@ export async function PATCH(
     }
 
     const accountId = session.user.accountId;
-    const customerId = params.id;
+    const { id: customerId } = await params;
     const body = await req.json();
     const validatedData = updateCustomerSchema.parse(body);
 
@@ -135,7 +135,7 @@ export async function PATCH(
 // DELETE customer
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -145,7 +145,7 @@ export async function DELETE(
     }
 
     const accountId = session.user.accountId;
-    const customerId = params.id;
+    const { id: customerId } = await params;
 
     // Verify customer belongs to this account
     const existingCustomer = await prisma.customer.findFirst({

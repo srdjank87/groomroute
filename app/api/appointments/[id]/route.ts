@@ -15,7 +15,7 @@ const updateAppointmentSchema = z.object({
 // GET single appointment
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -25,7 +25,7 @@ export async function GET(
     }
 
     const accountId = session.user.accountId;
-    const appointmentId = params.id;
+    const { id: appointmentId } = await params;
 
     const appointment = await prisma.appointment.findFirst({
       where: {
@@ -56,7 +56,7 @@ export async function GET(
 // PATCH - Update appointment
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -66,7 +66,7 @@ export async function PATCH(
     }
 
     const accountId = session.user.accountId;
-    const appointmentId = params.id;
+    const { id: appointmentId } = await params;
     const body = await req.json();
     const validatedData = updateAppointmentSchema.parse(body);
 
@@ -138,7 +138,7 @@ export async function PATCH(
 // DELETE appointment
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -148,7 +148,7 @@ export async function DELETE(
     }
 
     const accountId = session.user.accountId;
-    const appointmentId = params.id;
+    const { id: appointmentId } = await params;
 
     // Verify appointment belongs to this account
     const existingAppointment = await prisma.appointment.findFirst({
