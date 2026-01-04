@@ -25,9 +25,9 @@ export default function Home() {
             <Image
               src="/images/icon.svg"
               alt="GroomRoute"
-              width={32}
-              height={32}
-              className="w-8 h-8"
+              width={16}
+              height={16}
+              className="w-6 h-6"
             />
             <span className="font-bold text-lg">
               <GroomRouteLogo />
