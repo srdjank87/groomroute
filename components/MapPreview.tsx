@@ -8,6 +8,9 @@ interface MapPreviewProps {
   address: string;
   geocodeStatus?: string;
   showMap?: boolean;
+  locationVerified?: boolean;
+  onVerifyLocation?: () => void;
+  isVerifying?: boolean;
 }
 
 export default function MapPreview({
@@ -16,6 +19,9 @@ export default function MapPreview({
   address,
   geocodeStatus = "OK",
   showMap = true,
+  locationVerified = false,
+  onVerifyLocation,
+  isVerifying = false,
 }: MapPreviewProps) {
   if (!lat || !lng || (geocodeStatus !== "OK" && geocodeStatus !== "PARTIAL")) {
     return (
@@ -41,12 +47,28 @@ export default function MapPreview({
   return (
     <div className="space-y-3">
       {/* Success Message */}
-      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-        <div className="flex items-center gap-2">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <p className="text-sm font-medium text-green-900">
-            Location found and verified
-          </p>
+      <div className={`border rounded-lg p-3 ${locationVerified ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200'}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle className={`h-5 w-5 ${locationVerified ? 'text-green-600' : 'text-blue-600'}`} />
+            <p className={`text-sm font-medium ${locationVerified ? 'text-green-900' : 'text-blue-900'}`}>
+              {locationVerified ? 'Location verified by groomer' : 'Location found on map'}
+            </p>
+          </div>
+          {!locationVerified && onVerifyLocation && (
+            <button
+              onClick={onVerifyLocation}
+              disabled={isVerifying}
+              className="btn btn-sm h-8 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1"
+            >
+              {isVerifying ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : (
+                <CheckCircle className="h-4 w-4" />
+              )}
+              Confirm Location
+            </button>
+          )}
         </div>
       </div>
 

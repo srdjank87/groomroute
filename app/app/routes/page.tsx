@@ -18,6 +18,7 @@ interface Appointment {
     address: string;
     addressNotes: string | null;
     accessInstructions: string | null;
+    locationVerified: boolean;
   };
   pet: {
     name: string;
@@ -171,7 +172,15 @@ export default function TodaysRoutePage() {
               </div>
 
               {/* Customer & Pet Info */}
-              <h3 className="font-semibold text-gray-900 mb-1">{appointment.customer.name}</h3>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold text-gray-900">{appointment.customer.name}</h3>
+                {appointment.customer.locationVerified && (
+                  <span className="badge badge-success badge-sm gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Verified
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-gray-700 mb-2">
                 {appointment.pet?.name && `${appointment.pet.name} • `}
                 {appointment.appointmentType}

@@ -13,7 +13,8 @@ import {
   Phone,
   Mail,
   MapPin,
-  PawPrint
+  PawPrint,
+  CheckCircle
 } from "lucide-react";
 import toast from "react-hot-toast";
 import MapPreview from "@/components/MapPreview";
@@ -51,6 +52,7 @@ interface Customer {
   lat?: number | null;
   lng?: number | null;
   geocodeStatus?: string | null;
+  locationVerified?: boolean;
   pets: Pet[];
   appointments: Appointment[];
 }
@@ -64,6 +66,7 @@ export default function CustomerEditPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -157,6 +160,29 @@ export default function CustomerEditPage() {
       toast.error("Failed to delete customer");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleVerifyLocation = async () => {
+    setIsVerifying(true);
+    try {
+      const response = await fetch(`/api/customers/${customerId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locationVerified: true }),
+      });
+
+      if (response.ok) {
+        toast.success("Location verified successfully");
+        fetchCustomer();
+      } else {
+        toast.error("Failed to verify location");
+      }
+    } catch (error) {
+      console.error("Failed to verify location:", error);
+      toast.error("Failed to verify location");
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -268,6 +294,9 @@ export default function CustomerEditPage() {
                 lng={customer.lng ?? null}
                 address={customer.address}
                 geocodeStatus={customer.geocodeStatus ?? undefined}
+                locationVerified={customer.locationVerified}
+                onVerifyLocation={handleVerifyLocation}
+                isVerifying={isVerifying}
               />
             </div>
           )}

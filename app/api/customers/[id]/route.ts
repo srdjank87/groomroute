@@ -11,6 +11,7 @@ const updateCustomerSchema = z.object({
   address: z.string().min(1, "Address is required").optional(),
   addressNotes: z.string().optional(),
   accessInstructions: z.string().optional(),
+  locationVerified: z.boolean().optional(),
 });
 
 // GET single customer
@@ -119,6 +120,9 @@ export async function PATCH(
         }),
         ...(validatedData.accessInstructions !== undefined && {
           accessInstructions: validatedData.accessInstructions || null
+        }),
+        ...(validatedData.locationVerified !== undefined && {
+          locationVerified: validatedData.locationVerified
         }),
       },
     });
