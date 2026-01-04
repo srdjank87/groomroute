@@ -112,7 +112,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Combine date and time into DateTime
-    const startAt = new Date(`${validatedData.date}T${validatedData.time}`);
+    // Parse as local time by creating a date object with explicit components
+    const [year, month, day] = validatedData.date.split('-').map(Number);
+    const [hours, minutes] = validatedData.time.split(':').map(Number);
+    const startAt = new Date(year, month - 1, day, hours, minutes, 0, 0);
 
     // Check for scheduling conflicts (same groomer, overlapping time)
     // Get all appointments for this groomer on the same day
