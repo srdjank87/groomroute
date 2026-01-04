@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { geocodeAddress } from "@/lib/geocoding";
 
 const updateCustomerSchema = z.object({
   name: z.string().min(1, "Name is required").optional(),
@@ -92,6 +93,19 @@ export async function PATCH(
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
 
+    // Geocode if address changed
+    let geocodeData = {};
+    if (validatedData.address && validatedData.address !== existingCustomer.address) {
+      const geocodeResult = await geocodeAddress(validatedData.address);
+      geocodeData = {
+        address: validatedData.address,
+        lat: geocodeResult.success ? geocodeResult.lat : null,
+        lng: geocodeResult.success ? geocodeResult.lng : null,
+        geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
+        locationVerified: false, // Reset verification when address changes
+      };
+    }
+
     // Update customer
     const customer = await prisma.customer.update({
       where: { id: customerId },
@@ -99,10 +113,7 @@ export async function PATCH(
         ...(validatedData.name && { name: validatedData.name }),
         ...(validatedData.phone !== undefined && { phone: validatedData.phone || null }),
         ...(validatedData.email !== undefined && { email: validatedData.email || null }),
-        ...(validatedData.address && {
-          address: validatedData.address,
-          geocodeStatus: "PENDING", // Re-geocode if address changes
-        }),
+        ...geocodeData,
         ...(validatedData.addressNotes !== undefined && {
           addressNotes: validatedData.addressNotes || null
         }),

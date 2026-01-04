@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { BehaviorFlag } from "@prisma/client";
 import { canAddCustomer } from "@/lib/feature-helpers";
+import { geocodeAddress } from "@/lib/geocoding";
 
 const customerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -63,6 +64,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Geocode the address before creating customer
+    const geocodeResult = await geocodeAddress(validatedData.address);
+
     // Create customer in transaction (with optional pet)
     const result = await prisma.$transaction(async (tx) => {
       // Create customer
@@ -76,7 +80,9 @@ export async function POST(req: NextRequest) {
           addressNotes: validatedData.addressNotes || null,
           accessInstructions: validatedData.accessInstructions || null,
           notes: validatedData.notes || null,
-          geocodeStatus: "PENDING",
+          lat: geocodeResult.success ? geocodeResult.lat : null,
+          lng: geocodeResult.success ? geocodeResult.lng : null,
+          geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
         },
       });
 
@@ -98,10 +104,6 @@ export async function POST(req: NextRequest) {
 
       return { customer, pet };
     });
-
-    // TODO: Trigger geocoding in background
-    // This would be a separate service that geocodes the address
-    // and updates the customer record with lat/lng
 
     return NextResponse.json({
       success: true,

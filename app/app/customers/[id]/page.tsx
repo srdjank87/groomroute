@@ -16,6 +16,7 @@ import {
   PawPrint
 } from "lucide-react";
 import toast from "react-hot-toast";
+import MapPreview from "@/components/MapPreview";
 
 interface Pet {
   id: string;
@@ -47,6 +48,9 @@ interface Customer {
   address: string;
   addressNotes?: string;
   accessInstructions?: string;
+  lat?: number | null;
+  lng?: number | null;
+  geocodeStatus?: string | null;
   pets: Pet[];
   appointments: Appointment[];
 }
@@ -255,6 +259,18 @@ export default function CustomerEditPage() {
               />
             </div>
           </div>
+
+          {/* Map Preview */}
+          {customer && (
+            <div>
+              <MapPreview
+                lat={customer.lat ?? null}
+                lng={customer.lng ?? null}
+                address={customer.address}
+                geocodeStatus={customer.geocodeStatus ?? undefined}
+              />
+            </div>
+          )}
 
           <div>
             <label className="label">
