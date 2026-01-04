@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronLeft, Check, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import MapPreview from "@/components/MapPreview";
 import toast from "react-hot-toast";
 
 export default function NewCustomerPage() {
@@ -12,6 +13,12 @@ export default function NewCustomerPage() {
   const [showAddressNotes, setShowAddressNotes] = useState(false);
   const [showPetSection, setShowPetSection] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [geocodedLocation, setGeocodedLocation] = useState<{
+    lat: number;
+    lng: number;
+    status: string;
+  } | null>(null);
 
   const [formData, setFormData] = useState({
     // Customer info
@@ -60,6 +67,45 @@ export default function NewCustomerPage() {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhone(e.target.value);
     setFormData({ ...formData, phone: formatted });
+  };
+
+  const handlePreviewLocation = async () => {
+    if (!formData.address) {
+      toast.error("Please enter an address first");
+      return;
+    }
+
+    setIsGeocoding(true);
+    try {
+      const response = await fetch("/api/geocode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: formData.address }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.lat && data.lng) {
+        setGeocodedLocation({
+          lat: data.lat,
+          lng: data.lng,
+          status: "OK",
+        });
+        toast.success("Location found!");
+      } else {
+        setGeocodedLocation({
+          lat: 0,
+          lng: 0,
+          status: "FAILED",
+        });
+        toast.error("Could not find this address on the map");
+      }
+    } catch (error) {
+      console.error("Geocoding error:", error);
+      toast.error("Failed to preview location");
+    } finally {
+      setIsGeocoding(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent, action: "save" | "saveAndBook") => {
@@ -169,16 +215,48 @@ export default function NewCustomerPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Street Address <span className="text-red-500">*</span>
             </label>
-            <AddressAutocomplete
-              value={formData.address}
-              onChange={(address) => setFormData({ ...formData, address })}
-              placeholder="Start typing address..."
-              required
-            />
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <AddressAutocomplete
+                  value={formData.address}
+                  onChange={(address) => {
+                    setFormData({ ...formData, address });
+                    setGeocodedLocation(null); // Reset preview when address changes
+                  }}
+                  placeholder="Start typing address..."
+                  required
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handlePreviewLocation}
+                disabled={!formData.address || isGeocoding}
+                className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+              >
+                {isGeocoding ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  <MapPin className="h-5 w-5" />
+                )}
+                Preview
+              </button>
+            </div>
             <p className="text-xs text-gray-500 mt-1">
-              Start typing and select from suggestions for accurate routing
+              Click &quot;Preview&quot; to see the location on a map
             </p>
           </div>
+
+          {/* Map Preview */}
+          {geocodedLocation && (
+            <div>
+              <MapPreview
+                lat={geocodedLocation.status === "OK" ? geocodedLocation.lat : null}
+                lng={geocodedLocation.status === "OK" ? geocodedLocation.lng : null}
+                address={formData.address}
+                geocodeStatus={geocodedLocation.status}
+              />
+            </div>
+          )}
 
           {/* Address Notes Toggle */}
           <button
