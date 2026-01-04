@@ -975,35 +975,32 @@ export default function Home() {
       {/* FINAL CTA WITH IMAGE */}
       <section className="py-8 lg:py-20 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
-          <div className="space-y-8">
-            {/* Hero Image - 16:9 ratio, full width */}
-            <div className="flex justify-center">
-              <Image
-                src="/images/final-cta.jpg"
-                alt="Happy mobile groomer with Golden Retriever outside grooming van - your future with GroomRoute"
-                width={1200}
-                height={675}
-                className="rounded-xl w-full shadow-2xl"
-              />
-            </div>
+          <div className="flex justify-center">
+            <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl max-w-2xl w-full overflow-hidden">
+              {/* Hero Image - inside card, above content */}
+              <figure>
+                <Image
+                  src="/images/final-cta.jpg"
+                  alt="Happy mobile groomer with Golden Retriever outside grooming van - your future with GroomRoute"
+                  width={1200}
+                  height={675}
+                  className="w-full"
+                />
+              </figure>
 
-            {/* CTA Card - centered below image */}
-            <div className="flex justify-center">
-              <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl max-w-2xl w-full">
-                <div className="card-body items-center text-center">
-                  <h2 className="card-title text-4xl mb-4">
-                    Ready for calmer, more profitable days?
-                  </h2>
-                  <p className="text-lg mb-6">
-                    One tap. Your whole day changes.
-                  </p>
-                  <div className="card-actions">
-                    <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
-                      Start Free Trial
-                    </Link>
-                  </div>
-                  <p className="text-sm opacity-70 mt-4">14-day free trial. Cancel anytime. Card required.</p>
+              <div className="card-body items-center text-center">
+                <h2 className="card-title text-4xl mb-4">
+                  Ready for calmer, more profitable days?
+                </h2>
+                <p className="text-lg mb-6">
+                  One tap. Your whole day changes.
+                </p>
+                <div className="card-actions">
+                  <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
+                    Start Free Trial
+                  </Link>
                 </div>
+                <p className="text-sm opacity-70 mt-4">14-day free trial. Cancel anytime. Card required.</p>
               </div>
             </div>
           </div>
