@@ -92,11 +92,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Fetch all appointments for the day
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    // Ensure we're only optimizing today's route
+    const today = new Date().toISOString().split('T')[0];
+    if (date !== today) {
+      return NextResponse.json(
+        { error: "Can only optimize today's route" },
+        { status: 400 }
+      );
+    }
+
+    // Fetch all incomplete appointments for today only
+    const startOfDay = new Date(date + 'T00:00:00.000Z');
+    const endOfDay = new Date(date + 'T23:59:59.999Z');
 
     const appointments = await prisma.appointment.findMany({
       where: {

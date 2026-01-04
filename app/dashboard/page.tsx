@@ -40,6 +40,7 @@ function DashboardContent() {
   const [stats, setStats] = useState<TodaysStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingSample, setIsGeneratingSample] = useState(false);
+  const [todaysAppointments, setTodaysAppointments] = useState<any[]>([]);
 
   useEffect(() => {
     async function handleSetup() {
@@ -109,11 +110,43 @@ function DashboardContent() {
         const data = await response.json();
         setStats(data);
       }
+
+      // Also fetch today's appointments for Start Driving
+      const today = new Date().toISOString().split('T')[0];
+      const appointmentsResponse = await fetch(`/api/appointments?date=${today}`);
+      if (appointmentsResponse.ok) {
+        const appointmentsData = await appointmentsResponse.json();
+        setTodaysAppointments(appointmentsData.appointments || []);
+      }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function startDriving() {
+    // Get incomplete appointments
+    const incompleteAppointments = todaysAppointments.filter(
+      (apt: any) => apt.status !== "COMPLETED" && apt.status !== "CANCELLED"
+    );
+
+    if (incompleteAppointments.length === 0) {
+      toast.error("No appointments to navigate to");
+      return;
+    }
+
+    // Build Google Maps directions URL with waypoints
+    let url = "https://www.google.com/maps/dir/";
+
+    // Add all appointment addresses as waypoints
+    incompleteAppointments.forEach((apt: any) => {
+      url += encodeURIComponent(apt.customer.address) + "/";
+    });
+
+    // Open in new tab
+    window.open(url, '_blank');
+    toast.success(`Opened route with ${incompleteAppointments.length} stops in Google Maps`);
   }
 
   if (isLoading || isGeneratingSample) {
@@ -198,19 +231,19 @@ function DashboardContent() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={startDriving}
+              className="btn bg-white text-blue-600 hover:bg-gray-100 border-0 flex-1 gap-2 h-12 font-bold"
+            >
+              <Navigation className="h-5 w-5" />
+              <span>Start Driving</span>
+            </button>
             <Link
               href="/app/routes"
-              className="btn bg-white text-blue-600 hover:bg-gray-100 border-0 flex-1 gap-2 h-12"
-            >
-              <Navigation className="h-4 w-4" />
-              <span className="text-sm">Start Navigation</span>
-            </Link>
-            <Link
-              href="/app/appointments"
               className="btn btn-ghost border border-white/30 hover:bg-white/10 flex-1 gap-2 h-12"
             >
-              <Calendar className="h-4 w-4" />
-              <span className="text-sm">View Schedule</span>
+              <MapPin className="h-4 w-4" />
+              <span className="text-sm">View Route</span>
             </Link>
           </div>
         </div>
@@ -282,6 +315,19 @@ function DashboardContent() {
         </div>
         <div className="p-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {/* Start Driving - Most Prominent */}
+            {stats?.hasData && todaysAppointments.length > 0 && (
+              <button
+                onClick={startDriving}
+                className="flex flex-col items-center gap-2 p-4 border-2 border-blue-500 bg-blue-500 rounded-lg hover:bg-blue-600 hover:border-blue-600 transition-colors text-center shadow-lg"
+              >
+                <div className="p-3 bg-white rounded-full">
+                  <Navigation className="h-6 w-6 text-blue-600" />
+                </div>
+                <span className="font-bold text-sm text-white">Start Driving</span>
+              </button>
+            )}
+
             <Link
               href="/app/appointments/new"
               className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/30 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors text-center"
@@ -307,7 +353,7 @@ function DashboardContent() {
               className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/20 rounded-lg hover:bg-orange-50 transition-colors text-center"
             >
               <div className="p-3 bg-[#A5744A]/20 rounded-full">
-                <Navigation className="h-6 w-6 text-[#8B6239]" />
+                <MapPin className="h-6 w-6 text-[#8B6239]" />
               </div>
               <span className="font-semibold text-sm text-gray-900">View Routes</span>
             </Link>

@@ -152,10 +152,9 @@ function NewAppointmentContent() {
     { id: "details", label: "Details", active: currentStep === "details" },
   ];
 
-  // Get tomorrow's date as default
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().split("T")[0];
+  // Get today's date as minimum (allow same-day appointments)
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -349,7 +348,7 @@ function NewAppointmentContent() {
                     type="date"
                     value={appointmentData.date}
                     onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
-                    min={tomorrowStr}
+                    min={todayStr}
                     className="input input-bordered w-full h-12 text-base cursor-pointer"
                     required
                   />

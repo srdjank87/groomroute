@@ -171,7 +171,7 @@ export default function AppointmentsPage() {
             No Appointments
           </h3>
           <p className="text-gray-600 mb-4">
-            No appointments scheduled for {format(new Date(selectedDate), "MMMM d, yyyy")}
+            No appointments scheduled for {format(new Date(selectedDate + 'T00:00:00'), "MMMM d, yyyy")}
           </p>
           <Link
             href="/app/appointments/new"
