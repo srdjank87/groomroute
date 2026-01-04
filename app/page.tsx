@@ -227,10 +227,10 @@ export default function Home() {
 
               <div className="mb-6">
                 <Image
-                  src="/images/groom-before.png"
-                  alt="Before GroomRoute - Stressed mobile groomer"
+                  src="/images/before.jpg"
+                  alt="Before GroomRoute - Exhausted mobile groomer sitting in van surrounded by chaos"
                   width={400}
-                  height={300}
+                  height={400}
                   className="rounded-xl w-full"
                 />
               </div>
@@ -277,10 +277,10 @@ export default function Home() {
 
               <div className="mb-6">
                 <Image
-                  src="/images/groom-after.png"
-                  alt="With GroomRoute - Happy mobile groomer"
+                  src="/images/after.jpg"
+                  alt="With GroomRoute - Confident mobile groomer standing in organized van with tablet"
                   width={400}
-                  height={300}
+                  height={400}
                   className="rounded-xl w-full"
                 />
               </div>
