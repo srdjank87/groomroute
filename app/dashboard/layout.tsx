@@ -101,7 +101,7 @@ export default function DashboardLayout({
             onClick={() => setSidebarOpen(false)}
           ></div>
           <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
-            <div className="flex h-16 items-center gap-x-3 px-6 border-b border-gray-200">
+            <div className="flex h-16 items-center gap-x-1.5 px-6 border-b border-gray-200">
               <Image
                 src="/images/icon.svg"
                 alt="GroomRoute"
@@ -143,7 +143,7 @@ export default function DashboardLayout({
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white border-r border-gray-200">
-          <div className="flex h-16 items-center gap-x-3 px-6 border-b border-gray-200">
+          <div className="flex h-16 items-center gap-x-1.5 px-6 border-b border-gray-200">
             <Image
               src="/images/icon.svg"
               alt="GroomRoute"
@@ -193,7 +193,7 @@ export default function DashboardLayout({
           </button>
 
           {/* Mobile logo - centered */}
-          <div className="flex flex-1 lg:hidden items-center justify-center gap-x-2">
+          <div className="flex flex-1 lg:hidden items-center justify-center gap-x-1.5 -ml-10">
             <Image
               src="/images/icon.svg"
               alt="GroomRoute"

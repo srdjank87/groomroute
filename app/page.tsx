@@ -21,7 +21,7 @@ export default function Home() {
       {/* HEADER */}
       <header className="border-b border-base-300 bg-base-100">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-1">
             <Image
               src="/images/icon.svg"
               alt="GroomRoute"
@@ -86,11 +86,11 @@ export default function Home() {
               />
             </div>
 
-            <h1 className="text-4xl lg:text-5xl font-bold mb-3">
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 lg:mb-5 leading-tight">
               Stop driving yourself to exhaustion.
             </h1>
 
-            <p className="text-lg lg:text-xl mb-4 lg:mb-3 leading-relaxed max-w-3xl mx-auto">
+            <p className="text-lg lg:text-xl mb-3 lg:mb-3 leading-snug max-w-3xl mx-auto">
               The first mobile grooming app that understands your workload isn&apos;t just about time - it&apos;s about protecting your body, sanity, and income.
             </p>
 
@@ -104,18 +104,18 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="max-w-2xl mx-auto mb-4 lg:mb-4 space-y-2">
+            <div className="max-w-2xl mx-auto mb-3 lg:mb-3 space-y-1.5">
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-base lg:text-lg text-left">Save 45-90 min/day with smart routing that respects your energy</p>
+                <p className="text-base lg:text-lg text-left leading-snug">Save 45-90 min/day with smart routing that respects your energy</p>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-base lg:text-lg text-left">Auto-notify customers when life happens - no panic texting</p>
+                <p className="text-base lg:text-lg text-left leading-snug">Auto-notify customers when life happens - no panic texting</p>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
-                <p className="text-base lg:text-lg text-left">Protect your body with workload intelligence (chihuahua days ≠ doodle days)</p>
+                <p className="text-base lg:text-lg text-left leading-snug">Protect your body with workload intelligence (chihuahua days ≠ doodle days)</p>
               </div>
             </div>
 
@@ -360,7 +360,7 @@ export default function Home() {
                       One-Tap Optimized Routes - Turn Chaos Into a Calm, Profitable Day
                     </h3>
                     <p className="text-lg opacity-90">
-                      GroomRoute doesn&apos;t just reorder stops - it builds real-world plans that match how groomers actually work. Save <strong>45-90 minutes a day</strong>, reduce mileage, and stop zig-zag driving all over town. Supports dedicated <strong>&quot;area days,&quot;</strong> so you can stay local, work efficiently, and finish your day with energy left.
+                      GroomRoute doesn&apos;t just reorder stops - it builds real-world plans that match how groomers actually work. Save <strong>45-90 minutes a day</strong>, reduce mileage, and stop zig-zag driving all over town. Supports dedicated <strong>&quot;area days&quot;</strong>, so you can stay local, work efficiently, and finish your day with energy left.
                     </p>
                   </div>
                 </div>
@@ -510,7 +510,7 @@ export default function Home() {
       <section className="py-8 lg:py-12 px-6 bg-gradient-to-br from-orange-50 to-amber-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-5xl font-bold mb-6">
+            <h2 className="text-5xl font-bold mb-6 leading-tight">
               Meet Calm Control - Your Safety Net for When Grooming Life Gets Messy
             </h2>
 
@@ -588,46 +588,24 @@ export default function Home() {
             </h2>
           </div>
 
-          {/* Video Testimonials Placeholder */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <div className="aspect-video bg-base-300 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">▶</div>
-                <p className="text-sm opacity-70">Video Testimonial 1</p>
-              </div>
-            </div>
-            <div className="aspect-video bg-base-300 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">▶</div>
-                <p className="text-sm opacity-70">Video Testimonial 2</p>
-              </div>
-            </div>
-            <div className="aspect-video bg-base-300 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">▶</div>
-                <p className="text-sm opacity-70">Video Testimonial 3</p>
-              </div>
-            </div>
-          </div>
-
           <div className="grid md:grid-cols-2 gap-6">
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <p className="text-lg mb-4">
-                  &quot;I don&apos;t stress about being behind anymore.&quot;
+                <p className="text-lg mb-4 italic">
+                  &quot;I used to end my day completely wrecked—physically and mentally. GroomRoute helped me build sustainable days that don&apos;t destroy my body. I actually have energy left at the end of the week now.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
-                  <div className="font-bold">Sarah</div>
-                  <div className="text-sm opacity-70">Mobile Groomer, 2 vans</div>
+                  <div className="font-bold">Sarah M.</div>
+                  <div className="text-sm opacity-70">Mobile Groomer, 6 years</div>
                 </div>
               </div>
             </div>
 
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <p className="text-lg mb-4">
-                  &quot;I finish the day feeling in control.&quot;
+                <p className="text-lg mb-4 italic">
+                  &quot;The running late feature is a game-changer. Instead of panic-texting while trying to dry a dog, I tap one button and everyone&apos;s informed. I stay professional without the stress.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -639,8 +617,8 @@ export default function Home() {
 
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <p className="text-lg mb-4">
-                  &quot;This is the first software built like we actually work.&quot;
+                <p className="text-lg mb-4 italic">
+                  &quot;I was losing $300+ a month to last-minute cancellations. Now GroomRoute fills those gaps automatically with my waitlist. That alone paid for itself three times over.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -652,8 +630,8 @@ export default function Home() {
 
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <p className="text-lg mb-4">
-                  &quot;My whole day changed. Less chaos, more money.&quot;
+                <p className="text-lg mb-4 italic">
+                  &quot;This is the first app that actually gets it. It understands that three doodles in a row will wreck my back, and helps me avoid those nightmare days before they happen.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -730,19 +708,19 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Starter */}
             <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="card-body">
+              <div className="card-body p-6">
                 <div className="badge badge-neutral mb-2">STARTER</div>
-                <div className="mb-4">
+                <div className="mb-3">
                   <span className="text-4xl font-bold">${isYearly ? '890' : '89'}</span>
                   <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$74/month billed annually (save ~17%)</div>}
+                {isYearly && <div className="text-xs opacity-70 -mt-2 mb-2">$74/month billed annually (save ~17%)</div>}
 
-                <p className="text-sm mb-4 italic opacity-80">
+                <p className="text-sm mb-3 italic opacity-80">
                   Solo groomer getting started
                 </p>
 
-                <ul className="space-y-2 mb-6">
+                <ul className="space-y-2 mb-4">
                   {[
                     "One-tap route optimization",
                     "One-tap navigation",
@@ -817,19 +795,19 @@ export default function Home() {
 
             {/* Pro */}
             <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="card-body">
+              <div className="card-body p-6">
                 <div className="badge badge-neutral mb-2">PRO</div>
-                <div className="mb-4">
+                <div className="mb-3">
                   <span className="text-4xl font-bold">${isYearly ? '3,290' : '329'}</span>
                   <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$274/month billed annually (save ~17%)</div>}
+                {isYearly && <div className="text-xs opacity-70 -mt-2 mb-2">$274/month billed annually (save ~17%)</div>}
 
-                <p className="text-sm mb-4 italic opacity-80">
+                <p className="text-sm mb-3 italic opacity-80">
                   Multi-van operation
                 </p>
 
-                <ul className="space-y-2 mb-6">
+                <ul className="space-y-2 mb-4">
                   {[
                     "Everything in Growth, PLUS:",
                     "Multi-groomer/multi-van support",
