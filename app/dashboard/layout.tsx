@@ -186,14 +186,14 @@ export default function DashboardLayout({
         <div className="sticky top-0 z-10 flex h-16 items-center gap-x-4 bg-white border-b border-gray-200 px-4 shadow-sm sm:px-6 lg:px-8">
           <button
             type="button"
-            className="lg:hidden -m-2.5 p-2.5 text-gray-700"
+            className="lg:hidden -m-2.5 p-2.5 text-gray-700 z-20"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="h-6 w-6" />
           </button>
 
           {/* Mobile logo - centered */}
-          <div className="flex flex-1 lg:hidden items-center justify-center gap-x-1.5 -ml-10">
+          <div className="lg:hidden absolute left-1/2 -translate-x-1/2 flex items-center gap-x-1.5">
             <Image
               src="/images/icon.svg"
               alt="GroomRoute"
