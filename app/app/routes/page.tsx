@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2 } from "lucide-react";
+import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Appointment {
@@ -29,7 +29,12 @@ interface Appointment {
 export default function TodaysRoutePage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isOptimizing, setIsOptimizing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [routeStats, setRouteStats] = useState<{
+    totalDistance?: number;
+    estimatedDriveTime?: number;
+  } | null>(null);
 
   useEffect(() => {
     fetchTodaysRoute();
@@ -89,6 +94,41 @@ export default function TodaysRoutePage() {
     window.open(`https://maps.google.com/?q=${encodedAddress}`, '_blank');
   }
 
+  async function optimizeRoute() {
+    setIsOptimizing(true);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch('/api/routes/optimize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: today }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to optimize route");
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message);
+        setRouteStats({
+          totalDistance: data.totalDistance,
+          estimatedDriveTime: data.estimatedDriveTime,
+        });
+        // Refresh appointments to show new order
+        await fetchTodaysRoute();
+      } else {
+        toast.error(data.message || "Could not optimize route");
+      }
+    } catch (error) {
+      console.error("Route optimization error:", error);
+      toast.error("Failed to optimize route");
+    } finally {
+      setIsOptimizing(false);
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -113,12 +153,65 @@ export default function TodaysRoutePage() {
     new Date(apt.startAt) > currentTime && apt.status !== "COMPLETED"
   );
 
+  const unoptimizedAppointments = appointments.filter(
+    (apt) => apt.status !== "COMPLETED" && apt.status !== "CANCELLED"
+  );
+  const hasUnverifiedLocations = unoptimizedAppointments.some(
+    (apt) => !apt.customer.locationVerified
+  );
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Today&apos;s Route</h1>
-        <p className="text-gray-600">{appointments.length} appointments • {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Today&apos;s Route</h1>
+            <p className="text-gray-600">{appointments.length} appointments • {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+          </div>
+          {unoptimizedAppointments.length > 1 && (
+            <button
+              onClick={optimizeRoute}
+              disabled={isOptimizing}
+              className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+            >
+              {isOptimizing ? (
+                <span className="loading loading-spinner loading-sm"></span>
+              ) : (
+                <Zap className="h-5 w-5" />
+              )}
+              Optimize Route
+            </button>
+          )}
+        </div>
+
+        {/* Route Stats */}
+        {routeStats && (
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-1 text-green-900">
+                <MapPin className="h-4 w-4" />
+                <span className="font-medium">{routeStats.totalDistance} miles</span>
+              </div>
+              <div className="flex items-center gap-1 text-green-900">
+                <Clock className="h-4 w-4" />
+                <span className="font-medium">~{routeStats.estimatedDriveTime} min drive time</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Warning for unverified locations */}
+        {hasUnverifiedLocations && unoptimizedAppointments.length > 1 && (
+          <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-900">
+                Some locations haven&apos;t been verified. Verify locations on customer profiles for better route optimization.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Next Up Card */}
