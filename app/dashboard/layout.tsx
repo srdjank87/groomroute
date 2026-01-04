@@ -223,7 +223,7 @@ export default function DashboardLayout({
           {/* Mobile logout button */}
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="lg:hidden -m-2.5 p-2.5 text-gray-700"
+            className="lg:hidden -m-2.5 p-2.5 text-gray-700 ml-auto z-20"
           >
             <LogOut className="h-5 w-5" />
           </button>
