@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { canAccessCalmControl } from "@/lib/feature-helpers";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,6 +12,29 @@ export async function GET(req: NextRequest) {
     }
 
     const accountId = session.user.accountId;
+
+    // Get account to check subscription plan
+    const account = await prisma.account.findUnique({
+      where: { id: accountId },
+      select: { subscriptionPlan: true },
+    });
+
+    if (!account) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    }
+
+    // Check if user can access Calm Control
+    if (!canAccessCalmControl(account)) {
+      return NextResponse.json(
+        {
+          error: "Calm Control is only available on the Growth and Pro plans.",
+          upgradeRequired: true,
+          suggestedPlan: "GROWTH",
+          featureName: "Calm Control Center"
+        },
+        { status: 403 }
+      );
+    }
 
     // Get today's date range
     const today = new Date();
