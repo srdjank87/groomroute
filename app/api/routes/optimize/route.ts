@@ -152,26 +152,34 @@ export async function POST(req: NextRequest) {
     const firstAppointmentTime = new Date(appointments[0].startAt);
     let currentTime = new Date(firstAppointmentTime);
 
-    // Update appointment times in database
+    // Pre-calculate all new start times (must be done sequentially before parallel updates)
+    const scheduledTimes: { id: string; newStartAt: Date; order: number }[] = [];
+    for (let i = 0; i < optimizedLocations.length; i++) {
+      const loc = optimizedLocations[i];
+      const appointment = appointments.find((a) => a.id === loc.id)!;
+
+      scheduledTimes.push({
+        id: loc.id,
+        newStartAt: new Date(currentTime),
+        order: i + 1,
+      });
+
+      // Increment time for next appointment (appointment duration + 15 min travel time)
+      currentTime = new Date(currentTime.getTime() + (appointment.serviceMinutes + 15) * 60000);
+    }
+
+    // Update appointment times in database (can now run in parallel)
     const updates = await Promise.all(
-      optimizedLocations.map(async (loc, index) => {
-        const appointment = appointments.find((a) => a.id === loc.id)!;
-
-        // Set new start time
-        const newStartAt = new Date(currentTime);
-
+      scheduledTimes.map(async (scheduled) => {
         await prisma.appointment.update({
-          where: { id: loc.id },
-          data: { startAt: newStartAt },
+          where: { id: scheduled.id },
+          data: { startAt: scheduled.newStartAt },
         });
 
-        // Increment time for next appointment (appointment duration + 15 min travel time)
-        currentTime = new Date(currentTime.getTime() + (appointment.serviceMinutes + 15) * 60000);
-
         return {
-          id: loc.id,
-          newStartAt: newStartAt.toISOString(),
-          order: index + 1,
+          id: scheduled.id,
+          newStartAt: scheduled.newStartAt.toISOString(),
+          order: scheduled.order,
         };
       })
     );
