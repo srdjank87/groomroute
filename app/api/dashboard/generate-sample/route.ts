@@ -296,12 +296,12 @@ export async function POST(req: NextRequest) {
         // Assign staggered times based on index (ensures different times)
         const hour = timeSlots[i % timeSlots.length];
 
-        // Create date string in local time format to avoid timezone issues
-        // Format: YYYY-MM-DDTHH:MM:SS (interpreted as local time)
+        // Create date with explicit UTC timezone
+        // We store times as UTC - the frontend will convert to local time for display
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const appointmentTime = new Date(`${year}-${month}-${day}T${String(hour).padStart(2, '0')}:00:00`);
+        const dayNum = String(date.getDate()).padStart(2, '0');
+        const appointmentTime = new Date(`${year}-${month}-${dayNum}T${String(hour).padStart(2, '0')}:00:00.000Z`);
 
         // Vary price slightly
         const basePrice = sampleData.duration >= 90 ? 85 : 65;

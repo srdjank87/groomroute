@@ -110,11 +110,8 @@ export async function GET(req: NextRequest) {
         ? {
             customerName: nextAppointment.customer.name,
             address: nextAppointment.customer.address,
-            time: nextAppointment.startAt.toLocaleTimeString("en-US", {
-              hour: "numeric",
-              minute: "2-digit",
-              hour12: true,
-            }),
+            // Return ISO string so client can format in user's local timezone
+            startAt: nextAppointment.startAt.toISOString(),
             petName: nextAppointment.pet?.name,
             serviceType:
               nextAppointment.appointmentType === "FULL_GROOM"

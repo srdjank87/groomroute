@@ -28,7 +28,7 @@ interface TodaysStats {
   nextAppointment?: {
     customerName: string;
     address: string;
-    time: string;
+    startAt: string; // ISO string - format on client for correct timezone
     petName?: string;
     serviceType: string;
     customerPhone?: string;
@@ -61,6 +61,15 @@ interface RevenueStats {
   avgRevenuePerCustomer: number;
   uniqueCustomers: number;
   completionRate: number;
+}
+
+// Format time from ISO string in user's local timezone
+function formatTime(isoString: string): string {
+  return new Date(isoString).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
 }
 
 function DashboardContent() {
@@ -375,7 +384,7 @@ function DashboardContent() {
             : 'rounded-xl shadow-lg p-6 mb-6 border border-[#A5744A]/30'
         }`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">Next Stop - {stats.nextAppointment.time}</h2>
+            <h2 className="text-2xl font-bold">Next Stop - {formatTime(stats.nextAppointment.startAt)}</h2>
             <div className="flex items-center gap-2">
               <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
                 {/* Remaining appointments = total - 1 (since we're showing the next one) */}
@@ -409,7 +418,7 @@ function DashboardContent() {
                   <p className="text-white/90 text-sm">{stats.nextAppointment.address}</p>
                   <p className="text-white/80 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
                     <Clock className="h-3 w-3" />
-                    {stats.nextAppointment.time}
+                    {formatTime(stats.nextAppointment.startAt)}
                   </p>
                 </div>
 
@@ -649,7 +658,7 @@ function DashboardContent() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.weeklyRevenue.toFixed(0)}</p>
-                <p className="text-xs text-gray-600 mt-1">Weekly Earned</p>
+                <p className="text-xs text-gray-600 mt-1">Weekly Earnings</p>
                 <p className="text-xs text-gray-500">{revenueStats.weeklyAppointments} jobs completed</p>
                 {revenueStats.weeklyLostRevenue > 0 && (
                   <p className="text-xs text-red-500 mt-1">-${revenueStats.weeklyLostRevenue.toFixed(0)} lost</p>
@@ -657,7 +666,7 @@ function DashboardContent() {
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.monthlyRevenue.toFixed(0)}</p>
-                <p className="text-xs text-gray-600 mt-1">Monthly Earned</p>
+                <p className="text-xs text-gray-600 mt-1">Monthly Earnings</p>
                 <p className="text-xs text-gray-500">{revenueStats.monthlyAppointments} jobs completed</p>
                 {revenueStats.monthlyLostRevenue > 0 && (
                   <p className="text-xs text-red-500 mt-1">-${revenueStats.monthlyLostRevenue.toFixed(0)} lost</p>
