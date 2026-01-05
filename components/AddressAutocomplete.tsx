@@ -111,24 +111,52 @@ export default function AddressAutocomplete({
 
       console.log("Autocomplete initialized successfully");
 
-      // Handle place selection
+      // Handle place selection - this is the primary event
       const listener = autocompleteRef.current.addListener("place_changed", () => {
+        console.log("place_changed event fired");
         const place = autocompleteRef.current?.getPlace();
-        console.log("Place selected:", place);
+        console.log("Place data:", place);
 
         if (place?.formatted_address) {
+          console.log("Updating with address:", place.formatted_address);
           onChange(place.formatted_address);
 
           if (onPlaceSelected) {
             onPlaceSelected(place);
           }
+        } else {
+          console.log("No formatted_address in place object");
         }
       });
+
+      // Add mousedown listener to the document to catch pac-item clicks
+      const handleDocumentClick = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        // Check if clicked element is a pac-item or child of pac-item
+        const pacItem = target.closest('.pac-item');
+        if (pacItem) {
+          console.log("PAC item clicked, waiting for place_changed...");
+          // Give Google Maps a moment to process the selection
+          setTimeout(() => {
+            const place = autocompleteRef.current?.getPlace();
+            console.log("After PAC click, place:", place);
+            if (place?.formatted_address) {
+              onChange(place.formatted_address);
+              if (onPlaceSelected) {
+                onPlaceSelected(place);
+              }
+            }
+          }, 50);
+        }
+      };
+
+      document.addEventListener("mousedown", handleDocumentClick, true);
 
       return () => {
         if (listener) {
           window.google?.maps.event.removeListener(listener);
         }
+        document.removeEventListener("mousedown", handleDocumentClick, true);
       };
     } catch (error) {
       console.error("Error initializing autocomplete:", error);
