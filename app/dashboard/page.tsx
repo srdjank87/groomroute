@@ -338,7 +338,7 @@ function DashboardContent() {
                 {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
               </span>
               <span className="sm:hidden">
-                {stats.appointments - 1 === 1 ? 'appt' : 'appts'} left
+                {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
               </span>
             </div>
           </div>
