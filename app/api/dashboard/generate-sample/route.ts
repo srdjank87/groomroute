@@ -274,7 +274,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create appointments for today and the last 7 days (8 days total)
-    // Random number of appointments (6-10) per day
+    // Random number of appointments (6-8) per day with staggered times
     for (let dayOffset = 7; dayOffset >= 0; dayOffset--) {
       const date = new Date(today);
       date.setDate(today.getDate() - dayOffset);
@@ -286,12 +286,21 @@ export async function POST(req: NextRequest) {
       const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
       const selectedCustomers = shuffledCustomers.slice(0, numAppointments);
 
+      // Define appointment time slots (9 AM to 5 PM in local time)
+      const timeSlots = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+
       for (let i = 0; i < selectedCustomers.length; i++) {
         const { customer, pet, sampleData } = selectedCustomers[i];
 
-        // Use the scheduled time from sample data
-        const appointmentTime = new Date(date);
-        appointmentTime.setHours(sampleData.time, 0, 0, 0);
+        // Assign staggered times based on index (ensures different times)
+        const hour = timeSlots[i % timeSlots.length];
+
+        // Create date string in local time format to avoid timezone issues
+        // Format: YYYY-MM-DDTHH:MM:SS (interpreted as local time)
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const appointmentTime = new Date(`${year}-${month}-${day}T${String(hour).padStart(2, '0')}:00:00`);
 
         // Vary price slightly
         const basePrice = sampleData.duration >= 90 ? 85 : 65;
