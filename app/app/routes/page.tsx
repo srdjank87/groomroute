@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, MessageSquare, UserPlus, Coffee, X, Play, ThumbsUp, CheckCircle } from "lucide-react";
+import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, MessageSquare, UserPlus, Coffee, X, Play, ThumbsUp, CheckCircle, SkipForward } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Appointment {
@@ -295,6 +295,31 @@ export default function TodaysRoutePage() {
     toast.success(`Opened route with ${validAppointments.length} stops in Google Maps`);
   }
 
+  async function handleSkipAppointment(appointmentId: string) {
+    if (!confirm("Skip this appointment?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "CANCELLED" }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment skipped");
+        await fetchTodaysRoute();
+        await fetchBreakSuggestion();
+      } else {
+        toast.error("Failed to skip appointment");
+      }
+    } catch (error) {
+      console.error("Skip appointment error:", error);
+      toast.error("Failed to skip appointment");
+    }
+  }
+
   async function handleConfirmAppointment(appointmentId: string) {
     try {
       const response = await fetch(`/api/appointments/${appointmentId}`, {
@@ -585,8 +610,10 @@ export default function TodaysRoutePage() {
         <div className="mb-6 bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] rounded-xl shadow-lg text-white border border-[#A5744A]/30 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Next Stop - {formatTime(nextAppointment.startAt)}</h2>
-            <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
-              {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1} left
+            {/* Badge hidden on mobile - shown below buttons instead */}
+            <div className="hidden sm:block badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
+              {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1}{' '}
+              {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1 === 1 ? 'appointment' : 'appointments'} left
             </div>
           </div>
 
@@ -658,31 +685,40 @@ export default function TodaysRoutePage() {
               Start Driving
             </button>
 
-            {/* Status actions - Confirm/Start/Complete */}
+            {/* Skip & Status actions - 2 column layout */}
             {nextAppointment.status !== "COMPLETED" && nextAppointment.status !== "CANCELLED" && (
-              <div className="flex gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                {/* Skip button - always shown */}
+                <button
+                  onClick={() => handleSkipAppointment(nextAppointment.id)}
+                  className="bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <SkipForward className="h-5 w-5" />
+                  Skip
+                </button>
+                {/* Status action button */}
                 {nextAppointment.status === "BOOKED" && (
                   <button
                     onClick={() => handleConfirmAppointment(nextAppointment.id)}
-                    className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <ThumbsUp className="h-5 w-5" />
-                    Confirm Appointment
+                    Confirm
                   </button>
                 )}
                 {nextAppointment.status === "CONFIRMED" && (
                   <button
                     onClick={() => handleStartAppointment(nextAppointment.id)}
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <Play className="h-5 w-5" />
-                    Start Grooming
+                    Start
                   </button>
                 )}
                 {nextAppointment.status === "IN_PROGRESS" && (
                   <button
                     onClick={() => handleCompleteAppointment(nextAppointment.id)}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <CheckCircle className="h-5 w-5" />
                     Complete
@@ -690,6 +726,14 @@ export default function TodaysRoutePage() {
                 )}
               </div>
             )}
+
+            {/* Appointments left badge - separate row on mobile */}
+            <div className="flex justify-center sm:hidden">
+              <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
+                {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1}{' '}
+                {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1 === 1 ? 'appointment' : 'appointments'} left
+              </div>
+            </div>
           </div>
         </div>
       )}

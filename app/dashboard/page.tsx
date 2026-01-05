@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  MapPin,
   Navigation,
   Clock,
   DollarSign,
@@ -522,15 +521,10 @@ function DashboardContent() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Next Stop - {formatTime(stats.nextAppointment.startAt)}</h2>
             <div className="flex items-center gap-2">
-              <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
-                {/* Remaining appointments = total - 1 (since we're showing the next one) */}
+              {/* Badge hidden on mobile - shown below buttons instead */}
+              <div className="hidden sm:block badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
                 {stats.appointments - 1}{' '}
-                <span className="hidden sm:inline">
-                  {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
-                </span>
-                <span className="sm:hidden">
-                  {stats.appointments - 1 === 1 ? 'appt' : 'appts'} left
-                </span>
+                {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
               </div>
               <button
                 onClick={toggleFullscreen}
@@ -635,29 +629,30 @@ function DashboardContent() {
               <span>Start Driving</span>
             </button>
 
-            {/* Secondary Actions - 3 Column Grid */}
-            <div className="grid grid-cols-3 gap-2">
-              <Link
-                href="/app/routes"
-                className="btn bg-blue-500/80 hover:bg-blue-500/90 border border-blue-300/30 text-white gap-1 h-11 text-xs"
-              >
-                <MapPin className="h-4 w-4" />
-                <span className="hidden sm:inline">Route</span>
-              </Link>
+            {/* Secondary Actions - Skip & Complete */}
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => stats.nextAppointment && handleSkipAppointment(stats.nextAppointment.appointmentId)}
-                className="btn bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white gap-1 h-11 text-xs"
+                className="btn bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white gap-2 h-11"
               >
                 <SkipForward className="h-4 w-4" />
-                <span className="hidden sm:inline">Skip</span>
+                <span>Skip</span>
               </button>
               <button
                 onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
-                className="btn bg-green-500/80 hover:bg-green-500/90 border border-green-300/30 text-white gap-1 h-11 text-xs"
+                className="btn bg-green-500/80 hover:bg-green-500/90 border border-green-300/30 text-white gap-2 h-11"
               >
                 <CheckCircle className="h-4 w-4" />
-                <span className="hidden sm:inline">Done</span>
+                <span>Complete</span>
               </button>
+            </div>
+
+            {/* Appointments left badge - separate row on mobile */}
+            <div className="flex justify-center sm:hidden">
+              <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
+                {stats.appointments - 1}{' '}
+                {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
+              </div>
             </div>
           </div>
         </div>
