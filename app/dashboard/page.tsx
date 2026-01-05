@@ -13,7 +13,10 @@ import {
   Calendar,
   CheckCircle,
   TrendingDown,
-  Sparkles
+  Sparkles,
+  Phone,
+  MessageSquare,
+  SkipForward
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
@@ -26,12 +29,15 @@ interface TodaysStats {
     time: string;
     petName?: string;
     serviceType: string;
+    customerPhone?: string;
+    appointmentId: string;
   };
   timeSaved: number; // minutes
   milesSaved: number;
   estimatedGasSavings: number;
   hasData: boolean;
   showSampleData: boolean;
+  contactMethods?: string[];
 }
 
 function DashboardContent() {
@@ -175,6 +181,94 @@ function DashboardContent() {
     }
   }
 
+  function handleCall(phone?: string) {
+    if (!phone) {
+      toast.error("No phone number available");
+      return;
+    }
+    window.location.href = `tel:${phone}`;
+  }
+
+  function handleSMS(phone?: string) {
+    if (!phone) {
+      toast.error("No phone number available");
+      return;
+    }
+    window.location.href = `sms:${phone}`;
+  }
+
+  function handleWhatsApp(phone?: string) {
+    if (!phone) {
+      toast.error("No phone number available");
+      return;
+    }
+    // Remove non-digits from phone number
+    const cleanPhone = phone.replace(/\D/g, '');
+    window.open(`https://wa.me/1${cleanPhone}`, '_blank');
+  }
+
+  function handleSignal(phone?: string) {
+    if (!phone) {
+      toast.error("No phone number available");
+      return;
+    }
+    // Signal uses signal:// URL scheme
+    window.location.href = `signal://send?phone=${phone}`;
+  }
+
+  function handleTelegram(phone?: string) {
+    if (!phone) {
+      toast.error("No phone number available");
+      return;
+    }
+    // Telegram uses tg:// URL scheme
+    window.location.href = `tg://resolve?phone=${phone}`;
+  }
+
+  async function handleSkipAppointment(appointmentId: string) {
+    if (!confirm("Skip this appointment?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "CANCELLED" }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment skipped");
+        await fetchDashboardData();
+      } else {
+        toast.error("Failed to skip appointment");
+      }
+    } catch (error) {
+      console.error("Skip appointment error:", error);
+      toast.error("Failed to skip appointment");
+    }
+  }
+
+  async function handleCompleteAppointment(appointmentId: string) {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "COMPLETED" }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment completed!");
+        await fetchDashboardData();
+      } else {
+        toast.error("Failed to complete appointment");
+      }
+    } catch (error) {
+      console.error("Complete appointment error:", error);
+      toast.error("Failed to complete appointment");
+    }
+  }
+
   if (isLoading || isGeneratingSample) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -265,6 +359,54 @@ function DashboardContent() {
                   <Clock className="h-3 w-3" />
                   {stats.nextAppointment.time}
                 </p>
+
+                {/* Contact Methods */}
+                {stats.nextAppointment.customerPhone && stats.contactMethods && stats.contactMethods.length > 0 && (
+                  <div className="flex gap-2 mt-3">
+                    {stats.contactMethods.includes("call") && (
+                      <button
+                        onClick={() => handleCall(stats.nextAppointment?.customerPhone)}
+                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                      >
+                        <Phone className="h-3 w-3" />
+                        Call
+                      </button>
+                    )}
+                    {stats.contactMethods.includes("sms") && (
+                      <button
+                        onClick={() => handleSMS(stats.nextAppointment?.customerPhone)}
+                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                      >
+                        <MessageSquare className="h-3 w-3" />
+                        SMS
+                      </button>
+                    )}
+                    {stats.contactMethods.includes("whatsapp") && (
+                      <button
+                        onClick={() => handleWhatsApp(stats.nextAppointment?.customerPhone)}
+                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                      >
+                        💚 WhatsApp
+                      </button>
+                    )}
+                    {stats.contactMethods.includes("signal") && (
+                      <button
+                        onClick={() => handleSignal(stats.nextAppointment?.customerPhone)}
+                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                      >
+                        🔵 Signal
+                      </button>
+                    )}
+                    {stats.contactMethods.includes("telegram") && (
+                      <button
+                        onClick={() => handleTelegram(stats.nextAppointment?.customerPhone)}
+                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                      >
+                        ✈️ Telegram
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -272,18 +414,35 @@ function DashboardContent() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={startDriving}
-              className="btn bg-white text-blue-600 hover:bg-gray-100 border-0 flex-1 gap-2 h-12 font-bold"
+              className="btn bg-white text-blue-600 hover:bg-gray-100 border-0 gap-2 h-12 font-bold"
             >
               <Navigation className="h-5 w-5" />
               <span>Start Driving</span>
             </button>
             <Link
               href="/app/routes"
-              className="btn btn-ghost border border-white/30 hover:bg-white/10 flex-1 gap-2 h-12"
+              className="btn btn-ghost border border-white/30 hover:bg-white/10 gap-2 h-12"
             >
               <MapPin className="h-4 w-4" />
               <span className="text-sm">View Route</span>
             </Link>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <button
+              onClick={() => stats.nextAppointment && handleSkipAppointment(stats.nextAppointment.appointmentId)}
+              className="btn btn-ghost border border-white/30 hover:bg-white/10 gap-2 h-12"
+            >
+              <SkipForward className="h-4 w-4" />
+              <span className="text-sm">Skip</span>
+            </button>
+            <button
+              onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
+              className="btn btn-ghost border border-white/30 hover:bg-white/10 gap-2 h-12"
+            >
+              <CheckCircle className="h-4 w-4" />
+              <span className="text-sm">Mark Complete</span>
+            </button>
           </div>
         </div>
       ) : (
@@ -353,20 +512,7 @@ function DashboardContent() {
           <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
         </div>
         <div className="p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {/* Start Driving - Most Prominent */}
-            {stats?.hasData && todaysAppointments.length > 0 && (
-              <button
-                onClick={startDriving}
-                className="flex flex-col items-center gap-2 p-4 border-2 border-blue-500 bg-blue-500 rounded-lg hover:bg-blue-600 hover:border-blue-600 transition-colors text-center shadow-lg"
-              >
-                <div className="p-3 bg-white rounded-full">
-                  <Navigation className="h-6 w-6 text-blue-600" />
-                </div>
-                <span className="font-bold text-sm text-white">Start Driving</span>
-              </button>
-            )}
-
+          <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
             <Link
               href="/app/appointments/new"
               className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/30 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors text-center"
@@ -385,26 +531,6 @@ function DashboardContent() {
                 <Plus className="h-6 w-6 text-[#8B6239]" />
               </div>
               <span className="font-semibold text-sm text-gray-900">Add Customer</span>
-            </Link>
-
-            <Link
-              href="/app/routes"
-              className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/20 rounded-lg hover:bg-orange-50 transition-colors text-center"
-            >
-              <div className="p-3 bg-[#A5744A]/20 rounded-full">
-                <MapPin className="h-6 w-6 text-[#8B6239]" />
-              </div>
-              <span className="font-semibold text-sm text-gray-900">View Routes</span>
-            </Link>
-
-            <Link
-              href="/app/appointments"
-              className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/20 rounded-lg hover:bg-orange-50 transition-colors text-center"
-            >
-              <div className="p-3 bg-[#A5744A]/20 rounded-full">
-                <CheckCircle className="h-6 w-6 text-[#8B6239]" />
-              </div>
-              <span className="font-semibold text-sm text-gray-900">Complete Job</span>
             </Link>
           </div>
         </div>

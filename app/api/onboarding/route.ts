@@ -16,6 +16,7 @@ const onboardingSchema = z.object({
     workingHoursStart: z.string().regex(/^\d{2}:\d{2}$/),
     workingHoursEnd: z.string().regex(/^\d{2}:\d{2}$/),
   }),
+  contactMethods: z.array(z.string()).optional().default(["call", "sms"]),
 });
 
 export async function POST(request: NextRequest) {
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
         baseAddress: validatedData.address.baseAddress,
         workingHoursStart: validatedData.hours.workingHoursStart,
         workingHoursEnd: validatedData.hours.workingHoursEnd,
+        contactMethods: validatedData.contactMethods || ["call", "sms"],
         geocodeStatus: "PENDING",
       },
     });

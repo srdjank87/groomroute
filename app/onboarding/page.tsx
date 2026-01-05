@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 
-type OnboardingStep = "address" | "hours" | "complete";
+type OnboardingStep = "address" | "hours" | "contact" | "complete";
 
 export default function OnboardingPage() {
   const { data: session, status } = useSession();
@@ -40,6 +40,8 @@ export default function OnboardingPage() {
     workingHoursEnd: "17:00",
   });
 
+  const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
+
 
   if (status === "loading") {
     return (
@@ -61,6 +63,19 @@ export default function OnboardingPage() {
 
   const handleHoursSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCurrentStep("contact");
+  };
+
+  const toggleContactMethod = (method: string) => {
+    setContactMethods((prev) =>
+      prev.includes(method)
+        ? prev.filter((m) => m !== method)
+        : [...prev, method]
+    );
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
 
     try {
@@ -72,6 +87,7 @@ export default function OnboardingPage() {
           groomer: groomerData,
           address: addressData,
           hours: hoursData,
+          contactMethods,
         }),
       });
 
@@ -103,11 +119,14 @@ export default function OnboardingPage() {
         {/* Progress Steps */}
         <div className="mb-8">
           <ul className="steps steps-horizontal w-full">
-            <li className={`step ${currentStep === "hours" ? "step-primary" : ""} text-gray-700 font-medium`}>
+            <li className={`step ${currentStep !== "address" ? "step-primary" : ""} text-gray-700 font-medium`}>
               Base Address
             </li>
-            <li className={`step ${currentStep === "hours" ? "step-primary" : ""} text-gray-700 font-medium`}>
+            <li className={`step ${currentStep === "hours" || currentStep === "contact" ? "step-primary" : ""} text-gray-700 font-medium`}>
               Working Hours
+            </li>
+            <li className={`step ${currentStep === "contact" ? "step-primary" : ""} text-gray-700 font-medium`}>
+              Contact Methods
             </li>
           </ul>
         </div>
@@ -184,6 +203,62 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setCurrentStep("address")}
+                  className="btn btn-ghost flex-1 border-2 border-gray-300"
+                  disabled={isLoading}
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary flex-1 text-white bg-[#A5744A] hover:bg-[#8B6239] border-0"
+                  disabled={isLoading}
+                >
+                  Continue
+                </button>
+              </div>
+            </form>
+          )}
+
+          {currentStep === "contact" && (
+            <form onSubmit={handleContactSubmit} className="space-y-4">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Contact Methods
+              </h2>
+              <p className="text-gray-600 mb-4">
+                How do you prefer to contact your customers? Select all that apply.
+              </p>
+
+              <div className="space-y-3">
+                {[
+                  { value: "call", label: "Phone Call", icon: "📞" },
+                  { value: "sms", label: "SMS / Text", icon: "💬" },
+                  { value: "whatsapp", label: "WhatsApp", icon: "💚" },
+                  { value: "signal", label: "Signal", icon: "🔵" },
+                  { value: "telegram", label: "Telegram", icon: "✈️" },
+                ].map((method) => (
+                  <button
+                    key={method.value}
+                    type="button"
+                    onClick={() => toggleContactMethod(method.value)}
+                    className={`w-full p-4 rounded-lg border-2 transition-colors text-left flex items-center gap-3 ${
+                      contactMethods.includes(method.value)
+                        ? "border-[#A5744A] bg-orange-50"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
+                    }`}
+                  >
+                    <span className="text-2xl">{method.icon}</span>
+                    <span className="font-medium text-gray-900">{method.label}</span>
+                    {contactMethods.includes(method.value) && (
+                      <span className="ml-auto text-[#A5744A]">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex gap-2 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep("hours")}
                   className="btn btn-ghost flex-1 border-2 border-gray-300"
                   disabled={isLoading}
                 >

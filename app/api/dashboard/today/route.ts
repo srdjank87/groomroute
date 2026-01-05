@@ -12,6 +12,17 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
+    // Get groomer profile for contact methods
+    const groomer = await prisma.groomer.findFirst({
+      where: {
+        accountId,
+        isActive: true,
+      },
+      select: {
+        contactMethods: true,
+      },
+    });
+
     // Get today's date range
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -115,6 +126,8 @@ export async function GET(req: NextRequest) {
                 : nextAppointment.appointmentType === "FACE_FEET_FANNY"
                 ? "Face, Feet & Fanny"
                 : "Service",
+            customerPhone: nextAppointment.customer.phone,
+            appointmentId: nextAppointment.id,
           }
         : undefined,
       timeSaved,
@@ -122,6 +135,7 @@ export async function GET(req: NextRequest) {
       estimatedGasSavings,
       hasData,
       showSampleData,
+      contactMethods: groomer?.contactMethods || ["call", "sms"],
     };
 
     return NextResponse.json(response);

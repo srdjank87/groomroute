@@ -92,6 +92,7 @@ model Groomer {
   geocodeStatus     GeocodeStatus @default(PENDING)
   workingHoursStart String?       // HH:mm format
   workingHoursEnd   String?       // HH:mm format
+  contactMethods    String[]      @default(["call", "sms"]) // call, sms, whatsapp, signal, telegram
   isActive          Boolean       @default(true)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
