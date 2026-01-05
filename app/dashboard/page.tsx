@@ -732,18 +732,16 @@ function DashboardContent() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
-            {/* Primary: Start Driving */}
-            <button
-              onClick={startDriving}
-              className={`w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg ${
-                stats.nextAppointment.status === "IN_PROGRESS"
-                  ? "bg-white/20 hover:bg-white/30 text-white"
-                  : "bg-[#A5744A] hover:bg-[#8B6239] text-white"
-              }`}
-            >
-              <Navigation className="h-6 w-6" />
-              Start Driving
-            </button>
+            {/* Primary: Start Driving - Only show when NOT in progress (groomer is already there when in progress) */}
+            {stats.nextAppointment.status !== "IN_PROGRESS" && (
+              <button
+                onClick={startDriving}
+                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-[#A5744A] hover:bg-[#8B6239] text-white"
+              >
+                <Navigation className="h-6 w-6" />
+                Start Driving
+              </button>
+            )}
 
             {/* Secondary Actions - Start Grooming, Skip & Complete */}
             <div className={`grid gap-2 ${stats.nextAppointment.status === "CONFIRMED" ? "grid-cols-3" : "grid-cols-2"}`}>
