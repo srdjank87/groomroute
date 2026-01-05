@@ -191,12 +191,52 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const totalDistanceMeters = Math.round(totalDistance * 1609.34); // Convert miles to meters
+    const totalDriveMinutes = Math.round(totalDistance / 30 * 60); // Assuming 30 mph average
+
+    // Save or update the Route record in the database
+    const routeDate = new Date(date + 'T00:00:00.000Z');
+
+    // Check if a route already exists for today
+    const existingRoute = await prisma.route.findFirst({
+      where: {
+        accountId,
+        groomerId: groomer.id,
+        routeDate,
+      },
+    });
+
+    if (existingRoute) {
+      // Update existing route
+      await prisma.route.update({
+        where: { id: existingRoute.id },
+        data: {
+          totalDistanceMeters,
+          totalDriveMinutes,
+          status: "DRAFT",
+        },
+      });
+    } else {
+      // Create new route
+      await prisma.route.create({
+        data: {
+          accountId,
+          groomerId: groomer.id,
+          routeDate,
+          totalDistanceMeters,
+          totalDriveMinutes,
+          status: "DRAFT",
+          provider: "LOCAL",
+        },
+      });
+    }
+
     return NextResponse.json({
       success: true,
       message: `Route optimized! ${updates.length} appointments reordered.`,
       optimizedOrder: updates,
       totalDistance: Math.round(totalDistance * 10) / 10, // Round to 1 decimal
-      estimatedDriveTime: Math.round(totalDistance / 30 * 60), // Assuming 30 mph average, in minutes
+      estimatedDriveTime: totalDriveMinutes,
     });
   } catch (error) {
     console.error("Route optimization error:", error);

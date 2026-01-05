@@ -370,7 +370,7 @@ function DashboardContent() {
             : 'rounded-xl shadow-lg p-6 mb-6 border border-[#A5744A]/30'
         }`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">Next Stop</h2>
+            <h2 className="text-2xl font-bold">Next Stop - {stats.nextAppointment.time}</h2>
             <div className="flex items-center gap-2">
               <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
                 {/* Remaining appointments = total - 1 (since we're showing the next one) */}
