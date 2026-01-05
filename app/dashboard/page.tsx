@@ -328,15 +328,15 @@ function DashboardContent() {
 
       {/* Hero Section - Today's Route */}
       {stats?.hasData && stats.nextAppointment ? (
-        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg text-white p-6 mb-6">
+        <div className="bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] rounded-xl shadow-lg text-white p-6 mb-6 border border-[#A5744A]/30">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Next Stop</h2>
-            <div className="badge badge-lg bg-white/20 border-0 text-white">
+            <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
               {stats.appointments} {stats.appointments === 1 ? 'appointment' : 'appointments'} today
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-4">
+          <div className="bg-[#A5744A]/10 backdrop-blur-sm rounded-lg p-4 mb-4 border border-[#A5744A]/20">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 mt-1">
                 <MapPin className="h-6 w-6" />
@@ -353,9 +353,9 @@ function DashboardContent() {
                 </p>
 
                 {/* Map Preview */}
-                <div className="mt-3 mb-3 rounded-lg overflow-hidden border-2 border-white/20">
+                <div className="mt-3 mb-3 rounded-lg overflow-hidden border-2 border-white/20 mx-auto max-w-sm">
                   <img
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=600x200&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=400x400&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                     alt="Location map"
                     className="w-full h-auto"
                   />
@@ -418,14 +418,14 @@ function DashboardContent() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={startDriving}
-                className="btn bg-white text-blue-600 hover:bg-gray-100 border-0 gap-2 h-12 font-bold"
+                className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 h-12 font-bold shadow-lg"
               >
                 <Navigation className="h-5 w-5" />
                 <span>Start Driving</span>
               </button>
               <Link
                 href="/app/routes"
-                className="btn btn-ghost border border-white/30 hover:bg-white/10 gap-2 h-12"
+                className="btn btn-ghost border border-[#A5744A]/50 hover:bg-[#A5744A]/20 gap-2 h-12"
               >
                 <MapPin className="h-4 w-4" />
                 <span className="text-sm">Today&apos;s Route</span>
