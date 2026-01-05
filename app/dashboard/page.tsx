@@ -332,7 +332,14 @@ function DashboardContent() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Next Stop</h2>
             <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
-              {stats.appointments} {stats.appointments === 1 ? 'appointment' : 'appointments'} today
+              {/* Remaining appointments = total - 1 (since we're showing the next one) */}
+              {stats.appointments - 1}{' '}
+              <span className="hidden sm:inline">
+                {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
+              </span>
+              <span className="sm:hidden">
+                {stats.appointments - 1 === 1 ? 'appt' : 'appts'} left
+              </span>
             </div>
           </div>
 
