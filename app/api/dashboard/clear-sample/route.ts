@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     // Delete all sample data (customers with [SAMPLE_DATA] tag)
     // This will cascade delete appointments, pets, etc.
-    await prisma.customer.deleteMany({
+    const deletedCustomers = await prisma.customer.deleteMany({
       where: {
         accountId,
         notes: {
@@ -37,7 +37,32 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true });
+    // Delete area day assignments for the account
+    const deletedAssignments = await prisma.areaDayAssignment.deleteMany({
+      where: {
+        accountId,
+      },
+    });
+
+    // Delete service areas that have no customers left
+    // (only delete orphaned areas to preserve any user-created areas with customers)
+    const deletedAreas = await prisma.serviceArea.deleteMany({
+      where: {
+        accountId,
+        customers: {
+          none: {},
+        },
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      deleted: {
+        customers: deletedCustomers.count,
+        areaAssignments: deletedAssignments.count,
+        serviceAreas: deletedAreas.count,
+      },
+    });
   } catch (error) {
     console.error("Clear sample data error:", error);
     return NextResponse.json(
