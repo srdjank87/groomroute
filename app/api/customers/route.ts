@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
 
     // Calculate revenue and last appointment date for each customer
     const customersWithMetrics = customers.map((customer) => {
-      const totalRevenue = customer.appointments.reduce((sum, apt) => sum + apt.price, 0);
+      const totalRevenue = customer.appointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
       const sortedAppointments = customer.appointments
         .filter((apt) => apt.status !== "CANCELLED")
         .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime());

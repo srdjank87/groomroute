@@ -41,10 +41,28 @@ interface TodaysStats {
   contactMethods?: string[];
 }
 
+interface RevenueStats {
+  dailyRevenue: {
+    date: string;
+    dayName: string;
+    revenue: number;
+    appointments: number;
+  }[];
+  weeklyRevenue: number;
+  weeklyAppointments: number;
+  monthlyRevenue: number;
+  monthlyAppointments: number;
+  avgRevenuePerAppointment: number;
+  avgRevenuePerCustomer: number;
+  uniqueCustomers: number;
+  completionRate: number;
+}
+
 function DashboardContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const [stats, setStats] = useState<TodaysStats | null>(null);
+  const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingSample, setIsGeneratingSample] = useState(false);
   const [todaysAppointments, setTodaysAppointments] = useState<any[]>([]);
@@ -117,6 +135,13 @@ function DashboardContent() {
       if (response.ok) {
         const data = await response.json();
         setStats(data);
+      }
+
+      // Fetch revenue stats
+      const revenueResponse = await fetch("/api/dashboard/revenue-stats");
+      if (revenueResponse.ok) {
+        const revenueData = await revenueResponse.json();
+        setRevenueStats(revenueData);
       }
 
       // Also fetch today's appointments for Start Driving
@@ -538,6 +563,68 @@ function DashboardContent() {
               <div>
                 <p className="text-2xl font-bold text-gray-900">${stats.estimatedGasSavings.toFixed(2)}</p>
                 <p className="text-sm text-gray-600">Gas Saved</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Revenue Stats - Only show when not in fullscreen */}
+      {revenueStats && !isFullscreen && (
+        <div className="bg-white rounded-lg shadow mb-6">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Revenue Overview</h2>
+          </div>
+
+          {/* Revenue Chart */}
+          <div className="p-6">
+            <div className="mb-6">
+              <h3 className="text-sm font-medium text-gray-700 mb-4">Last 7 Days</h3>
+              <div className="flex items-end justify-between gap-2 h-48">
+                {revenueStats.dailyRevenue.map((day, index) => {
+                  const maxRevenue = Math.max(...revenueStats.dailyRevenue.map(d => d.revenue));
+                  const heightPercent = maxRevenue > 0 ? (day.revenue / maxRevenue) * 100 : 0;
+
+                  return (
+                    <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
+                      <div className="relative w-full flex flex-col justify-end" style={{ height: '160px' }}>
+                        <div
+                          className="w-full bg-gradient-to-t from-[#A5744A] to-[#C99966] rounded-t-lg transition-all hover:opacity-80 cursor-pointer group relative"
+                          style={{ height: `${heightPercent}%`, minHeight: day.revenue > 0 ? '8px' : '0' }}
+                          title={`$${day.revenue.toFixed(0)} (${day.appointments} appointments)`}
+                        >
+                          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                            ${day.revenue.toFixed(0)}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-600 font-medium">{day.dayName}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.weeklyRevenue.toFixed(0)}</p>
+                <p className="text-xs text-gray-600 mt-1">Weekly Revenue</p>
+                <p className="text-xs text-gray-500">{revenueStats.weeklyAppointments} appointments</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.monthlyRevenue.toFixed(0)}</p>
+                <p className="text-xs text-gray-600 mt-1">Monthly Revenue</p>
+                <p className="text-xs text-gray-500">{revenueStats.monthlyAppointments} appointments</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.avgRevenuePerAppointment.toFixed(0)}</p>
+                <p className="text-xs text-gray-600 mt-1">Avg per Appointment</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.avgRevenuePerCustomer.toFixed(0)}</p>
+                <p className="text-xs text-gray-600 mt-1">Avg per Customer</p>
+                <p className="text-xs text-gray-500">{revenueStats.uniqueCustomers} unique</p>
               </div>
             </div>
           </div>
