@@ -360,6 +360,15 @@ function DashboardContent() {
                   {stats.nextAppointment.time}
                 </p>
 
+                {/* Map Preview */}
+                <div className="mt-3 mb-3 rounded-lg overflow-hidden border-2 border-white/20">
+                  <img
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=600x200&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                    alt="Location map"
+                    className="w-full h-auto"
+                  />
+                </div>
+
                 {/* Contact Methods */}
                 {stats.nextAppointment.customerPhone && stats.contactMethods && stats.contactMethods.length > 0 && (
                   <div className="flex gap-2 mt-3 flex-wrap">
@@ -435,14 +444,14 @@ function DashboardContent() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => stats.nextAppointment && handleSkipAppointment(stats.nextAppointment.appointmentId)}
-                className="btn bg-red-500/20 hover:bg-red-500/30 border border-red-300/30 text-white gap-2 h-12"
+                className="btn bg-red-500/80 hover:bg-red-500/30 border border-red-300/30 text-white gap-2 h-12"
               >
                 <SkipForward className="h-4 w-4" />
                 <span className="text-sm">Skip</span>
               </button>
               <button
                 onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
-                className="btn bg-green-500/20 hover:bg-green-500/30 border border-green-300/30 text-white gap-2 h-12"
+                className="btn bg-green-500/80 hover:bg-green-500/30 border border-green-300/30 text-white gap-2 h-12"
               >
                 <CheckCircle className="h-4 w-4" />
                 <span className="text-sm">Mark Complete</span>

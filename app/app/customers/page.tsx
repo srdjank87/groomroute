@@ -146,7 +146,8 @@ export default function CustomersPage() {
                   }}
                   className="btn btn-sm h-9 px-4 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
                 >
-                  Book Appointment
+                  <span className="hidden sm:inline">Book Appointment</span>
+                  <span className="sm:hidden">Book</span>
                 </button>
               </div>
             </Link>
