@@ -442,7 +442,7 @@ function DashboardContent() {
             <div className="grid grid-cols-3 gap-2">
               <Link
                 href="/app/routes"
-                className="btn btn-ghost border border-[#A5744A]/50 hover:bg-[#A5744A]/20 gap-1 h-11 text-xs"
+                className="btn bg-blue-500/80 hover:bg-blue-500/90 border border-blue-300/30 text-white gap-1 h-11 text-xs"
               >
                 <MapPin className="h-4 w-4" />
                 <span className="hidden sm:inline">Route</span>
