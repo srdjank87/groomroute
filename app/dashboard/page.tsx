@@ -362,29 +362,29 @@ function DashboardContent() {
 
                 {/* Contact Methods */}
                 {stats.nextAppointment.customerPhone && stats.contactMethods && stats.contactMethods.length > 0 && (
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex gap-2 mt-3 flex-wrap">
                     {stats.contactMethods.includes("call") && (
                       <button
                         onClick={() => handleCall(stats.nextAppointment?.customerPhone)}
-                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
-                        <Phone className="h-3 w-3" />
+                        <Phone className="h-4 w-4" />
                         Call
                       </button>
                     )}
                     {stats.contactMethods.includes("sms") && (
                       <button
                         onClick={() => handleSMS(stats.nextAppointment?.customerPhone)}
-                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
-                        <MessageSquare className="h-3 w-3" />
+                        <MessageSquare className="h-4 w-4" />
                         SMS
                       </button>
                     )}
                     {stats.contactMethods.includes("whatsapp") && (
                       <button
                         onClick={() => handleWhatsApp(stats.nextAppointment?.customerPhone)}
-                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
                         💚 WhatsApp
                       </button>
@@ -392,7 +392,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("signal") && (
                       <button
                         onClick={() => handleSignal(stats.nextAppointment?.customerPhone)}
-                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
                         🔵 Signal
                       </button>
@@ -400,7 +400,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("telegram") && (
                       <button
                         onClick={() => handleTelegram(stats.nextAppointment?.customerPhone)}
-                        className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1"
+                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
                         ✈️ Telegram
                       </button>
@@ -431,14 +431,14 @@ function DashboardContent() {
           <div className="grid grid-cols-2 gap-3 mt-3">
             <button
               onClick={() => stats.nextAppointment && handleSkipAppointment(stats.nextAppointment.appointmentId)}
-              className="btn btn-ghost border border-white/30 hover:bg-white/10 gap-2 h-12"
+              className="btn bg-red-500/20 hover:bg-red-500/30 border border-red-300/30 text-white gap-2 h-12"
             >
               <SkipForward className="h-4 w-4" />
               <span className="text-sm">Skip</span>
             </button>
             <button
               onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
-              className="btn btn-ghost border border-white/30 hover:bg-white/10 gap-2 h-12"
+              className="btn bg-green-500/20 hover:bg-green-500/30 border border-green-300/30 text-white gap-2 h-12"
             >
               <CheckCircle className="h-4 w-4" />
               <span className="text-sm">Mark Complete</span>
