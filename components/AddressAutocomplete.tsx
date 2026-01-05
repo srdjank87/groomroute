@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 declare global {
   interface Window {
     google?: typeof google;
+    initGoogleMaps?: () => void;
   }
 }
 
@@ -29,10 +30,12 @@ export default function AddressAutocomplete({
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [scriptError, setScriptError] = useState(false);
 
   useEffect(() => {
     // Check if Google Maps is already loaded
-    if (typeof google !== "undefined" && google.maps && google.maps.places) {
+    if (typeof window !== "undefined" && window.google?.maps?.places) {
+      console.log("Google Maps already loaded");
       setIsLoaded(true);
       return;
     }
@@ -41,65 +44,151 @@ export default function AddressAutocomplete({
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
     if (!apiKey) {
-      console.warn("Google Maps API key not found. Address autocomplete disabled.");
+      console.error("Google Maps API key not found in environment variables");
+      setScriptError(true);
       return;
     }
 
+    // Check if script is already being loaded
+    const existingScript = document.querySelector(
+      'script[src*="maps.googleapis.com"]'
+    );
+
+    if (existingScript) {
+      console.log("Google Maps script already exists, waiting for load");
+      existingScript.addEventListener("load", () => {
+        console.log("Existing script loaded");
+        setIsLoaded(true);
+      });
+      return;
+    }
+
+    console.log("Loading Google Maps script...");
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMaps`;
     script.async = true;
     script.defer = true;
-    script.onload = () => setIsLoaded(true);
+
+    // Global callback for when the script loads
+    window.initGoogleMaps = () => {
+      console.log("Google Maps loaded successfully");
+      setIsLoaded(true);
+    };
+
+    script.onerror = () => {
+      console.error("Failed to load Google Maps script");
+      setScriptError(true);
+    };
+
     document.head.appendChild(script);
 
     return () => {
-      // Cleanup if needed
+      // Cleanup callback
+      delete window.initGoogleMaps;
     };
   }, []);
 
   useEffect(() => {
-    if (!isLoaded || !inputRef.current) return;
-
-    // Initialize autocomplete
-    autocompleteRef.current = new google.maps.places.Autocomplete(
-      inputRef.current,
-      {
-        types: ["address"],
-        componentRestrictions: { country: ["us", "ca"] }, // US and Canada
-        fields: ["formatted_address", "geometry", "address_components"],
+    if (!isLoaded || !inputRef.current || scriptError) {
+      if (scriptError) {
+        console.error("Cannot initialize autocomplete: script error");
       }
-    );
+      return;
+    }
 
-    // Handle place selection
-    const listener = autocompleteRef.current.addListener("place_changed", () => {
-      const place = autocompleteRef.current?.getPlace();
+    console.log("Initializing Google Places Autocomplete...");
 
-      if (place?.formatted_address) {
-        onChange(place.formatted_address);
-
-        if (onPlaceSelected) {
-          onPlaceSelected(place);
+    try {
+      // Initialize autocomplete
+      autocompleteRef.current = new window.google!.maps.places.Autocomplete(
+        inputRef.current,
+        {
+          types: ["address"],
+          componentRestrictions: { country: ["us", "ca"] }, // US and Canada
+          fields: ["formatted_address", "geometry", "address_components"],
         }
-      }
-    });
+      );
 
-    return () => {
-      if (listener) {
-        google.maps.event.removeListener(listener);
-      }
-    };
-  }, [isLoaded, onChange, onPlaceSelected]);
+      console.log("Autocomplete initialized successfully");
+
+      // Handle place selection
+      const listener = autocompleteRef.current.addListener("place_changed", () => {
+        const place = autocompleteRef.current?.getPlace();
+        console.log("Place selected:", place);
+
+        if (place?.formatted_address) {
+          onChange(place.formatted_address);
+
+          if (onPlaceSelected) {
+            onPlaceSelected(place);
+          }
+        }
+      });
+
+      return () => {
+        if (listener) {
+          window.google?.maps.event.removeListener(listener);
+        }
+      };
+    } catch (error) {
+      console.error("Error initializing autocomplete:", error);
+    }
+  }, [isLoaded, onChange, onPlaceSelected, scriptError]);
 
   return (
-    <input
-      ref={inputRef}
-      type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      required={required}
-      className={className}
-      autoComplete="off"
-    />
+    <div className="relative">
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        required={required}
+        className={className}
+        autoComplete="off"
+        disabled={scriptError}
+      />
+      {scriptError && (
+        <p className="text-xs text-red-500 mt-1">
+          Address autocomplete unavailable
+        </p>
+      )}
+      {!isLoaded && !scriptError && (
+        <p className="text-xs text-gray-400 mt-1">
+          Loading address suggestions...
+        </p>
+      )}
+      <style jsx global>{`
+        .pac-container {
+          z-index: 9999 !important;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          border: 1px solid #e5e7eb;
+          margin-top: 4px;
+        }
+        .pac-item {
+          padding: 8px 12px;
+          cursor: pointer;
+          font-size: 14px;
+          line-height: 1.5;
+        }
+        .pac-item:hover {
+          background-color: #f9fafb;
+        }
+        .pac-item-selected {
+          background-color: #f3f4f6;
+        }
+        .pac-icon {
+          margin-right: 8px;
+        }
+        .pac-item-query {
+          font-weight: 500;
+          color: #111827;
+        }
+        .pac-matched {
+          font-weight: 600;
+        }
+      `}</style>
+    </div>
   );
 }
