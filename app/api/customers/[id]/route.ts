@@ -49,6 +49,13 @@ export async function GET(
             },
           },
         },
+        serviceArea: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
       },
     });
 

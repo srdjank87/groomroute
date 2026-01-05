@@ -41,6 +41,12 @@ interface Appointment {
   } | null;
 }
 
+interface ServiceArea {
+  id: string;
+  name: string;
+  color: string;
+}
+
 interface Customer {
   id: string;
   name: string;
@@ -53,6 +59,7 @@ interface Customer {
   lng?: number | null;
   geocodeStatus?: string | null;
   locationVerified?: boolean;
+  serviceArea?: ServiceArea | null;
   pets: Pet[];
   appointments: Appointment[];
 }
@@ -74,6 +81,11 @@ export default function CustomerEditPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+
+  // Area assignment state
+  const [availableAreas, setAvailableAreas] = useState<ServiceArea[]>([]);
+  const [showAreaDropdown, setShowAreaDropdown] = useState(false);
+  const [isAssigningArea, setIsAssigningArea] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -113,8 +125,46 @@ export default function CustomerEditPage() {
 
   useEffect(() => {
     fetchCustomer();
+    fetchAvailableAreas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId]);
+
+  const fetchAvailableAreas = async () => {
+    try {
+      const response = await fetch("/api/areas");
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableAreas(data.areas || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch areas:", error);
+    }
+  };
+
+  const handleAssignArea = async (areaId: string | null) => {
+    setIsAssigningArea(true);
+    setShowAreaDropdown(false);
+    try {
+      const response = await fetch(`/api/customers/${customerId}/assign-area`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ areaId }),
+      });
+
+      if (response.ok) {
+        toast.success(areaId ? "Area assigned" : "Area removed");
+        fetchCustomer();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to assign area");
+      }
+    } catch (error) {
+      console.error("Failed to assign area:", error);
+      toast.error("Failed to assign area");
+    } finally {
+      setIsAssigningArea(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!formData.name || !formData.address) {
@@ -256,6 +306,83 @@ export default function CustomerEditPage() {
           Edit Customer
         </h1>
       </div>
+
+      {/* Service Area Badge */}
+      {availableAreas.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <MapPin className="h-5 w-5 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-gray-700">Service Area</p>
+                {customer?.serviceArea ? (
+                  <div className="flex items-center gap-2 mt-1">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: customer.serviceArea.color }}
+                    />
+                    <span className="font-medium">{customer.serviceArea.name}</span>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 mt-1">No area assigned</p>
+                )}
+              </div>
+            </div>
+
+            <div className="relative">
+              <button
+                onClick={() => setShowAreaDropdown(!showAreaDropdown)}
+                disabled={isAssigningArea}
+                className="btn btn-sm btn-outline gap-2"
+              >
+                {isAssigningArea ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  <Edit2 className="h-3 w-3" />
+                )}
+                {customer?.serviceArea ? "Change" : "Assign Area"}
+              </button>
+
+              {showAreaDropdown && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowAreaDropdown(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-20">
+                    {customer?.serviceArea && (
+                      <button
+                        onClick={() => handleAssignArea(null)}
+                        className="w-full px-3 py-2 text-left text-sm text-gray-500 hover:bg-gray-50 border-b"
+                      >
+                        Remove area assignment
+                      </button>
+                    )}
+                    {availableAreas.map((area) => (
+                      <button
+                        key={area.id}
+                        onClick={() => handleAssignArea(area.id)}
+                        className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 ${
+                          customer?.serviceArea?.id === area.id ? "bg-gray-50" : ""
+                        }`}
+                      >
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: area.color }}
+                        />
+                        {area.name}
+                        {customer?.serviceArea?.id === area.id && (
+                          <CheckCircle className="h-3 w-3 ml-auto text-green-500" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Customer Details Form */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">

@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon } from "lucide-react";
+import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon, MapPin, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
+
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 type Step = "customer" | "pet" | "datetime" | "details";
 
@@ -23,6 +25,17 @@ interface Pet {
   breed?: string;
   weight?: number;
   behaviorFlags?: string[];
+}
+
+interface AreaDaySuggestion {
+  customer: {
+    serviceAreaId: string | null;
+    serviceAreaName: string | null;
+    serviceAreaColor: string | null;
+  };
+  suggestedDays: number[];
+  nextSuggestedDate: string | null;
+  reason: string | null;
 }
 
 function NewAppointmentContent() {
@@ -48,6 +61,8 @@ function NewAppointmentContent() {
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [areaSuggestion, setAreaSuggestion] = useState<AreaDaySuggestion | null>(null);
+  const [groomerId, setGroomerId] = useState<string | null>(null);
 
   const dateInputRef = useRef<HTMLInputElement>(null);
   const timeInputRef = useRef<HTMLInputElement>(null);
@@ -64,11 +79,52 @@ function NewAppointmentContent() {
     }
   }, [searchQuery]);
 
-  const selectCustomer = useCallback((customer: Customer) => {
+  // Fetch area day suggestion for selected customer
+  const fetchAreaSuggestion = useCallback(async (customerId: string, currentGroomerId: string) => {
+    try {
+      const response = await fetch(
+        `/api/appointments/suggest-date?customerId=${customerId}&groomerId=${currentGroomerId}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setAreaSuggestion(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch area suggestion:", error);
+    }
+  }, []);
+
+  // Get the first groomer for the account (used for area day suggestions)
+  const fetchDefaultGroomer = useCallback(async () => {
+    try {
+      const response = await fetch("/api/groomers");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.groomers && data.groomers.length > 0) {
+          setGroomerId(data.groomers[0].id);
+          return data.groomers[0].id;
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch groomers:", error);
+    }
+    return null;
+  }, []);
+
+  const selectCustomer = useCallback(async (customer: Customer) => {
     setSelectedCustomer(customer);
     setAppointmentData((prev) => ({ ...prev, customerId: customer.id }));
     setCurrentStep("pet");
-  }, []);
+
+    // Fetch area day suggestion
+    let currentGroomerId = groomerId;
+    if (!currentGroomerId) {
+      currentGroomerId = await fetchDefaultGroomer();
+    }
+    if (currentGroomerId) {
+      fetchAreaSuggestion(customer.id, currentGroomerId);
+    }
+  }, [groomerId, fetchDefaultGroomer, fetchAreaSuggestion]);
 
   // Fetch customers on mount
   useEffect(() => {
@@ -159,6 +215,23 @@ function NewAppointmentContent() {
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const day = String(today.getDate()).padStart(2, '0');
   const todayStr = `${year}-${month}-${day}`;
+
+  // Check if selected date matches suggested area days
+  const getSelectedDateMatch = () => {
+    if (!appointmentData.date || !areaSuggestion?.suggestedDays?.length) {
+      return null;
+    }
+    const selectedDate = new Date(appointmentData.date + 'T00:00:00');
+    const dayOfWeek = selectedDate.getDay();
+    const isMatch = areaSuggestion.suggestedDays.includes(dayOfWeek);
+    return {
+      isMatch,
+      dayOfWeek,
+      dayName: DAY_NAMES[dayOfWeek],
+    };
+  };
+
+  const dateMatch = getSelectedDateMatch();
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -338,6 +411,30 @@ function NewAppointmentContent() {
         {/* Step 3: Date & Time */}
         {currentStep === "datetime" && (
           <div className="space-y-6">
+            {/* Area Day Suggestion */}
+            {areaSuggestion?.customer?.serviceAreaName && areaSuggestion.suggestedDays.length > 0 && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div
+                    className="w-4 h-4 rounded-full mt-0.5 flex-shrink-0"
+                    style={{ backgroundColor: areaSuggestion.customer.serviceAreaColor || '#22C55E' }}
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-emerald-900">
+                      <MapPin className="h-4 w-4 inline mr-1" />
+                      Customer Location: {areaSuggestion.customer.serviceAreaName}
+                    </p>
+                    <p className="text-sm text-emerald-700 mt-1">
+                      Suggested Days: {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(", ")}
+                    </p>
+                    {areaSuggestion.reason && (
+                      <p className="text-xs text-emerald-600 mt-1">{areaSuggestion.reason}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -362,6 +459,27 @@ function NewAppointmentContent() {
                     </div>
                   </div>
                 </div>
+
+                {/* Date match feedback */}
+                {dateMatch && areaSuggestion?.customer?.serviceAreaName && (
+                  <div className={`mt-2 p-2 rounded-lg text-sm ${
+                    dateMatch.isMatch
+                      ? "bg-green-50 text-green-700 border border-green-200"
+                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                  }`}>
+                    {dateMatch.isMatch ? (
+                      <span className="flex items-center gap-1">
+                        <Check className="h-4 w-4" />
+                        Great choice - this is your {areaSuggestion.customer.serviceAreaName} day
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        <AlertTriangle className="h-4 w-4" />
+                        {dateMatch.dayName} is not a {areaSuggestion.customer.serviceAreaName} day - may have longer drives
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div>

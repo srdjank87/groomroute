@@ -51,6 +51,8 @@ model Account {
   appointments    Appointment[]
   routes          Route[]
   messageTemplates MessageTemplate[]
+  serviceAreas     ServiceArea[]
+  areaDayAssignments AreaDayAssignment[]
 
   @@index([createdAt])
   @@index([subscriptionStatus])
@@ -100,6 +102,7 @@ model Groomer {
   appointments        Appointment[]
   routes              Route[]
   breaks              Break[]
+  areaDayAssignments  AreaDayAssignment[]
 
   @@index([accountId])
   @@index([accountId, isActive])
@@ -143,9 +146,13 @@ model Customer {
   appointments       Appointment[]
   messages           Message[]
   waitlistEntries    CustomerWaitlist[]
+  // Area Days - customer belongs to a service area
+  serviceAreaId      String?
+  serviceArea        ServiceArea? @relation(fields: [serviceAreaId], references: [id], onDelete: SetNull)
 
   @@index([accountId])
   @@index([accountId, createdAt])
+  @@index([serviceAreaId])
 }
 
 // Pet
@@ -423,4 +430,57 @@ enum BreakType {
   LUNCH
   SHORT_BREAK
   HYDRATION
+}
+
+// Service area for "Area Days" feature - geographic zones for scheduling
+model ServiceArea {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  name        String   // "North Side", "Downtown", "Westwood"
+  color       String   // Hex color for UI display (#FF5733)
+
+  // Area definition - using zip codes as primary method
+  zipCodes    String[] // ["90210", "90211", "90212"]
+
+  // Optional: center point + radius (for distance-based matching)
+  centerLat   Float?
+  centerLng   Float?
+  radiusMiles Float?
+
+  isActive    Boolean  @default(true)
+
+  // Relationships
+  dayAssignments AreaDayAssignment[]
+  customers      Customer[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([accountId])
+  @@index([accountId, isActive])
+}
+
+// Day-of-week assignment for a groomer to a service area
+model AreaDayAssignment {
+  id          String      @id @default(cuid())
+  accountId   String
+  account     Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  groomerId   String
+  groomer     Groomer     @relation(fields: [groomerId], references: [id], onDelete: Cascade)
+
+  areaId      String
+  area        ServiceArea @relation(fields: [areaId], references: [id], onDelete: Cascade)
+
+  dayOfWeek   Int         // 0=Sunday, 1=Monday, 2=Tuesday, etc.
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([groomerId, dayOfWeek]) // One area per groomer per day
+  @@index([accountId])
+  @@index([groomerId])
+  @@index([areaId])
 }

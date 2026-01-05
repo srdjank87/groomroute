@@ -1,0 +1,614 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import {
+  Plus,
+  MapPin,
+  Edit2,
+  Trash2,
+  Users,
+  Loader2,
+  Wand2,
+  X,
+  Check,
+} from "lucide-react";
+import toast from "react-hot-toast";
+
+interface ServiceArea {
+  id: string;
+  name: string;
+  color: string;
+  zipCodes: string[];
+  centerLat: number | null;
+  centerLng: number | null;
+  radiusMiles: number | null;
+  isActive: boolean;
+  customerCount: number;
+  assignedDays: {
+    dayOfWeek: number;
+    groomerId: string;
+    groomerName: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Groomer {
+  id: string;
+  name: string;
+}
+
+interface AreaAssignment {
+  groomerId: string;
+  groomerName: string;
+  days: Record<number, { areaId: string; areaName: string; areaColor: string } | null>;
+}
+
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const PRESET_COLORS = [
+  "#EF4444", // Red
+  "#F97316", // Orange
+  "#EAB308", // Yellow
+  "#22C55E", // Green
+  "#14B8A6", // Teal
+  "#3B82F6", // Blue
+  "#8B5CF6", // Purple
+  "#EC4899", // Pink
+];
+
+export default function SettingsAreasPage() {
+  const [areas, setAreas] = useState<ServiceArea[]>([]);
+  const [assignments, setAssignments] = useState<AreaAssignment[]>([]);
+  const [availableAreas, setAvailableAreas] = useState<{ id: string; name: string; color: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAutoAssigning, setIsAutoAssigning] = useState(false);
+
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [editingArea, setEditingArea] = useState<ServiceArea | null>(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    color: "#3B82F6",
+    zipCodes: "",
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Assignment dropdown state
+  const [activeAssignmentCell, setActiveAssignmentCell] = useState<{
+    groomerId: string;
+    dayOfWeek: number;
+  } | null>(null);
+
+  const fetchAreas = useCallback(async () => {
+    try {
+      const response = await fetch("/api/areas");
+      if (response.ok) {
+        const data = await response.json();
+        setAreas(data.areas);
+      }
+    } catch (error) {
+      console.error("Failed to fetch areas:", error);
+      toast.error("Failed to load areas");
+    }
+  }, []);
+
+  const fetchAssignments = useCallback(async () => {
+    try {
+      const response = await fetch("/api/area-assignments");
+      if (response.ok) {
+        const data = await response.json();
+        setAssignments(data.assignments);
+        setAvailableAreas(data.areas);
+      }
+    } catch (error) {
+      console.error("Failed to fetch assignments:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      await Promise.all([fetchAreas(), fetchAssignments()]);
+      setIsLoading(false);
+    };
+    loadData();
+  }, [fetchAreas, fetchAssignments]);
+
+  const openCreateModal = () => {
+    setEditingArea(null);
+    setFormData({ name: "", color: PRESET_COLORS[areas.length % PRESET_COLORS.length], zipCodes: "" });
+    setShowModal(true);
+  };
+
+  const openEditModal = (area: ServiceArea) => {
+    setEditingArea(area);
+    setFormData({
+      name: area.name,
+      color: area.color,
+      zipCodes: area.zipCodes.join(", "),
+    });
+    setShowModal(true);
+  };
+
+  const handleSaveArea = async () => {
+    if (!formData.name.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+
+    const zipCodes = formData.zipCodes
+      .split(/[,\s]+/)
+      .map((z) => z.trim())
+      .filter((z) => z.length > 0);
+
+    if (zipCodes.length === 0) {
+      toast.error("At least one zip code is required");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const url = editingArea ? `/api/areas/${editingArea.id}` : "/api/areas";
+      const method = editingArea ? "PATCH" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          color: formData.color,
+          zipCodes,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success(editingArea ? "Area updated" : "Area created");
+        setShowModal(false);
+        fetchAreas();
+        fetchAssignments();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to save area");
+      }
+    } catch (error) {
+      console.error("Error saving area:", error);
+      toast.error("Failed to save area");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteArea = async (area: ServiceArea) => {
+    if (!confirm(`Delete "${area.name}"? ${area.customerCount} customers will be unassigned.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/areas/${area.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Area deleted");
+        fetchAreas();
+        fetchAssignments();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to delete area");
+      }
+    } catch (error) {
+      console.error("Error deleting area:", error);
+      toast.error("Failed to delete area");
+    }
+  };
+
+  const handleSetAssignment = async (
+    groomerId: string,
+    dayOfWeek: number,
+    areaId: string | null
+  ) => {
+    setActiveAssignmentCell(null);
+
+    try {
+      const response = await fetch("/api/area-assignments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groomerId, dayOfWeek, areaId }),
+      });
+
+      if (response.ok) {
+        toast.success(areaId ? "Assignment updated" : "Assignment removed");
+        fetchAssignments();
+        fetchAreas();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to update assignment");
+      }
+    } catch (error) {
+      console.error("Error setting assignment:", error);
+      toast.error("Failed to update assignment");
+    }
+  };
+
+  const handleAutoAssign = async () => {
+    setIsAutoAssigning(true);
+    try {
+      const response = await fetch("/api/areas/auto-assign", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message);
+        fetchAreas();
+      } else {
+        toast.error(data.error || "Failed to auto-assign customers");
+      }
+    } catch (error) {
+      console.error("Error auto-assigning:", error);
+      toast.error("Failed to auto-assign customers");
+    } finally {
+      setIsAutoAssigning(false);
+    }
+  };
+
+  const getDayAssignmentDisplay = (
+    assignment: AreaAssignment,
+    dayOfWeek: number
+  ) => {
+    const dayData = assignment.days[dayOfWeek];
+    if (!dayData) {
+      return (
+        <button
+          onClick={() =>
+            setActiveAssignmentCell({
+              groomerId: assignment.groomerId,
+              dayOfWeek,
+            })
+          }
+          className="w-full h-10 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center text-xs"
+        >
+          +
+        </button>
+      );
+    }
+
+    return (
+      <button
+        onClick={() =>
+          setActiveAssignmentCell({
+            groomerId: assignment.groomerId,
+            dayOfWeek,
+          })
+        }
+        className="w-full h-10 rounded-lg text-white text-xs font-medium truncate px-2 hover:opacity-90 transition-opacity flex items-center justify-center"
+        style={{ backgroundColor: dayData.areaColor }}
+        title={dayData.areaName}
+      >
+        {dayData.areaName.length > 8
+          ? dayData.areaName.substring(0, 8) + "..."
+          : dayData.areaName}
+      </button>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#A5744A]" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Service Areas</h1>
+          <p className="text-gray-600 mt-1">
+            Define geographic areas and assign them to days of the week to reduce
+            drive time.
+          </p>
+        </div>
+        <button
+          onClick={openCreateModal}
+          className="btn bg-[#A5744A] hover:bg-[#8B5A2B] text-white border-none gap-2"
+        >
+          <Plus className="h-5 w-5" />
+          New Area
+        </button>
+      </div>
+
+      {/* Areas List */}
+      <div className="mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">Your Areas</h2>
+          {areas.length > 0 && (
+            <button
+              onClick={handleAutoAssign}
+              disabled={isAutoAssigning}
+              className="btn btn-sm btn-outline gap-2"
+            >
+              {isAutoAssigning ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="h-4 w-4" />
+              )}
+              Auto-assign Customers
+            </button>
+          )}
+        </div>
+
+        {areas.length === 0 ? (
+          <div className="bg-white rounded-xl border p-8 text-center">
+            <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No areas defined yet
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Create service areas to organize your customers by location and
+              optimize your routes.
+            </p>
+            <button
+              onClick={openCreateModal}
+              className="btn bg-[#A5744A] hover:bg-[#8B5A2B] text-white border-none"
+            >
+              Create Your First Area
+            </button>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {areas.map((area) => (
+              <div
+                key={area.id}
+                className="bg-white rounded-xl border p-4 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: area.color }}
+                    />
+                    <h3 className="font-semibold text-gray-900">{area.name}</h3>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => openEditModal(area)}
+                      className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteArea(area)}
+                      className="p-1.5 text-gray-400 hover:text-red-600 rounded"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-sm text-gray-600 mb-3">
+                  Zip codes: {area.zipCodes.join(", ")}
+                </p>
+
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <div className="flex items-center gap-1">
+                    <Users className="h-4 w-4" />
+                    {area.customerCount} customer{area.customerCount !== 1 ? "s" : ""}
+                  </div>
+                  {area.assignedDays.length > 0 && (
+                    <div className="text-gray-400">
+                      {area.assignedDays
+                        .map((d) => DAY_NAMES[d.dayOfWeek])
+                        .join(", ")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Weekly Schedule Matrix */}
+      {areas.length > 0 && assignments.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Weekly Area Schedule
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Click a cell to assign an area to that day. Each groomer can have one
+            area per day.
+          </p>
+
+          <div className="bg-white rounded-xl border overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              <thead>
+                <tr className="border-b">
+                  <th className="p-3 text-left font-medium text-gray-700 w-32">
+                    Groomer
+                  </th>
+                  {DAY_NAMES.map((day, index) => (
+                    <th
+                      key={index}
+                      className="p-3 text-center font-medium text-gray-700 w-20"
+                    >
+                      {day}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {assignments.map((assignment) => (
+                  <tr key={assignment.groomerId} className="border-b last:border-b-0">
+                    <td className="p-3 font-medium text-gray-900">
+                      {assignment.groomerName}
+                    </td>
+                    {[0, 1, 2, 3, 4, 5, 6].map((dayOfWeek) => (
+                      <td key={dayOfWeek} className="p-2 relative">
+                        {getDayAssignmentDisplay(assignment, dayOfWeek)}
+
+                        {/* Assignment dropdown */}
+                        {activeAssignmentCell?.groomerId === assignment.groomerId &&
+                          activeAssignmentCell?.dayOfWeek === dayOfWeek && (
+                            <div className="absolute z-10 top-full left-0 mt-1 bg-white border rounded-lg shadow-lg min-w-[150px]">
+                              <button
+                                onClick={() =>
+                                  handleSetAssignment(
+                                    assignment.groomerId,
+                                    dayOfWeek,
+                                    null
+                                  )
+                                }
+                                className="w-full px-3 py-2 text-left text-sm text-gray-500 hover:bg-gray-50 border-b"
+                              >
+                                No area assigned
+                              </button>
+                              {availableAreas.map((area) => (
+                                <button
+                                  key={area.id}
+                                  onClick={() =>
+                                    handleSetAssignment(
+                                      assignment.groomerId,
+                                      dayOfWeek,
+                                      area.id
+                                    )
+                                  }
+                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                                >
+                                  <div
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: area.color }}
+                                  />
+                                  {area.name}
+                                </button>
+                              ))}
+                              <button
+                                onClick={() => setActiveAssignmentCell(null)}
+                                className="w-full px-3 py-2 text-left text-sm text-gray-400 hover:bg-gray-50 border-t"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Create/Edit Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">
+                {editingArea ? "Edit Area" : "Create Area"}
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-1 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Area Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  placeholder="e.g., North Side, Downtown"
+                  className="input input-bordered w-full"
+                />
+              </div>
+
+              {/* Color */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Color
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {PRESET_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setFormData({ ...formData, color })}
+                      className={`w-8 h-8 rounded-full transition-all ${
+                        formData.color === color
+                          ? "ring-2 ring-offset-2 ring-gray-400"
+                          : ""
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Zip Codes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Zip Codes
+                </label>
+                <textarea
+                  value={formData.zipCodes}
+                  onChange={(e) =>
+                    setFormData({ ...formData, zipCodes: e.target.value })
+                  }
+                  placeholder="Enter zip codes separated by commas (e.g., 90210, 90211, 90212)"
+                  className="textarea textarea-bordered w-full"
+                  rows={3}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Customers with matching zip codes will be auto-assigned to this
+                  area.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowModal(false)}
+                className="btn btn-ghost"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveArea}
+                disabled={isSaving}
+                className="btn bg-[#A5744A] hover:bg-[#8B5A2B] text-white border-none"
+              >
+                {isSaving ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Check className="h-5 w-5" />
+                )}
+                {editingArea ? "Save Changes" : "Create Area"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Click outside to close dropdown */}
+      {activeAssignmentCell && (
+        <div
+          className="fixed inset-0 z-0"
+          onClick={() => setActiveAssignmentCell(null)}
+        />
+      )}
+    </div>
+  );
+}

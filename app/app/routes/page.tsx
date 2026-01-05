@@ -61,6 +61,12 @@ interface AssistantStatus {
   hasRouteForToday: boolean;
 }
 
+interface TodayAreaDay {
+  areaId: string;
+  areaName: string;
+  areaColor: string;
+}
+
 export default function TodaysRoutePage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -85,12 +91,14 @@ export default function TodaysRoutePage() {
     noShows: number;
     suggestions: string[];
   } | null>(null);
+  const [todayAreaDay, setTodayAreaDay] = useState<TodayAreaDay | null>(null);
 
   useEffect(() => {
     fetchTodaysRoute();
     fetchContactMethods();
     fetchAssistantStatus();
     fetchBreakSuggestion();
+    fetchTodayAreaDay();
 
     // Update current time every minute
     const timer = setInterval(() => {
@@ -111,6 +119,31 @@ export default function TodaysRoutePage() {
       }
     } catch (error) {
       console.error("Error fetching contact methods:", error);
+    }
+  }
+
+  async function fetchTodayAreaDay() {
+    try {
+      const response = await fetch('/api/area-assignments');
+      if (response.ok) {
+        const data = await response.json();
+        // Find today's day of week
+        const today = new Date().getDay(); // 0=Sunday, 1=Monday, etc.
+
+        // Get the first groomer's assignment for today (most accounts have 1 groomer)
+        if (data.assignments && data.assignments.length > 0) {
+          const todayAssignment = data.assignments[0].days[today];
+          if (todayAssignment) {
+            setTodayAreaDay({
+              areaId: todayAssignment.areaId,
+              areaName: todayAssignment.areaName,
+              areaColor: todayAssignment.areaColor,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching today's area day:", error);
     }
   }
 
@@ -507,8 +540,21 @@ export default function TodaysRoutePage() {
       <div className="mb-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-2xl font-bold text-gray-900">Today&apos;s Route</h1>
+              {/* Area Day Indicator */}
+              {todayAreaDay && (
+                <div
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium"
+                  style={{
+                    backgroundColor: `${todayAreaDay.areaColor}20`,
+                    color: todayAreaDay.areaColor,
+                  }}
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  {todayAreaDay.areaName}
+                </div>
+              )}
               {/* Assistant Toggle */}
               {assistantStatus && (
                 <button
