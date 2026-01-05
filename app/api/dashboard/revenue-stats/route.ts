@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getDailyQuote } from "@/lib/daily-quotes";
 
 export async function GET(req: NextRequest) {
   try {
@@ -205,19 +206,8 @@ export async function GET(req: NextRequest) {
     );
     const weeklyClientsServed = weeklyCustomerIds.size;
 
-    // Generate calm impact summary message
-    let calmImpactMessage = "";
-    if (weeklyAppointments > 0) {
-      if (weeklyTimeRecoveredMinutes >= 60) {
-        const hours = Math.floor(weeklyTimeRecoveredMinutes / 60);
-        const mins = weeklyTimeRecoveredMinutes % 60;
-        calmImpactMessage = `${hours}h ${mins}m of your time protected this week`;
-      } else if (weeklyTimeRecoveredMinutes > 0) {
-        calmImpactMessage = `${weeklyTimeRecoveredMinutes} minutes of your time protected this week`;
-      } else {
-        calmImpactMessage = `${weeklyAppointments} appointments ran smoothly this week`;
-      }
-    }
+    // Get daily quote for calm impact message
+    const calmImpactMessage = getDailyQuote();
 
     return NextResponse.json({
       dailyRevenue,
