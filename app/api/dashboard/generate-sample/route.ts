@@ -273,14 +273,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Create appointments for the last 7 days - all 10 customers per day
-    for (let dayOffset = 6; dayOffset >= 0; dayOffset--) {
+    // Create appointments for today and the last 7 days (8 days total)
+    // Random number of appointments (6-10) per day
+    for (let dayOffset = 7; dayOffset >= 0; dayOffset--) {
       const date = new Date(today);
       date.setDate(today.getDate() - dayOffset);
 
-      // Use all 10 customers for each day
-      for (let i = 0; i < createdCustomers.length; i++) {
-        const { customer, pet, sampleData } = createdCustomers[i];
+      // Random number of appointments between 6 and 10
+      const numAppointments = Math.floor(Math.random() * 5) + 6; // 6, 7, 8, 9, or 10
+
+      // Shuffle customers and pick the random number
+      const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
+      const selectedCustomers = shuffledCustomers.slice(0, numAppointments);
+
+      for (let i = 0; i < selectedCustomers.length; i++) {
+        const { customer, pet, sampleData } = selectedCustomers[i];
 
         // Use the scheduled time from sample data
         const appointmentTime = new Date(date);
@@ -317,7 +324,7 @@ export async function POST(req: NextRequest) {
       success: true,
       customersCreated: SAMPLE_CUSTOMERS.length,
       appointmentsCreated: totalAppointmentsCreated,
-      daysGenerated: 7,
+      daysGenerated: 8,
     });
   } catch (error) {
     console.error("Generate sample data error:", error);

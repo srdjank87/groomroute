@@ -184,7 +184,7 @@ function DashboardContent() {
   }
 
   async function generateDemoData() {
-    if (!confirm("This will create 10 demo appointments per day for the last 7 days. Continue?")) {
+    if (!confirm("This will create 6-10 demo appointments per day for the last 8 days. Continue?")) {
       return;
     }
 
