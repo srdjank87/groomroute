@@ -366,25 +366,25 @@ function DashboardContent() {
                     {stats.contactMethods.includes("call") && (
                       <button
                         onClick={() => handleCall(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
-                        <Phone className="h-4 w-4" />
+                        <Phone className="h-5 w-5" />
                         Call
                       </button>
                     )}
                     {stats.contactMethods.includes("sms") && (
                       <button
                         onClick={() => handleSMS(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
-                        <MessageSquare className="h-4 w-4" />
+                        <MessageSquare className="h-5 w-5" />
                         SMS
                       </button>
                     )}
                     {stats.contactMethods.includes("whatsapp") && (
                       <button
                         onClick={() => handleWhatsApp(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
                         💚 WhatsApp
                       </button>
@@ -392,7 +392,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("signal") && (
                       <button
                         onClick={() => handleSignal(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
                         🔵 Signal
                       </button>
@@ -400,7 +400,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("telegram") && (
                       <button
                         onClick={() => handleTelegram(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
                         ✈️ Telegram
                       </button>
@@ -411,38 +411,43 @@ function DashboardContent() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={startDriving}
-              className="btn bg-white text-blue-600 hover:bg-gray-100 border-0 gap-2 h-12 font-bold"
-            >
-              <Navigation className="h-5 w-5" />
-              <span>Start Driving</span>
-            </button>
-            <Link
-              href="/app/routes"
-              className="btn btn-ghost border border-white/30 hover:bg-white/10 gap-2 h-12"
-            >
-              <MapPin className="h-4 w-4" />
-              <span className="text-sm">View Route</span>
-            </Link>
-          </div>
+          {/* Action Buttons - Mobile: Single Column, Desktop: 2 Columns */}
+          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3">
+            {/* Column 1: Start Driving & Today's Route */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={startDriving}
+                className="btn bg-white text-blue-600 hover:bg-gray-100 border-0 gap-2 h-12 font-bold"
+              >
+                <Navigation className="h-5 w-5" />
+                <span>Start Driving</span>
+              </button>
+              <Link
+                href="/app/routes"
+                className="btn btn-ghost border border-white/30 hover:bg-white/10 gap-2 h-12"
+              >
+                <MapPin className="h-4 w-4" />
+                <span className="text-sm">Today&apos;s Route</span>
+              </Link>
+            </div>
 
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <button
-              onClick={() => stats.nextAppointment && handleSkipAppointment(stats.nextAppointment.appointmentId)}
-              className="btn bg-red-500/20 hover:bg-red-500/30 border border-red-300/30 text-white gap-2 h-12"
-            >
-              <SkipForward className="h-4 w-4" />
-              <span className="text-sm">Skip</span>
-            </button>
-            <button
-              onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
-              className="btn bg-green-500/20 hover:bg-green-500/30 border border-green-300/30 text-white gap-2 h-12"
-            >
-              <CheckCircle className="h-4 w-4" />
-              <span className="text-sm">Mark Complete</span>
-            </button>
+            {/* Column 2: Skip & Mark Complete */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => stats.nextAppointment && handleSkipAppointment(stats.nextAppointment.appointmentId)}
+                className="btn bg-red-500/20 hover:bg-red-500/30 border border-red-300/30 text-white gap-2 h-12"
+              >
+                <SkipForward className="h-4 w-4" />
+                <span className="text-sm">Skip</span>
+              </button>
+              <button
+                onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
+                className="btn bg-green-500/20 hover:bg-green-500/30 border border-green-300/30 text-white gap-2 h-12"
+              >
+                <CheckCircle className="h-4 w-4" />
+                <span className="text-sm">Mark Complete</span>
+              </button>
+            </div>
           </div>
         </div>
       ) : (
