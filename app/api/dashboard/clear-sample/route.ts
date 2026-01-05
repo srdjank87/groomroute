@@ -37,6 +37,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Delete all breaks for this account (they're transient daily data)
+    const deletedBreaks = await prisma.break.deleteMany({
+      where: {
+        accountId,
+      },
+    });
+
     // Delete area day assignments for the account
     const deletedAssignments = await prisma.areaDayAssignment.deleteMany({
       where: {
@@ -59,6 +66,7 @@ export async function POST(req: NextRequest) {
       success: true,
       deleted: {
         customers: deletedCustomers.count,
+        breaks: deletedBreaks.count,
         areaAssignments: deletedAssignments.count,
         serviceAreas: deletedAreas.count,
       },
