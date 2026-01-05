@@ -134,7 +134,8 @@ export default function CustomersPage() {
                   </span>
                   <span className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    {customer._count.appointments} appointments
+                    {customer._count.appointments}{" "}
+                    {customer._count.appointments === 1 ? "appointment" : "appointments"}
                   </span>
                 </div>
 
