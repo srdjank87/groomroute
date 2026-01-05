@@ -442,18 +442,80 @@ function NewAppointmentContent() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Duration (minutes)
+                </label>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="15"
+                      max="240"
+                      step="15"
+                      value={appointmentData.serviceMinutes}
+                      onChange={(e) =>
+                        setAppointmentData({ ...appointmentData, serviceMinutes: parseInt(e.target.value) })
+                      }
+                      className="range range-sm flex-1"
+                      style={{
+                        background: `linear-gradient(to right, #A5744A 0%, #A5744A ${((appointmentData.serviceMinutes - 15) / (240 - 15)) * 100}%, #e5e7eb ${((appointmentData.serviceMinutes - 15) / (240 - 15)) * 100}%, #e5e7eb 100%)`
+                      }}
+                    />
+                    <input
+                      type="number"
+                      value={appointmentData.serviceMinutes}
+                      onChange={(e) =>
+                        setAppointmentData({ ...appointmentData, serviceMinutes: parseInt(e.target.value) || 15 })
+                      }
+                      className="input input-bordered w-24 h-10 text-base text-center"
+                      min="15"
+                      max="240"
+                      step="15"
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>15 min</span>
+                    <span>240 min</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Price ($)
                 </label>
-                <input
-                  type="number"
-                  value={appointmentData.price}
-                  onChange={(e) =>
-                    setAppointmentData({ ...appointmentData, price: parseFloat(e.target.value) })
-                  }
-                  className="input input-bordered w-full h-12 text-base"
-                  min="0"
-                  step="5"
-                />
+                <div className="space-y-3">
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max="300"
+                      step="5"
+                      value={appointmentData.price}
+                      onChange={(e) =>
+                        setAppointmentData({ ...appointmentData, price: parseFloat(e.target.value) })
+                      }
+                      className="range range-sm flex-1"
+                      style={{
+                        background: `linear-gradient(to right, #A5744A 0%, #A5744A ${(appointmentData.price / 300) * 100}%, #e5e7eb ${(appointmentData.price / 300) * 100}%, #e5e7eb 100%)`
+                      }}
+                    />
+                    <input
+                      type="number"
+                      value={appointmentData.price}
+                      onChange={(e) =>
+                        setAppointmentData({ ...appointmentData, price: parseFloat(e.target.value) || 0 })
+                      }
+                      className="input input-bordered w-24 h-10 text-base text-center"
+                      min="0"
+                      max="300"
+                      step="5"
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>$0</span>
+                    <span>$300</span>
+                  </div>
+                </div>
               </div>
 
               <div>
