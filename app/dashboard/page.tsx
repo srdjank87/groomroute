@@ -352,15 +352,6 @@ function DashboardContent() {
                   {stats.nextAppointment.time}
                 </p>
 
-                {/* Map Preview */}
-                <div className="mt-3 mb-3 rounded-lg overflow-hidden border-2 border-white/20 mx-auto max-w-sm">
-                  <img
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=400x400&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
-                    alt="Location map"
-                    className="w-full h-auto"
-                  />
-                </div>
-
                 {/* Contact Methods */}
                 {stats.nextAppointment.customerPhone && stats.contactMethods && stats.contactMethods.length > 0 && (
                   <div className="flex gap-2 mt-3 flex-wrap">
@@ -408,6 +399,15 @@ function DashboardContent() {
                     )}
                   </div>
                 )}
+
+                {/* Map Preview */}
+                <div className="mt-3 mb-3 rounded-lg overflow-hidden border-2 border-white/20 mx-auto max-w-xs">
+                  <img
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=300x300&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                    alt="Location map"
+                    className="w-full h-auto"
+                  />
+                </div>
               </div>
             </div>
           </div>
