@@ -1,11 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Check, ChevronDown, ChevronUp, MapPin } from "lucide-react";
+import { ChevronLeft, Check, ChevronDown, ChevronUp, MapPin, Sparkles } from "lucide-react";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import MapPreview from "@/components/MapPreview";
 import toast from "react-hot-toast";
+
+interface AreaSuggestion {
+  id: string;
+  name: string;
+  color: string;
+  customerCount: number;
+  confidence: "exact" | "prefix" | "nearby";
+}
+
+interface ServiceArea {
+  id: string;
+  name: string;
+  color: string;
+}
 
 export default function NewCustomerPage() {
   const router = useRouter();
@@ -19,6 +33,13 @@ export default function NewCustomerPage() {
     lng: number;
     status: string;
   } | null>(null);
+
+  // Area suggestion state
+  const [areaSuggestion, setAreaSuggestion] = useState<AreaSuggestion | null>(null);
+  const [areaSuggestionReason, setAreaSuggestionReason] = useState<string>("");
+  const [allAreas, setAllAreas] = useState<ServiceArea[]>([]);
+  const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null);
+  const [showAreaSelector, setShowAreaSelector] = useState(false);
 
   const [formData, setFormData] = useState({
     // Customer info
@@ -38,7 +59,57 @@ export default function NewCustomerPage() {
     specialHandling: "",
     // Notes
     notes: "",
+    serviceAreaId: null as string | null,
   });
+
+  // Extract zip code from address string
+  const extractZipCode = (address: string): string | null => {
+    // Match US zip codes (5 digits or 5+4 format)
+    const match = address.match(/\b(\d{5})(?:-\d{4})?\b/);
+    return match ? match[1] : null;
+  };
+
+  // Fetch area suggestion when address changes
+  const fetchAreaSuggestion = useCallback(async (zipCode: string) => {
+    try {
+      const response = await fetch(`/api/areas/suggest?zipCode=${zipCode}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.suggestion) {
+          setAreaSuggestion(data.suggestion);
+          setAreaSuggestionReason(data.reason || "");
+          // Auto-select the suggested area
+          setSelectedAreaId(data.suggestion.id);
+          setFormData((prev) => ({ ...prev, serviceAreaId: data.suggestion.id }));
+        } else {
+          setAreaSuggestion(null);
+          setAreaSuggestionReason(data.reason || "");
+        }
+        // Store all areas for manual selection
+        if (data.allAreas) {
+          setAllAreas(data.allAreas);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch area suggestion:", error);
+    }
+  }, []);
+
+  // Fetch all areas on mount
+  useEffect(() => {
+    const fetchAreas = async () => {
+      try {
+        const response = await fetch("/api/areas");
+        if (response.ok) {
+          const data = await response.json();
+          setAllAreas(data.areas || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch areas:", error);
+      }
+    };
+    fetchAreas();
+  }, []);
 
   const behaviorOptions = [
     { value: "FRIENDLY", label: "Friendly", emoji: "😊" },
@@ -227,13 +298,19 @@ export default function NewCustomerPage() {
                   const lat = place.geometry.location.lat();
                   const lng = place.geometry.location.lng();
 
-                  setFormData({ ...formData, address: place.formatted_address });
+                  setFormData((prev) => ({ ...prev, address: place.formatted_address || "" }));
                   setGeocodedLocation({
                     lat,
                     lng,
                     status: "OK",
                   });
                   toast.success("Location found!");
+
+                  // Try to get area suggestion based on zip code
+                  const zipCode = extractZipCode(place.formatted_address || "");
+                  if (zipCode) {
+                    fetchAreaSuggestion(zipCode);
+                  }
                 }
               }}
               placeholder="Start typing address..."
@@ -254,6 +331,124 @@ export default function NewCustomerPage() {
                 address={formData.address}
                 geocodeStatus={geocodedLocation.status}
               />
+            </div>
+          )}
+
+          {/* Area Suggestion */}
+          {allAreas.length > 0 && geocodedLocation && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              {areaSuggestion ? (
+                <div>
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-900">
+                        Suggested Service Area
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedAreaId(areaSuggestion.id);
+                            setFormData((prev) => ({ ...prev, serviceAreaId: areaSuggestion.id }));
+                          }}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 transition-colors ${
+                            selectedAreaId === areaSuggestion.id
+                              ? "border-blue-500 bg-blue-100"
+                              : "border-gray-200 bg-white hover:border-blue-300"
+                          }`}
+                        >
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: areaSuggestion.color }}
+                          />
+                          <span className="text-sm font-medium">{areaSuggestion.name}</span>
+                          {selectedAreaId === areaSuggestion.id && (
+                            <Check className="h-4 w-4 text-blue-600" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowAreaSelector(!showAreaSelector)}
+                          className="text-xs text-blue-600 hover:text-blue-800 underline"
+                        >
+                          {showAreaSelector ? "Hide options" : "Choose different"}
+                        </button>
+                      </div>
+                      {areaSuggestionReason && (
+                        <p className="text-xs text-blue-700 mt-2">{areaSuggestionReason}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-blue-900">
+                      Assign to Service Area
+                    </p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      {areaSuggestionReason || "Select an area to help organize your routes"}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowAreaSelector(!showAreaSelector)}
+                      className="text-xs text-blue-600 hover:text-blue-800 underline mt-2"
+                    >
+                      {showAreaSelector ? "Hide areas" : "Select area"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Area selector dropdown */}
+              {showAreaSelector && (
+                <div className="mt-3 pt-3 border-t border-blue-200">
+                  <div className="flex flex-wrap gap-2">
+                    {allAreas.map((area) => (
+                      <button
+                        key={area.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedAreaId(area.id);
+                          setFormData((prev) => ({ ...prev, serviceAreaId: area.id }));
+                          setShowAreaSelector(false);
+                        }}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 transition-colors ${
+                          selectedAreaId === area.id
+                            ? "border-blue-500 bg-blue-100"
+                            : "border-gray-200 bg-white hover:border-blue-300"
+                        }`}
+                      >
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: area.color }}
+                        />
+                        <span className="text-sm">{area.name}</span>
+                        {selectedAreaId === area.id && (
+                          <Check className="h-4 w-4 text-blue-600" />
+                        )}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedAreaId(null);
+                        setFormData((prev) => ({ ...prev, serviceAreaId: null }));
+                        setShowAreaSelector(false);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg border-2 transition-colors text-sm ${
+                        selectedAreaId === null
+                          ? "border-gray-400 bg-gray-100"
+                          : "border-gray-200 bg-white hover:border-gray-300"
+                      }`}
+                    >
+                      No area
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

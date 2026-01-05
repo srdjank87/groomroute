@@ -419,17 +419,20 @@ function NewAppointmentContent() {
                     className="w-4 h-4 rounded-full mt-0.5 flex-shrink-0"
                     style={{ backgroundColor: areaSuggestion.customer.serviceAreaColor || '#22C55E' }}
                   />
-                  <div>
+                  <div className="flex-1">
                     <p className="text-sm font-medium text-emerald-900">
                       <MapPin className="h-4 w-4 inline mr-1" />
-                      Customer Location: {areaSuggestion.customer.serviceAreaName}
+                      {areaSuggestion.customer.serviceAreaName} Customer
                     </p>
                     <p className="text-sm text-emerald-700 mt-1">
-                      Suggested Days: {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(", ")}
+                      <span className="font-medium">Best days to book:</span> {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(", ")}
                     </p>
-                    {areaSuggestion.reason && (
-                      <p className="text-xs text-emerald-600 mt-1">{areaSuggestion.reason}</p>
-                    )}
+                    <div className="mt-2 p-2 bg-emerald-100/50 rounded-lg">
+                      <p className="text-xs text-emerald-800">
+                        <span className="font-semibold">Why these days?</span> You work in {areaSuggestion.customer.serviceAreaName} on {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" and ")}.
+                        Booking on these days means shorter routes, less driving between appointments, and more time for grooming.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -462,21 +465,32 @@ function NewAppointmentContent() {
 
                 {/* Date match feedback */}
                 {dateMatch && areaSuggestion?.customer?.serviceAreaName && (
-                  <div className={`mt-2 p-2 rounded-lg text-sm ${
+                  <div className={`mt-2 p-3 rounded-lg text-sm ${
                     dateMatch.isMatch
                       ? "bg-green-50 text-green-700 border border-green-200"
-                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                      : "bg-amber-50 text-amber-800 border border-amber-200"
                   }`}>
                     {dateMatch.isMatch ? (
-                      <span className="flex items-center gap-1">
-                        <Check className="h-4 w-4" />
-                        Great choice - this is your {areaSuggestion.customer.serviceAreaName} day
-                      </span>
+                      <div>
+                        <span className="flex items-center gap-1 font-medium">
+                          <Check className="h-4 w-4" />
+                          Great choice!
+                        </span>
+                        <p className="text-xs mt-1 text-green-600">
+                          {dateMatch.dayName} is your {areaSuggestion.customer.serviceAreaName} day. This keeps your route tight and efficient.
+                        </p>
+                      </div>
                     ) : (
-                      <span className="flex items-center gap-1">
-                        <AlertTriangle className="h-4 w-4" />
-                        {dateMatch.dayName} is not a {areaSuggestion.customer.serviceAreaName} day - may have longer drives
-                      </span>
+                      <div>
+                        <span className="flex items-center gap-1 font-medium">
+                          <AlertTriangle className="h-4 w-4" />
+                          Heads up - {dateMatch.dayName} is not your {areaSuggestion.customer.serviceAreaName} day
+                        </span>
+                        <p className="text-xs mt-1 text-amber-700">
+                          This customer is in {areaSuggestion.customer.serviceAreaName}, but you typically work elsewhere on {dateMatch.dayName}s.
+                          This may add extra driving time between appointments. Consider booking on {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" or ")} instead.
+                        </p>
+                      </div>
                     )}
                   </div>
                 )}

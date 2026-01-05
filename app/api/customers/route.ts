@@ -14,6 +14,8 @@ const customerSchema = z.object({
   addressNotes: z.string().optional(),
   accessInstructions: z.string().optional(),
   notes: z.string().optional(),
+  // Service area assignment
+  serviceAreaId: z.string().nullable().optional(),
   // Pet data (optional)
   petName: z.string().optional(),
   species: z.string().optional(),
@@ -80,6 +82,7 @@ export async function POST(req: NextRequest) {
           addressNotes: validatedData.addressNotes || null,
           accessInstructions: validatedData.accessInstructions || null,
           notes: validatedData.notes || null,
+          serviceAreaId: validatedData.serviceAreaId || null,
           lat: geocodeResult.success ? geocodeResult.lat : null,
           lng: geocodeResult.success ? geocodeResult.lng : null,
           geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
