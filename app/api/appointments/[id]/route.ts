@@ -93,6 +93,21 @@ export async function PATCH(
         updateData.customerConfirmed = true;
         updateData.confirmedAt = new Date();
       }
+
+      // When starting an appointment (IN_PROGRESS), auto-complete any existing IN_PROGRESS appointment
+      if (validatedData.status === "IN_PROGRESS") {
+        await prisma.appointment.updateMany({
+          where: {
+            accountId,
+            groomerId: existingAppointment.groomerId,
+            status: "IN_PROGRESS",
+            id: { not: appointmentId },
+          },
+          data: {
+            status: "COMPLETED",
+          },
+        });
+      }
     }
 
     if (validatedData.startAt !== undefined) {

@@ -8,7 +8,6 @@ import {
   Trash2,
   Users,
   Loader2,
-  Wand2,
   X,
   Check,
 } from "lucide-react";
@@ -18,10 +17,6 @@ interface ServiceArea {
   id: string;
   name: string;
   color: string;
-  zipCodes: string[];
-  centerLat: number | null;
-  centerLng: number | null;
-  radiusMiles: number | null;
   isActive: boolean;
   customerCount: number;
   assignedDays: {
@@ -61,7 +56,6 @@ export default function SettingsAreasPage() {
   const [assignments, setAssignments] = useState<AreaAssignment[]>([]);
   const [availableAreas, setAvailableAreas] = useState<{ id: string; name: string; color: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAutoAssigning, setIsAutoAssigning] = useState(false);
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -69,7 +63,6 @@ export default function SettingsAreasPage() {
   const [formData, setFormData] = useState({
     name: "",
     color: "#3B82F6",
-    zipCodes: "",
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -116,7 +109,7 @@ export default function SettingsAreasPage() {
 
   const openCreateModal = () => {
     setEditingArea(null);
-    setFormData({ name: "", color: PRESET_COLORS[areas.length % PRESET_COLORS.length], zipCodes: "" });
+    setFormData({ name: "", color: PRESET_COLORS[areas.length % PRESET_COLORS.length] });
     setShowModal(true);
   };
 
@@ -125,7 +118,6 @@ export default function SettingsAreasPage() {
     setFormData({
       name: area.name,
       color: area.color,
-      zipCodes: area.zipCodes.join(", "),
     });
     setShowModal(true);
   };
@@ -133,16 +125,6 @@ export default function SettingsAreasPage() {
   const handleSaveArea = async () => {
     if (!formData.name.trim()) {
       toast.error("Name is required");
-      return;
-    }
-
-    const zipCodes = formData.zipCodes
-      .split(/[,\s]+/)
-      .map((z) => z.trim())
-      .filter((z) => z.length > 0);
-
-    if (zipCodes.length === 0) {
-      toast.error("At least one zip code is required");
       return;
     }
 
@@ -157,7 +139,6 @@ export default function SettingsAreasPage() {
         body: JSON.stringify({
           name: formData.name.trim(),
           color: formData.color,
-          zipCodes,
         }),
       });
 
@@ -230,29 +211,6 @@ export default function SettingsAreasPage() {
     }
   };
 
-  const handleAutoAssign = async () => {
-    setIsAutoAssigning(true);
-    try {
-      const response = await fetch("/api/areas/auto-assign", {
-        method: "POST",
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success(data.message);
-        fetchAreas();
-      } else {
-        toast.error(data.error || "Failed to auto-assign customers");
-      }
-    } catch (error) {
-      console.error("Error auto-assigning:", error);
-      toast.error("Failed to auto-assign customers");
-    } finally {
-      setIsAutoAssigning(false);
-    }
-  };
-
   const getDayAssignmentDisplay = (
     assignment: AreaAssignment,
     dayOfWeek: number
@@ -308,8 +266,8 @@ export default function SettingsAreasPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Service Areas</h1>
           <p className="text-gray-600 mt-1">
-            Define geographic areas and assign them to days of the week to reduce
-            drive time.
+            Create areas for different parts of your service territory and assign
+            them to days of the week to reduce drive time.
           </p>
         </div>
         <button
@@ -325,20 +283,6 @@ export default function SettingsAreasPage() {
       <div className="mb-10">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Your Areas</h2>
-          {areas.length > 0 && (
-            <button
-              onClick={handleAutoAssign}
-              disabled={isAutoAssigning}
-              className="btn btn-sm btn-outline gap-2"
-            >
-              {isAutoAssigning ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Wand2 className="h-4 w-4" />
-              )}
-              Auto-assign Customers
-            </button>
-          )}
         </div>
 
         {areas.length === 0 ? (
@@ -388,10 +332,6 @@ export default function SettingsAreasPage() {
                     </button>
                   </div>
                 </div>
-
-                <p className="text-sm text-gray-600 mb-3">
-                  Zip codes: {area.zipCodes.join(", ")}
-                </p>
 
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <div className="flex items-center gap-1">
@@ -531,9 +471,12 @@ export default function SettingsAreasPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder="e.g., North Side, Downtown"
+                  placeholder="e.g., North Side, Downtown, Westwood"
                   className="input input-bordered w-full"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Name your area based on neighborhoods or landmarks your customers know.
+                </p>
               </div>
 
               {/* Color */}
@@ -555,26 +498,6 @@ export default function SettingsAreasPage() {
                     />
                   ))}
                 </div>
-              </div>
-
-              {/* Zip Codes */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Zip Codes
-                </label>
-                <textarea
-                  value={formData.zipCodes}
-                  onChange={(e) =>
-                    setFormData({ ...formData, zipCodes: e.target.value })
-                  }
-                  placeholder="Enter zip codes separated by commas (e.g., 90210, 90211, 90212)"
-                  className="textarea textarea-bordered w-full"
-                  rows={3}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Customers with matching zip codes will be auto-assigned to this
-                  area.
-                </p>
               </div>
             </div>
 

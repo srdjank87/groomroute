@@ -432,7 +432,7 @@ enum BreakType {
   HYDRATION
 }
 
-// Service area for "Area Days" feature - geographic zones for scheduling
+// Service area for "Area Days" feature - named groups for organizing customers by location
 model ServiceArea {
   id          String   @id @default(cuid())
   accountId   String
@@ -441,13 +441,8 @@ model ServiceArea {
   name        String   // "North Side", "Downtown", "Westwood"
   color       String   // Hex color for UI display (#FF5733)
 
-  // Area definition - using zip codes as primary method
-  zipCodes    String[] // ["90210", "90211", "90212"]
-
-  // Optional: center point + radius (for distance-based matching)
-  centerLat   Float?
-  centerLng   Float?
-  radiusMiles Float?
+  // Areas are defined by which customers are assigned, not by geographic rules
+  // The groomer manually assigns customers to areas based on their knowledge of the territory
 
   isActive    Boolean  @default(true)
 

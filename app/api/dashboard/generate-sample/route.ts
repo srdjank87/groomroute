@@ -4,126 +4,145 @@ import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geocoding";
 import { AppointmentStatus } from "@prisma/client";
 
-// Sample customer data for demonstration - using real Austin, TX addresses
+// Service areas for demo - simple name + color groupings
+const SERVICE_AREAS = [
+  {
+    name: "North Austin",
+    color: "#3B82F6", // Blue
+  },
+  {
+    name: "Downtown & Central",
+    color: "#22C55E", // Green
+  },
+  {
+    name: "South Austin",
+    color: "#F59E0B", // Amber
+  },
+];
+
+// Sample customer data for demonstration - using real Austin, TX addresses (15 customers)
+// Customers are grouped by area for demo purposes
 const SAMPLE_CUSTOMERS = [
+  // North Austin customers (5)
   {
     name: "Sarah Johnson",
     phone: "(512) 555-0101",
     email: "sarah.j@example.com",
-    address: "1100 Congress Ave, Austin, TX 78701",
+    address: "2525 W Anderson Ln, Austin, TX 78757",
     city: "Austin",
     state: "TX",
-    zipCode: "78701",
+    zipCode: "78757",
+    areaName: "North Austin",
     pet: {
       name: "Max",
       breed: "Golden Retriever",
       species: "dog",
       weight: 65,
     },
-    time: 9, // 9 AM
     duration: 90,
   },
   {
     name: "Michael Chen",
     phone: "(512) 555-0102",
     email: "mchen@example.com",
-    address: "2525 W Anderson Ln, Austin, TX 78757",
+    address: "10710 Research Blvd, Austin, TX 78759",
     city: "Austin",
     state: "TX",
-    zipCode: "78757",
+    zipCode: "78759",
+    areaName: "North Austin",
     pet: {
       name: "Bella",
       breed: "Poodle",
       species: "dog",
       weight: 45,
     },
-    time: 10, // 10 AM
     duration: 60,
-  },
-  {
-    name: "Emily Rodriguez",
-    phone: "(512) 555-0103",
-    email: "emily.r@example.com",
-    address: "4001 S Lamar Blvd, Austin, TX 78704",
-    city: "Austin",
-    state: "TX",
-    zipCode: "78704",
-    pet: {
-      name: "Charlie",
-      breed: "Labrador Retriever",
-      species: "dog",
-      weight: 70,
-    },
-    time: 11, // 11 AM
-    duration: 90,
-  },
-  {
-    name: "David Thompson",
-    phone: "(512) 555-0104",
-    email: "dthompson@example.com",
-    address: "9500 S IH 35 Frontage Rd, Austin, TX 78748",
-    city: "Austin",
-    state: "TX",
-    zipCode: "78748",
-    pet: {
-      name: "Luna",
-      breed: "French Bulldog",
-      species: "dog",
-      weight: 25,
-    },
-    time: 12, // 12 PM
-    duration: 60,
-  },
-  {
-    name: "Jessica Martinez",
-    phone: "(512) 555-0105",
-    email: "jmartinez@example.com",
-    address: "5400 Brodie Ln, Austin, TX 78745",
-    city: "Austin",
-    state: "TX",
-    zipCode: "78745",
-    pet: {
-      name: "Rocky",
-      breed: "German Shepherd",
-      species: "dog",
-      weight: 80,
-    },
-    time: 13, // 1 PM
-    duration: 90,
   },
   {
     name: "Amanda Wilson",
-    phone: "(512) 555-0106",
+    phone: "(512) 555-0103",
     email: "awilson@example.com",
-    address: "10710 Research Blvd, Austin, TX 78759",
+    address: "6001 W Parmer Ln, Austin, TX 78729",
     city: "Austin",
     state: "TX",
-    zipCode: "78759",
+    zipCode: "78729",
+    areaName: "North Austin",
     pet: {
       name: "Daisy",
       breed: "Shih Tzu",
       species: "dog",
       weight: 12,
     },
-    time: 14, // 2 PM
     duration: 60,
   },
   {
-    name: "Robert Garcia",
-    phone: "(512) 555-0107",
-    email: "rgarcia@example.com",
-    address: "6001 W Parmer Ln, Austin, TX 78729",
+    name: "Jennifer Lee",
+    phone: "(512) 555-0104",
+    email: "jlee@example.com",
+    address: "7701 N Lamar Blvd, Austin, TX 78752",
     city: "Austin",
     state: "TX",
-    zipCode: "78729",
+    zipCode: "78752",
+    areaName: "North Austin",
     pet: {
-      name: "Cooper",
-      breed: "Australian Shepherd",
+      name: "Sadie",
+      breed: "Cavalier King Charles",
       species: "dog",
-      weight: 55,
+      weight: 18,
     },
-    time: 15, // 3 PM
+    duration: 60,
+  },
+  {
+    name: "Thomas Wright",
+    phone: "(512) 555-0105",
+    email: "twright@example.com",
+    address: "9901 N Capital of Texas Hwy, Austin, TX 78759",
+    city: "Austin",
+    state: "TX",
+    zipCode: "78759",
+    areaName: "North Austin",
+    pet: {
+      name: "Zeus",
+      breed: "Rottweiler",
+      species: "dog",
+      weight: 110,
+    },
+    duration: 120,
+  },
+  // Downtown & Central customers (5)
+  {
+    name: "Emily Rodriguez",
+    phone: "(512) 555-0106",
+    email: "emily.r@example.com",
+    address: "1100 Congress Ave, Austin, TX 78701",
+    city: "Austin",
+    state: "TX",
+    zipCode: "78701",
+    areaName: "Downtown & Central",
+    pet: {
+      name: "Charlie",
+      breed: "Labrador Retriever",
+      species: "dog",
+      weight: 70,
+    },
     duration: 90,
+  },
+  {
+    name: "Kevin Brown",
+    phone: "(512) 555-0107",
+    email: "kbrown@example.com",
+    address: "2901 S Capital of Texas Hwy, Austin, TX 78746",
+    city: "Austin",
+    state: "TX",
+    zipCode: "78746",
+    areaName: "Downtown & Central",
+    pet: {
+      name: "Tucker",
+      breed: "Beagle",
+      species: "dog",
+      weight: 28,
+    },
+    duration: 60,
   },
   {
     name: "Lisa Anderson",
@@ -133,48 +152,134 @@ const SAMPLE_CUSTOMERS = [
     city: "Austin",
     state: "TX",
     zipCode: "78723",
+    areaName: "Downtown & Central",
     pet: {
       name: "Milo",
       breed: "Bernese Mountain Dog",
       species: "dog",
       weight: 95,
     },
-    time: 16, // 4 PM
     duration: 120,
   },
   {
-    name: "Kevin Brown",
+    name: "Rachel Kim",
     phone: "(512) 555-0109",
-    email: "kbrown@example.com",
-    address: "2901 S Capital of Texas Hwy, Austin, TX 78746",
+    email: "rkim@example.com",
+    address: "4001 S Lamar Blvd, Austin, TX 78704",
     city: "Austin",
     state: "TX",
-    zipCode: "78746",
+    zipCode: "78704",
+    areaName: "Downtown & Central",
     pet: {
-      name: "Tucker",
-      breed: "Beagle",
+      name: "Oscar",
+      breed: "Cockapoo",
       species: "dog",
-      weight: 28,
+      weight: 22,
     },
-    time: 17, // 5 PM
     duration: 60,
   },
   {
-    name: "Jennifer Lee",
+    name: "Daniel Park",
     phone: "(512) 555-0110",
-    email: "jlee@example.com",
-    address: "7701 N Lamar Blvd, Austin, TX 78752",
+    email: "dpark@example.com",
+    address: "1601 E Cesar Chavez St, Austin, TX 78702",
     city: "Austin",
     state: "TX",
-    zipCode: "78752",
+    zipCode: "78702",
+    areaName: "Downtown & Central",
     pet: {
-      name: "Sadie",
-      breed: "Cavalier King Charles",
+      name: "Nala",
+      breed: "Goldendoodle",
       species: "dog",
-      weight: 18,
+      weight: 55,
     },
-    time: 18, // 6 PM
+    duration: 90,
+  },
+  // South Austin customers (5)
+  {
+    name: "David Thompson",
+    phone: "(512) 555-0111",
+    email: "dthompson@example.com",
+    address: "9500 S IH 35 Frontage Rd, Austin, TX 78748",
+    city: "Austin",
+    state: "TX",
+    zipCode: "78748",
+    areaName: "South Austin",
+    pet: {
+      name: "Luna",
+      breed: "French Bulldog",
+      species: "dog",
+      weight: 25,
+    },
     duration: 60,
+  },
+  {
+    name: "Jessica Martinez",
+    phone: "(512) 555-0112",
+    email: "jmartinez@example.com",
+    address: "5400 Brodie Ln, Austin, TX 78745",
+    city: "Austin",
+    state: "TX",
+    zipCode: "78745",
+    areaName: "South Austin",
+    pet: {
+      name: "Rocky",
+      breed: "German Shepherd",
+      species: "dog",
+      weight: 80,
+    },
+    duration: 90,
+  },
+  {
+    name: "Robert Garcia",
+    phone: "(512) 555-0113",
+    email: "rgarcia@example.com",
+    address: "4301 W William Cannon Dr, Austin, TX 78749",
+    city: "Austin",
+    state: "TX",
+    zipCode: "78749",
+    areaName: "South Austin",
+    pet: {
+      name: "Cooper",
+      breed: "Australian Shepherd",
+      species: "dog",
+      weight: 55,
+    },
+    duration: 90,
+  },
+  {
+    name: "Maria Santos",
+    phone: "(512) 555-0114",
+    email: "msantos@example.com",
+    address: "6800 Manchaca Rd, Austin, TX 78745",
+    city: "Austin",
+    state: "TX",
+    zipCode: "78745",
+    areaName: "South Austin",
+    pet: {
+      name: "Pepper",
+      breed: "Miniature Schnauzer",
+      species: "dog",
+      weight: 15,
+    },
+    duration: 60,
+  },
+  {
+    name: "Chris Taylor",
+    phone: "(512) 555-0115",
+    email: "ctaylor@example.com",
+    address: "1700 Slaughter Ln, Austin, TX 78748",
+    city: "Austin",
+    state: "TX",
+    zipCode: "78748",
+    areaName: "South Austin",
+    pet: {
+      name: "Bear",
+      breed: "Great Pyrenees",
+      species: "dog",
+      weight: 100,
+    },
+    duration: 120,
   },
 ];
 
@@ -226,17 +331,67 @@ export async function POST(req: NextRequest) {
 
     console.log("Found groomer:", groomer.id, "for account:", accountId);
 
-    // Generate appointments for the last 7 days
+    // Generate appointments for the last 14 days
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     let totalAppointmentsCreated = 0;
     const createdCustomers: any[] = [];
 
-    // Create customers first with geocoding
+    // Create service areas first (just name + color)
+    const areaIdsByName: { [key: string]: string } = {}; // areaName -> areaId mapping
+
+    for (const areaData of SERVICE_AREAS) {
+      const area = await prisma.serviceArea.create({
+        data: {
+          accountId,
+          name: areaData.name,
+          color: areaData.color,
+          isActive: true,
+        },
+      });
+
+      areaIdsByName[areaData.name] = area.id;
+    }
+
+    console.log("Created service areas:", Object.keys(areaIdsByName));
+
+    // Create area day assignments for the groomer
+    // Monday & Thursday: North Austin
+    // Tuesday & Friday: Downtown & Central
+    // Wednesday & Saturday: South Austin
+    const dayAssignments = [
+      { dayOfWeek: 1, areaName: "North Austin" },     // Monday
+      { dayOfWeek: 2, areaName: "Downtown & Central" }, // Tuesday
+      { dayOfWeek: 3, areaName: "South Austin" },     // Wednesday
+      { dayOfWeek: 4, areaName: "North Austin" },     // Thursday
+      { dayOfWeek: 5, areaName: "Downtown & Central" }, // Friday
+      { dayOfWeek: 6, areaName: "South Austin" },     // Saturday
+    ];
+
+    for (const assignment of dayAssignments) {
+      const areaId = areaIdsByName[assignment.areaName];
+      if (areaId) {
+        await prisma.areaDayAssignment.create({
+          data: {
+            accountId,
+            groomerId: groomer.id,
+            areaId,
+            dayOfWeek: assignment.dayOfWeek,
+          },
+        });
+      }
+    }
+
+    console.log("Created area day assignments for groomer");
+
+    // Create customers with geocoding and area assignment
     for (const sampleCustomer of SAMPLE_CUSTOMERS) {
       // Geocode the address
       const geocodeResult = await geocodeAddress(sampleCustomer.address);
+
+      // Find the matching service area by name
+      const serviceAreaId = areaIdsByName[sampleCustomer.areaName] || null;
 
       // Create customer
       const customer = await prisma.customer.create({
@@ -253,6 +408,7 @@ export async function POST(req: NextRequest) {
           lng: geocodeResult.success ? geocodeResult.lng : null,
           geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
           locationVerified: geocodeResult.success, // Mark as verified if geocoded successfully
+          serviceAreaId, // Assign to service area by name
           notes: "[SAMPLE_DATA] This is sample data to demonstrate GroomRoute's features.",
         },
       });
@@ -350,6 +506,7 @@ export async function POST(req: NextRequest) {
       success: true,
       customersCreated: SAMPLE_CUSTOMERS.length,
       appointmentsCreated: totalAppointmentsCreated,
+      areasCreated: SERVICE_AREAS.length,
       daysGenerated: 15,
     });
   } catch (error) {

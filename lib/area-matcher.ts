@@ -1,6 +1,6 @@
 /**
  * Area matching utilities for the Area Days feature.
- * Matches customers to service areas based on zip codes or coordinates.
+ * Areas are now simple name+color groupings - customers are assigned manually.
  */
 
 import { prisma } from "@/lib/prisma";
@@ -9,86 +9,6 @@ export interface ServiceArea {
   id: string;
   name: string;
   color: string;
-  zipCodes: string[];
-  centerLat: number | null;
-  centerLng: number | null;
-  radiusMiles: number | null;
-}
-
-export interface CustomerLocation {
-  zipCode: string | null;
-  lat: number | null;
-  lng: number | null;
-}
-
-/**
- * Calculate distance between two coordinates using Haversine formula
- * @returns Distance in miles
- */
-export function calculateDistanceMiles(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number {
-  const R = 3959; // Earth's radius in miles
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-/**
- * Find the best matching service area for a customer location.
- * Priority:
- * 1. Exact zip code match
- * 2. Within radius (if area has centerLat/centerLng/radiusMiles)
- *
- * @returns The matching area or null if no match
- */
-export function findMatchingArea(
-  areas: ServiceArea[],
-  location: CustomerLocation
-): ServiceArea | null {
-  // First, try zip code match
-  if (location.zipCode) {
-    const normalizedZip = location.zipCode.trim();
-    const zipMatch = areas.find((area) =>
-      area.zipCodes.some((zip) => zip.trim() === normalizedZip)
-    );
-    if (zipMatch) {
-      return zipMatch;
-    }
-  }
-
-  // Second, try radius match if customer has coordinates
-  if (location.lat !== null && location.lng !== null) {
-    for (const area of areas) {
-      if (
-        area.centerLat !== null &&
-        area.centerLng !== null &&
-        area.radiusMiles !== null
-      ) {
-        const distance = calculateDistanceMiles(
-          location.lat,
-          location.lng,
-          area.centerLat,
-          area.centerLng
-        );
-        if (distance <= area.radiusMiles) {
-          return area;
-        }
-      }
-    }
-  }
-
-  return null;
 }
 
 /**

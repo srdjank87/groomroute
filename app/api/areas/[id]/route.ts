@@ -4,13 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 // Validation schema for updating service areas
+// Areas are just name + color - customers are assigned manually
 const updateServiceAreaSchema = z.object({
   name: z.string().min(1, "Name is required").max(100).optional(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color").optional(),
-  zipCodes: z.array(z.string().min(1)).min(1, "At least one zip code is required").optional(),
-  centerLat: z.number().nullable().optional(),
-  centerLng: z.number().nullable().optional(),
-  radiusMiles: z.number().positive().nullable().optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -69,10 +66,6 @@ export async function GET(
         id: area.id,
         name: area.name,
         color: area.color,
-        zipCodes: area.zipCodes,
-        centerLat: area.centerLat,
-        centerLng: area.centerLng,
-        radiusMiles: area.radiusMiles,
         isActive: area.isActive,
         customerCount: area._count.customers,
         assignedDays: area.dayAssignments.map((da) => ({
@@ -147,10 +140,6 @@ export async function PATCH(
       data: {
         ...(validatedData.name && { name: validatedData.name }),
         ...(validatedData.color && { color: validatedData.color }),
-        ...(validatedData.zipCodes && { zipCodes: validatedData.zipCodes }),
-        ...(validatedData.centerLat !== undefined && { centerLat: validatedData.centerLat }),
-        ...(validatedData.centerLng !== undefined && { centerLng: validatedData.centerLng }),
-        ...(validatedData.radiusMiles !== undefined && { radiusMiles: validatedData.radiusMiles }),
         ...(validatedData.isActive !== undefined && { isActive: validatedData.isActive }),
       },
       include: {
@@ -173,10 +162,6 @@ export async function PATCH(
         id: updatedArea.id,
         name: updatedArea.name,
         color: updatedArea.color,
-        zipCodes: updatedArea.zipCodes,
-        centerLat: updatedArea.centerLat,
-        centerLng: updatedArea.centerLng,
-        radiusMiles: updatedArea.radiusMiles,
         isActive: updatedArea.isActive,
         customerCount: updatedArea._count.customers,
         assignedDays: updatedArea.dayAssignments.map((da) => ({

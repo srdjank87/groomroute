@@ -4,13 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 // Validation schema for creating/updating service areas
+// Areas are just name + color - customers are assigned manually
 const serviceAreaSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color"),
-  zipCodes: z.array(z.string().min(1)).min(1, "At least one zip code is required"),
-  centerLat: z.number().optional(),
-  centerLng: z.number().optional(),
-  radiusMiles: z.number().positive().optional(),
 });
 
 // GET - List all service areas for the account
@@ -45,10 +42,6 @@ export async function GET() {
       id: area.id,
       name: area.name,
       color: area.color,
-      zipCodes: area.zipCodes,
-      centerLat: area.centerLat,
-      centerLng: area.centerLng,
-      radiusMiles: area.radiusMiles,
       isActive: area.isActive,
       customerCount: area._count.customers,
       // Group day assignments by day
@@ -102,10 +95,6 @@ export async function POST(request: Request) {
         accountId: session.user.accountId,
         name: validatedData.name,
         color: validatedData.color,
-        zipCodes: validatedData.zipCodes,
-        centerLat: validatedData.centerLat,
-        centerLng: validatedData.centerLng,
-        radiusMiles: validatedData.radiusMiles,
       },
       include: {
         _count: {
@@ -120,10 +109,6 @@ export async function POST(request: Request) {
         id: area.id,
         name: area.name,
         color: area.color,
-        zipCodes: area.zipCodes,
-        centerLat: area.centerLat,
-        centerLng: area.centerLng,
-        radiusMiles: area.radiusMiles,
         isActive: area.isActive,
         customerCount: area._count.customers,
         assignedDays: [],
