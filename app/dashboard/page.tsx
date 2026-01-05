@@ -413,7 +413,7 @@ function DashboardContent() {
                   <img
                     src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=300x300&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                     alt="Location map"
-                    className="w-[200px] h-[200px] md:w-[300px] md:h-[300px]"
+                    className="w-[150px] h-[150px] md:w-[300px] md:h-[300px]"
                   />
                 </div>
               </div>

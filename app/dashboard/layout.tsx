@@ -124,7 +124,7 @@ export default function DashboardLayout({
                           item.special && !isActive
                             ? "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-700 hover:from-pink-100 hover:to-purple-100 border border-pink-200"
                             : isActive
-                            ? "bg-primary text-white"
+                            ? "bg-[#A5744A] text-white"
                             : "text-gray-700 hover:bg-gray-100"
                         }`}
                       >
@@ -165,7 +165,7 @@ export default function DashboardLayout({
                         item.special && !isActive
                           ? "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-700 hover:from-pink-100 hover:to-purple-100 border border-pink-200"
                           : isActive
-                          ? "bg-primary text-white"
+                          ? "bg-[#A5744A] text-white"
                           : "text-gray-700 hover:bg-gray-100"
                       }`}
                     >
