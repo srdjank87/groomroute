@@ -145,17 +145,22 @@ export default function AppointmentsPage() {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Select Date
         </label>
-        <div
-          className="cursor-pointer"
-          onClick={() => dateInputRef.current?.showPicker?.()}
-        >
-          <input
-            ref={dateInputRef}
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="input input-bordered w-full h-12 cursor-pointer"
-          />
+        <div className="relative">
+          <div
+            className="cursor-pointer"
+            onClick={() => dateInputRef.current?.showPicker?.()}
+          >
+            <input
+              ref={dateInputRef}
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="input input-bordered w-full h-12 cursor-pointer opacity-0 absolute inset-0"
+            />
+            <div className="input input-bordered w-full h-12 cursor-pointer flex items-center">
+              {format(new Date(selectedDate + 'T00:00:00'), "EEEE, MMMM dd, yyyy")}
+            </div>
+          </div>
         </div>
       </div>
 

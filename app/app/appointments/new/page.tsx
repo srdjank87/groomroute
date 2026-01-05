@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import toast from "react-hot-toast";
 
 type Step = "customer" | "pet" | "datetime" | "details";
@@ -342,19 +343,24 @@ function NewAppointmentContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Date <span className="text-red-500">*</span>
                 </label>
-                <div
-                  className="cursor-pointer"
-                  onClick={() => dateInputRef.current?.showPicker?.()}
-                >
-                  <input
-                    ref={dateInputRef}
-                    type="date"
-                    value={appointmentData.date}
-                    onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
-                    min={todayStr}
-                    className="input input-bordered w-full h-12 text-base cursor-pointer"
-                    required
-                  />
+                <div className="relative">
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => dateInputRef.current?.showPicker?.()}
+                  >
+                    <input
+                      ref={dateInputRef}
+                      type="date"
+                      value={appointmentData.date}
+                      onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
+                      min={todayStr}
+                      className="input input-bordered w-full h-12 text-base cursor-pointer opacity-0 absolute inset-0"
+                      required
+                    />
+                    <div className="input input-bordered w-full h-12 text-base cursor-pointer flex items-center">
+                      {appointmentData.date ? format(new Date(appointmentData.date + 'T00:00:00'), "EEEE, MMMM dd, yyyy") : "Select a date"}
+                    </div>
+                  </div>
                 </div>
               </div>
 
