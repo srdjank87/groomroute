@@ -132,27 +132,19 @@ function DashboardContent() {
   }
 
   function startDriving() {
-    // Get incomplete appointments
-    const incompleteAppointments = todaysAppointments.filter(
-      (apt: any) => apt.status !== "COMPLETED" && apt.status !== "CANCELLED"
-    );
-
-    if (incompleteAppointments.length === 0) {
-      toast.error("No appointments to navigate to");
+    if (!stats?.nextAppointment) {
+      toast.error("No next appointment to navigate to");
       return;
     }
 
-    // Build Google Maps directions URL with waypoints
-    let url = "https://www.google.com/maps/dir/";
-
-    // Add all appointment addresses as waypoints
-    incompleteAppointments.forEach((apt: any) => {
-      url += encodeURIComponent(apt.customer.address) + "/";
-    });
+    // Build Google Maps directions URL from current location to next appointment
+    // Using empty string for origin triggers "Your Location" in Google Maps
+    const destination = encodeURIComponent(stats.nextAppointment.address);
+    const url = `https://www.google.com/maps/dir/?api=1&origin=&destination=${destination}&travelmode=driving`;
 
     // Open in new tab
     window.open(url, '_blank');
-    toast.success(`Opened route with ${incompleteAppointments.length} stops in Google Maps`);
+    toast.success("Opening directions to next stop");
   }
 
   async function generateDemoData() {
@@ -444,14 +436,14 @@ function DashboardContent() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => stats.nextAppointment && handleSkipAppointment(stats.nextAppointment.appointmentId)}
-                className="btn bg-red-500/80 hover:bg-red-500/30 border border-red-300/30 text-white gap-2 h-12"
+                className="btn bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white gap-2 h-12"
               >
                 <SkipForward className="h-4 w-4" />
                 <span className="text-sm">Skip</span>
               </button>
               <button
                 onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
-                className="btn bg-green-500/80 hover:bg-green-500/30 border border-green-300/30 text-white gap-2 h-12"
+                className="btn bg-green-500/80 hover:bg-green-500/90 border border-green-300/30 text-white gap-2 h-12"
               >
                 <CheckCircle className="h-4 w-4" />
                 <span className="text-sm">Mark Complete</span>
