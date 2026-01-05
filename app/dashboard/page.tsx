@@ -340,7 +340,7 @@ function DashboardContent() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Next Stop</h2>
             <div className="badge badge-lg bg-white/20 border-0 text-white">
-              {stats.appointments} appointments today
+              {stats.appointments} {stats.appointments === 1 ? 'appointment' : 'appointments'} today
             </div>
           </div>
 

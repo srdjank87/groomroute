@@ -483,7 +483,8 @@ function NewAppointmentContent() {
                 ) : (
                   <>
                     <Check className="h-4 w-4" />
-                    Book Appointment
+                    <span className="hidden sm:inline">Book Appointment</span>
+                    <span className="sm:hidden">Book</span>
                   </>
                 )}
               </button>

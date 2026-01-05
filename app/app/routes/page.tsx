@@ -309,7 +309,7 @@ export default function TodaysRoutePage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Today&apos;s Route</h1>
-            <p className="text-gray-600">{appointments.length} appointments • {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+            <p className="text-gray-600">{appointments.length} {appointments.length === 1 ? 'appointment' : 'appointments'} • {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
           </div>
           {unoptimizedAppointments.length > 0 && (
             <div className="flex gap-2">
