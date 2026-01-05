@@ -827,20 +827,18 @@ export default function TodaysRoutePage() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
-            {/* Start Driving - Primary */}
-            <button
-              onClick={() => openInMaps(nextAppointment.customer.address)}
-              className={`w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg ${
-                nextAppointment.status === "IN_PROGRESS"
-                  ? "bg-white/20 hover:bg-white/30 text-white"
-                  : "bg-[#A5744A] hover:bg-[#8B6239] text-white"
-              }`}
-            >
-              <Navigation className="h-6 w-6" />
-              Start Driving
-            </button>
+            {/* Start Driving - Only show when NOT in progress (groomer is already there when in progress) */}
+            {nextAppointment.status !== "IN_PROGRESS" && (
+              <button
+                onClick={() => openInMaps(nextAppointment.customer.address)}
+                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-[#A5744A] hover:bg-[#8B6239] text-white"
+              >
+                <Navigation className="h-6 w-6" />
+                Start Driving
+              </button>
+            )}
 
-            {/* Skip & Status actions - 3 column layout when IN_PROGRESS has Start Grooming */}
+            {/* Skip & Status actions */}
             {nextAppointment.status !== "COMPLETED" && nextAppointment.status !== "CANCELLED" && (
               <div className={`grid gap-2 ${nextAppointment.status === "CONFIRMED" ? "grid-cols-3" : "grid-cols-2"}`}>
                 {/* Start Grooming - Only show when CONFIRMED */}
