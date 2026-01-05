@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, MessageSquare, UserPlus, Coffee, X } from "lucide-react";
+import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, MessageSquare, UserPlus, Coffee, X, Play, ThumbsUp, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Appointment {
@@ -215,12 +215,10 @@ export default function TodaysRoutePage() {
   }
 
   function getStatusColor(appointment: Appointment): string {
-    const appointmentTime = new Date(appointment.startAt);
-    const now = currentTime;
-
     if (appointment.status === "COMPLETED") return "bg-green-100 border-green-300";
     if (appointment.status === "CANCELLED") return "bg-gray-100 border-gray-300";
-    if (appointmentTime < now) return "bg-amber-100 border-amber-300";
+    if (appointment.status === "IN_PROGRESS") return "bg-yellow-100 border-yellow-300";
+    if (appointment.status === "CONFIRMED") return "bg-emerald-50 border-emerald-200";
 
     return "bg-blue-50 border-blue-200";
   }
@@ -294,6 +292,72 @@ export default function TodaysRoutePage() {
     // Open in new tab
     window.open(url, '_blank');
     toast.success(`Opened route with ${validAppointments.length} stops in Google Maps`);
+  }
+
+  async function handleConfirmAppointment(appointmentId: string) {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "CONFIRMED" }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment confirmed");
+        await fetchTodaysRoute();
+      } else {
+        toast.error("Failed to confirm appointment");
+      }
+    } catch (error) {
+      console.error("Failed to confirm appointment:", error);
+      toast.error("Failed to confirm appointment");
+    }
+  }
+
+  async function handleStartAppointment(appointmentId: string) {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "IN_PROGRESS" }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment started");
+        await fetchTodaysRoute();
+      } else {
+        toast.error("Failed to start appointment");
+      }
+    } catch (error) {
+      console.error("Failed to start appointment:", error);
+      toast.error("Failed to start appointment");
+    }
+  }
+
+  async function handleCompleteAppointment(appointmentId: string) {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "COMPLETED" }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.nextAppointmentStarted) {
+          toast.success("Done! Next appointment started automatically");
+        } else {
+          toast.success("Appointment completed");
+        }
+        await fetchTodaysRoute();
+        await fetchBreakSuggestion();
+      } else {
+        toast.error("Failed to complete appointment");
+      }
+    } catch (error) {
+      console.error("Failed to complete appointment:", error);
+      toast.error("Failed to complete appointment");
+    }
   }
 
   async function optimizeRoute() {
@@ -552,11 +616,26 @@ export default function TodaysRoutePage() {
                   <span className="font-semibold text-gray-900">
                     {index + 1}. {formatTime(appointment.startAt)}
                   </span>
-                  {appointment.status === "COMPLETED" && (
-                    <span className="badge badge-success badge-sm">Completed</span>
+                  {appointment.status === "BOOKED" && (
+                    <span className="badge badge-info badge-sm">Booked</span>
                   )}
-                  {isPast && appointment.status !== "COMPLETED" && (
-                    <span className="badge badge-warning badge-sm">In Progress</span>
+                  {appointment.status === "CONFIRMED" && (
+                    <span className="badge badge-success badge-sm gap-1">
+                      <ThumbsUp className="h-3 w-3" />
+                      Confirmed
+                    </span>
+                  )}
+                  {appointment.status === "IN_PROGRESS" && (
+                    <span className="badge badge-warning badge-sm gap-1">
+                      <Play className="h-3 w-3" />
+                      In Progress
+                    </span>
+                  )}
+                  {appointment.status === "COMPLETED" && (
+                    <span className="badge badge-success badge-sm gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Completed
+                    </span>
                   )}
                 </div>
                 <span className="text-sm text-gray-600">{appointment.serviceMinutes} min</span>
@@ -606,6 +685,39 @@ export default function TodaysRoutePage() {
 
               {/* Action Buttons */}
               <div className="space-y-2 mt-3">
+                {/* Status Action Row */}
+                {appointment.status !== "COMPLETED" && appointment.status !== "CANCELLED" && (
+                  <div className="flex gap-2 mb-2">
+                    {appointment.status === "BOOKED" && (
+                      <button
+                        onClick={() => handleConfirmAppointment(appointment.id)}
+                        className="btn h-10 flex-1 bg-emerald-500 hover:bg-emerald-600 text-white border-0 gap-2"
+                      >
+                        <ThumbsUp className="h-4 w-4" />
+                        Confirm
+                      </button>
+                    )}
+                    {appointment.status === "CONFIRMED" && (
+                      <button
+                        onClick={() => handleStartAppointment(appointment.id)}
+                        className="btn h-10 flex-1 bg-blue-500 hover:bg-blue-600 text-white border-0 gap-2"
+                      >
+                        <Play className="h-4 w-4" />
+                        Start Grooming
+                      </button>
+                    )}
+                    {appointment.status === "IN_PROGRESS" && (
+                      <button
+                        onClick={() => handleCompleteAppointment(appointment.id)}
+                        className="btn h-10 flex-1 bg-green-500 hover:bg-green-600 text-white border-0 gap-2"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                        Complete
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {/* Contact Methods Row */}
                 {appointment.customer.phone && (
                   <div className="flex gap-2 flex-wrap">

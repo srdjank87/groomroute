@@ -5,7 +5,7 @@ import { z } from "zod";
 import { AppointmentStatus } from "@prisma/client";
 
 const updateAppointmentSchema = z.object({
-  status: z.enum(["BOOKED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "NO_SHOW"]).optional(),
+  status: z.enum(["BOOKED", "CONFIRMED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "NO_SHOW"]).optional(),
   startAt: z.string().optional(),
   serviceMinutes: z.number().optional(),
   price: z.number().optional(),
@@ -87,6 +87,12 @@ export async function PATCH(
 
     if (validatedData.status !== undefined) {
       updateData.status = validatedData.status as AppointmentStatus;
+
+      // When confirming, also set customerConfirmed and confirmedAt
+      if (validatedData.status === "CONFIRMED") {
+        updateData.customerConfirmed = true;
+        updateData.confirmedAt = new Date();
+      }
     }
 
     if (validatedData.startAt !== undefined) {
@@ -115,9 +121,49 @@ export async function PATCH(
       },
     });
 
+    // Auto-progress: When an appointment is completed, set the next one to IN_PROGRESS
+    let nextAppointmentStarted = false;
+    if (validatedData.status === "COMPLETED") {
+      // Get today's date range
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      // Find the next pending/confirmed appointment for today (sorted by time)
+      const nextAppointment = await prisma.appointment.findFirst({
+        where: {
+          accountId,
+          startAt: {
+            gte: today,
+            lt: tomorrow,
+          },
+          status: {
+            in: ["BOOKED", "CONFIRMED"],
+          },
+          id: {
+            not: appointmentId, // Exclude the one we just completed
+          },
+        },
+        orderBy: {
+          startAt: "asc",
+        },
+      });
+
+      // Auto-set the next appointment to IN_PROGRESS
+      if (nextAppointment) {
+        await prisma.appointment.update({
+          where: { id: nextAppointment.id },
+          data: { status: "IN_PROGRESS" },
+        });
+        nextAppointmentStarted = true;
+      }
+    }
+
     return NextResponse.json({
       success: true,
       appointment,
+      nextAppointmentStarted,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

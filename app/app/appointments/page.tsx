@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw } from "lucide-react";
+import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw, CheckCircle, Play, ThumbsUp } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -93,12 +93,81 @@ export default function AppointmentsPage() {
     const colors: Record<string, string> = {
       SCHEDULED: "bg-blue-100 text-blue-800",
       BOOKED: "bg-blue-100 text-blue-800",
+      CONFIRMED: "bg-emerald-100 text-emerald-800",
       IN_PROGRESS: "bg-yellow-100 text-yellow-800",
       COMPLETED: "bg-green-100 text-green-800",
       CANCELLED: "bg-red-100 text-red-800",
       NO_SHOW: "bg-gray-100 text-gray-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
+  };
+
+  const handleConfirmAppointment = async (appointmentId: string) => {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "CONFIRMED" }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment confirmed");
+        fetchAppointments();
+        fetchAllAppointments();
+      } else {
+        toast.error("Failed to confirm appointment");
+      }
+    } catch (error) {
+      console.error("Failed to confirm appointment:", error);
+      toast.error("Failed to confirm appointment");
+    }
+  };
+
+  const handleStartAppointment = async (appointmentId: string) => {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "IN_PROGRESS" }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment started");
+        fetchAppointments();
+        fetchAllAppointments();
+      } else {
+        toast.error("Failed to start appointment");
+      }
+    } catch (error) {
+      console.error("Failed to start appointment:", error);
+      toast.error("Failed to start appointment");
+    }
+  };
+
+  const handleCompleteAppointment = async (appointmentId: string) => {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "COMPLETED" }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.nextAppointmentStarted) {
+          toast.success("Done! Next appointment started automatically");
+        } else {
+          toast.success("Appointment completed");
+        }
+        fetchAppointments();
+        fetchAllAppointments();
+      } else {
+        toast.error("Failed to complete appointment");
+      }
+    } catch (error) {
+      console.error("Failed to complete appointment:", error);
+      toast.error("Failed to complete appointment");
+    }
   };
 
   const handleCancelAppointment = async (appointmentId: string) => {
@@ -259,6 +328,34 @@ export default function AppointmentsPage() {
               {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
               {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                 <div className="flex gap-2 pt-3 border-t border-gray-100">
+                  {/* Status-specific primary action */}
+                  {appointment.status === "BOOKED" && (
+                    <button
+                      onClick={() => handleConfirmAppointment(appointment.id)}
+                      className="btn btn-sm gap-2 flex-1 bg-emerald-500 hover:bg-emerald-600 text-white border-0"
+                    >
+                      <ThumbsUp className="h-4 w-4" />
+                      Confirm
+                    </button>
+                  )}
+                  {appointment.status === "CONFIRMED" && (
+                    <button
+                      onClick={() => handleStartAppointment(appointment.id)}
+                      className="btn btn-sm gap-2 flex-1 bg-blue-500 hover:bg-blue-600 text-white border-0"
+                    >
+                      <Play className="h-4 w-4" />
+                      Start
+                    </button>
+                  )}
+                  {appointment.status === "IN_PROGRESS" && (
+                    <button
+                      onClick={() => handleCompleteAppointment(appointment.id)}
+                      className="btn btn-sm gap-2 flex-1 bg-green-500 hover:bg-green-600 text-white border-0"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                      Complete
+                    </button>
+                  )}
                   <Link
                     href={`/app/appointments/${appointment.id}/edit`}
                     className="btn btn-ghost btn-sm gap-2 flex-1"
@@ -266,19 +363,11 @@ export default function AppointmentsPage() {
                     <Edit2 className="h-4 w-4" />
                     Modify
                   </Link>
-                  <Link
-                    href={`/app/appointments/${appointment.id}/reschedule`}
-                    className="btn btn-ghost btn-sm gap-2 flex-1"
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    Reschedule
-                  </Link>
                   <button
                     onClick={() => handleCancelAppointment(appointment.id)}
-                    className="btn btn-ghost btn-sm gap-2 flex-1 text-red-600 hover:bg-red-50"
+                    className="btn btn-ghost btn-sm gap-2 text-red-600 hover:bg-red-50"
                   >
                     <X className="h-4 w-4" />
-                    Cancel
                   </button>
                 </div>
               )}
@@ -387,6 +476,34 @@ export default function AppointmentsPage() {
                 {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
                 {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
+                    {/* Status-specific primary action */}
+                    {appointment.status === "BOOKED" && (
+                      <button
+                        onClick={() => handleConfirmAppointment(appointment.id)}
+                        className="btn btn-sm gap-2 flex-1 bg-emerald-500 hover:bg-emerald-600 text-white border-0"
+                      >
+                        <ThumbsUp className="h-4 w-4" />
+                        Confirm
+                      </button>
+                    )}
+                    {appointment.status === "CONFIRMED" && (
+                      <button
+                        onClick={() => handleStartAppointment(appointment.id)}
+                        className="btn btn-sm gap-2 flex-1 bg-blue-500 hover:bg-blue-600 text-white border-0"
+                      >
+                        <Play className="h-4 w-4" />
+                        Start
+                      </button>
+                    )}
+                    {appointment.status === "IN_PROGRESS" && (
+                      <button
+                        onClick={() => handleCompleteAppointment(appointment.id)}
+                        className="btn btn-sm gap-2 flex-1 bg-green-500 hover:bg-green-600 text-white border-0"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                        Complete
+                      </button>
+                    )}
                     <Link
                       href={`/app/appointments/${appointment.id}/edit`}
                       className="btn btn-ghost btn-sm gap-2 flex-1"
@@ -394,19 +511,11 @@ export default function AppointmentsPage() {
                       <Edit2 className="h-4 w-4" />
                       Modify
                     </Link>
-                    <Link
-                      href={`/app/appointments/${appointment.id}/reschedule`}
-                      className="btn btn-ghost btn-sm gap-2 flex-1"
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                      Reschedule
-                    </Link>
                     <button
                       onClick={() => handleCancelAppointment(appointment.id)}
-                      className="btn btn-ghost btn-sm gap-2 flex-1 text-red-600 hover:bg-red-50"
+                      className="btn btn-ghost btn-sm gap-2 text-red-600 hover:bg-red-50"
                     >
                       <X className="h-4 w-4" />
-                      Cancel
                     </button>
                   </div>
                 )}
