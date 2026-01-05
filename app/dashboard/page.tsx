@@ -286,7 +286,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className={`max-w-7xl mx-auto pb-20 ${isFullscreen ? 'fixed inset-0 z-[60] bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] overflow-auto max-w-none px-0 pb-0 pt-0' : ''}`}>
+    <div className={`max-w-7xl mx-auto pb-20 ${isFullscreen ? 'fixed inset-0 z-[60] bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] overflow-hidden max-w-none px-0 pb-0 pt-0' : ''}`}>
       {/* Demo Button - Only show when no appointments */}
       {!stats?.hasData && !isFullscreen && (
         <div className="mb-4 flex justify-end">
@@ -439,7 +439,7 @@ function DashboardContent() {
                   <img
                     src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=300x300&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                     alt="Location map"
-                    className={isFullscreen ? "w-[300px] h-[300px]" : "w-[150px] h-[150px] md:w-[300px] md:h-[300px]"}
+                    className={isFullscreen ? "w-[200px] h-[200px]" : "w-[150px] h-[150px] md:w-[300px] md:h-[300px]"}
                   />
                 </div>
               </div>
