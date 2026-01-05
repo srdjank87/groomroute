@@ -94,6 +94,28 @@ export async function PATCH(req: NextRequest) {
       updateData.defaultHasAssistant = Boolean(body.defaultHasAssistant);
     }
 
+    if (body.workingHoursStart !== undefined) {
+      // Validate format HH:MM
+      if (!/^\d{2}:\d{2}$/.test(body.workingHoursStart)) {
+        return NextResponse.json(
+          { error: "Working hours start must be in HH:MM format" },
+          { status: 400 }
+        );
+      }
+      updateData.workingHoursStart = body.workingHoursStart;
+    }
+
+    if (body.workingHoursEnd !== undefined) {
+      // Validate format HH:MM
+      if (!/^\d{2}:\d{2}$/.test(body.workingHoursEnd)) {
+        return NextResponse.json(
+          { error: "Working hours end must be in HH:MM format" },
+          { status: 400 }
+        );
+      }
+      updateData.workingHoursEnd = body.workingHoursEnd;
+    }
+
     const updatedGroomer = await prisma.groomer.update({
       where: { id: groomer.id },
       data: updateData,
@@ -102,6 +124,8 @@ export async function PATCH(req: NextRequest) {
         name: true,
         largeDogDailyLimit: true,
         defaultHasAssistant: true,
+        workingHoursStart: true,
+        workingHoursEnd: true,
       },
     });
 

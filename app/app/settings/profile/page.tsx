@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, Save, Dog, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Save, Dog, AlertTriangle, Clock } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -9,6 +9,8 @@ interface GroomerSettings {
   name: string;
   largeDogDailyLimit: number | null;
   defaultHasAssistant: boolean;
+  workingHoursStart: string;
+  workingHoursEnd: string;
 }
 
 export default function ProfileSettingsPage() {
@@ -17,6 +19,8 @@ export default function ProfileSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [largeDogLimit, setLargeDogLimit] = useState<string>("");
   const [hasAssistant, setHasAssistant] = useState(false);
+  const [workingHoursStart, setWorkingHoursStart] = useState("08:00");
+  const [workingHoursEnd, setWorkingHoursEnd] = useState("17:00");
 
   useEffect(() => {
     fetchSettings();
@@ -30,6 +34,8 @@ export default function ProfileSettingsPage() {
         setSettings(data.groomer);
         setLargeDogLimit(data.groomer.largeDogDailyLimit?.toString() || "");
         setHasAssistant(data.groomer.defaultHasAssistant);
+        setWorkingHoursStart(data.groomer.workingHoursStart || "08:00");
+        setWorkingHoursEnd(data.groomer.workingHoursEnd || "17:00");
       }
     } catch (error) {
       console.error("Failed to fetch settings:", error);
@@ -48,6 +54,8 @@ export default function ProfileSettingsPage() {
         body: JSON.stringify({
           largeDogDailyLimit: largeDogLimit === "" ? null : parseInt(largeDogLimit),
           defaultHasAssistant: hasAssistant,
+          workingHoursStart,
+          workingHoursEnd,
         }),
       });
 
@@ -156,6 +164,68 @@ export default function ProfileSettingsPage() {
               </div>
             </label>
           </div>
+        </div>
+      </div>
+
+      {/* Working Hours */}
+      <div className="bg-white rounded-xl border p-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Clock className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-gray-900">Working Hours</h2>
+            <p className="text-sm text-gray-500">
+              Set your typical working hours. You&apos;ll see warnings when booking outside these times.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Start Time
+            </label>
+            <input
+              type="time"
+              value={workingHoursStart}
+              onChange={(e) => setWorkingHoursStart(e.target.value)}
+              className="input input-bordered w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              End Time
+            </label>
+            <input
+              type="time"
+              value={workingHoursEnd}
+              onChange={(e) => setWorkingHoursEnd(e.target.value)}
+              className="input input-bordered w-full"
+            />
+          </div>
+        </div>
+
+        <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+          <p className="text-sm text-blue-800">
+            When booking appointments outside {workingHoursStart && workingHoursEnd ? (
+              <>
+                {(() => {
+                  const [h1, m1] = workingHoursStart.split(':');
+                  const hour1 = parseInt(h1);
+                  const period1 = hour1 >= 12 ? 'PM' : 'AM';
+                  const h12_1 = hour1 % 12 || 12;
+                  return `${h12_1}:${m1} ${period1}`;
+                })()} - {(() => {
+                  const [h2, m2] = workingHoursEnd.split(':');
+                  const hour2 = parseInt(h2);
+                  const period2 = hour2 >= 12 ? 'PM' : 'AM';
+                  const h12_2 = hour2 % 12 || 12;
+                  return `${h12_2}:${m2} ${period2}`;
+                })()}
+              </>
+            ) : "your working hours"}, you&apos;ll see a warning to help you stay balanced.
+          </p>
         </div>
       </div>
 

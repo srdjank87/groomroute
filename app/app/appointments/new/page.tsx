@@ -48,6 +48,23 @@ interface LargeDogCheck {
   remainingSlots: number | null;
 }
 
+interface WorkingHoursCheck {
+  time: string;
+  duration: number;
+  workingHours: {
+    start: string;
+    end: string;
+    startFormatted: string;
+    endFormatted: string;
+  };
+  isWithinWorkingHours: boolean;
+  startsBeforeWorkday: boolean;
+  startsAfterWorkday: boolean;
+  endsAfterWorkday: boolean;
+  minutesOutside: number;
+  outsideReason: string;
+}
+
 const LARGE_DOG_WEIGHT_THRESHOLD = 50;
 
 function NewAppointmentContent() {
@@ -77,6 +94,8 @@ function NewAppointmentContent() {
   const [groomerId, setGroomerId] = useState<string | null>(null);
   const [largeDogCheck, setLargeDogCheck] = useState<LargeDogCheck | null>(null);
   const [largeDogWarningDismissed, setLargeDogWarningDismissed] = useState(false);
+  const [workingHoursCheck, setWorkingHoursCheck] = useState<WorkingHoursCheck | null>(null);
+  const [workingHoursWarningDismissed, setWorkingHoursWarningDismissed] = useState(false);
 
   const dateInputRef = useRef<HTMLInputElement>(null);
   const timeInputRef = useRef<HTMLInputElement>(null);
@@ -119,6 +138,20 @@ function NewAppointmentContent() {
       }
     } catch (error) {
       console.error("Failed to fetch large dog count:", error);
+    }
+  }, []);
+
+  // Fetch working hours check for a time
+  const fetchWorkingHoursCheck = useCallback(async (time: string, duration: number) => {
+    try {
+      const response = await fetch(`/api/groomer/working-hours-check?time=${time}&duration=${duration}`);
+      if (response.ok) {
+        const data = await response.json();
+        setWorkingHoursCheck(data);
+        setWorkingHoursWarningDismissed(false); // Reset dismissal when time changes
+      }
+    } catch (error) {
+      console.error("Failed to fetch working hours check:", error);
     }
   }, []);
 
@@ -185,6 +218,15 @@ function NewAppointmentContent() {
       setLargeDogCheck(null);
     }
   }, [appointmentData.date, selectedPet, fetchLargeDogCheck]);
+
+  // Fetch working hours check when time changes
+  useEffect(() => {
+    if (appointmentData.time) {
+      fetchWorkingHoursCheck(appointmentData.time, appointmentData.serviceMinutes);
+    } else {
+      setWorkingHoursCheck(null);
+    }
+  }, [appointmentData.time, appointmentData.serviceMinutes, fetchWorkingHoursCheck]);
 
   // Helper to check if current booking would exceed limit
   const wouldExceedLargeDogLimit = () => {
@@ -613,6 +655,65 @@ function NewAppointmentContent() {
                 <p className="text-xs text-gray-500 mt-1">
                   Select your preferred arrival time
                 </p>
+
+                {/* Working hours warning */}
+                {workingHoursCheck && !workingHoursCheck.isWithinWorkingHours && !workingHoursWarningDismissed && (
+                  <div className="mt-2 p-3 rounded-lg text-sm bg-amber-50 text-amber-800 border border-amber-200">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <span className="font-medium block">
+                          Outside Working Hours
+                        </span>
+                        <p className="text-xs mt-1 text-amber-700">
+                          {workingHoursCheck.startsBeforeWorkday && (
+                            <>This appointment starts at {(() => {
+                              const [hours, minutes] = appointmentData.time.split(':');
+                              const hour = parseInt(hours);
+                              const period = hour >= 12 ? 'PM' : 'AM';
+                              const hour12 = hour % 12 || 12;
+                              return `${hour12}:${minutes} ${period}`;
+                            })()}, which is before your workday starts at {workingHoursCheck.workingHours.startFormatted}.</>
+                          )}
+                          {workingHoursCheck.startsAfterWorkday && (
+                            <>This appointment starts at {(() => {
+                              const [hours, minutes] = appointmentData.time.split(':');
+                              const hour = parseInt(hours);
+                              const period = hour >= 12 ? 'PM' : 'AM';
+                              const hour12 = hour % 12 || 12;
+                              return `${hour12}:${minutes} ${period}`;
+                            })()}, which is after your workday ends at {workingHoursCheck.workingHours.endFormatted}.</>
+                          )}
+                          {workingHoursCheck.endsAfterWorkday && !workingHoursCheck.startsAfterWorkday && (
+                            <>This {appointmentData.serviceMinutes}-minute appointment would end after your workday ends at {workingHoursCheck.workingHours.endFormatted}.</>
+                          )}
+                        </p>
+                        <p className="text-xs mt-2 text-amber-600">
+                          Your working hours are {workingHoursCheck.workingHours.startFormatted} - {workingHoursCheck.workingHours.endFormatted}. You can change this in Settings → Profile.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setWorkingHoursWarningDismissed(true)}
+                          className="mt-2 text-xs text-amber-600 underline hover:text-amber-800"
+                        >
+                          I understand, continue anyway
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Show working hours info when within hours */}
+                {workingHoursCheck && workingHoursCheck.isWithinWorkingHours && appointmentData.time && (
+                  <div className="mt-2 p-3 rounded-lg text-sm bg-green-50 text-green-800 border border-green-200">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <p className="text-xs">
+                        <span className="font-medium">Within working hours</span> ({workingHoursCheck.workingHours.startFormatted} - {workingHoursCheck.workingHours.endFormatted})
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
