@@ -279,8 +279,8 @@ export async function POST(req: NextRequest) {
       const date = new Date(today);
       date.setDate(today.getDate() - dayOffset);
 
-      // Random number of appointments between 6 and 10
-      const numAppointments = Math.floor(Math.random() * 5) + 6; // 6, 7, 8, 9, or 10
+      // Random number of appointments between 6 and 8
+      const numAppointments = Math.floor(Math.random() * 3) + 6; // 6, 7, or 8
 
       // Shuffle customers and pick the random number
       const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
