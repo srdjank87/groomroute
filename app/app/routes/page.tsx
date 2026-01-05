@@ -745,7 +745,9 @@ export default function TodaysRoutePage() {
             </h2>
             {/* Badge hidden on mobile - shown below buttons instead */}
             <p className="hidden sm:block text-white/60 text-sm">
-              {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1} more after this one
+              {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1 === 0
+                ? "Last one — you got this! 🎉"
+                : `${appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1} more after this one`}
             </p>
           </div>
 
@@ -894,7 +896,9 @@ export default function TodaysRoutePage() {
             {/* Appointments left - separate row on mobile */}
             <div className="flex justify-center sm:hidden mt-3">
               <p className="text-white/60 text-sm">
-                {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1} more after this one
+                {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1 === 0
+                  ? "Last one — you got this! 🎉"
+                  : `${appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1} more after this one`}
               </p>
             </div>
           </div>

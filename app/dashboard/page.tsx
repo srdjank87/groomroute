@@ -617,7 +617,9 @@ function DashboardContent() {
             <div className="flex items-center gap-2">
               {/* Badge hidden on mobile - shown below buttons instead */}
               <p className="hidden sm:block text-white/60 text-sm">
-                {stats.appointments - 1} more after this one
+                {stats.appointments - 1 === 0
+                  ? "Last one — you got this! 🎉"
+                  : `${stats.appointments - 1} more after this one`}
               </p>
               <button
                 onClick={toggleFullscreen}
@@ -777,7 +779,9 @@ function DashboardContent() {
             {/* Appointments left - separate row on mobile */}
             <div className="flex justify-center sm:hidden mt-3">
               <p className="text-white/60 text-sm">
-                {stats.appointments - 1} more after this one
+                {stats.appointments - 1 === 0
+                  ? "Last one — you got this! 🎉"
+                  : `${stats.appointments - 1} more after this one`}
               </p>
             </div>
           </div>
