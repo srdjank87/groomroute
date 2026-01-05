@@ -286,7 +286,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className={`max-w-7xl mx-auto pb-20 ${isFullscreen ? 'fixed inset-0 z-50 bg-gray-50 overflow-auto pt-20 max-w-none' : ''}`}>
+    <div className={`max-w-7xl mx-auto pb-20 ${isFullscreen ? 'fixed inset-0 z-50 bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] overflow-hidden pt-16 max-w-none px-0 pb-0' : ''}`}>
       {/* Demo Button - Only show when no appointments */}
       {!stats?.hasData && !isFullscreen && (
         <div className="mb-4 flex justify-end">
@@ -339,17 +339,14 @@ function DashboardContent() {
 
       {/* Hero Section - Today's Route */}
       {stats?.hasData && stats.nextAppointment ? (
-        <div className={`bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] rounded-xl shadow-lg text-white p-6 mb-6 border border-[#A5744A]/30 ${isFullscreen ? 'min-h-screen flex flex-col' : ''}`}>
+        <div className={`bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] text-white ${
+          isFullscreen
+            ? 'h-full flex flex-col p-6 rounded-none border-0 shadow-none'
+            : 'rounded-xl shadow-lg p-6 mb-6 border border-[#A5744A]/30'
+        }`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Next Stop</h2>
             <div className="flex items-center gap-2">
-              <button
-                onClick={toggleFullscreen}
-                className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1 md:hidden"
-                title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-              >
-                <Maximize className="h-4 w-4" />
-              </button>
               <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
                 {/* Remaining appointments = total - 1 (since we're showing the next one) */}
                 {stats.appointments - 1}{' '}
@@ -360,6 +357,13 @@ function DashboardContent() {
                   {stats.appointments - 1 === 1 ? 'appt' : 'appts'} left
                 </span>
               </div>
+              <button
+                onClick={toggleFullscreen}
+                className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1 md:hidden"
+                title={isFullscreen ? "Exit focus mode" : "Enter focus mode"}
+              >
+                <Maximize className="h-4 w-4" />
+              </button>
             </div>
           </div>
 
