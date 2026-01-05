@@ -610,16 +610,16 @@ function DashboardContent() {
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.weeklyRevenue.toFixed(0)}</p>
                 <p className="text-xs text-gray-600 mt-1">Weekly Revenue</p>
-                <p className="text-xs text-gray-500">{revenueStats.weeklyAppointments} appointments</p>
+                <p className="text-xs text-gray-500">{revenueStats.weeklyAppointments} jobs completed</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.monthlyRevenue.toFixed(0)}</p>
                 <p className="text-xs text-gray-600 mt-1">Monthly Revenue</p>
-                <p className="text-xs text-gray-500">{revenueStats.monthlyAppointments} appointments</p>
+                <p className="text-xs text-gray-500">{revenueStats.monthlyAppointments} jobs completed</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.avgRevenuePerAppointment.toFixed(0)}</p>
-                <p className="text-xs text-gray-600 mt-1">Avg per Appointment</p>
+                <p className="text-xs text-gray-600 mt-1">Avg per Job</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.avgRevenuePerCustomer.toFixed(0)}</p>

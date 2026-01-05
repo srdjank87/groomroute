@@ -25,16 +25,14 @@ export async function GET(req: NextRequest) {
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(today.getDate() - 29); // Including today = 30 days
 
-    // Fetch appointments for the last 30 days (completed or in progress)
+    // Fetch ONLY completed appointments for the last 30 days (actual revenue)
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
         startAt: {
           gte: thirtyDaysAgo,
         },
-        status: {
-          in: ["COMPLETED", "IN_PROGRESS", "BOOKED", "CONFIRMED"],
-        },
+        status: "COMPLETED",
       },
       select: {
         price: true,
@@ -97,13 +95,21 @@ export async function GET(req: NextRequest) {
     const avgRevenuePerCustomer =
       uniqueCustomers > 0 ? monthlyRevenue / uniqueCustomers : 0;
 
-    // Get completed appointments for completion rate
-    const completedAppointments = appointments.filter(
-      (apt) => apt.status === "COMPLETED"
-    ).length;
+    // Get total appointments (all statuses) for completion rate
+    const allAppointments = await prisma.appointment.count({
+      where: {
+        accountId,
+        startAt: {
+          gte: thirtyDaysAgo,
+        },
+        status: {
+          in: ["COMPLETED", "CANCELLED", "NO_SHOW"],
+        },
+      },
+    });
     const completionRate =
-      monthlyAppointments > 0
-        ? (completedAppointments / monthlyAppointments) * 100
+      allAppointments > 0
+        ? (monthlyAppointments / allAppointments) * 100
         : 0;
 
     return NextResponse.json({

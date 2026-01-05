@@ -307,8 +307,23 @@ export async function POST(req: NextRequest) {
         const priceVariation = Math.floor(Math.random() * 21) - 10; // -10 to +10
         const price = Math.max(50, basePrice + priceVariation);
 
-        // Mark appointments from past days as completed
+        // Determine appointment status for past days
+        // ~85% completed, ~10% cancelled, ~5% no-show
+        let status: string;
         const isPast = dayOffset > 0;
+
+        if (isPast) {
+          const randomValue = Math.random();
+          if (randomValue < 0.85) {
+            status = "COMPLETED";
+          } else if (randomValue < 0.95) {
+            status = "CANCELLED";
+          } else {
+            status = "NO_SHOW";
+          }
+        } else {
+          status = "CONFIRMED";
+        }
 
         await prisma.appointment.create({
           data: {
@@ -318,7 +333,7 @@ export async function POST(req: NextRequest) {
             petId: pet.id,
             startAt: appointmentTime,
             serviceMinutes: sampleData.duration,
-            status: isPast ? "COMPLETED" : "CONFIRMED",
+            status,
             appointmentType: "FULL_GROOM",
             price: price,
             customerConfirmed: true,
