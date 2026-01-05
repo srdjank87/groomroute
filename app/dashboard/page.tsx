@@ -603,25 +603,25 @@ function DashboardContent() {
                     {stats.contactMethods.includes("call") && (
                       <button
                         onClick={() => handleCall(stats.nextAppointment?.customerPhone)}
-                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
-                        <Phone className="h-5 w-5" />
+                        <Phone className="h-4 w-4" />
                         Call
                       </button>
                     )}
                     {stats.contactMethods.includes("sms") && (
                       <button
                         onClick={() => handleSMS(stats.nextAppointment?.customerPhone)}
-                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
-                        <MessageSquare className="h-5 w-5" />
+                        <MessageSquare className="h-4 w-4" />
                         SMS
                       </button>
                     )}
                     {stats.contactMethods.includes("whatsapp") && (
                       <button
                         onClick={() => handleWhatsApp(stats.nextAppointment?.customerPhone)}
-                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
                         💚 WhatsApp
                       </button>
@@ -629,7 +629,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("signal") && (
                       <button
                         onClick={() => handleSignal(stats.nextAppointment?.customerPhone)}
-                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
                         🔵 Signal
                       </button>
@@ -637,7 +637,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("telegram") && (
                       <button
                         onClick={() => handleTelegram(stats.nextAppointment?.customerPhone)}
-                        className="btn h-12 px-6 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
                       >
                         ✈️ Telegram
                       </button>
@@ -649,13 +649,12 @@ function DashboardContent() {
               {/* Column 2: Map Preview */}
               <div className="w-full md:w-auto flex justify-center md:justify-end">
                 <div className="rounded-lg overflow-hidden border-2 border-white/20">
-                  {/* Mobile: 150x150 (200x200 in fullscreen), Desktop: 300x300 */}
                   <Image
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=300x300&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=200x200&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                     alt="Location map"
-                    width={300}
-                    height={300}
-                    className={isFullscreen ? "w-[200px] h-[200px]" : "w-[150px] h-[150px] md:w-[300px] md:h-[300px]"}
+                    width={150}
+                    height={150}
+                    className={isFullscreen ? "w-[200px] h-[200px]" : "w-[150px] h-[150px]"}
                     unoptimized
                   />
                 </div>
@@ -665,37 +664,37 @@ function DashboardContent() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
-            {/* Primary: Start Driving - Full Width, Prominent */}
+            {/* Primary: Start Driving */}
             <button
               onClick={startDriving}
-              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-3 py-6 px-12 font-bold shadow-lg text-lg min-h-[80px]"
+              className="w-full bg-[#A5744A] hover:bg-[#8B6239] text-white font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
             >
               <Navigation className="h-6 w-6" />
-              <span>Start Driving</span>
+              Start Driving
             </button>
 
             {/* Secondary Actions - Skip & Complete */}
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => stats.nextAppointment && openSkipModal(stats.nextAppointment.appointmentId)}
-                className="btn bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white gap-2 h-11"
+                className="bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
-                <SkipForward className="h-4 w-4" />
-                <span>Skip</span>
+                <SkipForward className="h-5 w-5" />
+                Skip
               </button>
               <button
                 onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
-                className="btn bg-green-500/80 hover:bg-green-500/90 border border-green-300/30 text-white gap-2 h-11"
+                className="bg-green-500/80 hover:bg-green-500/90 border border-green-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
-                <CheckCircle className="h-4 w-4" />
-                <span>Complete</span>
+                <CheckCircle className="h-5 w-5" />
+                Complete
               </button>
             </div>
 
             {/* Appointments left - separate row on mobile */}
             <div className="flex justify-center sm:hidden mt-3">
               <p className="text-white/60 text-sm">
-                {stats.appointments - 1} more {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} after this one
+                {stats.appointments - 1} more after this one
               </p>
             </div>
           </div>

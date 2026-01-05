@@ -773,7 +773,7 @@ export default function TodaysRoutePage() {
             {/* Appointments left - separate row on mobile */}
             <div className="flex justify-center sm:hidden mt-3">
               <p className="text-white/60 text-sm">
-                {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1} more {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1 === 1 ? 'appointment' : 'appointments'} after this one
+                {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1} more after this one
               </p>
             </div>
           </div>
