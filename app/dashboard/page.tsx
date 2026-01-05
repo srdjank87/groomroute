@@ -286,7 +286,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className={`max-w-7xl mx-auto pb-20 ${isFullscreen ? 'fixed inset-0 z-50 bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] overflow-hidden pt-16 max-w-none px-0 pb-0' : ''}`}>
+    <div className={`max-w-7xl mx-auto pb-20 ${isFullscreen ? 'fixed inset-0 z-[60] bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] overflow-auto max-w-none px-0 pb-0 pt-0' : ''}`}>
       {/* Demo Button - Only show when no appointments */}
       {!stats?.hasData && !isFullscreen && (
         <div className="mb-4 flex justify-end">
@@ -341,7 +341,7 @@ function DashboardContent() {
       {stats?.hasData && stats.nextAppointment ? (
         <div className={`bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] text-white ${
           isFullscreen
-            ? 'h-full flex flex-col p-6 rounded-none border-0 shadow-none'
+            ? 'min-h-screen flex flex-col justify-center p-4 rounded-none border-0 shadow-none'
             : 'rounded-xl shadow-lg p-6 mb-6 border border-[#A5744A]/30'
         }`}>
           <div className="flex items-center justify-between mb-4">
@@ -359,10 +359,10 @@ function DashboardContent() {
               </div>
               <button
                 onClick={toggleFullscreen}
-                className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1 md:hidden"
+                className="btn btn-md bg-white/20 hover:bg-white/30 border-0 text-white gap-1 md:hidden px-4"
                 title={isFullscreen ? "Exit focus mode" : "Enter focus mode"}
               >
-                <Maximize className="h-4 w-4" />
+                <Maximize className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -371,21 +371,16 @@ function DashboardContent() {
             <div className="flex flex-col md:flex-row items-start gap-4">
               {/* Column 1: Info and Contact Methods */}
               <div className="flex-1 min-w-0 w-full">
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <MapPin className="h-6 w-6" />
-                  </div>
-                  <div className="flex-1 min-w-0 text-center md:text-left">
-                    <p className="font-bold text-lg mb-1">{stats.nextAppointment.customerName}</p>
-                    {stats.nextAppointment.petName && (
-                      <p className="text-white/80 text-sm mb-1">{stats.nextAppointment.petName} - {stats.nextAppointment.serviceType}</p>
-                    )}
-                    <p className="text-white/90 text-sm">{stats.nextAppointment.address}</p>
-                    <p className="text-white/80 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
-                      <Clock className="h-3 w-3" />
-                      {stats.nextAppointment.time}
-                    </p>
-                  </div>
+                <div className="text-center md:text-left">
+                  <p className="font-bold text-lg mb-1">{stats.nextAppointment.customerName}</p>
+                  {stats.nextAppointment.petName && (
+                    <p className="text-white/80 text-sm mb-1">{stats.nextAppointment.petName} - {stats.nextAppointment.serviceType}</p>
+                  )}
+                  <p className="text-white/90 text-sm">{stats.nextAppointment.address}</p>
+                  <p className="text-white/80 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
+                    <Clock className="h-3 w-3" />
+                    {stats.nextAppointment.time}
+                  </p>
                 </div>
 
                 {/* Contact Methods */}
