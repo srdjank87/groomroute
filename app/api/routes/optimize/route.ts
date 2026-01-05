@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getRouteEfficiencyRating, ROUTE_EFFICIENCY } from "@/lib/benchmarks";
 
 interface Location {
   id: string;
@@ -239,6 +240,34 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Calculate route details
+    const stops = optimizedLocations.length;
+    const avgMinutesBetweenStops = stops > 1
+      ? Math.round(totalDriveMinutes / (stops - 1))
+      : 0;
+
+    // Get route efficiency rating
+    const efficiencyRating = getRouteEfficiencyRating(avgMinutesBetweenStops);
+    const efficiency = ROUTE_EFFICIENCY[efficiencyRating].label;
+
+    // Calculate estimated finish time
+    const lastAppointment = appointments.find(
+      (a) => a.id === optimizedLocations[optimizedLocations.length - 1].id
+    );
+    let estimatedFinish: string | null = null;
+    if (lastAppointment) {
+      const lastScheduled = scheduledTimes.find((s) => s.id === lastAppointment.id);
+      if (lastScheduled) {
+        const finishTime = new Date(lastScheduled.newStartAt);
+        finishTime.setMinutes(finishTime.getMinutes() + lastAppointment.serviceMinutes);
+        const hours = finishTime.getUTCHours();
+        const minutes = finishTime.getUTCMinutes();
+        const period = hours >= 12 ? "PM" : "AM";
+        const hour12 = hours % 12 || 12;
+        estimatedFinish = `${hour12}:${minutes.toString().padStart(2, "0")} ${period}`;
+      }
+    }
+
     // Generate calm, affirming success message
     const calmMessages = [
       "Your day just got smoother",
@@ -249,11 +278,27 @@ export async function POST(req: NextRequest) {
     ];
     const calmMessage = calmMessages[Math.floor(Math.random() * calmMessages.length)];
 
+    // Format total drive time for display
+    const driveHours = Math.floor(totalDriveMinutes / 60);
+    const driveMinutesRemainder = totalDriveMinutes % 60;
+    const formattedDriveTime = driveHours > 0
+      ? `${driveHours}h ${driveMinutesRemainder}m`
+      : `${totalDriveMinutes}m`;
+
     return NextResponse.json({
       success: true,
       message: calmMessage,
+      estimatedFinish,
       appointmentsOptimized: updates.length,
       optimizedOrder: updates,
+      routeDetails: {
+        stops,
+        avgMinutesBetweenStops,
+        totalDriveMinutes,
+        formattedDriveTime,
+        efficiency,
+        totalDistanceMiles: Math.round(totalDistance * 10) / 10,
+      },
     });
   } catch (error) {
     console.error("Route optimization error:", error);

@@ -20,7 +20,12 @@ import {
   Maximize,
   Shield,
   Users,
-  Smile
+  Smile,
+  Coffee,
+  UserPlus,
+  ChevronDown,
+  ChevronUp,
+  Zap,
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
@@ -57,6 +62,74 @@ interface CalmImpact {
   weeklyAppointmentsSmooth: number;
   monthlyAppointmentsSmooth: number;
   calmImpactMessage: string;
+}
+
+interface DogsBySize {
+  small: number;
+  medium: number;
+  large: number;
+  giant: number;
+}
+
+interface TodayPerformance {
+  headline: string;
+  subtext: string;
+  softComparison: string;
+  dogsGroomed: number;
+  dogsScheduled: number;
+  dogsBySize: DogsBySize;
+  energyLoad: number;
+  largeDogCount: number;
+  revenue: number;
+  avgDriveMinutes: number | null;
+  estimatedFinish: string | null;
+  hasAssistant: boolean;
+  dayStatus: "not-started" | "in-progress" | "completed";
+}
+
+interface WeeklyPerformance {
+  headline: string;
+  subtext: string;
+  dogsGroomed: number;
+  dogsBySize: DogsBySize;
+  totalEnergyLoad: number;
+  revenue: number;
+  daysWorked: number;
+  avgDogsPerDay: number;
+  avgEnergyPerDay: number;
+  avgDriveMinutesPerStop: number | null;
+  avgRevenuePerDay: number;
+}
+
+interface IndustryInsights {
+  dogsPerDay: { industry: string; user30Day: number; comparison: string };
+  energyLoad: { industry: string; userAvg: number; comparison: string };
+  driveTime: { target: string; userAvg: number | null; comparison: string };
+  cancellationRate: { typical: string; user: number; comparison: string };
+  largeDogs: { typical: string; userAvg: number; comparison: string };
+}
+
+interface BreakStats {
+  breaksTakenToday: number;
+  totalBreakMinutes: number;
+  lastBreakTime: string | null;
+  scheduledBreaks: number;
+}
+
+interface PerformanceData {
+  today: TodayPerformance;
+  weekly: WeeklyPerformance;
+  insights: IndustryInsights;
+  routeEfficiency: {
+    rating: string;
+    ratingKey: string;
+    avgMinutesBetweenStops: number;
+    totalDriveMinutes: number;
+    totalStops: number;
+  } | null;
+  breakStats: BreakStats;
+  hasAssistant: boolean;
+  defaultHasAssistant: boolean;
 }
 
 interface RevenueStats {
@@ -98,10 +171,13 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const [stats, setStats] = useState<TodaysStats | null>(null);
   const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null);
+  const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingSample, setIsGeneratingSample] = useState(false);
   const [todaysAppointments, setTodaysAppointments] = useState<any[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
+  const [isTogglingAssistant, setIsTogglingAssistant] = useState(false);
 
   useEffect(() => {
     async function handleSetup() {
@@ -177,6 +253,13 @@ function DashboardContent() {
       if (revenueResponse.ok) {
         const revenueData = await revenueResponse.json();
         setRevenueStats(revenueData);
+      }
+
+      // Fetch performance data
+      const performanceResponse = await fetch("/api/dashboard/performance");
+      if (performanceResponse.ok) {
+        const perfData = await performanceResponse.json();
+        setPerformanceData(perfData);
       }
 
       // Also fetch today's appointments for Start Driving
@@ -329,6 +412,38 @@ function DashboardContent() {
     } catch (error) {
       console.error("Complete appointment error:", error);
       toast.error("Failed to complete appointment");
+    }
+  }
+
+  async function toggleAssistant() {
+    if (!performanceData) return;
+
+    setIsTogglingAssistant(true);
+    try {
+      const newValue = !performanceData.hasAssistant;
+      const response = await fetch("/api/routes/assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hasAssistant: newValue }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(data.message);
+        // Refresh performance data
+        const perfResponse = await fetch("/api/dashboard/performance");
+        if (perfResponse.ok) {
+          const perfData = await perfResponse.json();
+          setPerformanceData(perfData);
+        }
+      } else {
+        toast.error("Failed to update assistant status");
+      }
+    } catch (error) {
+      console.error("Toggle assistant error:", error);
+      toast.error("Failed to update assistant status");
+    } finally {
+      setIsTogglingAssistant(false);
     }
   }
 
@@ -591,6 +706,188 @@ function DashboardContent() {
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Today's Performance - Supportive Achievement */}
+      {performanceData && stats?.hasData && !isFullscreen && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div className="flex items-start justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Today&apos;s Performance</h3>
+            {/* Assistant Toggle */}
+            <button
+              onClick={toggleAssistant}
+              disabled={isTogglingAssistant}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                performanceData.hasAssistant
+                  ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              <UserPlus className="h-4 w-4" />
+              {performanceData.hasAssistant ? "With Bather" : "Solo"}
+            </button>
+          </div>
+
+          {/* Headline */}
+          <p className="text-2xl font-bold text-emerald-600 mb-1">
+            {performanceData.today.headline}
+          </p>
+          <p className="text-gray-600 mb-4">
+            {performanceData.today.subtext}
+          </p>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <div className="bg-gray-50 rounded-lg p-3 text-center">
+              <p className="text-xl font-bold text-gray-900">
+                {performanceData.today.dogsGroomed}/{performanceData.today.dogsScheduled}
+              </p>
+              <p className="text-xs text-gray-500">Dogs</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 text-center">
+              <p className="text-xl font-bold text-gray-900">
+                {performanceData.today.energyLoad}
+              </p>
+              <p className="text-xs text-gray-500">Energy Load</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 text-center">
+              <p className="text-xl font-bold text-gray-900">
+                {performanceData.today.largeDogCount}
+              </p>
+              <p className="text-xs text-gray-500">Large Dogs</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 text-center">
+              <p className="text-xl font-bold text-[#A5744A]">
+                ${performanceData.today.revenue.toFixed(0)}
+              </p>
+              <p className="text-xs text-gray-500">Revenue</p>
+            </div>
+          </div>
+
+          {/* Break Stats */}
+          {performanceData.breakStats && (
+            <div className="flex items-center gap-4 p-3 bg-amber-50 rounded-lg mb-4">
+              <Coffee className="h-5 w-5 text-amber-600" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">
+                  {performanceData.breakStats.breaksTakenToday === 0
+                    ? "No breaks yet today"
+                    : `${performanceData.breakStats.breaksTakenToday} break${performanceData.breakStats.breaksTakenToday !== 1 ? "s" : ""} taken`}
+                  {performanceData.breakStats.totalBreakMinutes > 0 &&
+                    ` (${performanceData.breakStats.totalBreakMinutes} min)`}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {performanceData.breakStats.breaksTakenToday === 0
+                    ? "Remember: rest isn't lazy, it's sustainable"
+                    : "Taking breaks protects your career longevity"}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Soft Comparison */}
+          <p className="text-sm text-gray-500 mb-4">
+            {performanceData.today.softComparison}
+          </p>
+
+          {/* Expandable Industry Insights */}
+          <button
+            onClick={() => setShowInsights(!showInsights)}
+            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            {showInsights ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            See industry insights
+          </button>
+
+          {showInsights && (
+            <div className="mt-3 p-4 bg-gray-50 rounded-lg">
+              <div className="grid gap-3 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Dogs per day</span>
+                  <div className="text-right">
+                    <span className="font-medium text-gray-900">
+                      {performanceData.insights.dogsPerDay.user30Day.toFixed(1)}
+                    </span>
+                    <span className="text-gray-400 text-xs ml-2">
+                      vs {performanceData.insights.dogsPerDay.industry}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Energy load</span>
+                  <div className="text-right">
+                    <span className="font-medium text-gray-900">
+                      {performanceData.insights.energyLoad.userAvg.toFixed(1)}
+                    </span>
+                    <span className="text-gray-400 text-xs ml-2">
+                      ({performanceData.insights.energyLoad.comparison})
+                    </span>
+                  </div>
+                </div>
+                {performanceData.insights.driveTime.userAvg !== null && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Avg drive time</span>
+                    <div className="text-right">
+                      <span className="font-medium text-gray-900">
+                        {performanceData.insights.driveTime.userAvg} min
+                      </span>
+                      <span className="text-gray-400 text-xs ml-2">
+                        (target: {performanceData.insights.driveTime.target})
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Cancellation rate</span>
+                  <div className="text-right">
+                    <span className="font-medium text-gray-900">
+                      {performanceData.insights.cancellationRate.user.toFixed(1)}%
+                    </span>
+                    <span className="text-gray-400 text-xs ml-2">
+                      (typical: {performanceData.insights.cancellationRate.typical})
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Large dogs/day</span>
+                  <div className="text-right">
+                    <span className="font-medium text-gray-900">
+                      {performanceData.insights.largeDogs.userAvg.toFixed(1)}
+                    </span>
+                    <span className="text-gray-400 text-xs ml-2">
+                      ({performanceData.insights.largeDogs.typical})
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Route Efficiency */}
+          {performanceData.routeEfficiency && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm text-gray-600">Route Efficiency</span>
+                </div>
+                <span className={`text-sm font-medium ${
+                  performanceData.routeEfficiency.ratingKey === "excellent"
+                    ? "text-green-600"
+                    : performanceData.routeEfficiency.ratingKey === "good"
+                      ? "text-blue-600"
+                      : "text-amber-600"
+                }`}>
+                  {performanceData.routeEfficiency.rating}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                {performanceData.routeEfficiency.avgMinutesBetweenStops} min avg between stops
+                {performanceData.today.estimatedFinish && ` · Est. finish: ${performanceData.today.estimatedFinish}`}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

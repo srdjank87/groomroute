@@ -80,24 +80,26 @@ enum SubscriptionStatus {
 
 // Groomer (person/vehicle)
 model Groomer {
-  id                String        @id @default(cuid())
-  accountId         String
-  account           Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  name              String
-  email             String?
-  phone             String?
-  baseAddress       String
-  baseLat           Float?
-  baseLng           Float?
-  geocodeStatus     GeocodeStatus @default(PENDING)
-  workingHoursStart String?       // HH:mm format
-  workingHoursEnd   String?       // HH:mm format
-  contactMethods    String[]      @default(["call", "sms"]) // call, sms, whatsapp, signal, telegram
-  isActive          Boolean       @default(true)
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  appointments      Appointment[]
-  routes            Route[]
+  id                  String        @id @default(cuid())
+  accountId           String
+  account             Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name                String
+  email               String?
+  phone               String?
+  baseAddress         String
+  baseLat             Float?
+  baseLng             Float?
+  geocodeStatus       GeocodeStatus @default(PENDING)
+  workingHoursStart   String?       // HH:mm format
+  workingHoursEnd     String?       // HH:mm format
+  contactMethods      String[]      @default(["call", "sms"]) // call, sms, whatsapp, signal, telegram
+  defaultHasAssistant Boolean       @default(false) // Default setting for working with a bather
+  isActive            Boolean       @default(true)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  appointments        Appointment[]
+  routes              Route[]
+  breaks              Break[]
 
   @@index([accountId])
   @@index([accountId, isActive])
@@ -254,6 +256,7 @@ model Route {
   totalServiceMinutes Int?
   efficiencyScore     Float?                 // 0-100, higher = better (work time / total time)
   estimatedGasCost    Float?
+  hasAssistant        Boolean                @default(false) // Per-day override for working with bather
   status              RouteStatus            @default(DRAFT)
   provider            String?                // google | mapbox | custom
   polyline            String?                @db.Text // Encoded polyline for map display
@@ -388,4 +391,31 @@ model GapFillNotification {
 
   @@index([accountId])
   @@index([routeId])
+}
+
+// Break tracking for groomer wellness
+model Break {
+  id          String    @id @default(cuid())
+  accountId   String
+  groomerId   String
+  groomer     Groomer   @relation(fields: [groomerId], references: [id], onDelete: Cascade)
+  breakDate   DateTime  @db.Date // Date only
+  startTime   DateTime? // Scheduled start time
+  endTime     DateTime? // Scheduled end time
+  breakType   BreakType @default(LUNCH)
+  taken       Boolean   @default(false) // Was the break actually taken?
+  takenAt     DateTime? // When the break was taken
+  durationMinutes Int?  // Actual duration if taken
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([accountId])
+  @@index([groomerId])
+  @@index([groomerId, breakDate])
+}
+
+enum BreakType {
+  LUNCH
+  SHORT_BREAK
+  HYDRATION
 }

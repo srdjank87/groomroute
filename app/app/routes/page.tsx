@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, MessageSquare } from "lucide-react";
+import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, MessageSquare, UserPlus, Coffee, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Appointment {
@@ -23,7 +23,41 @@ interface Appointment {
   pet: {
     name: string;
     size: string;
+    weight?: number;
   } | null;
+}
+
+interface RouteDetails {
+  stops: number;
+  avgMinutesBetweenStops: number;
+  totalDriveMinutes: number;
+  formattedDriveTime: string;
+  efficiency: string;
+  totalDistanceMiles: number;
+}
+
+interface OptimizationResult {
+  success: boolean;
+  message: string;
+  estimatedFinish: string | null;
+  appointmentsOptimized: number;
+  routeDetails?: RouteDetails;
+}
+
+interface BreakSuggestion {
+  shouldSuggest: boolean;
+  reason: string;
+  message: string;
+  subtext: string;
+  breakType: "lunch" | "short" | "hydration";
+  availableMinutes: number;
+  suggestedDurationMinutes: number;
+}
+
+interface AssistantStatus {
+  hasAssistant: boolean;
+  defaultHasAssistant: boolean;
+  hasRouteForToday: boolean;
 }
 
 export default function TodaysRoutePage() {
@@ -31,12 +65,19 @@ export default function TodaysRoutePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [optimizationMessage, setOptimizationMessage] = useState<string | null>(null);
+  const [optimizationResult, setOptimizationResult] = useState<OptimizationResult | null>(null);
   const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
+  const [assistantStatus, setAssistantStatus] = useState<AssistantStatus | null>(null);
+  const [isTogglingAssistant, setIsTogglingAssistant] = useState(false);
+  const [breakSuggestion, setBreakSuggestion] = useState<BreakSuggestion | null>(null);
+  const [isTakingBreak, setIsTakingBreak] = useState(false);
+  const [showBreakSuggestion, setShowBreakSuggestion] = useState(true);
 
   useEffect(() => {
     fetchTodaysRoute();
     fetchContactMethods();
+    fetchAssistantStatus();
+    fetchBreakSuggestion();
 
     // Update current time every minute
     const timer = setInterval(() => {
@@ -57,6 +98,90 @@ export default function TodaysRoutePage() {
       }
     } catch (error) {
       console.error("Error fetching contact methods:", error);
+    }
+  }
+
+  async function fetchAssistantStatus() {
+    try {
+      const response = await fetch('/api/routes/assistant');
+      if (response.ok) {
+        const data = await response.json();
+        setAssistantStatus(data);
+      }
+    } catch (error) {
+      console.error("Error fetching assistant status:", error);
+    }
+  }
+
+  async function fetchBreakSuggestion() {
+    try {
+      const response = await fetch('/api/breaks/suggest');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.suggestion?.shouldSuggest) {
+          setBreakSuggestion(data.suggestion);
+          setShowBreakSuggestion(true);
+        } else {
+          setBreakSuggestion(null);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching break suggestion:", error);
+    }
+  }
+
+  async function toggleAssistant() {
+    if (!assistantStatus) return;
+
+    setIsTogglingAssistant(true);
+    try {
+      const newValue = !assistantStatus.hasAssistant;
+      const response = await fetch('/api/routes/assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hasAssistant: newValue }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(data.message);
+        setAssistantStatus(prev => prev ? { ...prev, hasAssistant: newValue } : null);
+      } else {
+        toast.error("Failed to update assistant status");
+      }
+    } catch (error) {
+      console.error("Toggle assistant error:", error);
+      toast.error("Failed to update assistant status");
+    } finally {
+      setIsTogglingAssistant(false);
+    }
+  }
+
+  async function takeBreak(breakType: string) {
+    setIsTakingBreak(true);
+    try {
+      const response = await fetch('/api/breaks/take', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          breakType: breakType.toUpperCase().replace(' ', '_'),
+          durationMinutes: breakSuggestion?.suggestedDurationMinutes || 15,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(data.message);
+        setBreakSuggestion(null);
+        setShowBreakSuggestion(false);
+      } else {
+        toast.error("Failed to log break");
+      }
+    } catch (error) {
+      console.error("Take break error:", error);
+      toast.error("Failed to log break");
+    } finally {
+      setIsTakingBreak(false);
     }
   }
 
@@ -191,9 +316,11 @@ export default function TodaysRoutePage() {
 
       if (data.success) {
         toast.success(data.message);
-        setOptimizationMessage(data.message);
+        setOptimizationResult(data);
         // Refresh appointments to show new order
         await fetchTodaysRoute();
+        // Also refresh break suggestion since schedule changed
+        await fetchBreakSuggestion();
       } else {
         toast.error(data.message || "Could not optimize route");
       }
@@ -240,9 +367,26 @@ export default function TodaysRoutePage() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Today&apos;s Route</h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-2xl font-bold text-gray-900">Today&apos;s Route</h1>
+              {/* Assistant Toggle */}
+              {assistantStatus && (
+                <button
+                  onClick={toggleAssistant}
+                  disabled={isTogglingAssistant}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    assistantStatus.hasAssistant
+                      ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <UserPlus className="h-3.5 w-3.5" />
+                  {assistantStatus.hasAssistant ? "With Bather" : "Solo"}
+                </button>
+              )}
+            </div>
             <p className="text-gray-600">{appointments.length} {appointments.length === 1 ? 'appointment' : 'appointments'} • {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
           </div>
           {unoptimizedAppointments.length > 0 && (
@@ -272,14 +416,85 @@ export default function TodaysRoutePage() {
           )}
         </div>
 
-        {/* Optimization Success Message */}
-        {optimizationMessage && (
+        {/* Optimization Success Message - Enhanced */}
+        {optimizationResult && (
           <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-100 rounded-full">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-emerald-100 rounded-full flex-shrink-0">
                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
               </div>
-              <p className="text-emerald-900 font-medium">{optimizationMessage}</p>
+              <div className="flex-1">
+                <p className="text-emerald-900 font-semibold">{optimizationResult.message}</p>
+                {optimizationResult.estimatedFinish && (
+                  <p className="text-emerald-700 text-sm mt-1">
+                    Estimated finish: {optimizationResult.estimatedFinish}
+                  </p>
+                )}
+                {optimizationResult.routeDetails && (
+                  <div className="mt-3 pt-3 border-t border-emerald-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                    <div>
+                      <p className="text-emerald-600">Stops</p>
+                      <p className="font-medium text-emerald-900">{optimizationResult.routeDetails.stops}</p>
+                    </div>
+                    <div>
+                      <p className="text-emerald-600">Avg between</p>
+                      <p className="font-medium text-emerald-900">{optimizationResult.routeDetails.avgMinutesBetweenStops} min</p>
+                    </div>
+                    <div>
+                      <p className="text-emerald-600">Total drive</p>
+                      <p className="font-medium text-emerald-900">{optimizationResult.routeDetails.formattedDriveTime}</p>
+                    </div>
+                    <div>
+                      <p className="text-emerald-600">Efficiency</p>
+                      <p className="font-medium text-emerald-900">{optimizationResult.routeDetails.efficiency}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Break Suggestion */}
+        {breakSuggestion && showBreakSuggestion && (
+          <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-amber-100 rounded-full flex-shrink-0">
+                <Coffee className="h-5 w-5 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-amber-900 font-semibold">{breakSuggestion.message}</p>
+                    <p className="text-amber-700 text-sm mt-1">{breakSuggestion.subtext}</p>
+                  </div>
+                  <button
+                    onClick={() => setShowBreakSuggestion(false)}
+                    className="text-amber-400 hover:text-amber-600 p-1"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => takeBreak(breakSuggestion.breakType)}
+                    disabled={isTakingBreak}
+                    className="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0"
+                  >
+                    {isTakingBreak ? (
+                      <span className="loading loading-spinner loading-xs"></span>
+                    ) : (
+                      <>Take {breakSuggestion.suggestedDurationMinutes} min Break</>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setShowBreakSuggestion(false)}
+                    className="btn btn-sm btn-ghost text-amber-700"
+                  >
+                    Skip
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
