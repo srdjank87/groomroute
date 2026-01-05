@@ -154,7 +154,10 @@ function NewAppointmentContent() {
 
   // Get today's date as minimum (allow same-day appointments)
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${year}-${month}-${day}`;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
