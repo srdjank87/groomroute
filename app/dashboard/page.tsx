@@ -341,7 +341,7 @@ function DashboardContent() {
       {stats?.hasData && stats.nextAppointment ? (
         <div className={`bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] text-white ${
           isFullscreen
-            ? 'min-h-screen flex flex-col justify-center p-4 rounded-none border-0 shadow-none'
+            ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none'
             : 'rounded-xl shadow-lg p-6 mb-6 border border-[#A5744A]/30'
         }`}>
           <div className="flex items-center justify-between mb-4">
