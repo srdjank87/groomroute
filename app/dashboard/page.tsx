@@ -340,17 +340,17 @@ function DashboardContent() {
             <div className="flex flex-col md:flex-row items-start gap-4">
               {/* Column 1: Info and Contact Methods */}
               <div className="flex-1 min-w-0 w-full">
-                <div className="flex items-start gap-3">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-3">
                   <div className="flex-shrink-0 mt-1">
                     <MapPin className="h-6 w-6" />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 text-center md:text-left">
                     <p className="font-bold text-lg mb-1">{stats.nextAppointment.customerName}</p>
                     {stats.nextAppointment.petName && (
                       <p className="text-white/80 text-sm mb-1">{stats.nextAppointment.petName} - {stats.nextAppointment.serviceType}</p>
                     )}
                     <p className="text-white/90 text-sm">{stats.nextAppointment.address}</p>
-                    <p className="text-white/80 text-xs mt-2 flex items-center gap-1">
+                    <p className="text-white/80 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
                       <Clock className="h-3 w-3" />
                       {stats.nextAppointment.time}
                     </p>
@@ -359,7 +359,7 @@ function DashboardContent() {
 
                 {/* Contact Methods */}
                 {stats.nextAppointment.customerPhone && stats.contactMethods && stats.contactMethods.length > 0 && (
-                  <div className="flex gap-2 mt-3 flex-wrap">
+                  <div className="flex gap-2 mt-3 flex-wrap justify-center md:justify-start">
                     {stats.contactMethods.includes("call") && (
                       <button
                         onClick={() => handleCall(stats.nextAppointment?.customerPhone)}
@@ -420,41 +420,39 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* Action Buttons - Mobile: Single Column, Desktop: 2 Columns */}
-          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3">
-            {/* Column 1: Start Driving & Today's Route */}
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={startDriving}
-                className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 h-12 font-bold shadow-lg"
-              >
-                <Navigation className="h-5 w-5" />
-                <span>Start Driving</span>
-              </button>
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-3">
+            {/* Primary: Start Driving - Full Width, Prominent */}
+            <button
+              onClick={startDriving}
+              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-3 py-6 px-12 font-bold shadow-lg text-lg min-h-[80px]"
+            >
+              <Navigation className="h-6 w-6" />
+              <span>Start Driving</span>
+            </button>
+
+            {/* Secondary Actions - 3 Column Grid */}
+            <div className="grid grid-cols-3 gap-2">
               <Link
                 href="/app/routes"
-                className="btn btn-ghost border border-[#A5744A]/50 hover:bg-[#A5744A]/20 gap-2 h-12"
+                className="btn btn-ghost border border-[#A5744A]/50 hover:bg-[#A5744A]/20 gap-1 h-11 text-xs"
               >
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm">Today&apos;s Route</span>
+                <span className="hidden sm:inline">Route</span>
               </Link>
-            </div>
-
-            {/* Column 2: Skip & Mark Complete */}
-            <div className="flex flex-col gap-3">
               <button
                 onClick={() => stats.nextAppointment && handleSkipAppointment(stats.nextAppointment.appointmentId)}
-                className="btn bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white gap-2 h-12"
+                className="btn bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white gap-1 h-11 text-xs"
               >
                 <SkipForward className="h-4 w-4" />
-                <span className="text-sm">Skip</span>
+                <span className="hidden sm:inline">Skip</span>
               </button>
               <button
                 onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
-                className="btn bg-green-500/80 hover:bg-green-500/90 border border-green-300/30 text-white gap-2 h-12"
+                className="btn bg-green-500/80 hover:bg-green-500/90 border border-green-300/30 text-white gap-1 h-11 text-xs"
               >
                 <CheckCircle className="h-4 w-4" />
-                <span className="text-sm">Mark Complete</span>
+                <span className="hidden sm:inline">Done</span>
               </button>
             </div>
           </div>
