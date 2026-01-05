@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, MessageSquare, UserPlus, Coffee, X, Play, ThumbsUp, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -416,9 +417,12 @@ export default function TodaysRoutePage() {
     );
   }
 
-  const nextAppointment = appointments.find(apt =>
-    new Date(apt.startAt) > currentTime && apt.status !== "COMPLETED"
+  // Find the next appointment - first IN_PROGRESS, or first non-COMPLETED by startAt order
+  const inProgressAppointment = appointments.find(apt => apt.status === "IN_PROGRESS");
+  const nextPendingAppointment = appointments.find(apt =>
+    apt.status !== "COMPLETED" && apt.status !== "CANCELLED" && apt.status !== "IN_PROGRESS"
   );
+  const nextAppointment = inProgressAppointment || nextPendingAppointment;
 
   const unoptimizedAppointments = appointments.filter(
     (apt) => apt.status !== "COMPLETED" && apt.status !== "CANCELLED"
@@ -543,7 +547,7 @@ export default function TodaysRoutePage() {
                   <button
                     onClick={() => takeBreak(breakSuggestion.breakType)}
                     disabled={isTakingBreak}
-                    className="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0"
+                    className="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0 px-4"
                   >
                     {isTakingBreak ? (
                       <span className="loading loading-spinner loading-xs"></span>
@@ -576,26 +580,117 @@ export default function TodaysRoutePage() {
         )}
       </div>
 
-      {/* Next Up Card */}
+      {/* Next Stop Card - Enhanced Design */}
       {nextAppointment && (
-        <div className="mb-6 p-4 bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] rounded-xl shadow-lg text-white border border-[#A5744A]/30">
-          <div className="flex items-center gap-2 mb-2">
-            <Navigation className="h-5 w-5" />
-            <span className="font-semibold">Up Next</span>
+        <div className="mb-6 bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] rounded-xl shadow-lg text-white border border-[#A5744A]/30 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold">Next Stop - {formatTime(nextAppointment.startAt)}</h2>
+            <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
+              {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1} left
+            </div>
           </div>
-          <h3 className="text-xl font-bold mb-1">{nextAppointment.customer.name}</h3>
-          <p className="text-white/80 mb-3">{nextAppointment.pet?.name ? `${nextAppointment.pet.name} • ` : ''}{formatAppointmentType(nextAppointment.appointmentType)}</p>
-          <div className="flex items-center gap-2 text-sm mb-3">
-            <Clock className="h-4 w-4" />
-            <span>{formatTime(nextAppointment.startAt)} ({nextAppointment.serviceMinutes} min)</span>
+
+          <div className="bg-[#A5744A]/10 backdrop-blur-sm rounded-lg p-4 mb-4 border border-[#A5744A]/20">
+            <div className="flex flex-col md:flex-row items-start gap-4">
+              {/* Info Column */}
+              <div className="flex-1 min-w-0 w-full">
+                <div className="text-center md:text-left">
+                  <p className="font-bold text-lg mb-1">{nextAppointment.customer.name}</p>
+                  {nextAppointment.pet && (
+                    <p className="text-white/80 text-sm mb-1">{nextAppointment.pet.name} - {formatAppointmentType(nextAppointment.appointmentType)}</p>
+                  )}
+                  <p className="text-white/90 text-sm">{nextAppointment.customer.address}</p>
+                  <p className="text-white/80 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
+                    <Clock className="h-3 w-3" />
+                    {formatTime(nextAppointment.startAt)} ({nextAppointment.serviceMinutes} min)
+                  </p>
+                </div>
+
+                {/* Contact Methods */}
+                {nextAppointment.customer.phone && contactMethods.length > 0 && (
+                  <div className="flex gap-2 mt-3 flex-wrap justify-center md:justify-start">
+                    {contactMethods.includes("call") && (
+                      <button
+                        onClick={() => handleCall(nextAppointment.customer.phone!)}
+                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                      >
+                        <Phone className="h-4 w-4" />
+                        Call
+                      </button>
+                    )}
+                    {contactMethods.includes("sms") && (
+                      <button
+                        onClick={() => handleSMS(nextAppointment.customer.phone!)}
+                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        SMS
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Map Preview */}
+              <div className="w-full md:w-auto flex justify-center md:justify-end">
+                <div className="rounded-lg overflow-hidden border-2 border-white/20">
+                  <Image
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(nextAppointment.customer.address)}&zoom=15&size=200x200&maptype=roadmap&markers=color:red%7C${encodeURIComponent(nextAppointment.customer.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                    alt="Location map"
+                    width={150}
+                    height={150}
+                    className="w-[150px] h-[150px]"
+                    unoptimized
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-          <button
-            onClick={() => openInMaps(nextAppointment.customer.address)}
-            className="w-full bg-[#A5744A] hover:bg-[#8B6239] text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-          >
-            <Navigation className="h-5 w-5" />
-            Start Driving
-          </button>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-3">
+            {/* Start Driving - Primary */}
+            <button
+              onClick={() => openInMaps(nextAppointment.customer.address)}
+              className="w-full bg-[#A5744A] hover:bg-[#8B6239] text-white font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
+            >
+              <Navigation className="h-6 w-6" />
+              Start Driving
+            </button>
+
+            {/* Status actions - Confirm/Start/Complete */}
+            {nextAppointment.status !== "COMPLETED" && nextAppointment.status !== "CANCELLED" && (
+              <div className="flex gap-2">
+                {nextAppointment.status === "BOOKED" && (
+                  <button
+                    onClick={() => handleConfirmAppointment(nextAppointment.id)}
+                    className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <ThumbsUp className="h-5 w-5" />
+                    Confirm Appointment
+                  </button>
+                )}
+                {nextAppointment.status === "CONFIRMED" && (
+                  <button
+                    onClick={() => handleStartAppointment(nextAppointment.id)}
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Play className="h-5 w-5" />
+                    Start Grooming
+                  </button>
+                )}
+                {nextAppointment.status === "IN_PROGRESS" && (
+                  <button
+                    onClick={() => handleCompleteAppointment(nextAppointment.id)}
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle className="h-5 w-5" />
+                    Complete
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
