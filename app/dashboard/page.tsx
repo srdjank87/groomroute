@@ -337,20 +337,25 @@ function DashboardContent() {
           </div>
 
           <div className="bg-[#A5744A]/10 backdrop-blur-sm rounded-lg p-4 mb-4 border border-[#A5744A]/20">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 mt-1">
-                <MapPin className="h-6 w-6" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-lg mb-1">{stats.nextAppointment.customerName}</p>
-                {stats.nextAppointment.petName && (
-                  <p className="text-white/80 text-sm mb-1">{stats.nextAppointment.petName} - {stats.nextAppointment.serviceType}</p>
-                )}
-                <p className="text-white/90 text-sm">{stats.nextAppointment.address}</p>
-                <p className="text-white/80 text-xs mt-2 flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {stats.nextAppointment.time}
-                </p>
+            <div className="flex flex-col md:flex-row items-start gap-4">
+              {/* Column 1: Info and Contact Methods */}
+              <div className="flex-1 min-w-0 w-full">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <MapPin className="h-6 w-6" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-lg mb-1">{stats.nextAppointment.customerName}</p>
+                    {stats.nextAppointment.petName && (
+                      <p className="text-white/80 text-sm mb-1">{stats.nextAppointment.petName} - {stats.nextAppointment.serviceType}</p>
+                    )}
+                    <p className="text-white/90 text-sm">{stats.nextAppointment.address}</p>
+                    <p className="text-white/80 text-xs mt-2 flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {stats.nextAppointment.time}
+                    </p>
+                  </div>
+                </div>
 
                 {/* Contact Methods */}
                 {stats.nextAppointment.customerPhone && stats.contactMethods && stats.contactMethods.length > 0 && (
@@ -399,13 +404,16 @@ function DashboardContent() {
                     )}
                   </div>
                 )}
+              </div>
 
-                {/* Map Preview */}
-                <div className="mt-3 mb-3 rounded-lg overflow-hidden border-2 border-white/20 mx-auto max-w-xs">
+              {/* Column 2: Map Preview */}
+              <div className="w-full md:w-auto flex justify-center md:justify-end">
+                <div className="rounded-lg overflow-hidden border-2 border-white/20">
+                  {/* Mobile: 200x200, Desktop: 300x300 */}
                   <img
                     src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=300x300&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                     alt="Location map"
-                    className="w-full h-auto"
+                    className="w-[200px] h-[200px] md:w-[300px] md:h-[300px]"
                   />
                 </div>
               </div>
