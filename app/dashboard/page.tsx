@@ -149,6 +149,32 @@ function DashboardContent() {
     toast.success(`Opened route with ${incompleteAppointments.length} stops in Google Maps`);
   }
 
+  async function generateDemoData() {
+    if (!confirm("This will create 5 demo appointments for today. Continue?")) {
+      return;
+    }
+
+    setIsGeneratingSample(true);
+    try {
+      const response = await fetch("/api/dashboard/generate-sample", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        toast.success("Demo appointments created! Refreshing...");
+        await fetchDashboardData();
+      } else {
+        const error = await response.json();
+        toast.error(error.error || "Failed to create demo data");
+      }
+    } catch (error) {
+      console.error("Demo data error:", error);
+      toast.error("Failed to create demo data");
+    } finally {
+      setIsGeneratingSample(false);
+    }
+  }
+
   if (isLoading || isGeneratingSample) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -164,6 +190,19 @@ function DashboardContent() {
 
   return (
     <div className="max-w-7xl mx-auto pb-20">
+      {/* Demo Button - Only show when no appointments */}
+      {!stats?.hasData && (
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={generateDemoData}
+            className="btn btn-sm bg-purple-600 hover:bg-purple-700 text-white border-0 gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            Generate Demo Appointments
+          </button>
+        </div>
+      )}
+
       {/* Trial/Subscription Status */}
       <TrialStatus />
 
