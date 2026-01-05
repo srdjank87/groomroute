@@ -252,6 +252,7 @@ export async function POST(req: NextRequest) {
           lat: geocodeResult.success ? geocodeResult.lat : null,
           lng: geocodeResult.success ? geocodeResult.lng : null,
           geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
+          locationVerified: geocodeResult.success, // Mark as verified if geocoded successfully
           notes: "[SAMPLE_DATA] This is sample data to demonstrate GroomRoute's features.",
         },
       });
@@ -274,14 +275,14 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Create appointments for today and the last 7 days (8 days total)
-    // Random number of appointments (6-8) per day with staggered times
-    for (let dayOffset = 7; dayOffset >= 0; dayOffset--) {
+    // Create appointments for today and the last 14 days (15 days total)
+    // Random number of appointments (4-8) per day with staggered times
+    for (let dayOffset = 14; dayOffset >= 0; dayOffset--) {
       const date = new Date(today);
       date.setDate(today.getDate() - dayOffset);
 
-      // Random number of appointments between 6 and 8
-      const numAppointments = Math.floor(Math.random() * 3) + 6; // 6, 7, or 8
+      // Random number of appointments between 4 and 8
+      const numAppointments = Math.floor(Math.random() * 5) + 4; // 4, 5, 6, 7, or 8
 
       // Shuffle customers and pick the random number
       const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
@@ -349,7 +350,7 @@ export async function POST(req: NextRequest) {
       success: true,
       customersCreated: SAMPLE_CUSTOMERS.length,
       appointmentsCreated: totalAppointmentsCreated,
-      daysGenerated: 8,
+      daysGenerated: 15,
     });
   } catch (error) {
     console.error("Generate sample data error:", error);

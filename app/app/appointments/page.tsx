@@ -414,7 +414,8 @@ export default function AppointmentsPage() {
                     return `${formatTime(hours, minutes)} - ${formatTime(endHours, endMinutes)}`;
                   })()}
                 </div>
-                <div className="flex items-center gap-1">
+                {/* Address hidden on mobile to save space */}
+                <div className="hidden sm:flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
                   {appointment.customer.address}
                 </div>
@@ -591,7 +592,8 @@ export default function AppointmentsPage() {
                       return `${formatTime(hours, minutes)} - ${formatTime(endHours, endMinutes)}`;
                     })()}
                   </div>
-                  <div className="flex items-center gap-1">
+                  {/* Address hidden on mobile to save space */}
+                  <div className="hidden sm:flex items-center gap-1">
                     <MapPin className="h-4 w-4" />
                     {appointment.customer.address}
                   </div>

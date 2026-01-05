@@ -25,6 +25,8 @@ import {
   ChevronDown,
   ChevronUp,
   Zap,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
@@ -177,6 +179,18 @@ function DashboardContent() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showInsights, setShowInsights] = useState(false);
   const [isTogglingAssistant, setIsTogglingAssistant] = useState(false);
+  const [showSkipModal, setShowSkipModal] = useState(false);
+  const [skipAppointmentId, setSkipAppointmentId] = useState<string | null>(null);
+  const [skipReason, setSkipReason] = useState<string>("");
+  const [skipNotes, setSkipNotes] = useState("");
+  const [isSkipping, setIsSkipping] = useState(false);
+  const [skipWarning, setSkipWarning] = useState<{
+    message: string;
+    customerName: string;
+    cancellations: number;
+    noShows: number;
+    suggestions: string[];
+  } | null>(null);
 
   useEffect(() => {
     async function handleSetup() {
@@ -370,20 +384,50 @@ function DashboardContent() {
     window.location.href = `tg://resolve?phone=${phone}`;
   }
 
-  async function handleSkipAppointment(appointmentId: string) {
-    if (!confirm("Skip this appointment?")) {
+  function openSkipModal(appointmentId: string) {
+    setSkipAppointmentId(appointmentId);
+    setSkipReason("");
+    setSkipNotes("");
+    setSkipWarning(null);
+    setShowSkipModal(true);
+  }
+
+  function closeSkipModal() {
+    setShowSkipModal(false);
+    setSkipAppointmentId(null);
+    setSkipReason("");
+    setSkipNotes("");
+    setSkipWarning(null);
+  }
+
+  async function handleSkipAppointment() {
+    if (!skipAppointmentId || !skipReason) {
+      toast.error("Please select a reason");
       return;
     }
 
+    setIsSkipping(true);
     try {
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: "PATCH",
+      const response = await fetch(`/api/appointments/${skipAppointmentId}/skip`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "CANCELLED" }),
+        body: JSON.stringify({
+          reason: skipReason,
+          notes: skipNotes,
+        }),
       });
 
       if (response.ok) {
+        const data = await response.json();
         toast.success("Appointment skipped");
+
+        // Show warning modal if customer has issues
+        if (data.warning) {
+          setSkipWarning(data.warning);
+        } else {
+          closeSkipModal();
+        }
+
         await fetchDashboardData();
       } else {
         toast.error("Failed to skip appointment");
@@ -391,6 +435,8 @@ function DashboardContent() {
     } catch (error) {
       console.error("Skip appointment error:", error);
       toast.error("Failed to skip appointment");
+    } finally {
+      setIsSkipping(false);
     }
   }
 
@@ -522,10 +568,9 @@ function DashboardContent() {
             <h2 className="text-2xl font-bold">Next Stop - {formatTime(stats.nextAppointment.startAt)}</h2>
             <div className="flex items-center gap-2">
               {/* Badge hidden on mobile - shown below buttons instead */}
-              <div className="hidden sm:block badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
-                {stats.appointments - 1}{' '}
-                {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
-              </div>
+              <p className="hidden sm:block text-white/60 text-sm">
+                {stats.appointments - 1} more after this one
+              </p>
               <button
                 onClick={toggleFullscreen}
                 className="btn btn-md bg-white/20 hover:bg-white/30 border-0 text-white gap-1 md:hidden px-4"
@@ -632,7 +677,7 @@ function DashboardContent() {
             {/* Secondary Actions - Skip & Complete */}
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => stats.nextAppointment && handleSkipAppointment(stats.nextAppointment.appointmentId)}
+                onClick={() => stats.nextAppointment && openSkipModal(stats.nextAppointment.appointmentId)}
                 className="btn bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white gap-2 h-11"
               >
                 <SkipForward className="h-4 w-4" />
@@ -647,12 +692,11 @@ function DashboardContent() {
               </button>
             </div>
 
-            {/* Appointments left badge - separate row on mobile */}
-            <div className="flex justify-center sm:hidden">
-              <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
-                {stats.appointments - 1}{' '}
-                {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
-              </div>
+            {/* Appointments left - separate row on mobile */}
+            <div className="flex justify-center sm:hidden mt-3">
+              <p className="text-white/60 text-sm">
+                {stats.appointments - 1} more {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} after this one
+              </p>
             </div>
           </div>
         </div>
@@ -1069,6 +1113,168 @@ function DashboardContent() {
           </div>
         </div>
       </div>
+      )}
+
+      {/* Skip Appointment Modal */}
+      {showSkipModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            {!skipWarning ? (
+              // Reason selection view
+              <>
+                <div className="flex items-center justify-between p-4 border-b">
+                  <h3 className="text-lg font-semibold">Skip Appointment</h3>
+                  <button onClick={closeSkipModal} className="btn btn-ghost btn-sm btn-circle">
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="p-4">
+                  <p className="text-gray-600 mb-4">Why are you skipping this appointment?</p>
+
+                  <div className="space-y-2 mb-4">
+                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "CANCELLED" ? "border-red-500 bg-red-50" : "hover:bg-gray-50"}`}>
+                      <input
+                        type="radio"
+                        name="skipReason"
+                        value="CANCELLED"
+                        checked={skipReason === "CANCELLED"}
+                        onChange={(e) => setSkipReason(e.target.value)}
+                        className="radio radio-error"
+                      />
+                      <div>
+                        <p className="font-medium">Customer Cancelled</p>
+                        <p className="text-sm text-gray-500">Customer requested to cancel</p>
+                      </div>
+                    </label>
+
+                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "NO_SHOW" ? "border-red-500 bg-red-50" : "hover:bg-gray-50"}`}>
+                      <input
+                        type="radio"
+                        name="skipReason"
+                        value="NO_SHOW"
+                        checked={skipReason === "NO_SHOW"}
+                        onChange={(e) => setSkipReason(e.target.value)}
+                        className="radio radio-error"
+                      />
+                      <div>
+                        <p className="font-medium">No Show</p>
+                        <p className="text-sm text-gray-500">Customer didn&apos;t show up or respond</p>
+                      </div>
+                    </label>
+
+                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "RESCHEDULED" ? "border-blue-500 bg-blue-50" : "hover:bg-gray-50"}`}>
+                      <input
+                        type="radio"
+                        name="skipReason"
+                        value="RESCHEDULED"
+                        checked={skipReason === "RESCHEDULED"}
+                        onChange={(e) => setSkipReason(e.target.value)}
+                        className="radio radio-info"
+                      />
+                      <div>
+                        <p className="font-medium">Rescheduled</p>
+                        <p className="text-sm text-gray-500">Moving to a different date/time</p>
+                      </div>
+                    </label>
+
+                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "OTHER" ? "border-gray-500 bg-gray-50" : "hover:bg-gray-50"}`}>
+                      <input
+                        type="radio"
+                        name="skipReason"
+                        value="OTHER"
+                        checked={skipReason === "OTHER"}
+                        onChange={(e) => setSkipReason(e.target.value)}
+                        className="radio"
+                      />
+                      <div>
+                        <p className="font-medium">Other</p>
+                        <p className="text-sm text-gray-500">Another reason</p>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Notes (optional)
+                    </label>
+                    <textarea
+                      value={skipNotes}
+                      onChange={(e) => setSkipNotes(e.target.value)}
+                      placeholder="Add any additional notes..."
+                      className="textarea textarea-bordered w-full"
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={closeSkipModal}
+                      className="btn btn-ghost flex-1"
+                      disabled={isSkipping}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSkipAppointment}
+                      className="btn bg-red-500 hover:bg-red-600 text-white flex-1"
+                      disabled={!skipReason || isSkipping}
+                    >
+                      {isSkipping ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        "Skip Appointment"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              // Warning view
+              <>
+                <div className="p-4 bg-amber-50 border-b border-amber-200">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-amber-100 rounded-full">
+                      <AlertTriangle className="h-6 w-6 text-amber-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-amber-900">Customer Alert</h3>
+                      <p className="text-sm text-amber-700">{skipWarning.message}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <div className="flex gap-4 mb-4">
+                    <div className="flex-1 p-3 bg-red-50 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-red-600">{skipWarning.cancellations}</p>
+                      <p className="text-sm text-red-700">Cancellations</p>
+                    </div>
+                    <div className="flex-1 p-3 bg-gray-50 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-gray-600">{skipWarning.noShows}</p>
+                      <p className="text-sm text-gray-700">No Shows</p>
+                    </div>
+                  </div>
+
+                  <h4 className="font-medium text-gray-900 mb-2">Suggestions:</h4>
+                  <ul className="space-y-2 mb-4">
+                    {skipWarning.suggestions.map((suggestion, index) => (
+                      <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                        <span className="text-amber-500 mt-0.5">•</span>
+                        {suggestion}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={closeSkipModal}
+                    className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white w-full"
+                  >
+                    Got it
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

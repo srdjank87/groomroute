@@ -132,6 +132,11 @@ model Customer {
   accessInstructions String?             @db.Text // How to access property
   locationVerified   Boolean             @default(false) // Groomer confirmed on first visit
   notes              String?             @db.Text
+  // Cancellation/No-show tracking
+  cancellationCount  Int                 @default(0) // Total cancellations
+  noShowCount        Int                 @default(0) // Total no-shows
+  lastCancellationAt DateTime?           // When last cancelled
+  lastNoShowAt       DateTime?           // When last no-showed
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   pets               Pet[]
