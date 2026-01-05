@@ -242,9 +242,10 @@ export default function TodaysRoutePage() {
   }
 
   function openInMaps(address: string) {
-    // Opens in phone's default maps app
+    // Opens Google Maps with directions from current location to destination
     const encodedAddress = encodeURIComponent(address);
-    window.open(`https://maps.google.com/?q=${encodedAddress}`, '_blank');
+    // Using 'dir' mode with empty origin uses device's current location
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`, '_blank');
   }
 
   function handleCall(phone: string) {
