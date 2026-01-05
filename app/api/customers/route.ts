@@ -139,6 +139,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search");
 
+    // Get customers with appointments for revenue and activity calculations
     const customers = await prisma.customer.findMany({
       where: {
         accountId,
@@ -155,14 +156,42 @@ export async function GET(req: NextRequest) {
         _count: {
           select: { appointments: true },
         },
+        appointments: {
+          select: {
+            price: true,
+            startAt: true,
+            status: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
-      take: 50,
     });
 
-    return NextResponse.json({ customers });
+    // Calculate revenue and last appointment date for each customer
+    const customersWithMetrics = customers.map((customer) => {
+      const totalRevenue = customer.appointments.reduce((sum, apt) => sum + apt.price, 0);
+      const sortedAppointments = customer.appointments
+        .filter((apt) => apt.status !== "CANCELLED")
+        .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime());
+      const lastAppointmentDate = sortedAppointments.length > 0 ? sortedAppointments[0].startAt : null;
+
+      return {
+        id: customer.id,
+        name: customer.name,
+        phone: customer.phone,
+        email: customer.email,
+        address: customer.address,
+        createdAt: customer.createdAt,
+        pets: customer.pets,
+        _count: customer._count,
+        totalRevenue,
+        lastAppointmentDate,
+      };
+    });
+
+    return NextResponse.json({ customers: customersWithMetrics });
   } catch (error) {
     console.error("Get customers error:", error);
     return NextResponse.json(

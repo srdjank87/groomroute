@@ -382,7 +382,13 @@ function NewAppointmentContent() {
                       required
                     />
                     <div className="input input-bordered w-full h-12 text-base cursor-pointer flex items-center">
-                      {appointmentData.time || "Select a time"}
+                      {appointmentData.time ? (() => {
+                        const [hours, minutes] = appointmentData.time.split(':');
+                        const hour = parseInt(hours);
+                        const period = hour >= 12 ? 'PM' : 'AM';
+                        const hour12 = hour % 12 || 12;
+                        return `${hour12}:${minutes} ${period}`;
+                      })() : "Select a time"}
                     </div>
                   </div>
                 </div>
