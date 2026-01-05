@@ -218,7 +218,13 @@ export default function AppointmentsPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-[#A5744A]">
+                  <p className={`font-semibold ${
+                    appointment.status === "COMPLETED"
+                      ? "text-green-600"
+                      : appointment.status === "CANCELLED" || appointment.status === "NO_SHOW"
+                        ? "text-red-500"
+                        : "text-[#A5744A]"
+                  }`}>
                     ${appointment.price}
                   </p>
                 </div>
@@ -250,8 +256,8 @@ export default function AppointmentsPage() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && (
+              {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
+              {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                 <div className="flex gap-2 pt-3 border-t border-gray-100">
                   <Link
                     href={`/app/appointments/${appointment.id}/edit`}
@@ -340,7 +346,13 @@ export default function AppointmentsPage() {
                     <p className="text-sm text-gray-500 mb-1">
                       {format(new Date(appointment.startAt), "MMM d, yyyy")}
                     </p>
-                    <p className="font-semibold text-[#A5744A]">
+                    <p className={`font-semibold ${
+                      appointment.status === "COMPLETED"
+                        ? "text-green-600"
+                        : appointment.status === "CANCELLED" || appointment.status === "NO_SHOW"
+                          ? "text-red-500"
+                          : "text-[#A5744A]"
+                    }`}>
                       ${appointment.price}
                     </p>
                   </div>
@@ -372,8 +384,8 @@ export default function AppointmentsPage() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && (
+                {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
+                {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
                     <Link
                       href={`/app/appointments/${appointment.id}/edit`}

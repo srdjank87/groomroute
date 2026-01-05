@@ -599,22 +599,20 @@ function DashboardContent() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">This Week</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Time Protected */}
+            {/* Days Organized */}
             <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <Shield className="h-5 w-5 text-blue-600" />
               </div>
               <div>
                 <p className="text-xl font-bold text-gray-900">
-                  {revenueStats.calmImpact.weeklyTimeRecoveredMinutes >= 60
-                    ? `${Math.floor(revenueStats.calmImpact.weeklyTimeRecoveredMinutes / 60)}h ${revenueStats.calmImpact.weeklyTimeRecoveredMinutes % 60}m`
-                    : `${revenueStats.calmImpact.weeklyTimeRecoveredMinutes}m`}
+                  {revenueStats.calmImpact.weeklyOrganizedDays}
                 </p>
-                <p className="text-xs text-gray-600">Time protected</p>
+                <p className="text-xs text-gray-600">Days organized</p>
               </div>
             </div>
 
-            {/* Appointments Smooth */}
+            {/* Appointments Ran Smoothly */}
             <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
               <div className="p-2 bg-green-100 rounded-lg">
                 <CheckCircle className="h-5 w-5 text-green-600" />
@@ -623,7 +621,7 @@ function DashboardContent() {
                 <p className="text-xl font-bold text-gray-900">
                   {revenueStats.calmImpact.weeklyAppointmentsSmooth}
                 </p>
-                <p className="text-xs text-gray-600">Appointments smooth</p>
+                <p className="text-xs text-gray-600">Ran smoothly</p>
               </div>
             </div>
 
