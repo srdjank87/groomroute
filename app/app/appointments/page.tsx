@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw, CheckCircle, Play, ThumbsUp } from "lucide-react";
+import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw, CheckCircle, Play, ThumbsUp, Filter } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -25,6 +25,16 @@ interface Appointment {
   };
 }
 
+const STATUS_OPTIONS = [
+  { value: "ALL", label: "All Statuses" },
+  { value: "BOOKED", label: "Booked" },
+  { value: "CONFIRMED", label: "Confirmed" },
+  { value: "IN_PROGRESS", label: "In Progress" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "CANCELLED", label: "Cancelled" },
+  { value: "NO_SHOW", label: "No Show" },
+];
+
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
@@ -33,8 +43,33 @@ export default function AppointmentsPage() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   const dateInputRef = useRef<HTMLInputElement>(null);
+
+  // Check if selected date is today
+  const isToday = selectedDate === new Date().toISOString().split("T")[0];
+
+  // Format the section header based on selected date
+  const getSectionHeader = () => {
+    if (isToday) {
+      return "Today's Appointments";
+    }
+    const date = new Date(selectedDate + 'T00:00:00');
+    return format(date, "MMMM d") + " Appointments";
+  };
+
+  // Filter appointments by status
+  const filterByStatus = (appts: Appointment[]) => {
+    if (statusFilter === "ALL") return appts;
+    return appts.filter(apt => apt.status === statusFilter);
+  };
+
+  // Filter "Other Appointments" to exclude the selected date
+  const otherAppointments = allAppointments.filter(apt => {
+    const aptDate = new Date(apt.startAt).toISOString().split("T")[0];
+    return aptDate !== selectedDate;
+  });
 
   const fetchAppointments = useCallback(async () => {
     setIsLoading(true);
@@ -209,43 +244,82 @@ export default function AppointmentsPage() {
         </Link>
       </div>
 
-      {/* Date Picker */}
+      {/* Date Picker and Status Filter */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Select Date
-        </label>
-        <div className="relative">
-          <div
-            className="cursor-pointer"
-            onClick={() => dateInputRef.current?.showPicker?.()}
-          >
-            <input
-              ref={dateInputRef}
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="input input-bordered w-full h-12 cursor-pointer opacity-0 absolute inset-0"
-            />
-            <div className="input input-bordered w-full h-12 cursor-pointer flex items-center">
-              {format(new Date(selectedDate + 'T00:00:00'), "EEEE, MMMM dd, yyyy")}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Date Picker */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Date
+            </label>
+            <div className="relative">
+              <div
+                className="cursor-pointer"
+                onClick={() => dateInputRef.current?.showPicker?.()}
+              >
+                <input
+                  ref={dateInputRef}
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="input input-bordered w-full h-12 cursor-pointer opacity-0 absolute inset-0"
+                />
+                <div className="input input-bordered w-full h-12 cursor-pointer flex items-center">
+                  {format(new Date(selectedDate + 'T00:00:00'), "EEEE, MMMM dd, yyyy")}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Filter by Status
+            </label>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="select select-bordered w-full h-12 pl-10"
+              >
+                {STATUS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Section Header for Selected Date */}
+      <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+        {getSectionHeader()}
+        {statusFilter !== "ALL" && (
+          <span className="text-sm font-normal text-gray-500">
+            ({STATUS_OPTIONS.find(s => s.value === statusFilter)?.label})
+          </span>
+        )}
+      </h2>
 
       {/* Appointments List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
-      ) : appointments.length === 0 ? (
+      ) : filterByStatus(appointments).length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center">
           <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-3" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             No Appointments
           </h3>
           <p className="text-gray-600 mb-4">
-            No appointments scheduled for {format(new Date(selectedDate + 'T00:00:00'), "MMMM d, yyyy")}
+            {statusFilter !== "ALL"
+              ? `No ${STATUS_OPTIONS.find(s => s.value === statusFilter)?.label.toLowerCase()} appointments for ${format(new Date(selectedDate + 'T00:00:00'), "MMMM d, yyyy")}`
+              : `No appointments scheduled for ${format(new Date(selectedDate + 'T00:00:00'), "MMMM d, yyyy")}`
+            }
           </p>
           <Link
             href="/app/appointments/new"
@@ -257,7 +331,7 @@ export default function AppointmentsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {appointments.map((appointment) => (
+          {filterByStatus(appointments).map((appointment) => (
             <div
               key={appointment.id}
               className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4"
@@ -376,33 +450,43 @@ export default function AppointmentsPage() {
         </div>
       )}
 
-      {/* All Appointments Section */}
-      <div className="mt-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">All Appointments</h2>
+      {/* Other Appointments Section */}
+      <div className="mt-10 pt-6 border-t border-gray-200">
+        <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+          Other Appointments
+          {statusFilter !== "ALL" && (
+            <span className="text-sm font-normal text-gray-500">
+              ({STATUS_OPTIONS.find(s => s.value === statusFilter)?.label})
+            </span>
+          )}
+        </h2>
         {isLoadingAll ? (
           <div className="flex items-center justify-center py-12">
             <span className="loading loading-spinner loading-lg"></span>
           </div>
-        ) : allAppointments.length === 0 ? (
+        ) : filterByStatus(otherAppointments).length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-3" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Appointments Yet
+              No Other Appointments
             </h3>
             <p className="text-gray-600 mb-4">
-              You haven&apos;t scheduled any appointments yet
+              {statusFilter !== "ALL"
+                ? `No ${STATUS_OPTIONS.find(s => s.value === statusFilter)?.label.toLowerCase()} appointments on other dates`
+                : "No appointments scheduled on other dates"
+              }
             </p>
             <Link
               href="/app/appointments/new"
               className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
             >
               <Plus className="h-5 w-5" />
-              Schedule First Appointment
+              Schedule Appointment
             </Link>
           </div>
         ) : (
           <div className="space-y-3">
-            {allAppointments.map((appointment) => (
+            {filterByStatus(otherAppointments).map((appointment) => (
               <div
                 key={appointment.id}
                 className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4"
