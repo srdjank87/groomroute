@@ -31,10 +31,7 @@ export default function TodaysRoutePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [routeStats, setRouteStats] = useState<{
-    totalDistance?: number;
-    estimatedDriveTime?: number;
-  } | null>(null);
+  const [optimizationMessage, setOptimizationMessage] = useState<string | null>(null);
   const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
 
   useEffect(() => {
@@ -194,10 +191,7 @@ export default function TodaysRoutePage() {
 
       if (data.success) {
         toast.success(data.message);
-        setRouteStats({
-          totalDistance: data.totalDistance,
-          estimatedDriveTime: data.estimatedDriveTime,
-        });
+        setOptimizationMessage(data.message);
         // Refresh appointments to show new order
         await fetchTodaysRoute();
       } else {
@@ -278,18 +272,14 @@ export default function TodaysRoutePage() {
           )}
         </div>
 
-        {/* Route Stats */}
-        {routeStats && (
-          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-1 text-green-900">
-                <MapPin className="h-4 w-4" />
-                <span className="font-medium">{routeStats.totalDistance} miles</span>
+        {/* Optimization Success Message */}
+        {optimizationMessage && (
+          <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-100 rounded-full">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
               </div>
-              <div className="flex items-center gap-1 text-green-900">
-                <Clock className="h-4 w-4" />
-                <span className="font-medium">~{routeStats.estimatedDriveTime} min drive time</span>
-              </div>
+              <p className="text-emerald-900 font-medium">{optimizationMessage}</p>
             </div>
           </div>
         )}

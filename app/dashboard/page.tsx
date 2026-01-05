@@ -13,18 +13,26 @@ import {
   Plus,
   Calendar,
   CheckCircle,
-  TrendingDown,
   Sparkles,
   Phone,
   MessageSquare,
   SkipForward,
-  Maximize
+  Maximize,
+  Shield,
+  Users,
+  Smile
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
 
 interface TodaysStats {
   appointments: number;
+  totalAppointments: number;
+  confirmedCount: number;
+  completedCount: number;
+  dayStatus: "ready" | "in-progress" | "completed" | "no-appointments";
+  calmMessage: string;
+  hasRoute: boolean;
   nextAppointment?: {
     customerName: string;
     address: string;
@@ -34,12 +42,21 @@ interface TodaysStats {
     customerPhone?: string;
     appointmentId: string;
   };
-  timeSaved: number; // minutes
-  milesSaved: number;
-  estimatedGasSavings: number;
   hasData: boolean;
   showSampleData: boolean;
   contactMethods?: string[];
+}
+
+interface CalmImpact {
+  weeklyTimeRecoveredMinutes: number;
+  monthlyTimeRecoveredMinutes: number;
+  weeklyOrganizedDays: number;
+  monthlyOrganizedDays: number;
+  weeklyClientsServed: number;
+  monthlyClientsServed: number;
+  weeklyAppointmentsSmooth: number;
+  monthlyAppointmentsSmooth: number;
+  calmImpactMessage: string;
 }
 
 interface RevenueStats {
@@ -61,6 +78,7 @@ interface RevenueStats {
   avgRevenuePerCustomer: number;
   uniqueCustomers: number;
   completionRate: number;
+  calmImpact: CalmImpact;
 }
 
 // Format time from ISO string - display the UTC time as-is (not converted to local)
@@ -548,52 +566,95 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Savings Stats - Only show when there's data and not in fullscreen */}
+      {/* Day Status Card - Calm & Control messaging */}
       {stats?.hasData && !isFullscreen && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-5">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Clock className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.timeSaved} min</p>
-                <p className="text-sm text-gray-600">Time Saved Today</p>
-              </div>
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl shadow-sm border border-emerald-100 p-6 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-emerald-100 rounded-full">
+              <Smile className="h-7 w-7 text-emerald-600" />
             </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-5">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <TrendingDown className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.milesSaved} mi</p>
-                <p className="text-sm text-gray-600">Miles Saved</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-5">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <DollarSign className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">${stats.estimatedGasSavings.toFixed(2)}</p>
-                <p className="text-sm text-gray-600">Gas Saved</p>
-              </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {stats.dayStatus === "completed"
+                  ? "Day Complete"
+                  : stats.dayStatus === "in-progress"
+                    ? "Day in Progress"
+                    : "Your Day is Ready"}
+              </h3>
+              <p className="text-gray-600 text-sm mt-0.5">
+                {stats.totalAppointments} appointment{stats.totalAppointments !== 1 ? "s" : ""}
+                {stats.completedCount > 0 && ` · ${stats.completedCount} completed`}
+                {stats.confirmedCount > 0 && stats.completedCount === 0 && ` · All confirmed`}
+              </p>
+              <p className="text-emerald-700 font-medium mt-2 text-sm italic">
+                &ldquo;{stats.calmMessage}&rdquo;
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Revenue Stats - Only show when not in fullscreen */}
+      {/* This Week - Calm Impact Summary */}
+      {revenueStats?.calmImpact && !isFullscreen && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">This Week</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Time Protected */}
+            <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Shield className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-gray-900">
+                  {revenueStats.calmImpact.weeklyTimeRecoveredMinutes >= 60
+                    ? `${Math.floor(revenueStats.calmImpact.weeklyTimeRecoveredMinutes / 60)}h ${revenueStats.calmImpact.weeklyTimeRecoveredMinutes % 60}m`
+                    : `${revenueStats.calmImpact.weeklyTimeRecoveredMinutes}m`}
+                </p>
+                <p className="text-xs text-gray-600">Time protected</p>
+              </div>
+            </div>
+
+            {/* Appointments Smooth */}
+            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-gray-900">
+                  {revenueStats.calmImpact.weeklyAppointmentsSmooth}
+                </p>
+                <p className="text-xs text-gray-600">Appointments smooth</p>
+              </div>
+            </div>
+
+            {/* Clients Served */}
+            <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Users className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-gray-900">
+                  {revenueStats.calmImpact.weeklyClientsServed}
+                </p>
+                <p className="text-xs text-gray-600">Happy clients</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Calm Impact Message */}
+          {revenueStats.calmImpact.calmImpactMessage && (
+            <p className="text-center text-gray-500 text-sm mt-4 pt-4 border-t border-gray-100">
+              {revenueStats.calmImpact.calmImpactMessage}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Your Earnings - Only show when not in fullscreen */}
       {revenueStats && !isFullscreen && (
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Revenue Overview</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Your Earnings</h2>
           </div>
 
           {/* Revenue Chart */}

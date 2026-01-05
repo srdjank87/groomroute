@@ -239,12 +239,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Generate calm, affirming success message
+    const calmMessages = [
+      "Your day just got smoother",
+      "Schedule is now calm and controlled",
+      "Your route is set. You've got this",
+      "Day organized. Less stress ahead",
+      "Your schedule is sorted and ready",
+    ];
+    const calmMessage = calmMessages[Math.floor(Math.random() * calmMessages.length)];
+
     return NextResponse.json({
       success: true,
-      message: `Route optimized! ${updates.length} appointments reordered.`,
+      message: calmMessage,
+      appointmentsOptimized: updates.length,
       optimizedOrder: updates,
-      totalDistance: Math.round(totalDistance * 10) / 10, // Round to 1 decimal
-      estimatedDriveTime: totalDriveMinutes,
     });
   } catch (error) {
     console.error("Route optimization error:", error);

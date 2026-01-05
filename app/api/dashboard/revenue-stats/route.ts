@@ -17,9 +17,9 @@ export async function GET(req: NextRequest) {
     const today = new Date(now);
     today.setHours(0, 0, 0, 0);
 
-    // Last 7 days for chart
+    // Last 7 days for chart (excluding today)
     const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(today.getDate() - 6); // Including today = 7 days
+    sevenDaysAgo.setDate(today.getDate() - 7); // Previous 7 days, not including today
 
     // Last 30 days for monthly stats
     const thirtyDaysAgo = new Date(today);
@@ -64,9 +64,9 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Calculate daily revenue for last 7 days
+    // Calculate daily revenue for last 7 days (excluding today)
     const dailyRevenue = [];
-    for (let i = 6; i >= 0; i--) {
+    for (let i = 7; i >= 1; i--) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
       const nextDate = new Date(date);
@@ -143,6 +143,82 @@ export async function GET(req: NextRequest) {
         ? (monthlyAppointments / allAppointments) * 100
         : 0;
 
+    // ============================================
+    // CALM IMPACT METRICS - Weekly/Monthly Aggregates
+    // ============================================
+
+    // Get routes for the last 7 days to calculate time recovered
+    const weeklyRoutes = await prisma.route.findMany({
+      where: {
+        accountId,
+        routeDate: {
+          gte: sevenDaysAgo,
+          lt: today,
+        },
+      },
+      select: {
+        totalDriveMinutes: true,
+        routeDate: true,
+      },
+    });
+
+    // Get routes for the last 30 days
+    const monthlyRoutes = await prisma.route.findMany({
+      where: {
+        accountId,
+        routeDate: {
+          gte: thirtyDaysAgo,
+        },
+      },
+      select: {
+        totalDriveMinutes: true,
+        routeDate: true,
+      },
+    });
+
+    // Calculate time recovered (estimate 20% savings from optimization)
+    // This is cumulative - bigger numbers feel more meaningful
+    const weeklyTimeRecoveredMinutes = weeklyRoutes.reduce(
+      (sum, route) => sum + Math.round((route.totalDriveMinutes || 0) * 0.2),
+      0
+    );
+    const monthlyTimeRecoveredMinutes = monthlyRoutes.reduce(
+      (sum, route) => sum + Math.round((route.totalDriveMinutes || 0) * 0.2),
+      0
+    );
+
+    // Count days with routes (days stayed organized)
+    const weeklyOrganizedDays = weeklyRoutes.length;
+    const monthlyOrganizedDays = monthlyRoutes.length;
+
+    // Count unique customers served (monthly)
+    const monthlyClientsServed = uniqueCustomers;
+
+    // Weekly unique customers
+    const weeklyCustomerIds = new Set(
+      appointments
+        .filter((apt) => {
+          const aptDate = new Date(apt.startAt);
+          return aptDate >= sevenDaysAgo && aptDate < today;
+        })
+        .map((apt) => apt.customer.id)
+    );
+    const weeklyClientsServed = weeklyCustomerIds.size;
+
+    // Generate calm impact summary message
+    let calmImpactMessage = "";
+    if (weeklyAppointments > 0) {
+      if (weeklyTimeRecoveredMinutes >= 60) {
+        const hours = Math.floor(weeklyTimeRecoveredMinutes / 60);
+        const mins = weeklyTimeRecoveredMinutes % 60;
+        calmImpactMessage = `${hours}h ${mins}m of your time protected this week`;
+      } else if (weeklyTimeRecoveredMinutes > 0) {
+        calmImpactMessage = `${weeklyTimeRecoveredMinutes} minutes of your time protected this week`;
+      } else {
+        calmImpactMessage = `${weeklyAppointments} appointments ran smoothly this week`;
+      }
+    }
+
     return NextResponse.json({
       dailyRevenue,
       weeklyRevenue,
@@ -155,6 +231,18 @@ export async function GET(req: NextRequest) {
       avgRevenuePerCustomer,
       uniqueCustomers,
       completionRate,
+      // New calm impact metrics
+      calmImpact: {
+        weeklyTimeRecoveredMinutes,
+        monthlyTimeRecoveredMinutes,
+        weeklyOrganizedDays,
+        monthlyOrganizedDays,
+        weeklyClientsServed,
+        monthlyClientsServed,
+        weeklyAppointmentsSmooth: weeklyAppointments, // completed appointments
+        monthlyAppointmentsSmooth: monthlyAppointments,
+        calmImpactMessage,
+      },
     });
   } catch (error) {
     console.error("Revenue stats API error:", error);

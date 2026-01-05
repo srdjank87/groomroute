@@ -2,6 +2,67 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+// Generate calm, affirming messages based on day status
+function getCalmMessage(
+  appointmentCount: number,
+  confirmedCount: number,
+  completedCount: number,
+  hasRoute: boolean
+): string {
+  const hour = new Date().getHours();
+  const isMorning = hour < 12;
+  const isAfternoon = hour >= 12 && hour < 17;
+
+  if (appointmentCount === 0) {
+    return "Enjoy your day off";
+  }
+
+  if (completedCount === appointmentCount) {
+    return "Another smooth day in the books";
+  }
+
+  if (completedCount > 0) {
+    const remaining = appointmentCount - completedCount;
+    if (remaining === 1) {
+      return "Almost there! One more to go";
+    }
+    return "Great progress. Keep the momentum going";
+  }
+
+  // No appointments completed yet
+  if (hasRoute) {
+    if (isMorning) {
+      return "Your day is organized and ready to go";
+    }
+    if (isAfternoon) {
+      return "Your schedule is set. You've got this";
+    }
+    return "Your route is planned and ready";
+  }
+
+  if (confirmedCount === appointmentCount) {
+    return "All appointments confirmed. Smooth sailing ahead";
+  }
+
+  if (confirmedCount > 0) {
+    return "Your day is coming together nicely";
+  }
+
+  return "Your schedule is ready when you are";
+}
+
+// Determine day status
+function getDayStatus(
+  appointmentCount: number,
+  completedCount: number,
+  inProgressCount: number
+): "ready" | "in-progress" | "completed" | "no-appointments" {
+  if (appointmentCount === 0) return "no-appointments";
+  if (completedCount === appointmentCount) return "completed";
+  if (inProgressCount > 0 || completedCount > 0) return "in-progress";
+  return "ready";
+}
+
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
@@ -29,8 +90,8 @@ export async function GET(req: NextRequest) {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // Fetch today's appointments
-    const appointments = await prisma.appointment.findMany({
+    // Fetch ALL today's appointments (including completed) for status tracking
+    const allTodayAppointments = await prisma.appointment.findMany({
       where: {
         accountId,
         startAt: {
@@ -38,7 +99,7 @@ export async function GET(req: NextRequest) {
           lt: tomorrow,
         },
         status: {
-          in: ["BOOKED", "CONFIRMED", "IN_PROGRESS"],
+          notIn: ["CANCELLED", "NO_SHOW"],
         },
       },
       include: {
@@ -50,62 +111,69 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const hasData = appointments.length > 0;
-
-    // Check if this is sample data (we'll mark sample customers with a special tag)
-    const showSampleData = hasData && appointments.some(apt =>
-      apt.customer.notes?.includes("[SAMPLE_DATA]")
+    // Filter for active appointments (not completed) for next appointment
+    const activeAppointments = allTodayAppointments.filter(
+      (apt) => apt.status !== "COMPLETED"
     );
 
-    // Get today's route for stats
+    // Count by status
+    const completedCount = allTodayAppointments.filter(
+      (apt) => apt.status === "COMPLETED"
+    ).length;
+    const confirmedCount = allTodayAppointments.filter(
+      (apt) => apt.status === "CONFIRMED"
+    ).length;
+    const inProgressCount = allTodayAppointments.filter(
+      (apt) => apt.status === "IN_PROGRESS"
+    ).length;
+
+    const totalAppointments = allTodayAppointments.length;
+    const hasData = totalAppointments > 0;
+
+    // Check if this is sample data (we'll mark sample customers with a special tag)
+    const showSampleData =
+      hasData &&
+      allTodayAppointments.some((apt) =>
+        apt.customer.notes?.includes("[SAMPLE_DATA]")
+      );
+
+    // Get today's route to check if optimized
     const route = hasData
       ? await prisma.route.findFirst({
           where: {
             accountId,
             routeDate: today,
           },
-          include: {
-            stops: {
-              include: {
-                appointment: {
-                  include: {
-                    customer: true,
-                    pet: true,
-                  },
-                },
-              },
-              orderBy: {
-                sequence: "asc",
-              },
-            },
-          },
         })
       : null;
 
-    // Calculate stats
-    let timeSaved = 0;
-    let milesSaved = 0;
-    let estimatedGasSavings = 0;
+    const hasRoute = !!route;
 
-    if (route) {
-      // Estimate time saved (comparing optimized vs unoptimized)
-      // Simple calculation: assume 20% time savings from optimization
-      const totalDriveMinutes = route.totalDriveMinutes || 0;
-      timeSaved = Math.round(totalDriveMinutes * 0.2);
+    // Generate status and calm message
+    const dayStatus = getDayStatus(
+      totalAppointments,
+      completedCount,
+      inProgressCount
+    );
+    const calmMessage = getCalmMessage(
+      totalAppointments,
+      confirmedCount,
+      completedCount,
+      hasRoute
+    );
 
-      // Estimate miles saved
-      const totalDistanceMiles = (route.totalDistanceMeters || 0) / 1609.34;
-      milesSaved = Math.round(totalDistanceMiles * 0.2);
-
-      // Estimate gas savings ($3.50/gallon, 20 MPG average)
-      estimatedGasSavings = (milesSaved / 20) * 3.5;
-    }
-
-    // Get next appointment
-    const nextAppointment = appointments.length > 0 ? appointments[0] : null;
+    // Get next appointment (first active one)
+    const nextAppointment =
+      activeAppointments.length > 0 ? activeAppointments[0] : null;
 
     const response = {
-      appointments: appointments.length,
+      appointments: activeAppointments.length,
+      totalAppointments,
+      confirmedCount,
+      completedCount,
+      dayStatus,
+      calmMessage,
+      hasRoute,
       nextAppointment: nextAppointment
         ? {
             customerName: nextAppointment.customer.name,
@@ -117,19 +185,16 @@ export async function GET(req: NextRequest) {
               nextAppointment.appointmentType === "FULL_GROOM"
                 ? "Full Groom"
                 : nextAppointment.appointmentType === "BATH_ONLY"
-                ? "Bath Only"
-                : nextAppointment.appointmentType === "NAIL_TRIM"
-                ? "Nail Trim"
-                : nextAppointment.appointmentType === "FACE_FEET_FANNY"
-                ? "Face, Feet & Fanny"
-                : "Service",
+                  ? "Bath Only"
+                  : nextAppointment.appointmentType === "NAIL_TRIM"
+                    ? "Nail Trim"
+                    : nextAppointment.appointmentType === "FACE_FEET_FANNY"
+                      ? "Face, Feet & Fanny"
+                      : "Service",
             customerPhone: nextAppointment.customer.phone,
             appointmentId: nextAppointment.id,
           }
         : undefined,
-      timeSaved,
-      milesSaved,
-      estimatedGasSavings,
       hasData,
       showSampleData,
       contactMethods: groomer?.contactMethods || ["call", "sms"],
