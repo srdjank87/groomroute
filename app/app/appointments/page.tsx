@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw, CheckCircle, Play, ThumbsUp, Filter } from "lucide-react";
+import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw, CheckCircle, Play, ThumbsUp, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -44,6 +44,9 @@ export default function AppointmentsPage() {
     new Date().toISOString().split("T")[0]
   );
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [otherStatusFilter, setOtherStatusFilter] = useState("ALL");
+  const [otherPage, setOtherPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
 
   const dateInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,17 +62,35 @@ export default function AppointmentsPage() {
     return format(date, "MMMM d") + " Appointments";
   };
 
-  // Filter appointments by status
+  // Filter appointments by status for the selected date section
   const filterByStatus = (appts: Appointment[]) => {
     if (statusFilter === "ALL") return appts;
     return appts.filter(apt => apt.status === statusFilter);
   };
 
   // Filter "Other Appointments" to exclude the selected date
-  const otherAppointments = allAppointments.filter(apt => {
+  const otherAppointmentsBase = allAppointments.filter(apt => {
     const aptDate = new Date(apt.startAt).toISOString().split("T")[0];
     return aptDate !== selectedDate;
   });
+
+  // Apply status filter for other appointments
+  const otherAppointmentsFiltered = otherStatusFilter === "ALL"
+    ? otherAppointmentsBase
+    : otherAppointmentsBase.filter(apt => apt.status === otherStatusFilter);
+
+  // Calculate pagination for other appointments
+  const totalOtherPages = Math.ceil(otherAppointmentsFiltered.length / ITEMS_PER_PAGE);
+  const otherAppointmentsPaginated = otherAppointmentsFiltered.slice(
+    (otherPage - 1) * ITEMS_PER_PAGE,
+    otherPage * ITEMS_PER_PAGE
+  );
+
+  // Reset page when filter changes
+  const handleOtherStatusFilterChange = (value: string) => {
+    setOtherStatusFilter(value);
+    setOtherPage(1);
+  };
 
   const fetchAppointments = useCallback(async () => {
     setIsLoading(true);
@@ -452,27 +473,46 @@ export default function AppointmentsPage() {
 
       {/* Other Appointments Section */}
       <div className="mt-10 pt-6 border-t border-gray-200">
-        <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-          Other Appointments
-          {statusFilter !== "ALL" && (
-            <span className="text-sm font-normal text-gray-500">
-              ({STATUS_OPTIONS.find(s => s.value === statusFilter)?.label})
-            </span>
-          )}
-        </h2>
+        {/* Header with Filter */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            Other Appointments
+            {otherStatusFilter !== "ALL" && (
+              <span className="text-sm font-normal text-gray-500">
+                ({STATUS_OPTIONS.find(s => s.value === otherStatusFilter)?.label})
+              </span>
+            )}
+          </h2>
+          {/* Other Appointments Filter */}
+          <div className="relative w-full sm:w-48">
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+            <select
+              value={otherStatusFilter}
+              onChange={(e) => handleOtherStatusFilterChange(e.target.value)}
+              className="select select-bordered select-sm w-full pl-9"
+            >
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
         {isLoadingAll ? (
           <div className="flex items-center justify-center py-12">
             <span className="loading loading-spinner loading-lg"></span>
           </div>
-        ) : filterByStatus(otherAppointments).length === 0 ? (
+        ) : otherAppointmentsFiltered.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-3" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               No Other Appointments
             </h3>
             <p className="text-gray-600 mb-4">
-              {statusFilter !== "ALL"
-                ? `No ${STATUS_OPTIONS.find(s => s.value === statusFilter)?.label.toLowerCase()} appointments on other dates`
+              {otherStatusFilter !== "ALL"
+                ? `No ${STATUS_OPTIONS.find(s => s.value === otherStatusFilter)?.label.toLowerCase()} appointments on other dates`
                 : "No appointments scheduled on other dates"
               }
             </p>
@@ -486,7 +526,7 @@ export default function AppointmentsPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {filterByStatus(otherAppointments).map((appointment) => (
+            {otherAppointmentsPaginated.map((appointment) => (
               <div
                 key={appointment.id}
                 className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4"
@@ -605,6 +645,36 @@ export default function AppointmentsPage() {
                 )}
               </div>
             ))}
+
+            {/* Pagination Controls */}
+            {totalOtherPages > 1 && (
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                <p className="text-sm text-gray-500">
+                  Showing {((otherPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(otherPage * ITEMS_PER_PAGE, otherAppointmentsFiltered.length)} of {otherAppointmentsFiltered.length}
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setOtherPage(p => Math.max(1, p - 1))}
+                    disabled={otherPage === 1}
+                    className="btn btn-sm btn-ghost gap-1 disabled:opacity-50"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </button>
+                  <span className="text-sm text-gray-600 px-2">
+                    Page {otherPage} of {totalOtherPages}
+                  </span>
+                  <button
+                    onClick={() => setOtherPage(p => Math.min(totalOtherPages, p + 1))}
+                    disabled={otherPage === totalOtherPages}
+                    className="btn btn-sm btn-ghost gap-1 disabled:opacity-50"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
