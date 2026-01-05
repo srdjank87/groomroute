@@ -17,6 +17,7 @@ const onboardingSchema = z.object({
     workingHoursEnd: z.string().regex(/^\d{2}:\d{2}$/),
   }),
   contactMethods: z.array(z.string()).optional().default(["call", "sms"]),
+  largeDogDailyLimit: z.number().min(1).max(10).nullable().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -41,6 +42,7 @@ export async function POST(request: NextRequest) {
         workingHoursStart: validatedData.hours.workingHoursStart,
         workingHoursEnd: validatedData.hours.workingHoursEnd,
         contactMethods: validatedData.contactMethods || ["call", "sms"],
+        largeDogDailyLimit: validatedData.largeDogDailyLimit ?? null,
         geocodeStatus: "PENDING",
       },
     });

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 
-type OnboardingStep = "address" | "hours" | "contact" | "complete";
+type OnboardingStep = "address" | "hours" | "contact" | "workload" | "complete";
 
 export default function OnboardingPage() {
   const { data: session, status } = useSession();
@@ -41,6 +41,7 @@ export default function OnboardingPage() {
   });
 
   const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
+  const [largeDogLimit, setLargeDogLimit] = useState<string>("");
 
 
   if (status === "loading") {
@@ -76,6 +77,11 @@ export default function OnboardingPage() {
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCurrentStep("workload");
+  };
+
+  const handleWorkloadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
 
     try {
@@ -88,6 +94,7 @@ export default function OnboardingPage() {
           address: addressData,
           hours: hoursData,
           contactMethods,
+          largeDogDailyLimit: largeDogLimit === "" ? null : parseInt(largeDogLimit),
         }),
       });
 
@@ -120,13 +127,16 @@ export default function OnboardingPage() {
         <div className="mb-8">
           <ul className="steps steps-horizontal w-full">
             <li className={`step ${currentStep !== "address" ? "step-primary" : ""} text-gray-700 font-medium`}>
-              Base Address
+              Address
             </li>
-            <li className={`step ${currentStep === "hours" || currentStep === "contact" ? "step-primary" : ""} text-gray-700 font-medium`}>
-              Working Hours
+            <li className={`step ${["hours", "contact", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
+              Hours
             </li>
-            <li className={`step ${currentStep === "contact" ? "step-primary" : ""} text-gray-700 font-medium`}>
-              Contact Methods
+            <li className={`step ${["contact", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
+              Contact
+            </li>
+            <li className={`step ${currentStep === "workload" ? "step-primary" : ""} text-gray-700 font-medium`}>
+              Workload
             </li>
           </ul>
         </div>
@@ -259,6 +269,74 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setCurrentStep("hours")}
+                  className="btn btn-ghost flex-1 border-2 border-gray-300"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary flex-1 text-white bg-[#A5744A] hover:bg-[#8B6239] border-0"
+                >
+                  Continue
+                </button>
+              </div>
+            </form>
+          )}
+
+          {currentStep === "workload" && (
+            <form onSubmit={handleWorkloadSubmit} className="space-y-4">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Workload Preferences
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Set limits to protect your energy and prevent overexertion.
+              </p>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Large Dog Daily Limit
+                </label>
+                <p className="text-sm text-gray-500 mb-3">
+                  Dogs over 50 lbs are considered large dogs. Set a limit to get warnings when booking too many large dogs on the same day.
+                </p>
+
+                <div className="space-y-3">
+                  {[
+                    { value: "", label: "No limit", description: "I can handle any number of large dogs" },
+                    { value: "1", label: "1 large dog", description: "Best for solo groomers or lighter workloads" },
+                    { value: "2", label: "2 large dogs", description: "Good balance for most groomers" },
+                    { value: "3", label: "3 large dogs", description: "For experienced groomers" },
+                    { value: "4", label: "4 large dogs", description: "High capacity" },
+                    { value: "5", label: "5 large dogs", description: "Maximum recommended" },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setLargeDogLimit(option.value)}
+                      className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
+                        largeDogLimit === option.value
+                          ? "border-[#A5744A] bg-orange-50"
+                          : "border-gray-200 hover:border-gray-300 bg-white"
+                      }`}
+                    >
+                      <span className="font-medium text-gray-900">{option.label}</span>
+                      <span className="text-sm text-gray-500 ml-2">— {option.description}</span>
+                      {largeDogLimit === option.value && (
+                        <span className="float-right text-[#A5744A]">✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-xs text-gray-500 mt-3">
+                  You can change this anytime in Settings → Profile.
+                </p>
+              </div>
+
+              <div className="flex gap-2 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep("contact")}
                   className="btn btn-ghost flex-1 border-2 border-gray-300"
                   disabled={isLoading}
                 >
