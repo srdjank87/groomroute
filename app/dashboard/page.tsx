@@ -16,7 +16,8 @@ import {
   Sparkles,
   Phone,
   MessageSquare,
-  SkipForward
+  SkipForward,
+  Maximize
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
@@ -47,6 +48,7 @@ function DashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingSample, setIsGeneratingSample] = useState(false);
   const [todaysAppointments, setTodaysAppointments] = useState<any[]>([]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     async function handleSetup() {
@@ -145,6 +147,15 @@ function DashboardContent() {
     // Open in new tab
     window.open(url, '_blank');
     toast.success("Opening directions to next stop");
+  }
+
+  function toggleFullscreen() {
+    setIsFullscreen(!isFullscreen);
+    if (!isFullscreen) {
+      toast.success("Focus mode - tap the button again to exit");
+      // Scroll to top when entering focus mode
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   async function generateDemoData() {
@@ -275,9 +286,9 @@ function DashboardContent() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto pb-20">
+    <div className={`max-w-7xl mx-auto pb-20 ${isFullscreen ? 'fixed inset-0 z-50 bg-gray-50 overflow-auto pt-20 max-w-none' : ''}`}>
       {/* Demo Button - Only show when no appointments */}
-      {!stats?.hasData && (
+      {!stats?.hasData && !isFullscreen && (
         <div className="mb-4 flex justify-end">
           <button
             onClick={generateDemoData}
@@ -290,10 +301,10 @@ function DashboardContent() {
       )}
 
       {/* Trial/Subscription Status */}
-      <TrialStatus />
+      {!isFullscreen && <TrialStatus />}
 
       {/* Sample Data Banner - Only show on first login with no data */}
-      {stats?.showSampleData && (
+      {stats?.showSampleData && !isFullscreen && (
         <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg text-white p-6 mb-6">
           <div className="flex items-start gap-3">
             <Sparkles className="h-6 w-6 flex-shrink-0 mt-0.5" />
@@ -328,18 +339,27 @@ function DashboardContent() {
 
       {/* Hero Section - Today's Route */}
       {stats?.hasData && stats.nextAppointment ? (
-        <div className="bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] rounded-xl shadow-lg text-white p-6 mb-6 border border-[#A5744A]/30">
+        <div className={`bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] rounded-xl shadow-lg text-white p-6 mb-6 border border-[#A5744A]/30 ${isFullscreen ? 'min-h-screen flex flex-col' : ''}`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Next Stop</h2>
-            <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
-              {/* Remaining appointments = total - 1 (since we're showing the next one) */}
-              {stats.appointments - 1}{' '}
-              <span className="hidden sm:inline">
-                {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
-              </span>
-              <span className="sm:hidden">
-                {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
-              </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleFullscreen}
+                className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white gap-1 md:hidden"
+                title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+              >
+                <Maximize className="h-4 w-4" />
+              </button>
+              <div className="badge badge-lg bg-[#A5744A]/30 border border-[#A5744A]/50 text-white">
+                {/* Remaining appointments = total - 1 (since we're showing the next one) */}
+                {stats.appointments - 1}{' '}
+                <span className="hidden sm:inline">
+                  {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
+                </span>
+                <span className="sm:hidden">
+                  {stats.appointments - 1 === 1 ? 'appointment' : 'appointments'} left
+                </span>
+              </div>
             </div>
           </div>
 
@@ -416,11 +436,11 @@ function DashboardContent() {
               {/* Column 2: Map Preview */}
               <div className="w-full md:w-auto flex justify-center md:justify-end">
                 <div className="rounded-lg overflow-hidden border-2 border-white/20">
-                  {/* Mobile: 200x200, Desktop: 300x300 */}
+                  {/* Mobile: 150x150 (300x300 in fullscreen), Desktop: 300x300 */}
                   <img
                     src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=300x300&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                     alt="Location map"
-                    className="w-[150px] h-[150px] md:w-[300px] md:h-[300px]"
+                    className={isFullscreen ? "w-[300px] h-[300px]" : "w-[150px] h-[150px] md:w-[300px] md:h-[300px]"}
                   />
                 </div>
               </div>
@@ -484,8 +504,8 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Savings Stats - Only show when there's data */}
-      {stats?.hasData && (
+      {/* Savings Stats - Only show when there's data and not in fullscreen */}
+      {stats?.hasData && !isFullscreen && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-5">
             <div className="flex items-center gap-3">
@@ -526,6 +546,7 @@ function DashboardContent() {
       )}
 
       {/* One-Tap Quick Actions */}
+      {!isFullscreen && (
       <div className="bg-white rounded-lg shadow mb-6">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
@@ -554,6 +575,7 @@ function DashboardContent() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }
