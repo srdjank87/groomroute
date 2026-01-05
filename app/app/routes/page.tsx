@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, Locate, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, Locate, ChevronDown, ChevronUp, ExternalLink, MessageSquare } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Appointment {
@@ -40,9 +40,11 @@ export default function TodaysRoutePage() {
   const [startLat, setStartLat] = useState<number | null>(null);
   const [startLng, setStartLng] = useState<number | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
 
   useEffect(() => {
     fetchTodaysRoute();
+    fetchContactMethods();
 
     // Update current time every minute
     const timer = setInterval(() => {
@@ -51,6 +53,20 @@ export default function TodaysRoutePage() {
 
     return () => clearInterval(timer);
   }, []);
+
+  async function fetchContactMethods() {
+    try {
+      const response = await fetch('/api/dashboard/today');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.contactMethods) {
+          setContactMethods(data.contactMethods);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching contact methods:", error);
+    }
+  }
 
   async function fetchTodaysRoute() {
     try {
@@ -97,6 +113,27 @@ export default function TodaysRoutePage() {
     // Opens in phone's default maps app
     const encodedAddress = encodeURIComponent(address);
     window.open(`https://maps.google.com/?q=${encodedAddress}`, '_blank');
+  }
+
+  function handleCall(phone: string) {
+    window.location.href = `tel:${phone}`;
+  }
+
+  function handleSMS(phone: string) {
+    window.location.href = `sms:${phone}`;
+  }
+
+  function handleWhatsApp(phone: string) {
+    const cleanPhone = phone.replace(/\D/g, '');
+    window.open(`https://wa.me/1${cleanPhone}`, '_blank');
+  }
+
+  function handleSignal(phone: string) {
+    window.location.href = `signal://send?phone=${phone}`;
+  }
+
+  function handleTelegram(phone: string) {
+    window.location.href = `tg://resolve?phone=${phone}`;
   }
 
   async function getCurrentLocation() {
@@ -428,7 +465,7 @@ export default function TodaysRoutePage() {
             className="w-full bg-white text-blue-600 font-semibold py-3 px-4 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
           >
             <Navigation className="h-5 w-5" />
-            Start Navigation
+            Start Driving
           </button>
         </div>
       )}
@@ -503,24 +540,64 @@ export default function TodaysRoutePage() {
               )}
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2 mt-3">
-                <button
-                  onClick={() => copyAddress(appointment.customer.address)}
-                  className="btn btn-sm btn-outline gap-1"
-                >
-                  <Copy className="h-4 w-4" />
-                  Copy Address
-                </button>
+              <div className="space-y-2 mt-3">
+                {/* Contact Methods Row */}
                 {appointment.customer.phone && (
-                  <a
-                    href={`tel:${appointment.customer.phone}`}
+                  <div className="flex gap-2 flex-wrap">
+                    {contactMethods.includes("call") && (
+                      <button
+                        onClick={() => handleCall(appointment.customer.phone!)}
+                        className="btn btn-sm btn-outline gap-1"
+                      >
+                        <Phone className="h-4 w-4" />
+                        Call
+                      </button>
+                    )}
+                    {contactMethods.includes("sms") && (
+                      <button
+                        onClick={() => handleSMS(appointment.customer.phone!)}
+                        className="btn btn-sm btn-outline gap-1"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        SMS
+                      </button>
+                    )}
+                    {contactMethods.includes("whatsapp") && (
+                      <button
+                        onClick={() => handleWhatsApp(appointment.customer.phone!)}
+                        className="btn btn-sm btn-outline gap-1"
+                      >
+                        💚 WhatsApp
+                      </button>
+                    )}
+                    {contactMethods.includes("signal") && (
+                      <button
+                        onClick={() => handleSignal(appointment.customer.phone!)}
+                        className="btn btn-sm btn-outline gap-1"
+                      >
+                        🔵 Signal
+                      </button>
+                    )}
+                    {contactMethods.includes("telegram") && (
+                      <button
+                        onClick={() => handleTelegram(appointment.customer.phone!)}
+                        className="btn btn-sm btn-outline gap-1"
+                      >
+                        ✈️ Telegram
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Other Actions Row */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => copyAddress(appointment.customer.address)}
                     className="btn btn-sm btn-outline gap-1"
                   >
-                    <Phone className="h-4 w-4" />
-                    Call
-                  </a>
-                )}
-                {!appointment.customer.phone && (
+                    <Copy className="h-4 w-4" />
+                    Copy Address
+                  </button>
                   <button
                     onClick={() => openInMaps(appointment.customer.address)}
                     className="btn btn-sm btn-primary gap-1"
@@ -528,7 +605,7 @@ export default function TodaysRoutePage() {
                     <Navigation className="h-4 w-4" />
                     Navigate
                   </button>
-                )}
+                </div>
               </div>
             </div>
           );
