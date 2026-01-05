@@ -31,6 +31,14 @@ export default function AddressAutocomplete({
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [scriptError, setScriptError] = useState(false);
+  const onChangeRef = useRef(onChange);
+  const onPlaceSelectedRef = useRef(onPlaceSelected);
+
+  // Keep refs updated with latest callbacks
+  useEffect(() => {
+    onChangeRef.current = onChange;
+    onPlaceSelectedRef.current = onPlaceSelected;
+  }, [onChange, onPlaceSelected]);
 
   useEffect(() => {
     // Check if Google Maps is already loaded
@@ -119,49 +127,43 @@ export default function AddressAutocomplete({
 
         if (place?.formatted_address) {
           console.log("Updating with address:", place.formatted_address);
-          onChange(place.formatted_address);
+          onChangeRef.current(place.formatted_address);
 
-          if (onPlaceSelected) {
-            onPlaceSelected(place);
+          if (onPlaceSelectedRef.current) {
+            onPlaceSelectedRef.current(place);
           }
         } else {
           console.log("No formatted_address in place object");
         }
       });
 
-      // Add mousedown listener to the document to catch pac-item clicks
-      const handleDocumentClick = (e: MouseEvent) => {
+      // Fix for Google Places Autocomplete first-click issue:
+      // The pac-container dropdown causes the input to blur on mousedown,
+      // which prevents place_changed from firing properly on first click.
+      // By preventing default on mousedown, we keep focus on the input
+      // and allow the click to properly select the place.
+      const handlePacMouseDown = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
-        // Check if clicked element is a pac-item or child of pac-item
-        const pacItem = target.closest('.pac-item');
-        if (pacItem) {
-          console.log("PAC item clicked, waiting for place_changed...");
-          // Give Google Maps a moment to process the selection
-          setTimeout(() => {
-            const place = autocompleteRef.current?.getPlace();
-            console.log("After PAC click, place:", place);
-            if (place?.formatted_address) {
-              onChange(place.formatted_address);
-              if (onPlaceSelected) {
-                onPlaceSelected(place);
-              }
-            }
-          }, 50);
+        // Check if clicked element is inside the pac-container
+        if (target.closest('.pac-container')) {
+          // Prevent the input from losing focus
+          e.preventDefault();
         }
       };
 
-      document.addEventListener("mousedown", handleDocumentClick, true);
+      // Use capture phase to intercept before Google's handlers
+      document.addEventListener("mousedown", handlePacMouseDown, true);
 
       return () => {
         if (listener) {
           window.google?.maps.event.removeListener(listener);
         }
-        document.removeEventListener("mousedown", handleDocumentClick, true);
+        document.removeEventListener("mousedown", handlePacMouseDown, true);
       };
     } catch (error) {
       console.error("Error initializing autocomplete:", error);
     }
-  }, [isLoaded, onChange, onPlaceSelected, scriptError]);
+  }, [isLoaded, scriptError]);
 
   return (
     <div className="relative">
