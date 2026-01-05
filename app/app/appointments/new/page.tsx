@@ -38,6 +38,18 @@ interface AreaDaySuggestion {
   reason: string | null;
 }
 
+interface LargeDogCheck {
+  date: string;
+  largeDogCount: number;
+  limit: number | null;
+  hasLimit: boolean;
+  atLimit: boolean;
+  overLimit: boolean;
+  remainingSlots: number | null;
+}
+
+const LARGE_DOG_WEIGHT_THRESHOLD = 50;
+
 function NewAppointmentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -63,6 +75,8 @@ function NewAppointmentContent() {
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [areaSuggestion, setAreaSuggestion] = useState<AreaDaySuggestion | null>(null);
   const [groomerId, setGroomerId] = useState<string | null>(null);
+  const [largeDogCheck, setLargeDogCheck] = useState<LargeDogCheck | null>(null);
+  const [largeDogWarningDismissed, setLargeDogWarningDismissed] = useState(false);
 
   const dateInputRef = useRef<HTMLInputElement>(null);
   const timeInputRef = useRef<HTMLInputElement>(null);
@@ -91,6 +105,20 @@ function NewAppointmentContent() {
       }
     } catch (error) {
       console.error("Failed to fetch area suggestion:", error);
+    }
+  }, []);
+
+  // Fetch large dog count for a date
+  const fetchLargeDogCheck = useCallback(async (date: string) => {
+    try {
+      const response = await fetch(`/api/groomer/large-dog-count?date=${date}`);
+      if (response.ok) {
+        const data = await response.json();
+        setLargeDogCheck(data);
+        setLargeDogWarningDismissed(false); // Reset dismissal when date changes
+      }
+    } catch (error) {
+      console.error("Failed to fetch large dog count:", error);
     }
   }, []);
 
@@ -148,6 +176,23 @@ function NewAppointmentContent() {
     }, 300);
     return () => clearTimeout(timer);
   }, [fetchCustomers]);
+
+  // Fetch large dog count when date changes and pet is a large dog
+  useEffect(() => {
+    if (appointmentData.date && selectedPet?.weight && selectedPet.weight > LARGE_DOG_WEIGHT_THRESHOLD) {
+      fetchLargeDogCheck(appointmentData.date);
+    } else {
+      setLargeDogCheck(null);
+    }
+  }, [appointmentData.date, selectedPet, fetchLargeDogCheck]);
+
+  // Helper to check if current booking would exceed limit
+  const wouldExceedLargeDogLimit = () => {
+    if (!largeDogCheck?.hasLimit || !selectedPet?.weight) return false;
+    if (selectedPet.weight <= LARGE_DOG_WEIGHT_THRESHOLD) return false;
+    // Would adding this large dog exceed the limit?
+    return largeDogCheck.largeDogCount >= (largeDogCheck.limit || 0);
+  };
 
   const selectPet = (pet: Pet) => {
     setSelectedPet(pet);
@@ -492,6 +537,47 @@ function NewAppointmentContent() {
                         </p>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* Large dog limit warning */}
+                {wouldExceedLargeDogLimit() && !largeDogWarningDismissed && largeDogCheck && (
+                  <div className="mt-2 p-3 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <span className="font-medium block">
+                          Large Dog Limit Warning
+                        </span>
+                        <p className="text-xs mt-1 text-red-700">
+                          {selectedPet?.name} is {selectedPet?.weight} lbs, which counts as a large dog.
+                          You already have {largeDogCheck.largeDogCount} large dog{largeDogCheck.largeDogCount !== 1 ? 's' : ''} scheduled on this date,
+                          and your daily limit is {largeDogCheck.limit}.
+                        </p>
+                        <p className="text-xs mt-2 text-red-600 font-medium">
+                          Booking this appointment would exceed your limit. Consider choosing a different date to protect your energy.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setLargeDogWarningDismissed(true)}
+                          className="mt-2 text-xs text-red-600 underline hover:text-red-800"
+                        >
+                          I understand, continue anyway
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Show large dog count info even if not exceeding limit (for awareness) */}
+                {largeDogCheck?.hasLimit && selectedPet?.weight && selectedPet.weight > LARGE_DOG_WEIGHT_THRESHOLD && !wouldExceedLargeDogLimit() && (
+                  <div className="mt-2 p-3 rounded-lg text-sm bg-blue-50 text-blue-800 border border-blue-200">
+                    <p className="text-xs">
+                      <span className="font-medium">Large dog count:</span> {largeDogCheck.largeDogCount} of {largeDogCheck.limit} on this date
+                      {largeDogCheck.remainingSlots !== null && largeDogCheck.remainingSlots > 0 && (
+                        <span> ({largeDogCheck.remainingSlots - 1} slot{largeDogCheck.remainingSlots - 1 !== 1 ? 's' : ''} remaining after this booking)</span>
+                      )}
+                    </p>
                   </div>
                 )}
               </div>

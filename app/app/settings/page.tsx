@@ -14,10 +14,11 @@ const settingsCategories = [
   },
   {
     name: "Profile",
-    description: "Manage your groomer profile and base address",
+    description: "Manage your workload preferences and limits",
     href: "/app/settings/profile",
     icon: User,
-    disabled: true,
+    badge: "New",
+    badgeColor: "bg-blue-100 text-blue-700",
   },
   {
     name: "Notifications",

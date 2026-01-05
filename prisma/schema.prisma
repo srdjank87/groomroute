@@ -96,6 +96,7 @@ model Groomer {
   workingHoursEnd     String?       // HH:mm format
   contactMethods      String[]      @default(["call", "sms"]) // call, sms, whatsapp, signal, telegram
   defaultHasAssistant Boolean       @default(false) // Default setting for working with a bather
+  largeDogDailyLimit  Int?          // Max large/giant dogs per day (null = no limit)
   isActive            Boolean       @default(true)
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
