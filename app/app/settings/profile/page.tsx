@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, Save, Dog, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 interface GroomerSettings {
   name: string;
