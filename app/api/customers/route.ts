@@ -156,6 +156,13 @@ export async function GET(req: NextRequest) {
       },
       include: {
         pets: true,
+        serviceArea: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
         _count: {
           select: { appointments: true },
         },
@@ -188,6 +195,7 @@ export async function GET(req: NextRequest) {
         address: customer.address,
         createdAt: customer.createdAt,
         pets: customer.pets,
+        serviceArea: customer.serviceArea,
         _count: customer._count,
         totalRevenue,
         lastAppointmentDate,

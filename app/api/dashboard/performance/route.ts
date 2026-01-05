@@ -224,10 +224,11 @@ export async function GET(req: NextRequest) {
       const dateStr = new Date(apt.startAt).toISOString().split("T")[0];
       days30Worked.add(dateStr);
     });
-    const daysWorked30 = days30Worked.size || 1;
+    const daysWorked30 = days30Worked.size;
 
     const totalDogs30 = last30DaysAppointments.length;
-    const avgDogsPerDay30 = totalDogs30 / daysWorked30;
+    // Only calculate averages if there's actual data
+    const avgDogsPerDay30 = daysWorked30 > 0 ? totalDogs30 / daysWorked30 : 0;
 
     // Calculate energy load
     let totalEnergy30 = 0;
@@ -244,17 +245,21 @@ export async function GET(req: NextRequest) {
         largeDogCount30++;
       }
     }
-    const avgEnergyPerDay30 = totalEnergy30 / daysWorked30;
-    const avgLargeDogsPerDay30 = largeDogCount30 / daysWorked30;
+    // Only calculate averages if there's actual data
+    const avgEnergyPerDay30 = daysWorked30 > 0 ? totalEnergy30 / daysWorked30 : 0;
+    const avgLargeDogsPerDay30 = daysWorked30 > 0 ? largeDogCount30 / daysWorked30 : 0;
 
-    // Calculate avg drive time
+    // Calculate avg drive time per stop
+    // Total drive time divided by number of "jumps" (stops - 1 per day)
     const totalDriveMinutes30 = last30DaysRoutes.reduce(
       (sum, r) => sum + (r.totalDriveMinutes || 0),
       0
     );
+    // Only calculate if we have drive data and enough appointments
+    const numJumps = totalDogs30 - daysWorked30; // Total stops minus starting points (1 per day)
     const avgDriveMinutes30 =
-      totalDogs30 > daysWorked30
-        ? totalDriveMinutes30 / (totalDogs30 - daysWorked30)
+      totalDriveMinutes30 > 0 && numJumps > 0
+        ? Math.round(totalDriveMinutes30 / numJumps)
         : null;
 
     // Calculate cancellation rate

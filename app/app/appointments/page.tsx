@@ -17,11 +17,18 @@ interface Appointment {
     id: string;
     name: string;
     address: string;
+    serviceArea?: {
+      id: string;
+      name: string;
+      color: string;
+    } | null;
   };
   pet?: {
     id: string;
     name: string;
     species?: string;
+    breed?: string;
+    weight?: number;
   };
 }
 
@@ -375,10 +382,24 @@ export default function AppointmentsPage() {
                     <p className="text-sm text-gray-600 mb-1">
                       {appointment.pet.species === "cat" ? "🐈" : "🐕"}{" "}
                       {appointment.pet.name}
+                      {appointment.pet.breed && (
+                        <span className="text-gray-500"> • {appointment.pet.breed}</span>
+                      )}
+                      {appointment.pet.weight && (
+                        <span className="text-gray-500"> • {appointment.pet.weight} lbs</span>
+                      )}
                     </p>
                   )}
                   <p className="text-sm text-gray-600">
                     {getServiceTypeLabel(appointment.appointmentType)}
+                    {appointment.customer.serviceArea && (
+                      <span
+                        className="ml-2 text-xs px-2 py-0.5 rounded text-white"
+                        style={{ backgroundColor: appointment.customer.serviceArea.color }}
+                      >
+                        {appointment.customer.serviceArea.name}
+                      </span>
+                    )}
                   </p>
                 </div>
                 <div className="text-right">
@@ -550,10 +571,24 @@ export default function AppointmentsPage() {
                       <p className="text-sm text-gray-600 mb-1">
                         {appointment.pet.species === "cat" ? "🐈" : "🐕"}{" "}
                         {appointment.pet.name}
+                        {appointment.pet.breed && (
+                          <span className="text-gray-500"> • {appointment.pet.breed}</span>
+                        )}
+                        {appointment.pet.weight && (
+                          <span className="text-gray-500"> • {appointment.pet.weight} lbs</span>
+                        )}
                       </p>
                     )}
                     <p className="text-sm text-gray-600">
                       {getServiceTypeLabel(appointment.appointmentType)}
+                      {appointment.customer.serviceArea && (
+                        <span
+                          className="ml-2 text-xs px-2 py-0.5 rounded text-white"
+                          style={{ backgroundColor: appointment.customer.serviceArea.color }}
+                        >
+                          {appointment.customer.serviceArea.name}
+                        </span>
+                      )}
                     </p>
                   </div>
                   <div className="text-right">

@@ -181,6 +181,9 @@ export async function GET(req: NextRequest) {
             // Return ISO string so client can format in user's local timezone
             startAt: nextAppointment.startAt.toISOString(),
             petName: nextAppointment.pet?.name,
+            petBreed: nextAppointment.pet?.breed,
+            petWeight: nextAppointment.pet?.weight,
+            serviceMinutes: nextAppointment.serviceMinutes,
             serviceType:
               nextAppointment.appointmentType === "FULL_GROOM"
                 ? "Full Groom"
@@ -193,6 +196,7 @@ export async function GET(req: NextRequest) {
                       : "Service",
             customerPhone: nextAppointment.customer.phone,
             appointmentId: nextAppointment.id,
+            status: nextAppointment.status,
           }
         : undefined,
       hasData,

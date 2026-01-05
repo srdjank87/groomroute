@@ -20,11 +20,17 @@ interface Appointment {
     addressNotes: string | null;
     accessInstructions: string | null;
     locationVerified: boolean;
+    serviceArea?: {
+      id: string;
+      name: string;
+      color: string;
+    } | null;
   };
   pet: {
     name: string;
     size: string;
     weight?: number;
+    breed?: string;
   } | null;
 }
 
@@ -92,6 +98,9 @@ export default function TodaysRoutePage() {
     suggestions: string[];
   } | null>(null);
   const [todayAreaDay, setTodayAreaDay] = useState<TodayAreaDay | null>(null);
+  const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
+  const [completeAppointmentId, setCompleteAppointmentId] = useState<string | null>(null);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   useEffect(() => {
     fetchTodaysRoute();
@@ -258,6 +267,34 @@ export default function TodaysRoutePage() {
     const displayHours = hours % 12 || 12;
     const displayMinutes = minutes.toString().padStart(2, '0');
     return `${displayHours}:${displayMinutes} ${period}`;
+  }
+
+  // Format time range (start - end) for an appointment
+  function formatTimeRange(startAt: string, serviceMinutes: number): string {
+    const startDate = new Date(startAt);
+    const endDate = new Date(startDate.getTime() + serviceMinutes * 60 * 1000);
+
+    const formatTimeFromDate = (date: Date) => {
+      const hours = date.getUTCHours();
+      const minutes = date.getUTCMinutes();
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12;
+      const displayMinutes = minutes.toString().padStart(2, '0');
+      return `${displayHours}:${displayMinutes} ${period}`;
+    };
+
+    return `${formatTimeFromDate(startDate)} - ${formatTimeFromDate(endDate)}`;
+  }
+
+  // Open complete confirmation modal
+  function openCompleteConfirm(appointmentId: string) {
+    setCompleteAppointmentId(appointmentId);
+    setShowCompleteConfirm(true);
+  }
+
+  function closeCompleteConfirm() {
+    setShowCompleteConfirm(false);
+    setCompleteAppointmentId(null);
   }
 
   function getStatusColor(appointment: Appointment): string {
@@ -439,6 +476,7 @@ export default function TodaysRoutePage() {
   }
 
   async function handleCompleteAppointment(appointmentId: string) {
+    setIsCompleting(true);
     try {
       const response = await fetch(`/api/appointments/${appointmentId}`, {
         method: "PATCH",
@@ -453,6 +491,7 @@ export default function TodaysRoutePage() {
         } else {
           toast.success("Appointment completed");
         }
+        closeCompleteConfirm();
         await fetchTodaysRoute();
         await fetchBreakSuggestion();
       } else {
@@ -461,6 +500,8 @@ export default function TodaysRoutePage() {
     } catch (error) {
       console.error("Failed to complete appointment:", error);
       toast.error("Failed to complete appointment");
+    } finally {
+      setIsCompleting(false);
     }
   }
 
@@ -698,28 +739,53 @@ export default function TodaysRoutePage() {
 
       {/* Next Stop Card - Enhanced Design */}
       {nextAppointment && (
-        <div className="mb-6 bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] rounded-xl shadow-lg text-white border border-[#A5744A]/30 p-6">
+        <div className={`mb-6 rounded-xl shadow-lg text-white p-6 ${
+          nextAppointment.status === "IN_PROGRESS"
+            ? "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 border border-blue-400/30"
+            : "bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] border border-[#A5744A]/30"
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">Next Stop - {formatTime(nextAppointment.startAt)}</h2>
+            <h2 className="text-2xl font-bold">
+              {nextAppointment.status === "IN_PROGRESS" ? "In Progress" : "Next Stop"} - {formatTime(nextAppointment.startAt)}
+            </h2>
             {/* Badge hidden on mobile - shown below buttons instead */}
             <p className="hidden sm:block text-white/60 text-sm">
               {appointments.filter(a => a.status !== "COMPLETED" && a.status !== "CANCELLED").length - 1} more after this one
             </p>
           </div>
 
-          <div className="bg-[#A5744A]/10 backdrop-blur-sm rounded-lg p-4 mb-4 border border-[#A5744A]/20">
+          <div className={`backdrop-blur-sm rounded-lg p-4 mb-4 border ${
+            nextAppointment.status === "IN_PROGRESS"
+              ? "bg-white/10 border-white/20"
+              : "bg-[#A5744A]/10 border-[#A5744A]/20"
+          }`}>
             <div className="flex flex-col md:flex-row items-start gap-4">
               {/* Info Column */}
               <div className="flex-1 min-w-0 w-full">
                 <div className="text-center md:text-left">
                   <p className="font-bold text-lg mb-1">{nextAppointment.customer.name}</p>
+                  {/* Enhanced Pet Display */}
                   {nextAppointment.pet && (
-                    <p className="text-white/80 text-sm mb-1">{nextAppointment.pet.name} - {formatAppointmentType(nextAppointment.appointmentType)}</p>
+                    <div className="bg-white/10 rounded-lg px-3 py-2 inline-block mb-2">
+                      <p className="text-white font-medium text-sm flex items-center gap-2">
+                        <span>🐕</span>
+                        <span>{nextAppointment.pet.name}</span>
+                        {nextAppointment.pet.breed && (
+                          <span className="text-white/70">({nextAppointment.pet.breed})</span>
+                        )}
+                        {nextAppointment.pet.weight && (
+                          <span className="text-white/70">• {nextAppointment.pet.weight} lbs</span>
+                        )}
+                      </p>
+                      <p className="text-white/90 text-xs mt-1 font-medium">
+                        {formatAppointmentType(nextAppointment.appointmentType)}
+                      </p>
+                    </div>
                   )}
                   <p className="text-white/90 text-sm">{nextAppointment.customer.address}</p>
                   <p className="text-white/80 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
                     <Clock className="h-3 w-3" />
-                    {formatTime(nextAppointment.startAt)} ({nextAppointment.serviceMinutes} min)
+                    {formatTimeRange(nextAppointment.startAt, nextAppointment.serviceMinutes)}
                   </p>
                 </div>
 
@@ -769,15 +835,30 @@ export default function TodaysRoutePage() {
             {/* Start Driving - Primary */}
             <button
               onClick={() => openInMaps(nextAppointment.customer.address)}
-              className="w-full bg-[#A5744A] hover:bg-[#8B6239] text-white font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
+              className={`w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg ${
+                nextAppointment.status === "IN_PROGRESS"
+                  ? "bg-white/20 hover:bg-white/30 text-white"
+                  : "bg-[#A5744A] hover:bg-[#8B6239] text-white"
+              }`}
             >
               <Navigation className="h-6 w-6" />
               Start Driving
             </button>
 
-            {/* Skip & Status actions - 2 column layout */}
+            {/* Skip & Status actions - 3 column layout when IN_PROGRESS has Start Grooming */}
             {nextAppointment.status !== "COMPLETED" && nextAppointment.status !== "CANCELLED" && (
-              <div className="grid grid-cols-2 gap-2">
+              <div className={`grid gap-2 ${nextAppointment.status === "CONFIRMED" ? "grid-cols-3" : "grid-cols-2"}`}>
+                {/* Start Grooming - Only show when CONFIRMED */}
+                {nextAppointment.status === "CONFIRMED" && (
+                  <button
+                    onClick={() => handleStartAppointment(nextAppointment.id)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Play className="h-5 w-5" />
+                    <span className="hidden sm:inline">Start Grooming</span>
+                    <span className="sm:hidden">Start</span>
+                  </button>
+                )}
                 {/* Skip button - always shown */}
                 <button
                   onClick={() => openSkipModal(nextAppointment.id)}
@@ -798,16 +879,16 @@ export default function TodaysRoutePage() {
                 )}
                 {nextAppointment.status === "CONFIRMED" && (
                   <button
-                    onClick={() => handleStartAppointment(nextAppointment.id)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    onClick={() => openCompleteConfirm(nextAppointment.id)}
+                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
-                    <Play className="h-5 w-5" />
-                    Start
+                    <CheckCircle className="h-5 w-5" />
+                    Complete
                   </button>
                 )}
                 {nextAppointment.status === "IN_PROGRESS" && (
                   <button
-                    onClick={() => handleCompleteAppointment(nextAppointment.id)}
+                    onClick={() => openCompleteConfirm(nextAppointment.id)}
                     className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <CheckCircle className="h-5 w-5" />
@@ -840,9 +921,9 @@ export default function TodaysRoutePage() {
             >
               {/* Time & Status Row */}
               <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold text-gray-900">
-                    {index + 1}. {formatTime(appointment.startAt)}
+                    {formatTimeRange(appointment.startAt, appointment.serviceMinutes)}
                   </span>
                   {appointment.status === "BOOKED" && (
                     <span className="badge badge-info badge-sm">Booked</span>
@@ -865,12 +946,25 @@ export default function TodaysRoutePage() {
                       Completed
                     </span>
                   )}
+                  {/* Service Area Tag */}
+                  {appointment.customer.serviceArea && (
+                    <span
+                      className="badge badge-sm"
+                      style={{
+                        backgroundColor: `${appointment.customer.serviceArea.color}20`,
+                        color: appointment.customer.serviceArea.color,
+                        borderColor: appointment.customer.serviceArea.color,
+                      }}
+                    >
+                      <MapPin className="h-3 w-3 mr-1" />
+                      {appointment.customer.serviceArea.name}
+                    </span>
+                  )}
                 </div>
-                <span className="text-sm text-gray-600">{appointment.serviceMinutes} min</span>
               </div>
 
               {/* Customer & Pet Info */}
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-2">
                 <h3 className="font-semibold text-gray-900">{appointment.customer.name}</h3>
                 {appointment.customer.locationVerified && (
                   <span className="badge badge-success badge-sm gap-1">
@@ -879,11 +973,25 @@ export default function TodaysRoutePage() {
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-700 mb-2">
-                {appointment.pet?.name && `${appointment.pet.name} • `}
-                {formatAppointmentType(appointment.appointmentType)}
-                {appointment.pet?.size && ` • ${appointment.pet.size}`}
-              </p>
+
+              {/* Enhanced Pet & Service Display */}
+              {appointment.pet && (
+                <div className="bg-gray-100 rounded-lg px-3 py-2 mb-2 inline-block">
+                  <p className="text-gray-800 font-medium text-sm flex items-center gap-2">
+                    <span>🐕</span>
+                    <span>{appointment.pet.name}</span>
+                    {appointment.pet.breed && (
+                      <span className="text-gray-600">({appointment.pet.breed})</span>
+                    )}
+                    {appointment.pet.weight && (
+                      <span className="text-gray-600">• {appointment.pet.weight} lbs</span>
+                    )}
+                  </p>
+                  <p className="text-gray-700 text-xs mt-1 font-semibold">
+                    {formatAppointmentType(appointment.appointmentType)}
+                  </p>
+                </div>
+              )}
 
               {/* Address */}
               <div className="flex items-start gap-2 mb-3">
@@ -936,7 +1044,7 @@ export default function TodaysRoutePage() {
                     )}
                     {appointment.status === "IN_PROGRESS" && (
                       <button
-                        onClick={() => handleCompleteAppointment(appointment.id)}
+                        onClick={() => openCompleteConfirm(appointment.id)}
                         className="btn h-10 flex-1 bg-green-500 hover:bg-green-600 text-white border-0 gap-2"
                       >
                         <CheckCircle className="h-4 w-4" />
@@ -1197,6 +1305,45 @@ export default function TodaysRoutePage() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Complete Confirmation Modal */}
+      {showCompleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Complete Appointment?
+              </h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Are you sure you want to mark this appointment as completed?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={closeCompleteConfirm}
+                  className="btn btn-ghost flex-1"
+                  disabled={isCompleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => completeAppointmentId && handleCompleteAppointment(completeAppointmentId)}
+                  className="btn bg-green-500 hover:bg-green-600 text-white flex-1"
+                  disabled={isCompleting}
+                >
+                  {isCompleting ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    "Complete"
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

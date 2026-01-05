@@ -27,6 +27,7 @@ import {
   Zap,
   AlertTriangle,
   X,
+  Play,
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
@@ -44,9 +45,13 @@ interface TodaysStats {
     address: string;
     startAt: string; // ISO string - format on client for correct timezone
     petName?: string;
+    petBreed?: string;
+    petWeight?: number;
     serviceType: string;
+    serviceMinutes?: number;
     customerPhone?: string;
     appointmentId: string;
+    status?: string;
   };
   hasData: boolean;
   showSampleData: boolean;
@@ -191,6 +196,9 @@ function DashboardContent() {
     noShows: number;
     suggestions: string[];
   } | null>(null);
+  const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
+  const [completeAppointmentId, setCompleteAppointmentId] = useState<string | null>(null);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   useEffect(() => {
     async function handleSetup() {
@@ -440,7 +448,18 @@ function DashboardContent() {
     }
   }
 
+  function openCompleteConfirm(appointmentId: string) {
+    setCompleteAppointmentId(appointmentId);
+    setShowCompleteConfirm(true);
+  }
+
+  function closeCompleteConfirm() {
+    setShowCompleteConfirm(false);
+    setCompleteAppointmentId(null);
+  }
+
   async function handleCompleteAppointment(appointmentId: string) {
+    setIsCompleting(true);
     try {
       const response = await fetch(`/api/appointments/${appointmentId}`, {
         method: "PATCH",
@@ -450,6 +469,7 @@ function DashboardContent() {
 
       if (response.ok) {
         toast.success("Appointment completed!");
+        closeCompleteConfirm();
         await fetchDashboardData();
       } else {
         toast.error("Failed to complete appointment");
@@ -457,6 +477,28 @@ function DashboardContent() {
     } catch (error) {
       console.error("Complete appointment error:", error);
       toast.error("Failed to complete appointment");
+    } finally {
+      setIsCompleting(false);
+    }
+  }
+
+  async function handleStartGrooming(appointmentId: string) {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "IN_PROGRESS" }),
+      });
+
+      if (response.ok) {
+        toast.success("Grooming started!");
+        await fetchDashboardData();
+      } else {
+        toast.error("Failed to start grooming");
+      }
+    } catch (error) {
+      console.error("Start grooming error:", error);
+      toast.error("Failed to start grooming");
     }
   }
 
@@ -559,13 +601,19 @@ function DashboardContent() {
 
       {/* Hero Section - Today's Route */}
       {stats?.hasData && stats.nextAppointment ? (
-        <div className={`bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] text-white ${
-          isFullscreen
-            ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none'
-            : 'rounded-xl shadow-lg p-6 mb-6 border border-[#A5744A]/30'
+        <div className={`text-white ${
+          stats.nextAppointment.status === "IN_PROGRESS"
+            ? (isFullscreen
+              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800'
+              : 'rounded-xl shadow-lg p-6 mb-6 border border-blue-400/30 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800')
+            : (isFullscreen
+              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A]'
+              : 'rounded-xl shadow-lg p-6 mb-6 border border-[#A5744A]/30 bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A]')
         }`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">Next Stop - {formatTime(stats.nextAppointment.startAt)}</h2>
+            <h2 className="text-2xl font-bold">
+              {stats.nextAppointment.status === "IN_PROGRESS" ? "In Progress" : "Next Stop"} - {formatTime(stats.nextAppointment.startAt)}
+            </h2>
             <div className="flex items-center gap-2">
               {/* Badge hidden on mobile - shown below buttons instead */}
               <p className="hidden sm:block text-white/60 text-sm">
@@ -581,19 +629,39 @@ function DashboardContent() {
             </div>
           </div>
 
-          <div className="bg-[#A5744A]/10 backdrop-blur-sm rounded-lg p-4 mb-4 border border-[#A5744A]/20">
+          <div className={`backdrop-blur-sm rounded-lg p-4 mb-4 border ${
+            stats.nextAppointment.status === "IN_PROGRESS"
+              ? "bg-white/10 border-white/20"
+              : "bg-[#A5744A]/10 border-[#A5744A]/20"
+          }`}>
             <div className="flex flex-col md:flex-row items-start gap-4">
               {/* Column 1: Info and Contact Methods */}
               <div className="flex-1 min-w-0 w-full">
                 <div className="text-center md:text-left">
                   <p className="font-bold text-lg mb-1">{stats.nextAppointment.customerName}</p>
+                  {/* Enhanced Pet Display */}
                   {stats.nextAppointment.petName && (
-                    <p className="text-white/80 text-sm mb-1">{stats.nextAppointment.petName} - {stats.nextAppointment.serviceType}</p>
+                    <div className="bg-white/10 rounded-lg px-3 py-2 inline-block mb-2">
+                      <p className="text-white font-medium text-sm flex items-center gap-2">
+                        <span>🐕</span>
+                        <span>{stats.nextAppointment.petName}</span>
+                        {stats.nextAppointment.petBreed && (
+                          <span className="text-white/70">({stats.nextAppointment.petBreed})</span>
+                        )}
+                        {stats.nextAppointment.petWeight && (
+                          <span className="text-white/70">• {stats.nextAppointment.petWeight} lbs</span>
+                        )}
+                      </p>
+                      <p className="text-white/90 text-xs mt-1 font-medium">
+                        {stats.nextAppointment.serviceType}
+                      </p>
+                    </div>
                   )}
                   <p className="text-white/90 text-sm">{stats.nextAppointment.address}</p>
                   <p className="text-white/80 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
                     <Clock className="h-3 w-3" />
                     {formatTime(stats.nextAppointment.startAt)}
+                    {stats.nextAppointment.serviceMinutes && ` (${stats.nextAppointment.serviceMinutes} min)`}
                   </p>
                 </div>
 
@@ -667,14 +735,30 @@ function DashboardContent() {
             {/* Primary: Start Driving */}
             <button
               onClick={startDriving}
-              className="w-full bg-[#A5744A] hover:bg-[#8B6239] text-white font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
+              className={`w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg ${
+                stats.nextAppointment.status === "IN_PROGRESS"
+                  ? "bg-white/20 hover:bg-white/30 text-white"
+                  : "bg-[#A5744A] hover:bg-[#8B6239] text-white"
+              }`}
             >
               <Navigation className="h-6 w-6" />
               Start Driving
             </button>
 
-            {/* Secondary Actions - Skip & Complete */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* Secondary Actions - Start Grooming, Skip & Complete */}
+            <div className={`grid gap-2 ${stats.nextAppointment.status === "CONFIRMED" ? "grid-cols-3" : "grid-cols-2"}`}>
+              {/* Start Grooming - Only show when CONFIRMED */}
+              {stats.nextAppointment.status === "CONFIRMED" && (
+                <button
+                  onClick={() => stats.nextAppointment && handleStartGrooming(stats.nextAppointment.appointmentId)}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <Play className="h-5 w-5" />
+                  <span className="hidden sm:inline">Start Grooming</span>
+                  <span className="sm:hidden">Start</span>
+                </button>
+              )}
+              {/* Skip button */}
               <button
                 onClick={() => stats.nextAppointment && openSkipModal(stats.nextAppointment.appointmentId)}
                 className="bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
@@ -682,8 +766,9 @@ function DashboardContent() {
                 <SkipForward className="h-5 w-5" />
                 Skip
               </button>
+              {/* Complete button with confirmation */}
               <button
-                onClick={() => stats.nextAppointment && handleCompleteAppointment(stats.nextAppointment.appointmentId)}
+                onClick={() => stats.nextAppointment && openCompleteConfirm(stats.nextAppointment.appointmentId)}
                 className="bg-green-500/80 hover:bg-green-500/90 border border-green-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <CheckCircle className="h-5 w-5" />
@@ -771,9 +856,40 @@ function DashboardContent() {
           <p className="text-2xl font-bold text-emerald-600 mb-1">
             {performanceData.today.headline}
           </p>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 mb-2">
             {performanceData.today.subtext}
           </p>
+
+          {/* Dynamic Progress Context */}
+          {performanceData.today.dogsScheduled > 0 && (
+            <div className="mb-4">
+              {/* Progress Bar */}
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${(performanceData.today.dogsGroomed / performanceData.today.dogsScheduled) * 100}%`
+                    }}
+                  />
+                </div>
+                <span className="text-sm font-medium text-gray-600">
+                  {Math.round((performanceData.today.dogsGroomed / performanceData.today.dogsScheduled) * 100)}%
+                </span>
+              </div>
+              {/* Contextual message based on progress */}
+              <p className="text-xs text-gray-500">
+                {performanceData.today.dogsGroomed === 0
+                  ? `${performanceData.today.dogsScheduled} appointments ahead - you've got this!`
+                  : performanceData.today.dogsGroomed === performanceData.today.dogsScheduled
+                    ? "All done! Great work today."
+                    : performanceData.today.dogsGroomed >= performanceData.today.dogsScheduled / 2
+                      ? `Past the halfway mark! ${performanceData.today.dogsScheduled - performanceData.today.dogsGroomed} more to go.`
+                      : `Good progress! ${performanceData.today.dogsScheduled - performanceData.today.dogsGroomed} appointments remaining.`
+                }
+              </p>
+            </div>
+          )}
 
           {/* Quick Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
@@ -997,7 +1113,7 @@ function DashboardContent() {
                 <h3 className="text-sm font-medium text-gray-700">Last 7 Days</h3>
                 <div className="flex items-center gap-4 text-xs">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded bg-gradient-to-t from-[#A5744A] to-[#C99966]"></div>
+                    <div className="w-3 h-3 rounded bg-gradient-to-t from-green-500 to-green-400"></div>
                     <span className="text-gray-600">Earned</span>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -1006,55 +1122,74 @@ function DashboardContent() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-end justify-between gap-2 h-48">
-                {revenueStats.dailyRevenue.map((day) => {
-                  const totalRevenue = day.revenue + day.lostRevenue;
-                  const maxTotal = Math.max(...revenueStats.dailyRevenue.map(d => d.revenue + d.lostRevenue));
-                  const totalHeightPercent = maxTotal > 0 ? (totalRevenue / maxTotal) * 100 : 0;
-                  const earnedHeightPercent = totalRevenue > 0 ? (day.revenue / totalRevenue) * 100 : 0;
-                  const lostHeightPercent = totalRevenue > 0 ? (day.lostRevenue / totalRevenue) * 100 : 0;
+              {/* Chart with Y-axis */}
+              <div className="flex gap-2">
+                {/* Y-axis labels */}
+                <div className="flex flex-col justify-between h-[160px] text-xs text-gray-500 pr-2" style={{ minWidth: '40px' }}>
+                  {(() => {
+                    const maxTotal = Math.max(...revenueStats.dailyRevenue.map(d => d.revenue + d.lostRevenue), 1);
+                    return (
+                      <>
+                        <span>${maxTotal.toFixed(0)}</span>
+                        <span>${(maxTotal * 0.75).toFixed(0)}</span>
+                        <span>${(maxTotal * 0.5).toFixed(0)}</span>
+                        <span>${(maxTotal * 0.25).toFixed(0)}</span>
+                        <span>$0</span>
+                      </>
+                    );
+                  })()}
+                </div>
+                {/* Chart bars */}
+                <div className="flex-1 flex items-end justify-between gap-2 h-48">
+                  {revenueStats.dailyRevenue.map((day) => {
+                    const totalRevenue = day.revenue + day.lostRevenue;
+                    const maxTotal = Math.max(...revenueStats.dailyRevenue.map(d => d.revenue + d.lostRevenue));
+                    const totalHeightPercent = maxTotal > 0 ? (totalRevenue / maxTotal) * 100 : 0;
+                    const earnedHeightPercent = totalRevenue > 0 ? (day.revenue / totalRevenue) * 100 : 0;
+                    const lostHeightPercent = totalRevenue > 0 ? (day.lostRevenue / totalRevenue) * 100 : 0;
 
-                  return (
-                    <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
-                      <div className="relative w-full flex flex-col justify-end" style={{ height: '160px' }}>
-                        <div
-                          className="w-full flex flex-col justify-end cursor-pointer group"
-                          style={{ height: `${totalHeightPercent}%`, minHeight: totalRevenue > 0 ? '8px' : '0' }}
-                        >
-                          {/* Lost revenue (top - red) */}
-                          {day.lostRevenue > 0 && (
-                            <div
-                              className="w-full bg-red-300 rounded-t-lg transition-all hover:bg-red-400"
-                              style={{ height: `${lostHeightPercent}%`, minHeight: '4px' }}
-                              title={`Lost: $${day.lostRevenue.toFixed(0)} (${day.lostAppointments} cancelled/no-show)`}
-                            />
-                          )}
-                          {/* Earned revenue (bottom - gold) */}
-                          {day.revenue > 0 && (
-                            <div
-                              className={`w-full bg-gradient-to-t from-[#A5744A] to-[#C99966] transition-all hover:opacity-80 ${day.lostRevenue === 0 ? 'rounded-t-lg' : ''}`}
-                              style={{ height: `${earnedHeightPercent}%`, minHeight: '4px' }}
-                              title={`Earned: $${day.revenue.toFixed(0)} (${day.appointments} completed)`}
-                            />
-                          )}
-                          {/* Tooltip */}
-                          <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1.5 rounded whitespace-nowrap z-10">
-                            <div className="text-green-300">${day.revenue.toFixed(0)} earned</div>
-                            {day.lostRevenue > 0 && <div className="text-red-300">${day.lostRevenue.toFixed(0)} lost</div>}
+                    return (
+                      <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
+                        <div className="relative w-full flex flex-col justify-end" style={{ height: '160px' }}>
+                          <div
+                            className="w-full flex flex-col justify-end cursor-pointer group"
+                            style={{ height: `${totalHeightPercent}%`, minHeight: totalRevenue > 0 ? '8px' : '0' }}
+                          >
+                            {/* Lost revenue (top - red) */}
+                            {day.lostRevenue > 0 && (
+                              <div
+                                className="w-full bg-red-300 rounded-t-lg transition-all hover:bg-red-400"
+                                style={{ height: `${lostHeightPercent}%`, minHeight: '4px' }}
+                                title={`Lost: $${day.lostRevenue.toFixed(0)} (${day.lostAppointments} cancelled/no-show)`}
+                              />
+                            )}
+                            {/* Earned revenue (bottom - green) */}
+                            {day.revenue > 0 && (
+                              <div
+                                className={`w-full bg-gradient-to-t from-green-500 to-green-400 transition-all hover:opacity-80 ${day.lostRevenue === 0 ? 'rounded-t-lg' : ''}`}
+                                style={{ height: `${earnedHeightPercent}%`, minHeight: '4px' }}
+                                title={`Earned: $${day.revenue.toFixed(0)} (${day.appointments} completed)`}
+                              />
+                            )}
+                            {/* Tooltip */}
+                            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1.5 rounded whitespace-nowrap z-10">
+                              <div className="text-green-300">${day.revenue.toFixed(0)} earned</div>
+                              {day.lostRevenue > 0 && <div className="text-red-300">${day.lostRevenue.toFixed(0)} lost</div>}
+                            </div>
                           </div>
                         </div>
+                        <div className="text-xs text-gray-600 font-medium">{day.dayName}</div>
                       </div>
-                      <div className="text-xs text-gray-600 font-medium">{day.dayName}</div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.weeklyRevenue.toFixed(0)}</p>
+                <p className="text-2xl font-bold text-green-600">${revenueStats.weeklyRevenue.toFixed(0)}</p>
                 <p className="text-xs text-gray-600 mt-1">Weekly Earnings</p>
                 <p className="text-xs text-gray-500">{revenueStats.weeklyAppointments} jobs completed</p>
                 {revenueStats.weeklyLostRevenue > 0 && (
@@ -1062,7 +1197,7 @@ function DashboardContent() {
                 )}
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.monthlyRevenue.toFixed(0)}</p>
+                <p className="text-2xl font-bold text-green-600">${revenueStats.monthlyRevenue.toFixed(0)}</p>
                 <p className="text-xs text-gray-600 mt-1">Monthly Earnings</p>
                 <p className="text-xs text-gray-500">{revenueStats.monthlyAppointments} jobs completed</p>
                 {revenueStats.monthlyLostRevenue > 0 && (
@@ -1070,7 +1205,7 @@ function DashboardContent() {
                 )}
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.avgRevenuePerAppointment.toFixed(0)}</p>
+                <p className="text-2xl font-bold text-green-600">${revenueStats.avgRevenuePerAppointment.toFixed(0)}</p>
                 <p className="text-xs text-gray-600 mt-1">Avg per Job</p>
               </div>
               <div className="text-center">
@@ -1272,6 +1407,45 @@ function DashboardContent() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Complete Confirmation Modal */}
+      {showCompleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Complete Appointment?
+              </h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Are you sure you want to mark this appointment as completed?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={closeCompleteConfirm}
+                  className="btn btn-ghost flex-1"
+                  disabled={isCompleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => completeAppointmentId && handleCompleteAppointment(completeAppointmentId)}
+                  className="btn bg-green-500 hover:bg-green-600 text-white flex-1"
+                  disabled={isCompleting}
+                >
+                  {isCompleting ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    "Complete"
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

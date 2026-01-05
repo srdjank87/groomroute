@@ -2,7 +2,13 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search, Calendar, DollarSign, ArrowUpDown } from "lucide-react";
+import { Plus, Search, Calendar, DollarSign, ArrowUpDown, MapPin } from "lucide-react";
+
+interface ServiceArea {
+  id: string;
+  name: string;
+  color: string;
+}
 
 interface Customer {
   id: string;
@@ -16,6 +22,7 @@ interface Customer {
     name: string;
     species?: string;
   }[];
+  serviceArea?: ServiceArea | null;
   _count: {
     appointments: number;
   };
@@ -38,10 +45,28 @@ type FilterOption = "all" | "active" | "inactive" | "vip" | "new";
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
+  const [areaFilter, setAreaFilter] = useState<string>("all"); // "all" or areaId
+
+  // Fetch service areas
+  useEffect(() => {
+    const fetchAreas = async () => {
+      try {
+        const response = await fetch("/api/areas");
+        if (response.ok) {
+          const data = await response.json();
+          setServiceAreas(data.areas || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch service areas:", error);
+      }
+    };
+    fetchAreas();
+  }, []);
 
   const fetchCustomers = useCallback(async () => {
     setIsLoading(true);
@@ -71,10 +96,14 @@ export default function CustomersPage() {
     const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    // Sort by revenue to find VIP customers (top 10 or top 10%)
-    const sortedByRevenue = [...customers].sort((a, b) => b.totalRevenue - a.totalRevenue);
-    const vipCount = Math.max(10, Math.ceil(customers.length * 0.1));
-    const vipCustomerIds = new Set(sortedByRevenue.slice(0, vipCount).map((c) => c.id));
+    // Sort by revenue to find VIP customers (top 10% with minimum of 1, max of 10)
+    // Only customers with revenue > 0 can be VIP
+    const customersWithRevenue = customers.filter((c) => c.totalRevenue > 0);
+    const sortedByRevenue = [...customersWithRevenue].sort((a, b) => b.totalRevenue - a.totalRevenue);
+    // VIP count is 10% of customers with revenue, minimum 1 (if any), maximum 10
+    const vipCount = customersWithRevenue.length === 0
+      ? 0
+      : Math.min(10, Math.max(1, Math.ceil(customersWithRevenue.length * 0.1)));
 
     return {
       all: customers.length,
@@ -99,40 +128,53 @@ export default function CustomersPage() {
     const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    // Get VIP customer IDs
-    const sortedByRevenue = [...customers].sort((a, b) => b.totalRevenue - a.totalRevenue);
-    const vipCount = Math.max(10, Math.ceil(customers.length * 0.1));
+    // Get VIP customer IDs (only customers with revenue, top 10%, min 1, max 10)
+    const customersWithRevenue = customers.filter((c) => c.totalRevenue > 0);
+    const sortedByRevenue = [...customersWithRevenue].sort((a, b) => b.totalRevenue - a.totalRevenue);
+    const vipCount = customersWithRevenue.length === 0
+      ? 0
+      : Math.min(10, Math.max(1, Math.ceil(customersWithRevenue.length * 0.1)));
     const vipCustomerIds = new Set(sortedByRevenue.slice(0, vipCount).map((c) => c.id));
 
     let filtered = customers;
 
+    // Apply service area filter first
+    if (areaFilter !== "all") {
+      if (areaFilter === "unassigned") {
+        filtered = filtered.filter((c) => !c.serviceArea);
+      } else {
+        filtered = filtered.filter((c) => c.serviceArea?.id === areaFilter);
+      }
+    }
+
     switch (filterBy) {
       case "active":
-        filtered = customers.filter((c) => {
+        filtered = filtered.filter((c) => {
           if (!c.lastAppointmentDate) return false;
           return new Date(c.lastAppointmentDate) >= ninetyDaysAgo;
         });
         break;
       case "inactive":
-        filtered = customers.filter((c) => {
+        filtered = filtered.filter((c) => {
           if (!c.lastAppointmentDate) return true;
           return new Date(c.lastAppointmentDate) < ninetyDaysAgo;
         });
         break;
       case "vip":
-        filtered = customers.filter((c) => vipCustomerIds.has(c.id));
+        filtered = filtered.filter((c) => vipCustomerIds.has(c.id));
         break;
       case "new":
-        filtered = customers.filter((c) => {
+        filtered = filtered.filter((c) => {
           return new Date(c.createdAt) >= thirtyDaysAgo && c._count.appointments === 0;
         });
         break;
       default:
-        filtered = customers;
+        // Already filtered by area above
+        break;
     }
 
     return filtered;
-  }, [customers, filterBy]);
+  }, [customers, filterBy, areaFilter]);
 
   // Sort customers
   const sortedCustomers = useMemo(() => {
@@ -165,8 +207,11 @@ export default function CustomersPage() {
   // Check if customer is VIP
   const isVipCustomer = useCallback(
     (customerId: string) => {
-      const sortedByRevenue = [...customers].sort((a, b) => b.totalRevenue - a.totalRevenue);
-      const vipCount = Math.max(10, Math.ceil(customers.length * 0.1));
+      const customersWithRevenue = customers.filter((c) => c.totalRevenue > 0);
+      const sortedByRevenue = [...customersWithRevenue].sort((a, b) => b.totalRevenue - a.totalRevenue);
+      const vipCount = customersWithRevenue.length === 0
+        ? 0
+        : Math.min(10, Math.max(1, Math.ceil(customersWithRevenue.length * 0.1)));
       const vipCustomerIds = new Set(sortedByRevenue.slice(0, vipCount).map((c) => c.id));
       return vipCustomerIds.has(customerId);
     },
@@ -209,10 +254,10 @@ export default function CustomersPage() {
       </div>
 
       {/* Filter Pills */}
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 grid grid-cols-3 sm:grid-cols-5 gap-2">
         <button
           onClick={() => setFilterBy("all")}
-          className={`badge badge-lg h-10 px-4 cursor-pointer transition-colors ${
+          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
             filterBy === "all"
               ? "bg-[#A5744A] text-white border-[#A5744A]"
               : "bg-white text-gray-700 border-gray-300 hover:border-[#A5744A]"
@@ -222,7 +267,7 @@ export default function CustomersPage() {
         </button>
         <button
           onClick={() => setFilterBy("active")}
-          className={`badge badge-lg h-10 px-4 cursor-pointer transition-colors ${
+          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
             filterBy === "active"
               ? "bg-green-600 text-white border-green-600"
               : "bg-white text-gray-700 border-gray-300 hover:border-green-600"
@@ -232,7 +277,7 @@ export default function CustomersPage() {
         </button>
         <button
           onClick={() => setFilterBy("inactive")}
-          className={`badge badge-lg h-10 px-4 cursor-pointer transition-colors ${
+          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
             filterBy === "inactive"
               ? "bg-gray-600 text-white border-gray-600"
               : "bg-white text-gray-700 border-gray-300 hover:border-gray-600"
@@ -242,7 +287,7 @@ export default function CustomersPage() {
         </button>
         <button
           onClick={() => setFilterBy("vip")}
-          className={`badge badge-lg h-10 px-4 cursor-pointer transition-colors ${
+          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
             filterBy === "vip"
               ? "bg-purple-600 text-white border-purple-600"
               : "bg-white text-gray-700 border-gray-300 hover:border-purple-600"
@@ -252,7 +297,7 @@ export default function CustomersPage() {
         </button>
         <button
           onClick={() => setFilterBy("new")}
-          className={`badge badge-lg h-10 px-4 cursor-pointer transition-colors ${
+          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
             filterBy === "new"
               ? "bg-blue-600 text-white border-blue-600"
               : "bg-white text-gray-700 border-gray-300 hover:border-blue-600"
@@ -261,6 +306,36 @@ export default function CustomersPage() {
           New ({customerSegments.new})
         </button>
       </div>
+
+      {/* Service Area Filter */}
+      {serviceAreas.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-4 mb-4">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-gray-500" />
+            <select
+              value={areaFilter}
+              onChange={(e) => setAreaFilter(e.target.value)}
+              className="select select-bordered h-10 text-sm flex-1"
+            >
+              <option value="all">All Service Areas</option>
+              <option value="unassigned">Unassigned</option>
+              {serviceAreas.map((area) => (
+                <option key={area.id} value={area.id}>
+                  {area.name}
+                </option>
+              ))}
+            </select>
+            {areaFilter !== "all" && (
+              <button
+                onClick={() => setAreaFilter("all")}
+                className="btn btn-sm h-10 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Sort Control */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -287,12 +362,15 @@ export default function CustomersPage() {
       {/* Results Count */}
       <div className="mb-4 text-sm text-gray-600">
         Showing {sortedCustomers.length} {sortedCustomers.length === 1 ? "customer" : "customers"}
-        {filterBy !== "all" && (
+        {(filterBy !== "all" || areaFilter !== "all") && (
           <button
-            onClick={() => setFilterBy("all")}
+            onClick={() => {
+              setFilterBy("all");
+              setAreaFilter("all");
+            }}
             className="ml-2 text-[#A5744A] hover:underline"
           >
-            Clear filter
+            Clear all filters
           </button>
         )}
       </div>
@@ -351,6 +429,14 @@ export default function CustomersPage() {
                       {isActive && (
                         <span className="badge badge-sm bg-green-100 text-green-700 border-green-300">
                           Active
+                        </span>
+                      )}
+                      {customer.serviceArea && (
+                        <span
+                          className="badge badge-sm text-white"
+                          style={{ backgroundColor: customer.serviceArea.color }}
+                        >
+                          {customer.serviceArea.name}
                         </span>
                       )}
                     </div>
