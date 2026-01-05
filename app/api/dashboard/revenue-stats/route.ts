@@ -46,6 +46,24 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    // Fetch cancelled and no-show appointments for lost revenue calculation
+    const lostAppointments = await prisma.appointment.findMany({
+      where: {
+        accountId,
+        startAt: {
+          gte: thirtyDaysAgo,
+        },
+        status: {
+          in: ["CANCELLED", "NO_SHOW"],
+        },
+      },
+      select: {
+        price: true,
+        startAt: true,
+        status: true,
+      },
+    });
+
     // Calculate daily revenue for last 7 days
     const dailyRevenue = [];
     for (let i = 6; i >= 0; i--) {
@@ -59,18 +77,27 @@ export async function GET(req: NextRequest) {
         return aptDate >= date && aptDate < nextDate;
       });
 
+      const dayLostAppointments = lostAppointments.filter((apt) => {
+        const aptDate = new Date(apt.startAt);
+        return aptDate >= date && aptDate < nextDate;
+      });
+
       const revenue = dayAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
+      const lostRevenue = dayLostAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
 
       dailyRevenue.push({
         date: date.toISOString().split("T")[0],
         dayName: date.toLocaleDateString("en-US", { weekday: "short" }),
         revenue,
+        lostRevenue,
         appointments: dayAppointments.length,
+        lostAppointments: dayLostAppointments.length,
       });
     }
 
     // Calculate weekly revenue (last 7 days)
     const weeklyRevenue = dailyRevenue.reduce((sum, day) => sum + day.revenue, 0);
+    const weeklyLostRevenue = dailyRevenue.reduce((sum, day) => sum + day.lostRevenue, 0);
     const weeklyAppointments = dailyRevenue.reduce(
       (sum, day) => sum + day.appointments,
       0
@@ -78,6 +105,10 @@ export async function GET(req: NextRequest) {
 
     // Calculate monthly revenue (last 30 days)
     const monthlyRevenue = appointments.reduce(
+      (sum, apt) => sum + (apt.price || 0),
+      0
+    );
+    const monthlyLostRevenue = lostAppointments.reduce(
       (sum, apt) => sum + (apt.price || 0),
       0
     );
@@ -115,8 +146,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       dailyRevenue,
       weeklyRevenue,
+      weeklyLostRevenue,
       weeklyAppointments,
       monthlyRevenue,
+      monthlyLostRevenue,
       monthlyAppointments,
       avgRevenuePerAppointment,
       avgRevenuePerCustomer,

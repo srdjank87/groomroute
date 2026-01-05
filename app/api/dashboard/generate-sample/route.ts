@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geocoding";
+import { AppointmentStatus } from "@prisma/client";
 
 // Sample customer data for demonstration - using real Austin, TX addresses
 const SAMPLE_CUSTOMERS = [
@@ -309,20 +310,20 @@ export async function POST(req: NextRequest) {
 
         // Determine appointment status for past days
         // ~85% completed, ~10% cancelled, ~5% no-show
-        let status: string;
+        let status: AppointmentStatus;
         const isPast = dayOffset > 0;
 
         if (isPast) {
           const randomValue = Math.random();
           if (randomValue < 0.85) {
-            status = "COMPLETED";
+            status = AppointmentStatus.COMPLETED;
           } else if (randomValue < 0.95) {
-            status = "CANCELLED";
+            status = AppointmentStatus.CANCELLED;
           } else {
-            status = "NO_SHOW";
+            status = AppointmentStatus.NO_SHOW;
           }
         } else {
-          status = "CONFIRMED";
+          status = AppointmentStatus.CONFIRMED;
         }
 
         await prisma.appointment.create({

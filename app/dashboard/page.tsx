@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   MapPin,
   Navigation,
@@ -46,11 +47,15 @@ interface RevenueStats {
     date: string;
     dayName: string;
     revenue: number;
+    lostRevenue: number;
     appointments: number;
+    lostAppointments: number;
   }[];
   weeklyRevenue: number;
+  weeklyLostRevenue: number;
   weeklyAppointments: number;
   monthlyRevenue: number;
+  monthlyLostRevenue: number;
   monthlyAppointments: number;
   avgRevenuePerAppointment: number;
   avgRevenuePerCustomer: number;
@@ -460,11 +465,14 @@ function DashboardContent() {
               {/* Column 2: Map Preview */}
               <div className="w-full md:w-auto flex justify-center md:justify-end">
                 <div className="rounded-lg overflow-hidden border-2 border-white/20">
-                  {/* Mobile: 150x150 (300x300 in fullscreen), Desktop: 300x300 */}
-                  <img
+                  {/* Mobile: 150x150 (200x200 in fullscreen), Desktop: 300x300 */}
+                  <Image
                     src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=300x300&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                     alt="Location map"
+                    width={300}
+                    height={300}
                     className={isFullscreen ? "w-[200px] h-[200px]" : "w-[150px] h-[150px] md:w-[300px] md:h-[300px]"}
+                    unoptimized
                   />
                 </div>
               </div>
@@ -579,22 +587,54 @@ function DashboardContent() {
           {/* Revenue Chart */}
           <div className="p-6">
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-700 mb-4">Last 7 Days</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-gray-700">Last 7 Days</h3>
+                <div className="flex items-center gap-4 text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded bg-gradient-to-t from-[#A5744A] to-[#C99966]"></div>
+                    <span className="text-gray-600">Earned</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded bg-red-300"></div>
+                    <span className="text-gray-600">Lost</span>
+                  </div>
+                </div>
+              </div>
               <div className="flex items-end justify-between gap-2 h-48">
-                {revenueStats.dailyRevenue.map((day, index) => {
-                  const maxRevenue = Math.max(...revenueStats.dailyRevenue.map(d => d.revenue));
-                  const heightPercent = maxRevenue > 0 ? (day.revenue / maxRevenue) * 100 : 0;
+                {revenueStats.dailyRevenue.map((day) => {
+                  const totalRevenue = day.revenue + day.lostRevenue;
+                  const maxTotal = Math.max(...revenueStats.dailyRevenue.map(d => d.revenue + d.lostRevenue));
+                  const totalHeightPercent = maxTotal > 0 ? (totalRevenue / maxTotal) * 100 : 0;
+                  const earnedHeightPercent = totalRevenue > 0 ? (day.revenue / totalRevenue) * 100 : 0;
+                  const lostHeightPercent = totalRevenue > 0 ? (day.lostRevenue / totalRevenue) * 100 : 0;
 
                   return (
                     <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
                       <div className="relative w-full flex flex-col justify-end" style={{ height: '160px' }}>
                         <div
-                          className="w-full bg-gradient-to-t from-[#A5744A] to-[#C99966] rounded-t-lg transition-all hover:opacity-80 cursor-pointer group relative"
-                          style={{ height: `${heightPercent}%`, minHeight: day.revenue > 0 ? '8px' : '0' }}
-                          title={`$${day.revenue.toFixed(0)} (${day.appointments} appointments)`}
+                          className="w-full flex flex-col justify-end cursor-pointer group"
+                          style={{ height: `${totalHeightPercent}%`, minHeight: totalRevenue > 0 ? '8px' : '0' }}
                         >
-                          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                            ${day.revenue.toFixed(0)}
+                          {/* Lost revenue (top - red) */}
+                          {day.lostRevenue > 0 && (
+                            <div
+                              className="w-full bg-red-300 rounded-t-lg transition-all hover:bg-red-400"
+                              style={{ height: `${lostHeightPercent}%`, minHeight: '4px' }}
+                              title={`Lost: $${day.lostRevenue.toFixed(0)} (${day.lostAppointments} cancelled/no-show)`}
+                            />
+                          )}
+                          {/* Earned revenue (bottom - gold) */}
+                          {day.revenue > 0 && (
+                            <div
+                              className={`w-full bg-gradient-to-t from-[#A5744A] to-[#C99966] transition-all hover:opacity-80 ${day.lostRevenue === 0 ? 'rounded-t-lg' : ''}`}
+                              style={{ height: `${earnedHeightPercent}%`, minHeight: '4px' }}
+                              title={`Earned: $${day.revenue.toFixed(0)} (${day.appointments} completed)`}
+                            />
+                          )}
+                          {/* Tooltip */}
+                          <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1.5 rounded whitespace-nowrap z-10">
+                            <div className="text-green-300">${day.revenue.toFixed(0)} earned</div>
+                            {day.lostRevenue > 0 && <div className="text-red-300">${day.lostRevenue.toFixed(0)} lost</div>}
                           </div>
                         </div>
                       </div>
@@ -609,21 +649,27 @@ function DashboardContent() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.weeklyRevenue.toFixed(0)}</p>
-                <p className="text-xs text-gray-600 mt-1">Weekly Revenue</p>
+                <p className="text-xs text-gray-600 mt-1">Weekly Earned</p>
                 <p className="text-xs text-gray-500">{revenueStats.weeklyAppointments} jobs completed</p>
+                {revenueStats.weeklyLostRevenue > 0 && (
+                  <p className="text-xs text-red-500 mt-1">-${revenueStats.weeklyLostRevenue.toFixed(0)} lost</p>
+                )}
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.monthlyRevenue.toFixed(0)}</p>
-                <p className="text-xs text-gray-600 mt-1">Monthly Revenue</p>
+                <p className="text-xs text-gray-600 mt-1">Monthly Earned</p>
                 <p className="text-xs text-gray-500">{revenueStats.monthlyAppointments} jobs completed</p>
+                {revenueStats.monthlyLostRevenue > 0 && (
+                  <p className="text-xs text-red-500 mt-1">-${revenueStats.monthlyLostRevenue.toFixed(0)} lost</p>
+                )}
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.avgRevenuePerAppointment.toFixed(0)}</p>
                 <p className="text-xs text-gray-600 mt-1">Avg per Job</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-[#A5744A]">${revenueStats.avgRevenuePerCustomer.toFixed(0)}</p>
-                <p className="text-xs text-gray-600 mt-1">Avg per Customer</p>
+                <p className="text-2xl font-bold text-green-600">{revenueStats.completionRate.toFixed(0)}%</p>
+                <p className="text-xs text-gray-600 mt-1">Completion Rate</p>
               </div>
             </div>
           </div>
