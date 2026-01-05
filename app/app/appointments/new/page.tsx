@@ -368,18 +368,23 @@ function NewAppointmentContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Time <span className="text-red-500">*</span>
                 </label>
-                <div
-                  className="cursor-pointer"
-                  onClick={() => timeInputRef.current?.showPicker?.()}
-                >
-                  <input
-                    ref={timeInputRef}
-                    type="time"
-                    value={appointmentData.time}
-                    onChange={(e) => setAppointmentData({ ...appointmentData, time: e.target.value })}
-                    className="input input-bordered w-full h-12 text-base cursor-pointer"
-                    required
-                  />
+                <div className="relative">
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => timeInputRef.current?.showPicker?.()}
+                  >
+                    <input
+                      ref={timeInputRef}
+                      type="time"
+                      value={appointmentData.time}
+                      onChange={(e) => setAppointmentData({ ...appointmentData, time: e.target.value })}
+                      className="input input-bordered w-full h-12 text-base cursor-pointer opacity-0 absolute inset-0"
+                      required
+                    />
+                    <div className="input input-bordered w-full h-12 text-base cursor-pointer flex items-center">
+                      {appointmentData.time || "Select a time"}
+                    </div>
+                  </div>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
                   Select your preferred arrival time
