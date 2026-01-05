@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, Locate, ChevronDown, ChevronUp, ExternalLink, MessageSquare } from "lucide-react";
+import { Navigation, MapPin, Clock, Phone, AlertCircle, Copy, CheckCircle2, Zap, MessageSquare } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Appointment {
@@ -35,11 +35,6 @@ export default function TodaysRoutePage() {
     totalDistance?: number;
     estimatedDriveTime?: number;
   } | null>(null);
-  const [showStartLocation, setShowStartLocation] = useState(false);
-  const [startAddress, setStartAddress] = useState("");
-  const [startLat, setStartLat] = useState<number | null>(null);
-  const [startLng, setStartLng] = useState<number | null>(null);
-  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
 
   useEffect(() => {
@@ -136,66 +131,18 @@ export default function TodaysRoutePage() {
     window.location.href = `tg://resolve?phone=${phone}`;
   }
 
-  async function getCurrentLocation() {
-    setIsGettingLocation(true);
-    try {
-      if (!navigator.geolocation) {
-        toast.error("Geolocation is not supported by your browser");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-
-          setStartLat(lat);
-          setStartLng(lng);
-          setStartAddress(`Current Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
-          toast.success("Location detected!");
-          setIsGettingLocation(false);
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-          toast.error("Could not get your location. Please enter address manually.");
-          setIsGettingLocation(false);
-        }
-      );
-    } catch (error) {
-      console.error("Location error:", error);
-      toast.error("Failed to get location");
-      setIsGettingLocation(false);
-    }
-  }
-
-  async function geocodeStartAddress() {
-    if (!startAddress) {
-      toast.error("Please enter a starting address");
-      return;
-    }
-
-    setIsGettingLocation(true);
-    try {
-      const response = await fetch("/api/geocode", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: startAddress }),
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.lat && data.lng) {
-        setStartLat(data.lat);
-        setStartLng(data.lng);
-        toast.success("Starting location found!");
-      } else {
-        toast.error("Could not find this address. Please try again.");
-      }
-    } catch (error) {
-      console.error("Geocoding error:", error);
-      toast.error("Failed to geocode address");
-    } finally {
-      setIsGettingLocation(false);
+  function formatAppointmentType(type: string): string {
+    switch (type) {
+      case "FULL_GROOM":
+        return "Full Groom";
+      case "BATH_ONLY":
+        return "Bath Only";
+      case "NAIL_TRIM":
+        return "Nail Trim";
+      case "FACE_FEET_FANNY":
+        return "Face, Feet & Fanny";
+      default:
+        return type;
     }
   }
 
@@ -213,11 +160,6 @@ export default function TodaysRoutePage() {
     // Build Google Maps directions URL with waypoints
     let url = "https://www.google.com/maps/dir/";
 
-    // Add starting location if set
-    if (startAddress) {
-      url += encodeURIComponent(startAddress) + "/";
-    }
-
     // Add all appointment addresses as waypoints
     validAppointments.forEach((apt) => {
       url += encodeURIComponent(apt.customer.address) + "/";
@@ -232,13 +174,7 @@ export default function TodaysRoutePage() {
     setIsOptimizing(true);
     try {
       const today = new Date().toISOString().split('T')[0];
-      const payload: any = { date: today };
-
-      // Include starting location if provided
-      if (startLat !== null && startLng !== null) {
-        payload.startLat = startLat;
-        payload.startLng = startLng;
-      }
+      const payload = { date: today };
 
       const response = await fetch('/api/routes/optimize', {
         method: 'POST',
@@ -317,7 +253,7 @@ export default function TodaysRoutePage() {
                 <button
                   onClick={optimizeRoute}
                   disabled={isOptimizing}
-                  className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+                  className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 px-6"
                 >
                   {isOptimizing ? (
                     <span className="loading loading-spinner loading-sm"></span>
@@ -329,7 +265,7 @@ export default function TodaysRoutePage() {
               )}
               <button
                 onClick={exportToGoogleMaps}
-                className="btn h-12 btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white hover:border-[#A5744A] gap-2"
+                className="btn h-12 btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white hover:border-[#A5744A] gap-2 px-6"
               >
                 <Navigation className="h-5 w-5" />
                 Start Driving
@@ -337,86 +273,6 @@ export default function TodaysRoutePage() {
             </div>
           )}
         </div>
-
-        {/* Starting Location Section */}
-        {unoptimizedAppointments.length > 1 && (
-          <div className="mt-4">
-            <button
-              onClick={() => setShowStartLocation(!showStartLocation)}
-              className="flex items-center gap-2 text-sm text-[#A5744A] font-medium hover:text-[#8B6239]"
-            >
-              {showStartLocation ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              Set starting location (optional)
-            </button>
-
-            {showStartLocation && (
-              <div className="mt-3 p-4 bg-white rounded-lg border border-gray-200 space-y-3">
-                <p className="text-sm text-gray-600">
-                  Optimize route from your current location or a specific address
-                </p>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={getCurrentLocation}
-                    disabled={isGettingLocation}
-                    className="btn btn-sm h-10 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
-                  >
-                    {isGettingLocation ? (
-                      <span className="loading loading-spinner loading-xs"></span>
-                    ) : (
-                      <Locate className="h-4 w-4" />
-                    )}
-                    Use Current Location
-                  </button>
-
-                  {startLat && startLng && (
-                    <button
-                      onClick={() => {
-                        setStartLat(null);
-                        setStartLng(null);
-                        setStartAddress("");
-                      }}
-                      className="btn btn-sm h-10 btn-ghost gap-2"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-
-                <div className="divider text-xs text-gray-500">OR</div>
-
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={startAddress}
-                    onChange={(e) => setStartAddress(e.target.value)}
-                    placeholder="Enter starting address"
-                    className="input input-bordered flex-1 h-10"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        geocodeStartAddress();
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={geocodeStartAddress}
-                    disabled={!startAddress || isGettingLocation}
-                    className="btn btn-sm h-10 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
-                  >
-                    Set
-                  </button>
-                </div>
-
-                {startLat && startLng && (
-                  <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 p-2 rounded border border-green-200">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>Starting location set: {startAddress || `${startLat.toFixed(4)}, ${startLng.toFixed(4)}`}</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Route Stats */}
         {routeStats && (
@@ -449,20 +305,20 @@ export default function TodaysRoutePage() {
 
       {/* Next Up Card */}
       {nextAppointment && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg text-white">
+        <div className="mb-6 p-4 bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] rounded-xl shadow-lg text-white border border-[#A5744A]/30">
           <div className="flex items-center gap-2 mb-2">
             <Navigation className="h-5 w-5" />
             <span className="font-semibold">Up Next</span>
           </div>
           <h3 className="text-xl font-bold mb-1">{nextAppointment.customer.name}</h3>
-          <p className="text-blue-100 mb-3">{nextAppointment.pet?.name ? `${nextAppointment.pet.name} • ` : ''}{nextAppointment.appointmentType}</p>
+          <p className="text-white/80 mb-3">{nextAppointment.pet?.name ? `${nextAppointment.pet.name} • ` : ''}{formatAppointmentType(nextAppointment.appointmentType)}</p>
           <div className="flex items-center gap-2 text-sm mb-3">
             <Clock className="h-4 w-4" />
             <span>{formatTime(nextAppointment.startAt)} ({nextAppointment.serviceMinutes} min)</span>
           </div>
           <button
             onClick={() => openInMaps(nextAppointment.customer.address)}
-            className="w-full bg-white text-blue-600 font-semibold py-3 px-4 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-[#A5744A] hover:bg-[#8B6239] text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <Navigation className="h-5 w-5" />
             Start Driving
@@ -479,7 +335,7 @@ export default function TodaysRoutePage() {
           return (
             <div
               key={appointment.id}
-              className={`border-2 rounded-lg p-4 ${getStatusColor(appointment)} ${isNext ? 'ring-2 ring-blue-500' : ''}`}
+              className={`border-2 rounded-xl p-4 shadow ${getStatusColor(appointment)} ${isNext ? 'ring-2 ring-[#A5744A]' : ''}`}
             >
               {/* Time & Status Row */}
               <div className="flex items-center justify-between mb-2">
@@ -509,7 +365,7 @@ export default function TodaysRoutePage() {
               </div>
               <p className="text-sm text-gray-700 mb-2">
                 {appointment.pet?.name && `${appointment.pet.name} • `}
-                {appointment.appointmentType}
+                {formatAppointmentType(appointment.appointmentType)}
                 {appointment.pet?.size && ` • ${appointment.pet.size}`}
               </p>
 
@@ -547,7 +403,7 @@ export default function TodaysRoutePage() {
                     {contactMethods.includes("call") && (
                       <button
                         onClick={() => handleCall(appointment.customer.phone!)}
-                        className="btn btn-sm btn-outline gap-1"
+                        className="btn h-9 px-4 bg-white/80 hover:bg-white border border-gray-300 text-gray-700 gap-1"
                       >
                         <Phone className="h-4 w-4" />
                         Call
@@ -556,7 +412,7 @@ export default function TodaysRoutePage() {
                     {contactMethods.includes("sms") && (
                       <button
                         onClick={() => handleSMS(appointment.customer.phone!)}
-                        className="btn btn-sm btn-outline gap-1"
+                        className="btn h-9 px-4 bg-white/80 hover:bg-white border border-gray-300 text-gray-700 gap-1"
                       >
                         <MessageSquare className="h-4 w-4" />
                         SMS
@@ -565,7 +421,7 @@ export default function TodaysRoutePage() {
                     {contactMethods.includes("whatsapp") && (
                       <button
                         onClick={() => handleWhatsApp(appointment.customer.phone!)}
-                        className="btn btn-sm btn-outline gap-1"
+                        className="btn h-9 px-4 bg-white/80 hover:bg-white border border-gray-300 text-gray-700 gap-1"
                       >
                         💚 WhatsApp
                       </button>
@@ -573,7 +429,7 @@ export default function TodaysRoutePage() {
                     {contactMethods.includes("signal") && (
                       <button
                         onClick={() => handleSignal(appointment.customer.phone!)}
-                        className="btn btn-sm btn-outline gap-1"
+                        className="btn h-9 px-4 bg-white/80 hover:bg-white border border-gray-300 text-gray-700 gap-1"
                       >
                         🔵 Signal
                       </button>
@@ -581,7 +437,7 @@ export default function TodaysRoutePage() {
                     {contactMethods.includes("telegram") && (
                       <button
                         onClick={() => handleTelegram(appointment.customer.phone!)}
-                        className="btn btn-sm btn-outline gap-1"
+                        className="btn h-9 px-4 bg-white/80 hover:bg-white border border-gray-300 text-gray-700 gap-1"
                       >
                         ✈️ Telegram
                       </button>
@@ -593,14 +449,14 @@ export default function TodaysRoutePage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => copyAddress(appointment.customer.address)}
-                    className="btn btn-sm btn-outline gap-1"
+                    className="btn h-9 px-4 bg-white/80 hover:bg-white border border-gray-300 text-gray-700 gap-1"
                   >
                     <Copy className="h-4 w-4" />
                     Copy Address
                   </button>
                   <button
                     onClick={() => openInMaps(appointment.customer.address)}
-                    className="btn btn-sm btn-primary gap-1"
+                    className="btn h-9 px-4 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1"
                   >
                     <Navigation className="h-4 w-4" />
                     Navigate
