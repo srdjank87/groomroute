@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Clock, CreditCard, CheckCircle } from "lucide-react";
+import { Clock, CreditCard } from "lucide-react";
 
 export default function TrialStatus() {
   const { data: session } = useSession();
@@ -18,19 +18,7 @@ export default function TrialStatus() {
 
   // Don't show anything if user has an active paid subscription
   if (subscriptionStatus === "ACTIVE" && currentPeriodEnd) {
-    return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-        <div className="flex items-start gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <h3 className="font-semibold text-green-900">Active Subscription</h3>
-            <p className="text-sm text-green-700 mt-1">
-              Your subscription is active until {currentPeriodEnd.toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // Calculate days remaining in trial

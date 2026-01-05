@@ -36,7 +36,7 @@ const SAMPLE_CUSTOMERS = [
       species: "dog",
       weight: 45,
     },
-    time: 11, // 11 AM
+    time: 10, // 10 AM
     duration: 60,
   },
   {
@@ -53,7 +53,7 @@ const SAMPLE_CUSTOMERS = [
       species: "dog",
       weight: 70,
     },
-    time: 13, // 1 PM
+    time: 11, // 11 AM
     duration: 90,
   },
   {
@@ -70,7 +70,7 @@ const SAMPLE_CUSTOMERS = [
       species: "dog",
       weight: 25,
     },
-    time: 15, // 3 PM
+    time: 12, // 12 PM
     duration: 60,
   },
   {
@@ -87,8 +87,93 @@ const SAMPLE_CUSTOMERS = [
       species: "dog",
       weight: 80,
     },
-    time: 16, // 4 PM
+    time: 13, // 1 PM
     duration: 90,
+  },
+  {
+    name: "Amanda Wilson",
+    phone: "(555) 678-9012",
+    email: "awilson@example.com",
+    address: "987 Cedar Court, Springfield, IL 62706",
+    city: "Springfield",
+    state: "IL",
+    zipCode: "62706",
+    pet: {
+      name: "Daisy",
+      breed: "Shih Tzu",
+      species: "dog",
+      weight: 12,
+    },
+    time: 14, // 2 PM
+    duration: 60,
+  },
+  {
+    name: "Robert Garcia",
+    phone: "(555) 789-0123",
+    email: "rgarcia@example.com",
+    address: "147 Walnut Drive, Springfield, IL 62707",
+    city: "Springfield",
+    state: "IL",
+    zipCode: "62707",
+    pet: {
+      name: "Cooper",
+      breed: "Australian Shepherd",
+      species: "dog",
+      weight: 55,
+    },
+    time: 15, // 3 PM
+    duration: 90,
+  },
+  {
+    name: "Lisa Anderson",
+    phone: "(555) 890-1234",
+    email: "landerson@example.com",
+    address: "258 Spruce Way, Springfield, IL 62708",
+    city: "Springfield",
+    state: "IL",
+    zipCode: "62708",
+    pet: {
+      name: "Milo",
+      breed: "Bernese Mountain Dog",
+      species: "dog",
+      weight: 95,
+    },
+    time: 16, // 4 PM
+    duration: 120,
+  },
+  {
+    name: "Kevin Brown",
+    phone: "(555) 901-2345",
+    email: "kbrown@example.com",
+    address: "369 Ash Boulevard, Springfield, IL 62709",
+    city: "Springfield",
+    state: "IL",
+    zipCode: "62709",
+    pet: {
+      name: "Tucker",
+      breed: "Beagle",
+      species: "dog",
+      weight: 28,
+    },
+    time: 17, // 5 PM
+    duration: 60,
+  },
+  {
+    name: "Jennifer Lee",
+    phone: "(555) 012-3456",
+    email: "jlee@example.com",
+    address: "480 Hickory Lane, Springfield, IL 62710",
+    city: "Springfield",
+    state: "IL",
+    zipCode: "62710",
+    pet: {
+      name: "Sadie",
+      breed: "Cavalier King Charles",
+      species: "dog",
+      weight: 18,
+    },
+    time: 18, // 6 PM
+    duration: 60,
   },
 ];
 
@@ -188,29 +273,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Create appointments for the last 7 days
+    // Create appointments for the last 7 days - all 10 customers per day
     for (let dayOffset = 6; dayOffset >= 0; dayOffset--) {
       const date = new Date(today);
       date.setDate(today.getDate() - dayOffset);
 
-      // Randomly select 4-5 customers for each day
-      const numAppointments = Math.floor(Math.random() * 2) + 4; // 4 or 5 appointments
-      const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
-      const selectedCustomers = shuffledCustomers.slice(0, numAppointments);
+      // Use all 10 customers for each day
+      for (let i = 0; i < createdCustomers.length; i++) {
+        const { customer, pet, sampleData } = createdCustomers[i];
 
-      for (let i = 0; i < selectedCustomers.length; i++) {
-        const { customer, pet, sampleData } = selectedCustomers[i];
-
-        // Vary the time slightly for each day
-        const baseHour = sampleData.time;
-        const hourVariation = Math.floor(Math.random() * 2) - 1; // -1, 0, or 1 hour
-        const appointmentHour = Math.max(9, Math.min(17, baseHour + hourVariation));
-
+        // Use the scheduled time from sample data
         const appointmentTime = new Date(date);
-        appointmentTime.setHours(appointmentHour, 0, 0, 0);
+        appointmentTime.setHours(sampleData.time, 0, 0, 0);
 
         // Vary price slightly
-        const basePrice = sampleData.duration === 90 ? 85 : 65;
+        const basePrice = sampleData.duration >= 90 ? 85 : 65;
         const priceVariation = Math.floor(Math.random() * 21) - 10; // -10 to +10
         const price = Math.max(50, basePrice + priceVariation);
 
