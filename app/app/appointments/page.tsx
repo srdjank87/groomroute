@@ -216,12 +216,7 @@ export default function AppointmentsPage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        if (data.nextAppointmentStarted) {
-          toast.success("Done! Next appointment started automatically");
-        } else {
-          toast.success("Appointment completed");
-        }
+        toast.success("Appointment completed");
         fetchAppointments();
         fetchAllAppointments();
       } else {

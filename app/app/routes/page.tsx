@@ -485,12 +485,7 @@ export default function TodaysRoutePage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        if (data.nextAppointmentStarted) {
-          toast.success("Done! Next appointment started automatically");
-        } else {
-          toast.success("Appointment completed");
-        }
+        toast.success("Appointment completed");
         closeCompleteConfirm();
         await fetchTodaysRoute();
         await fetchBreakSuggestion();
