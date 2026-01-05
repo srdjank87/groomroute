@@ -339,22 +339,34 @@ export async function POST(req: NextRequest) {
     const createdCustomers: any[] = [];
 
     // Create service areas first (just name + color)
+    // Check if areas already exist and use them, or create new ones
     const areaIdsByName: { [key: string]: string } = {}; // areaName -> areaId mapping
 
     for (const areaData of SERVICE_AREAS) {
-      const area = await prisma.serviceArea.create({
-        data: {
+      // Check if area with this name already exists
+      const existingArea = await prisma.serviceArea.findFirst({
+        where: {
           accountId,
           name: areaData.name,
-          color: areaData.color,
-          isActive: true,
         },
       });
 
-      areaIdsByName[areaData.name] = area.id;
+      if (existingArea) {
+        areaIdsByName[areaData.name] = existingArea.id;
+      } else {
+        const area = await prisma.serviceArea.create({
+          data: {
+            accountId,
+            name: areaData.name,
+            color: areaData.color,
+            isActive: true,
+          },
+        });
+        areaIdsByName[areaData.name] = area.id;
+      }
     }
 
-    console.log("Created service areas:", Object.keys(areaIdsByName));
+    console.log("Service areas ready:", Object.keys(areaIdsByName));
 
     // Create area day assignments for the groomer
     // Monday & Thursday: North Austin
@@ -372,18 +384,30 @@ export async function POST(req: NextRequest) {
     for (const assignment of dayAssignments) {
       const areaId = areaIdsByName[assignment.areaName];
       if (areaId) {
-        await prisma.areaDayAssignment.create({
-          data: {
-            accountId,
-            groomerId: groomer.id,
-            areaId,
-            dayOfWeek: assignment.dayOfWeek,
+        // Check if assignment already exists (unique constraint on groomerId + dayOfWeek)
+        const existingAssignment = await prisma.areaDayAssignment.findUnique({
+          where: {
+            groomerId_dayOfWeek: {
+              groomerId: groomer.id,
+              dayOfWeek: assignment.dayOfWeek,
+            },
           },
         });
+
+        if (!existingAssignment) {
+          await prisma.areaDayAssignment.create({
+            data: {
+              accountId,
+              groomerId: groomer.id,
+              areaId,
+              dayOfWeek: assignment.dayOfWeek,
+            },
+          });
+        }
       }
     }
 
-    console.log("Created area day assignments for groomer");
+    console.log("Area day assignments ready for groomer");
 
     // Create customers with geocoding and area assignment
     for (const sampleCustomer of SAMPLE_CUSTOMERS) {
@@ -511,8 +535,20 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Generate sample data error:", error);
+
+    // Return more specific error message
+    const errorMessage = error instanceof Error ? error.message : "Failed to generate sample data";
+
+    // Check for Prisma unique constraint violation
+    if (errorMessage.includes("Unique constraint")) {
+      return NextResponse.json(
+        { error: "Sample data or areas may already exist. Try clearing existing data first." },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Failed to generate sample data" },
+      { error: errorMessage },
       { status: 500 }
     );
   }
