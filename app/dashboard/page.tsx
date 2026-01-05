@@ -63,13 +63,16 @@ interface RevenueStats {
   completionRate: number;
 }
 
-// Format time from ISO string in user's local timezone
+// Format time from ISO string - display the UTC time as-is (not converted to local)
+// This is because we store appointment times as "intended display time" in UTC
 function formatTime(isoString: string): string {
-  return new Date(isoString).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  });
+  const date = new Date(isoString);
+  const hours = date.getUTCHours();
+  const minutes = date.getUTCMinutes();
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const displayHours = hours % 12 || 12;
+  const displayMinutes = minutes.toString().padStart(2, '0');
+  return `${displayHours}:${displayMinutes} ${period}`;
 }
 
 function DashboardContent() {

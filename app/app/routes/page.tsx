@@ -80,12 +80,16 @@ export default function TodaysRoutePage() {
     }
   }
 
+  // Format time from ISO string - display the UTC time as-is (not converted to local)
+  // This is because we store appointment times as "intended display time" in UTC
   function formatTime(dateString: string): string {
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
+    const date = new Date(dateString);
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    const displayMinutes = minutes.toString().padStart(2, '0');
+    return `${displayHours}:${displayMinutes} ${period}`;
   }
 
   function getStatusColor(appointment: Appointment): string {
