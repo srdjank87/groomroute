@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { geocodeAddress } from "@/lib/geocoding";
 
 // Sample customer data for demonstration
 const SAMPLE_CUSTOMERS = [
@@ -139,13 +140,18 @@ export async function POST(req: NextRequest) {
 
     console.log("Found groomer:", groomer.id, "for account:", accountId);
 
-    // Create sample customers, pets, and appointments for today
+    // Generate appointments for the last 7 days
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const createdAppointments = [];
+    let totalAppointmentsCreated = 0;
+    const createdCustomers: any[] = [];
 
+    // Create customers first with geocoding
     for (const sampleCustomer of SAMPLE_CUSTOMERS) {
+      // Geocode the address
+      const geocodeResult = await geocodeAddress(sampleCustomer.address);
+
       // Create customer
       const customer = await prisma.customer.create({
         data: {
@@ -157,8 +163,10 @@ export async function POST(req: NextRequest) {
           city: sampleCustomer.city,
           state: sampleCustomer.state,
           zipCode: sampleCustomer.zipCode,
-          notes: "[SAMPLE_DATA] This is sample data to demonstrate GroomRoute's route optimization features.",
-          geocodeStatus: "PENDING",
+          lat: geocodeResult.success ? geocodeResult.lat : null,
+          lng: geocodeResult.success ? geocodeResult.lng : null,
+          geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
+          notes: "[SAMPLE_DATA] This is sample data to demonstrate GroomRoute's features.",
         },
       });
 
@@ -173,67 +181,66 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Create appointment for today
-      const appointmentTime = new Date(today);
-      appointmentTime.setHours(sampleCustomer.time, 0, 0, 0);
-
-      const appointment = await prisma.appointment.create({
-        data: {
-          accountId,
-          groomerId: groomer.id,
-          customerId: customer.id,
-          petId: pet.id,
-          startAt: appointmentTime,
-          serviceMinutes: sampleCustomer.duration,
-          status: "CONFIRMED",
-          appointmentType: "FULL_GROOM",
-          price: sampleCustomer.duration === 90 ? 85 : 65,
-          customerConfirmed: true,
-        },
+      createdCustomers.push({
+        customer,
+        pet,
+        sampleData: sampleCustomer,
       });
-
-      createdAppointments.push(appointment);
     }
 
-    // Create an optimized route for today
-    const route = await prisma.route.create({
-      data: {
-        accountId,
-        groomerId: groomer.id,
-        routeDate: today,
-        status: "PUBLISHED",
-        // Sample stats showing optimization benefits
-        totalDriveMinutes: 45, // Optimized drive time
-        totalDistanceMeters: 24140, // ~15 miles
-        totalServiceMinutes: 390, // Total service time
-        efficiencyScore: 89.7, // High efficiency score
-        estimatedGasCost: 2.65,
-      },
-    });
+    // Create appointments for the last 7 days
+    for (let dayOffset = 6; dayOffset >= 0; dayOffset--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - dayOffset);
 
-    // Create route stops
-    for (let i = 0; i < createdAppointments.length; i++) {
-      const appointment = createdAppointments[i];
+      // Randomly select 4-5 customers for each day
+      const numAppointments = Math.floor(Math.random() * 2) + 4; // 4 or 5 appointments
+      const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
+      const selectedCustomers = shuffledCustomers.slice(0, numAppointments);
 
-      await prisma.routeStop.create({
-        data: {
-          routeId: route.id,
-          appointmentId: appointment.id,
-          sequence: i + 1,
-          arrivalTime: appointment.startAt,
-          stopType: "APPOINTMENT",
-          driveMinutesFromPrev: i === 0 ? 0 : Math.floor(Math.random() * 10) + 5,
-          distanceMetersFromPrev:
-            i === 0 ? 0 : Math.floor(Math.random() * 5000) + 3000,
-        },
-      });
+      for (let i = 0; i < selectedCustomers.length; i++) {
+        const { customer, pet, sampleData } = selectedCustomers[i];
+
+        // Vary the time slightly for each day
+        const baseHour = sampleData.time;
+        const hourVariation = Math.floor(Math.random() * 2) - 1; // -1, 0, or 1 hour
+        const appointmentHour = Math.max(9, Math.min(17, baseHour + hourVariation));
+
+        const appointmentTime = new Date(date);
+        appointmentTime.setHours(appointmentHour, 0, 0, 0);
+
+        // Vary price slightly
+        const basePrice = sampleData.duration === 90 ? 85 : 65;
+        const priceVariation = Math.floor(Math.random() * 21) - 10; // -10 to +10
+        const price = Math.max(50, basePrice + priceVariation);
+
+        // Mark appointments from past days as completed
+        const isPast = dayOffset > 0;
+
+        await prisma.appointment.create({
+          data: {
+            accountId,
+            groomerId: groomer.id,
+            customerId: customer.id,
+            petId: pet.id,
+            startAt: appointmentTime,
+            serviceMinutes: sampleData.duration,
+            status: isPast ? "COMPLETED" : "CONFIRMED",
+            appointmentType: "FULL_GROOM",
+            price: price,
+            customerConfirmed: true,
+          },
+        });
+
+        totalAppointmentsCreated++;
+      }
     }
 
     return NextResponse.json({
       success: true,
       customersCreated: SAMPLE_CUSTOMERS.length,
-      appointmentsCreated: createdAppointments.length,
-      routeId: route.id,
+      appointmentsCreated: totalAppointmentsCreated,
+      daysGenerated: 7,
     });
   } catch (error) {
     console.error("Generate sample data error:", error);
