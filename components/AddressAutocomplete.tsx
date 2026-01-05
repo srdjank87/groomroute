@@ -138,27 +138,52 @@ export default function AddressAutocomplete({
       });
 
       // Fix for Google Places Autocomplete first-click issue:
-      // The pac-container dropdown causes the input to blur on mousedown,
-      // which prevents place_changed from firing properly on first click.
-      // By preventing default on mousedown, we keep focus on the input
-      // and allow the click to properly select the place.
-      const handlePacMouseDown = (e: MouseEvent) => {
+      // Google's pac-container handles mousedown in a way that can prevent
+      // place_changed from firing on first click. We work around this by
+      // manually triggering a selection when a pac-item is clicked.
+      const handlePacItemClick = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
-        // Check if clicked element is inside the pac-container
-        if (target.closest('.pac-container')) {
-          // Prevent the input from losing focus
-          e.preventDefault();
+        const pacItem = target.closest('.pac-item') as HTMLElement;
+
+        if (pacItem) {
+          // Get the text content from the pac-item
+          const mainText = pacItem.querySelector('.pac-item-query')?.textContent || '';
+          const secondaryText = pacItem.querySelector('.pac-secondary-text, .pac-item-query + span')?.textContent || '';
+          const fullText = secondaryText ? `${mainText}, ${secondaryText}` : mainText;
+
+          if (fullText && inputRef.current) {
+            // Set the input value to trigger Google's selection
+            inputRef.current.value = fullText;
+            inputRef.current.focus();
+
+            // Trigger input event to let Google know the value changed
+            const inputEvent = new Event('input', { bubbles: true });
+            inputRef.current.dispatchEvent(inputEvent);
+
+            // Use a small delay then simulate Enter key to trigger place_changed
+            setTimeout(() => {
+              if (inputRef.current) {
+                const enterEvent = new KeyboardEvent('keydown', {
+                  key: 'Enter',
+                  code: 'Enter',
+                  keyCode: 13,
+                  which: 13,
+                  bubbles: true,
+                });
+                inputRef.current.dispatchEvent(enterEvent);
+              }
+            }, 100);
+          }
         }
       };
 
-      // Use capture phase to intercept before Google's handlers
-      document.addEventListener("mousedown", handlePacMouseDown, true);
+      document.addEventListener("click", handlePacItemClick, true);
 
       return () => {
         if (listener) {
           window.google?.maps.event.removeListener(listener);
         }
-        document.removeEventListener("mousedown", handlePacMouseDown, true);
+        document.removeEventListener("click", handlePacItemClick, true);
       };
     } catch (error) {
       console.error("Error initializing autocomplete:", error);
