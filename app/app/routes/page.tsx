@@ -1161,36 +1161,36 @@ export default function TodaysRoutePage() {
                   </button>
                 </div>
                 <div className="p-4">
-                  <p className="text-gray-600 mb-4">What happened with this appointment?</p>
+                  <p className="text-gray-600 mb-4">These things happen — let&apos;s log it and move on.</p>
 
                   <div className="space-y-2 mb-4">
-                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "CANCELLED" ? "border-red-500 bg-red-50" : "hover:bg-gray-50"}`}>
+                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "CANCELLED" ? "border-amber-500 bg-amber-50" : "hover:bg-gray-50"}`}>
                       <input
                         type="radio"
                         name="skipReason"
                         value="CANCELLED"
                         checked={skipReason === "CANCELLED"}
                         onChange={(e) => setSkipReason(e.target.value)}
-                        className="radio radio-error"
+                        className="radio radio-warning"
                       />
                       <div>
-                        <p className="font-medium">Customer Cancelled</p>
-                        <p className="text-sm text-gray-500">Customer requested to cancel</p>
+                        <p className="font-medium">Customer needed to cancel</p>
+                        <p className="text-sm text-gray-500">Life happens — they&apos;ll reschedule when ready</p>
                       </div>
                     </label>
 
-                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "NO_SHOW" ? "border-red-500 bg-red-50" : "hover:bg-gray-50"}`}>
+                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "NO_SHOW" ? "border-amber-500 bg-amber-50" : "hover:bg-gray-50"}`}>
                       <input
                         type="radio"
                         name="skipReason"
                         value="NO_SHOW"
                         checked={skipReason === "NO_SHOW"}
                         onChange={(e) => setSkipReason(e.target.value)}
-                        className="radio radio-error"
+                        className="radio radio-warning"
                       />
                       <div>
-                        <p className="font-medium">No Show</p>
-                        <p className="text-sm text-gray-500">Customer didn&apos;t show up or respond</p>
+                        <p className="font-medium">Couldn&apos;t connect</p>
+                        <p className="text-sm text-gray-500">No answer or they weren&apos;t available</p>
                       </div>
                     </label>
 
@@ -1204,12 +1204,12 @@ export default function TodaysRoutePage() {
                         className="radio radio-info"
                       />
                       <div>
-                        <p className="font-medium">Rescheduled</p>
-                        <p className="text-sm text-gray-500">Moving to a different date/time</p>
+                        <p className="font-medium">Moving to another day</p>
+                        <p className="text-sm text-gray-500">We&apos;ll find a better time</p>
                       </div>
                     </label>
 
-                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "OTHER" ? "border-gray-500 bg-gray-50" : "hover:bg-gray-50"}`}>
+                    <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "OTHER" ? "border-gray-400 bg-gray-50" : "hover:bg-gray-50"}`}>
                       <input
                         type="radio"
                         name="skipReason"
@@ -1219,8 +1219,8 @@ export default function TodaysRoutePage() {
                         className="radio"
                       />
                       <div>
-                        <p className="font-medium">Other</p>
-                        <p className="text-sm text-gray-500">Another reason</p>
+                        <p className="font-medium">Something else</p>
+                        <p className="text-sm text-gray-500">I&apos;ll add a note below</p>
                       </div>
                     </label>
                   </div>
