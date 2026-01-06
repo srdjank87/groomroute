@@ -245,14 +245,21 @@ export default function AnalyticsPage() {
       )}
 
       {/* Your Earnings */}
-      {revenueStats && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Your Earnings</h2>
-          </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Your Earnings</h2>
+        </div>
 
-          {/* Revenue Chart */}
-          <div className="p-6">
+        {/* Revenue Chart */}
+        <div className="p-6">
+          {!revenueStats ? (
+            <div className="text-center py-8 text-gray-500">
+              <DollarSign className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+              <p className="font-medium">No earnings data yet</p>
+              <p className="text-sm mt-1">Complete your first appointment to see earnings</p>
+            </div>
+          ) : (
+            <>
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium text-gray-700">Last 7 Days</h3>
@@ -358,9 +365,10 @@ export default function AnalyticsPage() {
                 <p className="text-xs text-gray-600 mt-1">Completion Rate</p>
               </div>
             </div>
-          </div>
+            </>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Performance Insights */}
       {performanceData && (
