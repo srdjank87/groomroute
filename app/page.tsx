@@ -415,16 +415,6 @@ export default function Home() {
             <div className="rounded-2xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-pink-50 p-8">
               <h3 className="text-2xl font-bold mb-6 text-center text-gray-900">Before GroomRoute</h3>
 
-              <div className="mb-6">
-                <Image
-                  src="/images/before.jpg"
-                  alt="Stressed mobile groomer - before GroomRoute"
-                  width={400}
-                  height={400}
-                  className="rounded-xl w-full"
-                />
-              </div>
-
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <XCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
@@ -452,16 +442,6 @@ export default function Home() {
             {/* After */}
             <div className="rounded-2xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-8">
               <h3 className="text-2xl font-bold mb-6 text-center text-gray-900">With GroomRoute</h3>
-
-              <div className="mb-6">
-                <Image
-                  src="/images/after.jpg"
-                  alt="Confident mobile groomer - with GroomRoute"
-                  width={400}
-                  height={400}
-                  className="rounded-xl w-full"
-                />
-              </div>
 
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
