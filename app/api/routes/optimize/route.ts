@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getRouteEfficiencyRating, ROUTE_EFFICIENCY } from "@/lib/benchmarks";
+import {
+  getRouteEfficiencyRating,
+  ROUTE_EFFICIENCY,
+  getAdjustedServiceMinutes,
+  getBufferMinutes,
+} from "@/lib/benchmarks";
 
 interface Location {
   id: string;
@@ -102,6 +107,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check if working with assistant today
+    const routeDate = new Date(date + 'T00:00:00.000Z');
+    const existingRoute = await prisma.route.findFirst({
+      where: {
+        accountId,
+        groomerId: groomer.id,
+        routeDate,
+      },
+      select: { id: true, hasAssistant: true },
+    });
+    const hasAssistant = existingRoute?.hasAssistant ?? groomer.defaultHasAssistant;
+
     // Fetch all incomplete appointments for today only
     const startOfDay = new Date(date + 'T00:00:00.000Z');
     const endOfDay = new Date(date + 'T23:59:59.999Z');
@@ -154,6 +171,8 @@ export async function POST(req: NextRequest) {
     let currentTime = new Date(firstAppointmentTime);
 
     // Pre-calculate all new start times (must be done sequentially before parallel updates)
+    // With assistant mode, service times are reduced and buffer times adjusted
+    const bufferMinutes = getBufferMinutes(hasAssistant);
     const scheduledTimes: { id: string; newStartAt: Date; order: number }[] = [];
     for (let i = 0; i < optimizedLocations.length; i++) {
       const loc = optimizedLocations[i];
@@ -165,8 +184,15 @@ export async function POST(req: NextRequest) {
         order: i + 1,
       });
 
-      // Increment time for next appointment (appointment duration + 15 min travel time)
-      currentTime = new Date(currentTime.getTime() + (appointment.serviceMinutes + 15) * 60000);
+      // Increment time for next appointment
+      // With assistant: service time is reduced (~25% faster) and transitions are quicker
+      const adjustedServiceMinutes = getAdjustedServiceMinutes(
+        appointment.serviceMinutes,
+        hasAssistant
+      );
+      currentTime = new Date(
+        currentTime.getTime() + (adjustedServiceMinutes + bufferMinutes) * 60000
+      );
     }
 
     // Update appointment times in database (can now run in parallel)
@@ -204,18 +230,9 @@ export async function POST(req: NextRequest) {
     const totalDriveMinutes = Math.round(totalDistance / 30 * 60); // Assuming 30 mph average
 
     // Save or update the Route record in the database
-    const routeDate = new Date(date + 'T00:00:00.000Z');
+    // Note: routeDate and existingRoute were already defined earlier when checking assistant status
 
-    // Check if a route already exists for today
-    const existingRoute = await prisma.route.findFirst({
-      where: {
-        accountId,
-        groomerId: groomer.id,
-        routeDate,
-      },
-    });
-
-    if (existingRoute) {
+    if (existingRoute?.id) {
       // Update existing route
       await prisma.route.update({
         where: { id: existingRoute.id },
@@ -250,7 +267,7 @@ export async function POST(req: NextRequest) {
     const efficiencyRating = getRouteEfficiencyRating(avgMinutesBetweenStops);
     const efficiency = ROUTE_EFFICIENCY[efficiencyRating].label;
 
-    // Calculate estimated finish time
+    // Calculate estimated finish time (using adjusted service time for assistant mode)
     const lastAppointment = appointments.find(
       (a) => a.id === optimizedLocations[optimizedLocations.length - 1].id
     );
@@ -259,7 +276,11 @@ export async function POST(req: NextRequest) {
       const lastScheduled = scheduledTimes.find((s) => s.id === lastAppointment.id);
       if (lastScheduled) {
         const finishTime = new Date(lastScheduled.newStartAt);
-        finishTime.setMinutes(finishTime.getMinutes() + lastAppointment.serviceMinutes);
+        const adjustedLastServiceMinutes = getAdjustedServiceMinutes(
+          lastAppointment.serviceMinutes,
+          hasAssistant
+        );
+        finishTime.setMinutes(finishTime.getMinutes() + adjustedLastServiceMinutes);
         const hours = finishTime.getUTCHours();
         const minutes = finishTime.getUTCMinutes();
         const period = hours >= 12 ? "PM" : "AM";

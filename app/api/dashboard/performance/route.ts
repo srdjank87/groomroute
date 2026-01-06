@@ -9,6 +9,7 @@ import {
   type AppointmentData,
 } from "@/lib/performance-calculator";
 import { calculateBreakStats } from "@/lib/break-calculator";
+import { getAdditionalCapacity } from "@/lib/benchmarks";
 
 /**
  * GET /api/dashboard/performance
@@ -314,6 +315,12 @@ export async function GET(req: NextRequest) {
       }))
     );
 
+    // Calculate additional capacity when working with assistant
+    const assistantCapacity = getAdditionalCapacity(
+      todayAppointments.length,
+      hasAssistant
+    );
+
     return NextResponse.json({
       today: todayPerformance,
       weekly: weeklyPerformance,
@@ -322,6 +329,7 @@ export async function GET(req: NextRequest) {
       breakStats,
       hasAssistant,
       defaultHasAssistant: groomer.defaultHasAssistant,
+      assistantCapacity,
     });
   } catch (error) {
     console.error("Performance metrics error:", error);

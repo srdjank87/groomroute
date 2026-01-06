@@ -13,6 +13,100 @@ export const DOG_SIZE_ENERGY = {
   giant: { maxWeight: Infinity, energyCost: 3, label: "Giant" },
 } as const;
 
+/**
+ * Assistant Mode Adjustments
+ *
+ * When working with a bather/assistant:
+ * - Service times are reduced (bather handles bathing/drying while groomer preps)
+ * - More appointments can be scheduled
+ * - Energy load per dog is effectively lower (shared physical work)
+ */
+export const ASSISTANT_MODE = {
+  // Service time reduction factor (0.75 = 25% faster with assistant)
+  serviceTimeMultiplier: 0.75,
+
+  // Energy cost reduction when assistant helps with heavy lifting
+  energyCostMultiplier: 0.8,
+
+  // Extra capacity (in dogs per day) when working with assistant
+  extraDailyCapacity: 3,
+
+  // Standard service buffer time in minutes (travel + setup)
+  bufferMinutes: {
+    solo: 15,
+    withAssistant: 12, // Slightly faster transitions with help
+  },
+} as const;
+
+/**
+ * Get adjusted service duration based on assistant status
+ */
+export function getAdjustedServiceMinutes(
+  baseMinutes: number,
+  hasAssistant: boolean
+): number {
+  if (hasAssistant) {
+    return Math.round(baseMinutes * ASSISTANT_MODE.serviceTimeMultiplier);
+  }
+  return baseMinutes;
+}
+
+/**
+ * Get adjusted energy cost based on assistant status
+ */
+export function getAdjustedEnergyCost(
+  baseCost: number,
+  hasAssistant: boolean
+): number {
+  if (hasAssistant) {
+    return Math.round(baseCost * ASSISTANT_MODE.energyCostMultiplier * 10) / 10;
+  }
+  return baseCost;
+}
+
+/**
+ * Get buffer time between appointments based on assistant status
+ */
+export function getBufferMinutes(hasAssistant: boolean): number {
+  return hasAssistant
+    ? ASSISTANT_MODE.bufferMinutes.withAssistant
+    : ASSISTANT_MODE.bufferMinutes.solo;
+}
+
+/**
+ * Calculate additional booking capacity when working with assistant
+ */
+export function getAdditionalCapacity(
+  currentAppointments: number,
+  hasAssistant: boolean
+): { canAddMore: boolean; additionalSlots: number; message: string } {
+  if (!hasAssistant) {
+    return {
+      canAddMore: false,
+      additionalSlots: 0,
+      message: "",
+    };
+  }
+
+  const assistantMax = INDUSTRY_BENCHMARKS.dogsPerDay.withAssistant.typical.max;
+  const currentCapacity = assistantMax;
+  const additionalSlots = Math.max(0, currentCapacity - currentAppointments);
+
+  if (additionalSlots > 0) {
+    return {
+      canAddMore: true,
+      additionalSlots,
+      message: `With your assistant, you have capacity for ${additionalSlots} more appointment${additionalSlots > 1 ? "s" : ""} today`,
+    };
+  }
+
+  return {
+    canAddMore: false,
+    additionalSlots: 0,
+    message: "At capacity for team day",
+  };
+}
+
 export type DogSize = keyof typeof DOG_SIZE_ENERGY;
 
 // Get dog size category from weight

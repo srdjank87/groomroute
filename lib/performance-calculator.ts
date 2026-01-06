@@ -12,6 +12,9 @@ import {
   getDogsPerDayComparison,
   getEnergyLoadComparison,
   getRouteEfficiencyRating,
+  getAdjustedEnergyCost,
+  getAdjustedServiceMinutes,
+  getAdditionalCapacity,
   INDUSTRY_BENCHMARKS,
   PERFORMANCE_HEADLINES,
   ROUTE_EFFICIENCY,
@@ -129,11 +132,16 @@ export function calculateDogsBySize(appointments: AppointmentData[]): DogsBySize
 
 /**
  * Calculate total energy load from appointments
+ * When hasAssistant is true, energy costs are reduced (shared physical work)
  */
-export function calculateEnergyLoad(appointments: AppointmentData[]): number {
+export function calculateEnergyLoad(
+  appointments: AppointmentData[],
+  hasAssistant: boolean = false
+): number {
   let total = 0;
   for (const apt of appointments) {
-    total += getDogEnergyCost(apt.pet?.weight);
+    const baseCost = getDogEnergyCost(apt.pet?.weight);
+    total += getAdjustedEnergyCost(baseCost, hasAssistant);
   }
   return Math.round(total * 10) / 10; // Round to 1 decimal
 }
@@ -283,7 +291,8 @@ export function calculateTodayPerformance(
   const dogsScheduled = allAppointments.length;
   const dogsGroomed = completedAppointments.length;
   const dogsBySize = calculateDogsBySize(allAppointments);
-  const energyLoad = calculateEnergyLoad(allAppointments);
+  // Energy load is adjusted when working with assistant (shared physical work)
+  const energyLoad = calculateEnergyLoad(allAppointments, hasAssistant);
   const largeDogCount = countLargeDogs(allAppointments);
   const revenue = calculateRevenue(completedAppointments);
 

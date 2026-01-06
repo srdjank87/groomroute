@@ -144,6 +144,11 @@ interface PerformanceData {
   breakStats: BreakStats;
   hasAssistant: boolean;
   defaultHasAssistant: boolean;
+  assistantCapacity?: {
+    canAddMore: boolean;
+    additionalSlots: number;
+    message: string;
+  };
 }
 
 interface RevenueStats {
@@ -1031,18 +1036,26 @@ function DashboardContent() {
           <div className="flex items-start justify-between mb-5">
             <h3 className="text-lg font-semibold text-gray-900">Your Progress</h3>
             {/* Assistant Toggle */}
-            <button
-              onClick={toggleAssistant}
-              disabled={isTogglingAssistant}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                performanceData.hasAssistant
-                  ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              <UserPlus className="h-4 w-4" />
-              {performanceData.hasAssistant ? "With Bather" : "Solo"}
-            </button>
+            <div className="flex flex-col items-end gap-1">
+              <button
+                onClick={toggleAssistant}
+                disabled={isTogglingAssistant}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  performanceData.hasAssistant
+                    ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                <UserPlus className="h-4 w-4" />
+                {performanceData.hasAssistant ? "With Bather" : "Solo"}
+              </button>
+              {/* Capacity indicator - shows when working with assistant and has capacity */}
+              {performanceData.assistantCapacity?.canAddMore && (
+                <span className="text-xs text-blue-600 font-medium">
+                  +{performanceData.assistantCapacity.additionalSlots} slots available
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Dynamic Progress Context */}
