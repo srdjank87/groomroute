@@ -728,11 +728,11 @@ function DashboardContent() {
         <div className={`text-white ${
           stats.nextAppointment.status === "IN_PROGRESS"
             ? (isFullscreen
-              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800'
-              : 'rounded-xl shadow-lg p-6 mb-6 border border-blue-400/30 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800')
+              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700'
+              : 'rounded-xl shadow-lg p-6 mb-6 border border-blue-300/30 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700')
             : (isFullscreen
-              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A]'
-              : 'rounded-xl shadow-lg p-6 mb-6 border border-[#A5744A]/30 bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A]')
+              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-emerald-600 via-teal-600 to-teal-700'
+              : 'rounded-xl shadow-lg p-6 mb-6 border border-emerald-300/30 bg-gradient-to-br from-emerald-600 via-teal-600 to-teal-700')
         }`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">
@@ -758,7 +758,7 @@ function DashboardContent() {
           <div className={`backdrop-blur-sm rounded-lg p-4 mb-4 border ${
             stats.nextAppointment.status === "IN_PROGRESS"
               ? "bg-white/10 border-white/20"
-              : "bg-[#A5744A]/10 border-[#A5744A]/20"
+              : "bg-white/10 border-white/20"
           }`}>
             <div className="flex flex-col md:flex-row items-start gap-4">
               {/* Column 1: Info and Contact Methods */}
@@ -862,7 +862,7 @@ function DashboardContent() {
             {stats.nextAppointment.status !== "IN_PROGRESS" && (
               <button
                 onClick={startDriving}
-                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-[#A5744A] hover:bg-[#8B6239] text-white"
+                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-white/20 hover:bg-white/30 text-white border border-white/30"
               >
                 <Navigation className="h-6 w-6" />
                 Start Driving
