@@ -188,7 +188,7 @@ export default function Home() {
             <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
               How GroomRoute brings calm to your day
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-3">
               Not &quot;more appointments&quot;. Not &quot;faster scheduling&quot;.</p>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               A sustainable pace that protects your energy and your income.
@@ -256,8 +256,9 @@ export default function Home() {
             <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
               Everything you need. Nothing you don&apos;t.
             </h2>
-            <p className="text-xl text-gray-600">
-              We didn&apos;t build another bloated salon system and slap &quot;mobile&quot; on it.<br />
+            <p className="text-xl text-gray-600 mb-3">
+              We didn&apos;t build another bloated salon system and slap &quot;mobile&quot; on it.</p>
+              <p className="text-xl text-gray-600">
               GroomRoute is purpose-built for life in a grooming van.
             </p>
           </div>
@@ -319,7 +320,7 @@ export default function Home() {
             <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
               One tap. Problem solved.
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-3">
               You work in noise, motion, and time pressure.</p>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Every action in GroomRoute is designed for one-handed use.
@@ -737,7 +738,7 @@ export default function Home() {
           <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-gray-900">
             Ready for calmer days?
           </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 mb-3 max-w-2xl mx-auto">
             Stop zigzagging. Stop overcommitting. Stop the stress spirals.</p>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Start your free trial and see what a calm day feels like.
