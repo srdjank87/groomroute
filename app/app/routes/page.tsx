@@ -81,7 +81,6 @@ export default function TodaysRoutePage() {
   const [optimizationResult, setOptimizationResult] = useState<OptimizationResult | null>(null);
   const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
   const [assistantStatus, setAssistantStatus] = useState<AssistantStatus | null>(null);
-  const [isTogglingAssistant, setIsTogglingAssistant] = useState(false);
   const [breakSuggestion, setBreakSuggestion] = useState<BreakSuggestion | null>(null);
   const [isTakingBreak, setIsTakingBreak] = useState(false);
   const [showBreakSuggestion, setShowBreakSuggestion] = useState(true);
@@ -182,33 +181,6 @@ export default function TodaysRoutePage() {
       }
     } catch (error) {
       console.error("Error fetching break suggestion:", error);
-    }
-  }
-
-  async function toggleAssistant() {
-    if (!assistantStatus) return;
-
-    setIsTogglingAssistant(true);
-    try {
-      const newValue = !assistantStatus.hasAssistant;
-      const response = await fetch('/api/routes/assistant', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hasAssistant: newValue }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        toast.success(data.message);
-        setAssistantStatus(prev => prev ? { ...prev, hasAssistant: newValue } : null);
-      } else {
-        toast.error("Failed to update assistant status");
-      }
-    } catch (error) {
-      console.error("Toggle assistant error:", error);
-      toast.error("Failed to update assistant status");
-    } finally {
-      setIsTogglingAssistant(false);
     }
   }
 
@@ -593,20 +565,12 @@ export default function TodaysRoutePage() {
                   {todayAreaDay.areaName}
                 </div>
               )}
-              {/* Assistant Toggle */}
-              {assistantStatus && (
-                <button
-                  onClick={toggleAssistant}
-                  disabled={isTogglingAssistant}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                    assistantStatus.hasAssistant
-                      ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
+              {/* Assistant Status Indicator (read-only - toggle is on dashboard) */}
+              {assistantStatus?.hasAssistant && (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
                   <UserPlus className="h-3.5 w-3.5" />
-                  {assistantStatus.hasAssistant ? "With Bather" : "Solo"}
-                </button>
+                  With Bather
+                </div>
               )}
             </div>
             <p className="text-gray-600">{appointments.length} {appointments.length === 1 ? 'appointment' : 'appointments'} • {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>

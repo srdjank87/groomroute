@@ -15,6 +15,7 @@ import {
   Heart,
   Sparkles,
   BarChart3,
+  UserPlus,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -52,6 +53,26 @@ export default function AppLayout({
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [hasAssistant, setHasAssistant] = useState(false);
+
+  // Fetch assistant status for the day
+  useEffect(() => {
+    async function fetchAssistantStatus() {
+      try {
+        const response = await fetch("/api/routes/assistant");
+        if (response.ok) {
+          const data = await response.json();
+          setHasAssistant(data.hasAssistant);
+        }
+      } catch (error) {
+        console.error("Failed to fetch assistant status:", error);
+      }
+    }
+
+    if (status === "authenticated") {
+      fetchAssistantStatus();
+    }
+  }, [status]);
 
   // Check if user has completed Stripe checkout
   useEffect(() => {
@@ -113,8 +134,12 @@ export default function AppLayout({
             className="fixed inset-0 bg-gray-600 bg-opacity-75"
             onClick={() => setSidebarOpen(false)}
           ></div>
-          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
-            <div className="flex h-16 items-center gap-x-1 px-6 border-b border-gray-200">
+          <div className={`relative flex w-full max-w-xs flex-1 flex-col transition-colors ${
+            hasAssistant ? "bg-blue-50" : "bg-white"
+          }`}>
+            <div className={`flex h-16 items-center gap-x-1 px-6 border-b ${
+              hasAssistant ? "border-blue-200" : "border-gray-200"
+            }`}>
               <Image
                 src="/images/icon.svg"
                 alt="GroomRoute"
@@ -123,6 +148,12 @@ export default function AppLayout({
                 className="w-6 h-6"
               />
               <h1 className="text-xl font-bold"><GroomRouteLogo /></h1>
+              {hasAssistant && (
+                <div className="ml-auto flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+                  <UserPlus className="h-3 w-3" />
+                  Team
+                </div>
+              )}
             </div>
             <nav className="flex flex-1 flex-col p-4">
               {/* Main Navigation - Your Day */}
@@ -234,8 +265,12 @@ export default function AppLayout({
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white border-r border-gray-200">
-          <div className="flex h-16 items-center gap-x-1.5 px-6 border-b border-gray-200">
+        <div className={`flex grow flex-col gap-y-5 overflow-y-auto border-r transition-colors ${
+          hasAssistant ? "bg-blue-50 border-blue-200" : "bg-white border-gray-200"
+        }`}>
+          <div className={`flex h-16 items-center gap-x-1.5 px-6 border-b ${
+            hasAssistant ? "border-blue-200" : "border-gray-200"
+          }`}>
             <Image
               src="/images/icon.svg"
               alt="GroomRoute"
@@ -245,6 +280,13 @@ export default function AppLayout({
             />
             <h1 className="text-xl font-bold"><GroomRouteLogo /></h1>
           </div>
+          {/* Assistant Mode Indicator Banner */}
+          {hasAssistant && (
+            <div className="mx-4 -mt-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-100 border border-blue-200">
+              <UserPlus className="h-4 w-4 text-blue-700" />
+              <span className="text-sm font-medium text-blue-700">Team Day</span>
+            </div>
+          )}
           <nav className="flex flex-1 flex-col p-4">
             {/* Main Navigation - Your Day */}
             <div className="mb-4">
