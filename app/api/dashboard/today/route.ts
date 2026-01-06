@@ -166,6 +166,13 @@ export async function GET(req: NextRequest) {
     const nextAppointment =
       activeAppointments.length > 0 ? activeAppointments[0] : null;
 
+    // Get remaining appointments (after the current one) for "Running Late" notifications
+    const remainingAppointments = activeAppointments.slice(1).map((apt) => ({
+      customerName: apt.customer.name,
+      customerPhone: apt.customer.phone,
+      startAt: apt.startAt.toISOString(),
+    }));
+
     const response = {
       appointments: activeAppointments.length,
       totalAppointments,
@@ -202,6 +209,7 @@ export async function GET(req: NextRequest) {
       hasData,
       showSampleData,
       contactMethods: groomer?.contactMethods || ["call", "sms"],
+      remainingAppointments,
     };
 
     return NextResponse.json(response);

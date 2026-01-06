@@ -59,6 +59,11 @@ interface TodaysStats {
   hasData: boolean;
   showSampleData: boolean;
   contactMethods?: string[];
+  remainingAppointments?: {
+    customerName: string;
+    customerPhone?: string;
+    startAt: string;
+  }[];
 }
 
 interface CalmImpact {
@@ -289,6 +294,13 @@ function DashboardContent() {
   const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
   const [completeAppointmentId, setCompleteAppointmentId] = useState<string | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [showRunningLateModal, setShowRunningLateModal] = useState(false);
+  const [delayMinutes, setDelayMinutes] = useState(15);
+
+  // Check if user can use Running Late feature (GROWTH+ only)
+  const canUseRunningLate = ['GROWTH', 'PRO', 'TRIAL'].includes(
+    session?.user?.subscriptionPlan || ''
+  );
 
   useEffect(() => {
     async function handleSetup() {
@@ -480,6 +492,33 @@ function DashboardContent() {
     }
     // Telegram uses tg:// URL scheme
     window.location.href = `tg://resolve?phone=${phone}`;
+  }
+
+  function handleOnMyWay(phone?: string) {
+    if (!phone) {
+      toast.error("No phone number available");
+      return;
+    }
+    const message = encodeURIComponent("Hi! I'm on my way to you now. See you soon!");
+    window.location.href = `sms:${phone}?body=${message}`;
+  }
+
+  function handleSendRunningLate() {
+    const phones = stats?.remainingAppointments
+      ?.map(a => a.customerPhone)
+      .filter(Boolean) || [];
+
+    if (phones.length === 0) {
+      toast.error("No upcoming customers to notify");
+      return;
+    }
+
+    const message = encodeURIComponent(
+      `Hi! I'm running about ${delayMinutes} minutes behind schedule. Thanks for your patience!`
+    );
+    window.location.href = `sms:${phones.join(',')}?body=${message}`;
+    setShowRunningLateModal(false);
+    toast.success(`Opening SMS to notify ${phones.length} customer${phones.length > 1 ? 's' : ''}`);
   }
 
   function openSkipModal(appointmentId: string) {
@@ -860,6 +899,28 @@ function DashboardContent() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
+            {/* On My Way - Quick SMS with pre-filled message */}
+            {stats.nextAppointment.status !== "IN_PROGRESS" && (
+              <div className="flex flex-col gap-1">
+                <button
+                  onClick={() => handleOnMyWay(stats.nextAppointment?.customerPhone)}
+                  className="w-full font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 bg-teal-500/80 hover:bg-teal-500/90 text-white border border-teal-300/30"
+                >
+                  <Clock className="h-5 w-5" />
+                  On My Way
+                </button>
+                {/* Running Late link - GROWTH+ only, only show if there are remaining appointments */}
+                {canUseRunningLate && (stats.remainingAppointments?.length || 0) > 0 && (
+                  <button
+                    onClick={() => setShowRunningLateModal(true)}
+                    className="text-white/60 hover:text-white/80 text-sm underline underline-offset-2 transition-colors"
+                  >
+                    Running late? Notify all customers
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Primary: Start Driving - Only show when NOT in progress (groomer is already there when in progress) */}
             {stats.nextAppointment.status !== "IN_PROGRESS" && (
               <button
@@ -1375,6 +1436,95 @@ function DashboardContent() {
                   ) : (
                     "Complete"
                   )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Running Late Modal - GROWTH+ only */}
+      {showRunningLateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">Notify Customers</h3>
+              <button
+                onClick={() => setShowRunningLateModal(false)}
+                className="btn btn-ghost btn-sm btn-circle"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-4">
+              <p className="text-gray-600 mb-4">
+                Let your remaining customers know you&apos;re running a bit behind. This opens your SMS app with a pre-filled message.
+              </p>
+
+              {/* Delay selection */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  How far behind are you?
+                </label>
+                <div className="flex gap-2">
+                  {[10, 15, 30, 45].map((mins) => (
+                    <button
+                      key={mins}
+                      onClick={() => setDelayMinutes(mins)}
+                      className={`flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
+                        delayMinutes === mins
+                          ? "bg-amber-500 text-white border-amber-500"
+                          : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                      }`}
+                    >
+                      {mins} min
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Preview customers */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Customers to notify ({stats?.remainingAppointments?.length || 0})
+                </label>
+                <div className="bg-gray-50 rounded-lg p-3 max-h-32 overflow-y-auto">
+                  {stats?.remainingAppointments && stats.remainingAppointments.length > 0 ? (
+                    <ul className="space-y-1">
+                      {stats.remainingAppointments.map((apt, i) => (
+                        <li key={i} className="text-sm text-gray-600 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-amber-400 rounded-full"></span>
+                          {apt.customerName} — {formatTime(apt.startAt)}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-gray-500">No remaining appointments</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Message preview */}
+              <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <p className="text-sm text-blue-800">
+                  <span className="font-medium">Message preview:</span><br />
+                  &ldquo;Hi! I&apos;m running about {delayMinutes} minutes behind schedule. Thanks for your patience!&rdquo;
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowRunningLateModal(false)}
+                  className="btn btn-ghost flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendRunningLate}
+                  className="btn bg-amber-500 hover:bg-amber-600 text-white flex-1"
+                  disabled={!stats?.remainingAppointments?.length}
+                >
+                  Send Updates
                 </button>
               </div>
             </div>

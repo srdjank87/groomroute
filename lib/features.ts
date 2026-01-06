@@ -13,6 +13,7 @@ export type Feature =
   | "one_tap_navigation"
   | "area_days"
   | "skip_stop"
+  | "on_my_way"
 
   // Customer & Appointment Management
   | "unlimited_customers"
@@ -20,11 +21,16 @@ export type Feature =
   | "calendar_import"
   | "calendar_two_way_sync"
   | "appointment_conflict_detection"
+  | "basic_customer_notes"
+  | "pet_behavior_flags"
+  | "cancellation_history"
 
   // Workload Intelligence
   | "dog_size_tracking"
   | "energy_cost_ratings"
   | "danger_day_warnings"
+  | "working_hours_warnings"
+  | "workload_protection"
   | "assistant_mode"
   | "workload_distribution"
 
@@ -35,6 +41,7 @@ export type Feature =
   | "email_messaging"
   | "message_templates"
   | "running_late_automation"
+  | "running_late_notifications"
   | "bulk_notifications"
   | "calm_inbox"
   | "auto_reply_classification"
@@ -74,33 +81,50 @@ export type Feature =
  */
 const FEATURE_MATRIX: Record<SubscriptionPlan, Set<Feature>> = {
   TRIAL: new Set([
-    // Core features (same as STARTER for trial period)
+    // Core features (same as GROWTH for trial period to let them experience full features)
     "route_optimization",
     "one_tap_navigation",
+    "area_days",
     "skip_stop",
+    "on_my_way",
+
+    // Customer & Appointment (GROWTH level for trial)
+    "unlimited_customers",
     "appointment_conflict_detection",
     "calendar_import",
+    "basic_customer_notes",
+    "pet_behavior_flags",
+    "cancellation_history",
 
-    // Limited messaging (shared number)
+    // Workload Intelligence (GROWTH level for trial)
+    "workload_protection",
+    "working_hours_warnings",
+    "danger_day_warnings",
+
+    // Messaging (shared number for trial)
     "sms_messaging",
     "shared_sms_number",
     "email_messaging",
     "calm_inbox",
     "auto_reply_classification",
+    "running_late_notifications",
 
     // Basic support
     "email_support",
   ]),
 
   STARTER: new Set([
-    // Core Routing & Navigation
+    // Core Routing & Navigation (Landing page: Route optimization, Area day scheduling, One-tap navigation)
     "route_optimization",
     "one_tap_navigation",
+    "area_days",
     "skip_stop",
+    "on_my_way",
 
-    // Customer & Appointment Management (LIMITED)
+    // Customer & Appointment Management (Landing page: Basic customer notes, Up to 50 customers)
     "appointment_conflict_detection",
     "calendar_import",
+    "basic_customer_notes",
     // NOT INCLUDED: unlimited_customers, unlimited_appointments, calendar_two_way_sync
 
     // Communication (SHARED NUMBER ONLY)
@@ -113,42 +137,49 @@ const FEATURE_MATRIX: Record<SubscriptionPlan, Set<Feature>> = {
     // Basic Analytics
     "basic_analytics",
 
-    // Support
+    // Support (Landing page: Email support)
     "email_support",
   ]),
 
   GROWTH: new Set([
-    // Everything from STARTER
+    // Core Routing & Navigation (Landing page: all STARTER features plus more)
     "route_optimization",
     "one_tap_navigation",
     "area_days",
     "skip_stop",
+    "on_my_way",
 
-    // UNLIMITED Customer & Appointment Management
+    // Customer & Appointment Management (Landing page: Unlimited customers, Pet behavior flags, Cancellation history)
     "unlimited_customers",
     "unlimited_appointments",
     "calendar_import",
     "calendar_two_way_sync",
     "appointment_conflict_detection",
+    "basic_customer_notes",
+    "pet_behavior_flags",
+    "cancellation_history",
 
-    // FULL Workload Intelligence
+    // Workload Intelligence (Landing page: Workload protection limits, Working hours warnings)
     "dog_size_tracking",
     "energy_cost_ratings",
     "danger_day_warnings",
+    "working_hours_warnings",
+    "workload_protection",
     "assistant_mode",
     "workload_distribution",
 
-    // DEDICATED Communication
+    // Communication (Landing page: Running late notifications)
     "sms_messaging",
-    "dedicated_sms_number", // Key upgrade from STARTER
+    "dedicated_sms_number",
     "email_messaging",
     "message_templates",
     "running_late_automation",
+    "running_late_notifications",
     "bulk_notifications",
     "calm_inbox",
     "auto_reply_classification",
 
-    // FULL Calm Control
+    // Calm Control
     "calm_control_access",
     "rescue_my_day",
     "smart_skip_stop",
@@ -165,60 +196,74 @@ const FEATURE_MATRIX: Record<SubscriptionPlan, Set<Feature>> = {
     "roi_calculator",
     "time_savings_tracking",
 
-    // Support
+    // Support (Landing page: Priority support)
     "email_support",
     "priority_support",
   ]),
 
   PRO: new Set([
-    // Everything from GROWTH
+    // Everything from GROWTH plus PRO-exclusive features
+    // Core Routing & Navigation
     "route_optimization",
     "one_tap_navigation",
     "area_days",
     "skip_stop",
+    "on_my_way",
 
+    // Customer & Appointment Management
     "unlimited_customers",
     "unlimited_appointments",
     "calendar_import",
     "calendar_two_way_sync",
     "appointment_conflict_detection",
+    "basic_customer_notes",
+    "pet_behavior_flags",
+    "cancellation_history",
 
+    // Workload Intelligence
     "dog_size_tracking",
     "energy_cost_ratings",
     "danger_day_warnings",
+    "working_hours_warnings",
+    "workload_protection",
     "assistant_mode",
     "workload_distribution",
 
+    // Communication
     "sms_messaging",
     "dedicated_sms_number",
     "email_messaging",
     "message_templates",
     "running_late_automation",
+    "running_late_notifications",
     "bulk_notifications",
     "calm_inbox",
     "auto_reply_classification",
 
+    // Calm Control
     "calm_control_access",
     "rescue_my_day",
     "smart_skip_stop",
     "day_triage",
 
+    // Revenue Protection
     "cancellation_gap_fill",
     "waitlist_management",
     "revenue_tracking",
 
+    // Analytics
     "advanced_analytics",
     "end_of_day_summary",
     "roi_calculator",
     "time_savings_tracking",
 
-    // PRO-EXCLUSIVE: Multi-groomer & Team Features
+    // PRO-EXCLUSIVE: Multi-groomer & Team Features (Landing page: Multiple groomers/vans, Team calendar view, Per-groomer analytics)
     "multi_groomer",
     "team_calendar",
     "groomer_performance_analytics",
     "equipment_logging",
 
-    // PRO-EXCLUSIVE: Premium Support
+    // PRO-EXCLUSIVE: Premium Support (Landing page: Phone support, Dedicated account manager)
     "email_support",
     "priority_support",
     "phone_support",
@@ -312,6 +357,7 @@ export const FEATURE_DESCRIPTIONS: Record<Feature, string> = {
   one_tap_navigation: "Launch navigation with one tap",
   area_days: "Dedicated area days support",
   skip_stop: "Skip appointment and auto-rebuild route",
+  on_my_way: "One-tap 'On My Way' SMS notification",
 
   // Customer Management
   unlimited_customers: "Unlimited customer profiles",
@@ -319,11 +365,16 @@ export const FEATURE_DESCRIPTIONS: Record<Feature, string> = {
   calendar_import: "Import from Google Calendar / ICS",
   calendar_two_way_sync: "Two-way calendar sync",
   appointment_conflict_detection: "Automatic conflict detection",
+  basic_customer_notes: "Basic customer notes",
+  pet_behavior_flags: "Pet behavior flags & special needs tracking",
+  cancellation_history: "Customer cancellation history tracking",
 
   // Workload
   dog_size_tracking: "Dog size & breed tracking",
   energy_cost_ratings: "Energy cost per appointment",
   danger_day_warnings: "Danger day warnings",
+  working_hours_warnings: "Working hours warnings",
+  workload_protection: "Workload protection limits",
   assistant_mode: "Assistant mode (workload adjustment)",
   workload_distribution: "Smart workload distribution",
 
@@ -334,6 +385,7 @@ export const FEATURE_DESCRIPTIONS: Record<Feature, string> = {
   email_messaging: "Email messaging",
   message_templates: "Professional message templates",
   running_late_automation: "Running late automation",
+  running_late_notifications: "Running late bulk notifications",
   bulk_notifications: "Bulk notifications",
   calm_inbox: "Calm Inbox (intelligent reply sorting)",
   auto_reply_classification: "Auto-classify customer replies",
