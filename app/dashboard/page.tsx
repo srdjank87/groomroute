@@ -657,6 +657,8 @@ function DashboardContent() {
           const perfData = await perfResponse.json();
           setPerformanceData(perfData);
         }
+        // Dispatch event to notify layout of assistant status change
+        window.dispatchEvent(new CustomEvent("assistantStatusChanged", { detail: { hasAssistant: newValue } }));
       } else {
         toast.error("Failed to update assistant status");
       }

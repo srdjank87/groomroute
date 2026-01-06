@@ -72,6 +72,16 @@ export default function AppLayout({
     if (status === "authenticated") {
       fetchAssistantStatus();
     }
+
+    // Listen for assistant status changes from the dashboard toggle
+    function handleAssistantStatusChange(event: CustomEvent<{ hasAssistant: boolean }>) {
+      setHasAssistant(event.detail.hasAssistant);
+    }
+
+    window.addEventListener("assistantStatusChanged", handleAssistantStatusChange as EventListener);
+    return () => {
+      window.removeEventListener("assistantStatusChanged", handleAssistantStatusChange as EventListener);
+    };
   }, [status]);
 
   // Check if user has completed Stripe checkout
