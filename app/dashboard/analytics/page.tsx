@@ -91,7 +91,7 @@ export default function AnalyticsPage() {
       setIsLoading(true);
       try {
         const [revenueRes, perfRes] = await Promise.all([
-          fetch("/api/dashboard/revenue"),
+          fetch("/api/dashboard/revenue-stats"),
           fetch("/api/dashboard/performance"),
         ]);
 
