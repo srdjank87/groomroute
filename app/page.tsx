@@ -82,34 +82,34 @@ export default function Home() {
                 See How It Works
               </Link>
             </div>
-            <p className="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8">14-day free trial. No commitment. Cancel anytime.</p>
+            <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">14-day free trial. No commitment. Cancel anytime.</p>
 
-            {/* Hero image */}
-            <div className="flex justify-center mb-6 sm:mb-8">
+            {/* Value props - hidden on mobile, shown above image on larger screens */}
+            <div className="hidden sm:flex max-w-3xl mx-auto mb-4 gap-4 lg:gap-6 justify-center flex-wrap text-sm lg:text-base text-gray-600">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                Less driving
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                Energy protected
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                Fewer surprises
+              </span>
+            </div>
+
+            {/* Hero image - smaller on mobile */}
+            <div className="flex justify-center">
               <Image
                 src="/images/hero.jpg"
                 alt="GroomRoute app showing optimized route - finally a calm day for mobile groomers"
                 width={1200}
                 height={675}
-                className="rounded-xl sm:rounded-2xl w-full max-w-2xl lg:max-w-3xl shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white"
+                className="rounded-xl sm:rounded-2xl w-full max-w-xl sm:max-w-2xl lg:max-w-3xl shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white"
                 priority
               />
-            </div>
-
-            {/* Value props - emotional, not feature-focused */}
-            <div className="max-w-2xl mx-auto space-y-2 sm:space-y-3">
-              <div className="flex items-center gap-2 sm:gap-3 justify-center">
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600 flex-shrink-0" />
-                <p className="text-sm sm:text-base lg:text-lg text-gray-700 text-left">Same neighborhoods, same days - less driving, more grooming</p>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-3 justify-center">
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600 flex-shrink-0" />
-                <p className="text-sm sm:text-base lg:text-lg text-gray-700 text-left">Limits that protect your energy - because burnout isn&apos;t a business plan</p>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-3 justify-center">
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600 flex-shrink-0" />
-                <p className="text-sm sm:text-base lg:text-lg text-gray-700 text-left">Your safety net when things go sideways</p>
-              </div>
             </div>
           </div>
         </div>
