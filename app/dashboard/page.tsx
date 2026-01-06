@@ -29,6 +29,7 @@ import {
   X,
   Play,
   Dog,
+  Heart,
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
@@ -1280,6 +1281,27 @@ function DashboardContent() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Need a Breather? - Calm Center Link */}
+      {!isFullscreen && (
+        <div className="mb-8">
+          <Link
+            href="/dashboard/calm"
+            className="block p-5 bg-gradient-to-r from-pink-50 via-purple-50 to-pink-50 rounded-xl border border-pink-200 hover:border-pink-300 hover:shadow-sm transition-all"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white rounded-full shadow-sm">
+                <Heart className="h-6 w-6 text-pink-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900">Need a breather?</h3>
+                <p className="text-sm text-gray-600">Visit the Calm Center for scripts, templates, and support</p>
+              </div>
+              <span className="text-pink-500 font-medium text-sm">Visit</span>
+            </div>
+          </Link>
         </div>
       )}
 

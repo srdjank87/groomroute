@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   Heart,
+  Sparkles,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -20,12 +21,22 @@ const GroomRouteLogo = () => (
   <span>Groom<span style={{ color: '#A5744A' }}>Route</span></span>
 );
 
-const navigation = [
+// Navigation grouped by purpose
+const mainNavigation = [
   { name: "Today", href: "/dashboard", icon: Sun },
-  { name: "Calm Center", href: "/dashboard/calm", icon: Heart, special: true },
+  { name: "Routes", href: "/app/routes", icon: RouteIcon },
+];
+
+const businessNavigation = [
   { name: "Customers", href: "/app/customers", icon: Users },
   { name: "Appointments", href: "/app/appointments", icon: Calendar },
-  { name: "Routes", href: "/app/routes", icon: RouteIcon },
+];
+
+const supportNavigation = [
+  { name: "Calm Center", href: "/dashboard/calm", icon: Heart, special: true },
+];
+
+const settingsNavigation = [
   { name: "Settings", href: "/app/settings", icon: Settings },
 ];
 
@@ -112,29 +123,108 @@ export default function AppLayout({
               <h1 className="text-xl font-bold"><GroomRouteLogo /></h1>
             </div>
             <nav className="flex flex-1 flex-col p-4">
-              <ul role="list" className="space-y-1">
-                {navigation.map((item) => {
-                  const isActive = pathname === item.href;
-                  return (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        onClick={() => setSidebarOpen(false)}
-                        className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                          item.special && !isActive
-                            ? "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-700 hover:from-pink-100 hover:to-purple-100 border border-pink-200"
-                            : isActive
-                            ? "bg-[#A5744A] text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        <item.icon className="h-5 w-5" />
-                        {item.name}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+              {/* Main Navigation - Your Day */}
+              <div className="mb-4">
+                <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Your Day</p>
+                <ul role="list" className="space-y-1">
+                  {mainNavigation.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setSidebarOpen(false)}
+                          className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                            isActive
+                              ? "bg-[#A5744A] text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {item.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* Business Navigation */}
+              <div className="mb-4">
+                <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Business</p>
+                <ul role="list" className="space-y-1">
+                  {businessNavigation.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setSidebarOpen(false)}
+                          className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                            isActive
+                              ? "bg-[#A5744A] text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {item.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* Support Navigation - Calm Center */}
+              <div className="mb-4">
+                <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Support</p>
+                <ul role="list" className="space-y-1">
+                  {supportNavigation.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setSidebarOpen(false)}
+                          className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
+                            isActive
+                              ? "bg-pink-600 text-white"
+                              : "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-700 hover:from-pink-100 hover:to-purple-100 border border-pink-200"
+                          }`}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {item.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* Settings at bottom */}
+              <div className="mt-auto pt-4 border-t border-gray-200">
+                <ul role="list" className="space-y-1">
+                  {settingsNavigation.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setSidebarOpen(false)}
+                          className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                            isActive
+                              ? "bg-[#A5744A] text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {item.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </nav>
           </div>
         </div>
@@ -154,28 +244,104 @@ export default function AppLayout({
             <h1 className="text-xl font-bold"><GroomRouteLogo /></h1>
           </div>
           <nav className="flex flex-1 flex-col p-4">
-            <ul role="list" className="space-y-1">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                        item.special && !isActive
-                          ? "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-700 hover:from-pink-100 hover:to-purple-100 border border-pink-200"
-                          : isActive
-                          ? "bg-[#A5744A] text-white"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      <item.icon className="h-5 w-5" />
-                      {item.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+            {/* Main Navigation - Your Day */}
+            <div className="mb-4">
+              <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Your Day</p>
+              <ul role="list" className="space-y-1">
+                {mainNavigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                          isActive
+                            ? "bg-[#A5744A] text-white"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        {item.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* Business Navigation */}
+            <div className="mb-4">
+              <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Business</p>
+              <ul role="list" className="space-y-1">
+                {businessNavigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                          isActive
+                            ? "bg-[#A5744A] text-white"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        {item.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* Support Navigation - Calm Center */}
+            <div className="mb-4">
+              <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Support</p>
+              <ul role="list" className="space-y-1">
+                {supportNavigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        className={`flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                          isActive
+                            ? "bg-pink-600 text-white"
+                            : "bg-gradient-to-r from-pink-50 to-purple-50 text-pink-700 hover:from-pink-100 hover:to-purple-100 border border-pink-200"
+                        }`}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        {item.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* Settings at bottom */}
+            <div className="mt-auto pt-4 border-t border-gray-200">
+              <ul role="list" className="space-y-1">
+                {settingsNavigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                          isActive
+                            ? "bg-[#A5744A] text-white"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        {item.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           </nav>
         </div>
       </div>
