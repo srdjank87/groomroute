@@ -28,6 +28,7 @@ import {
   AlertTriangle,
   X,
   Play,
+  Dog,
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
@@ -868,13 +869,14 @@ function DashboardContent() {
                   <span className="sm:hidden">Start</span>
                 </button>
               )}
-              {/* Skip button */}
+              {/* Handle/Reschedule button - softer language */}
               <button
                 onClick={() => stats.nextAppointment && openSkipModal(stats.nextAppointment.appointmentId)}
-                className="bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="bg-gray-500/80 hover:bg-gray-500/90 border border-gray-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <SkipForward className="h-5 w-5" />
-                Skip
+                <span className="hidden sm:inline">Can&apos;t Make It</span>
+                <span className="sm:hidden">Handle</span>
               </button>
               {/* Complete button with confirmation */}
               <button
@@ -947,11 +949,11 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Today's Performance - Supportive Achievement */}
+      {/* Today's Progress - Simplified & Calm */}
       {performanceData && stats?.hasData && !isFullscreen && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-          <div className="flex items-start justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Today&apos;s Performance</h3>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+          <div className="flex items-start justify-between mb-5">
+            <h3 className="text-lg font-semibold text-gray-900">Your Progress</h3>
             {/* Assistant Toggle */}
             <button
               onClick={toggleAssistant}
@@ -967,20 +969,12 @@ function DashboardContent() {
             </button>
           </div>
 
-          {/* Headline */}
-          <p className="text-2xl font-bold text-emerald-600 mb-1">
-            {performanceData.today.headline}
-          </p>
-          <p className="text-gray-600 mb-2">
-            {performanceData.today.subtext}
-          </p>
-
           {/* Dynamic Progress Context */}
           {performanceData.today.dogsScheduled > 0 && (
-            <div className="mb-4">
-              {/* Progress Bar */}
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="mb-6">
+              {/* Progress Bar - Larger and more prominent */}
+              <div className="flex items-center gap-4 mb-3">
+                <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500"
                     style={{
@@ -988,173 +982,117 @@ function DashboardContent() {
                     }}
                   />
                 </div>
-                <span className="text-sm font-medium text-gray-600">
-                  {Math.round((performanceData.today.dogsGroomed / performanceData.today.dogsScheduled) * 100)}%
+                <span className="text-lg font-bold text-emerald-600">
+                  {performanceData.today.dogsGroomed}/{performanceData.today.dogsScheduled}
                 </span>
               </div>
               {/* Contextual message based on progress */}
-              <p className="text-xs text-gray-500">
+              <p className="text-gray-600">
                 {performanceData.today.dogsGroomed === 0
-                  ? `${performanceData.today.dogsScheduled} appointments ahead - you've got this!`
+                  ? `Ready to start your day with ${performanceData.today.dogsScheduled} appointments`
                   : performanceData.today.dogsGroomed === performanceData.today.dogsScheduled
-                    ? "All done! Great work today."
+                    ? "All done! Time to head home."
                     : performanceData.today.dogsGroomed >= performanceData.today.dogsScheduled / 2
-                      ? `Past the halfway mark! ${performanceData.today.dogsScheduled - performanceData.today.dogsGroomed} more to go.`
-                      : `Good progress! ${performanceData.today.dogsScheduled - performanceData.today.dogsGroomed} appointments remaining.`
+                      ? `Past halfway! ${performanceData.today.dogsScheduled - performanceData.today.dogsGroomed} more to go.`
+                      : `Good start! ${performanceData.today.dogsScheduled - performanceData.today.dogsGroomed} appointments remaining.`
                 }
               </p>
             </div>
           )}
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-            <div className="bg-gray-50 rounded-lg p-3 text-center">
-              <p className="text-xl font-bold text-gray-900">
-                {performanceData.today.dogsGroomed}/{performanceData.today.dogsScheduled}
+          {/* Simplified Stats - Just 3 key metrics */}
+          <div className="grid grid-cols-3 gap-4">
+            {/* Est. Finish Time */}
+            <div className="text-center p-4 bg-emerald-50 rounded-xl">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <Clock className="h-4 w-4 text-emerald-600" />
+                <p className="text-xs text-emerald-700 font-medium">Est. Finish</p>
+              </div>
+              <p className="text-xl font-bold text-emerald-700">
+                {performanceData.today.estimatedFinish || "—"}
               </p>
-              <p className="text-xs text-gray-500">Dogs</p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-3 text-center">
-              <p className="text-xl font-bold text-gray-900">
-                {performanceData.today.energyLoad}
-              </p>
-              <p className="text-xs text-gray-500">Energy Load</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-3 text-center">
-              <p className="text-xl font-bold text-gray-900">
+            {/* Large Dogs */}
+            <div className="text-center p-4 bg-amber-50 rounded-xl">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <Dog className="h-4 w-4 text-amber-600" />
+                <p className="text-xs text-amber-700 font-medium">Large Dogs</p>
+              </div>
+              <p className="text-xl font-bold text-amber-700">
                 {performanceData.today.largeDogCount}
               </p>
-              <p className="text-xs text-gray-500">Large Dogs</p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-3 text-center">
-              <p className="text-xl font-bold text-[#A5744A]">
+            {/* Today's Earnings */}
+            <div className="text-center p-4 bg-blue-50 rounded-xl">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <DollarSign className="h-4 w-4 text-blue-600" />
+                <p className="text-xs text-blue-700 font-medium">Earnings</p>
+              </div>
+              <p className="text-xl font-bold text-blue-700">
                 ${performanceData.today.revenue.toFixed(0)}
               </p>
-              <p className="text-xs text-gray-500">Revenue</p>
             </div>
           </div>
 
-          {/* Break Stats */}
-          {performanceData.breakStats && (
-            <div className="flex items-center gap-4 p-3 bg-amber-50 rounded-lg mb-4">
-              <Coffee className="h-5 w-5 text-amber-600" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
-                  {performanceData.breakStats.breaksTakenToday === 0
-                    ? "No breaks yet today"
-                    : `${performanceData.breakStats.breaksTakenToday} break${performanceData.breakStats.breaksTakenToday !== 1 ? "s" : ""} taken`}
-                  {performanceData.breakStats.totalBreakMinutes > 0 &&
-                    ` (${performanceData.breakStats.totalBreakMinutes} min)`}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {performanceData.breakStats.breaksTakenToday === 0
-                    ? "Remember: rest isn't lazy, it's sustainable"
-                    : "Taking breaks protects your career longevity"}
-                </p>
-              </div>
+          {/* Break Reminder - More gentle */}
+          {performanceData.breakStats && performanceData.today.dogsGroomed > 0 && performanceData.today.dogsGroomed < performanceData.today.dogsScheduled && (
+            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl mt-6">
+              <Coffee className="h-5 w-5 text-gray-500" />
+              <p className="text-sm text-gray-600">
+                {performanceData.breakStats.breaksTakenToday === 0
+                  ? "Remember to take a break when you need one"
+                  : `${performanceData.breakStats.breaksTakenToday} break${performanceData.breakStats.breaksTakenToday !== 1 ? "s" : ""} taken · ${performanceData.breakStats.totalBreakMinutes} min`}
+              </p>
             </div>
           )}
 
-          {/* Soft Comparison */}
-          <p className="text-sm text-gray-500 mb-4">
-            {performanceData.today.softComparison}
-          </p>
-
-          {/* Expandable Industry Insights */}
+          {/* Expandable Details */}
           <button
             onClick={() => setShowInsights(!showInsights)}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 transition-colors mt-6"
           >
             {showInsights ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            See industry insights
+            {showInsights ? "Hide details" : "Show more details"}
           </button>
 
           {showInsights && (
-            <div className="mt-3 p-4 bg-gray-50 rounded-lg">
+            <div className="mt-4 pt-4 border-t border-gray-100">
               <div className="grid gap-3 text-sm">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Dogs per day</span>
-                  <div className="text-right">
-                    <span className="font-medium text-gray-900">
-                      {performanceData.insights.dogsPerDay.user30Day.toFixed(1)}
-                    </span>
-                    <span className="text-gray-400 text-xs ml-2">
-                      vs {performanceData.insights.dogsPerDay.industry}
-                    </span>
-                  </div>
+                  <span className="text-gray-500">Energy load today</span>
+                  <span className="font-medium text-gray-700">
+                    {performanceData.today.energyLoad}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Energy load</span>
-                  <div className="text-right">
-                    <span className="font-medium text-gray-900">
-                      {performanceData.insights.energyLoad.userAvg.toFixed(1)}
-                    </span>
-                    <span className="text-gray-400 text-xs ml-2">
-                      ({performanceData.insights.energyLoad.comparison})
-                    </span>
-                  </div>
+                  <span className="text-gray-500">Dogs per day (30d avg)</span>
+                  <span className="font-medium text-gray-700">
+                    {performanceData.insights.dogsPerDay.user30Day.toFixed(1)}
+                  </span>
                 </div>
                 {performanceData.insights.driveTime.userAvg !== null && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Avg drive time</span>
-                    <div className="text-right">
-                      <span className="font-medium text-gray-900">
-                        {performanceData.insights.driveTime.userAvg} min
-                      </span>
-                      <span className="text-gray-400 text-xs ml-2">
-                        (target: {performanceData.insights.driveTime.target})
-                      </span>
-                    </div>
+                    <span className="text-gray-500">Avg drive time</span>
+                    <span className="font-medium text-gray-700">
+                      {performanceData.insights.driveTime.userAvg} min
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Cancellation rate</span>
-                  <div className="text-right">
-                    <span className="font-medium text-gray-900">
-                      {performanceData.insights.cancellationRate.user.toFixed(1)}%
-                    </span>
-                    <span className="text-gray-400 text-xs ml-2">
-                      (typical: {performanceData.insights.cancellationRate.typical})
+                  <span className="text-gray-500">Completion rate</span>
+                  <span className="font-medium text-gray-700">
+                    {(100 - performanceData.insights.cancellationRate.user).toFixed(0)}%
+                  </span>
+                </div>
+                {performanceData.routeEfficiency && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500">Route efficiency</span>
+                    <span className="font-medium text-gray-700">
+                      {performanceData.routeEfficiency.rating}
                     </span>
                   </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Large dogs/day</span>
-                  <div className="text-right">
-                    <span className="font-medium text-gray-900">
-                      {performanceData.insights.largeDogs.userAvg.toFixed(1)}
-                    </span>
-                    <span className="text-gray-400 text-xs ml-2">
-                      ({performanceData.insights.largeDogs.typical})
-                    </span>
-                  </div>
-                </div>
+                )}
               </div>
-            </div>
-          )}
-
-          {/* Route Efficiency */}
-          {performanceData.routeEfficiency && (
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm text-gray-600">Route Efficiency</span>
-                </div>
-                <span className={`text-sm font-medium ${
-                  performanceData.routeEfficiency.ratingKey === "excellent"
-                    ? "text-green-600"
-                    : performanceData.routeEfficiency.ratingKey === "good"
-                      ? "text-blue-600"
-                      : "text-amber-600"
-                }`}>
-                  {performanceData.routeEfficiency.rating}
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                {performanceData.routeEfficiency.avgMinutesBetweenStops} min avg between stops
-                {performanceData.today.estimatedFinish && ` · Est. finish: ${performanceData.today.estimatedFinish}`}
-              </p>
             </div>
           )}
         </div>
@@ -1162,7 +1100,7 @@ function DashboardContent() {
 
       {/* This Week - Calm Impact Summary */}
       {revenueStats?.calmImpact && !isFullscreen && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">This Week</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Days Organized */}
@@ -1216,7 +1154,7 @@ function DashboardContent() {
 
       {/* Your Earnings - Only show when not in fullscreen */}
       {revenueStats && !isFullscreen && (
-        <div className="bg-white rounded-lg shadow mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Your Earnings</h2>
           </div>
@@ -1332,39 +1270,41 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* One-Tap Quick Actions */}
+      {/* Quick Actions - Calmer styling */}
       {!isFullscreen && (
-      <div className="bg-white rounded-lg shadow mb-6">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
-        </div>
-        <div className="p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
-            <Link
-              href="/app/appointments/new"
-              className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/30 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors text-center"
-            >
-              <div className="p-3 bg-[#A5744A] rounded-full">
-                <Plus className="h-6 w-6 text-white" />
-              </div>
-              <span className="font-semibold text-sm text-gray-900">New Appointment</span>
-            </Link>
+      <div className="mb-8">
+        <h3 className="text-sm font-medium text-gray-500 mb-3">Quick Actions</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <Link
+            href="/app/appointments/new"
+            className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-emerald-300 hover:shadow-sm transition-all"
+          >
+            <div className="p-2.5 bg-emerald-100 rounded-lg">
+              <Calendar className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div>
+              <span className="font-medium text-gray-900 block">New Appointment</span>
+              <span className="text-xs text-gray-500">Schedule a visit</span>
+            </div>
+          </Link>
 
-            <Link
-              href="/app/customers/new"
-              className="flex flex-col items-center gap-2 p-4 border-2 border-[#A5744A]/20 rounded-lg hover:bg-orange-50 transition-colors text-center"
-            >
-              <div className="p-3 bg-[#A5744A]/20 rounded-full">
-                <Plus className="h-6 w-6 text-[#8B6239]" />
-              </div>
-              <span className="font-semibold text-sm text-gray-900">Add Customer</span>
-            </Link>
-          </div>
+          <Link
+            href="/app/customers/new"
+            className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all"
+          >
+            <div className="p-2.5 bg-blue-100 rounded-lg">
+              <UserPlus className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <span className="font-medium text-gray-900 block">Add Customer</span>
+              <span className="text-xs text-gray-500">New client</span>
+            </div>
+          </Link>
         </div>
       </div>
       )}
 
-      {/* Skip Appointment Modal */}
+      {/* Handle Appointment Modal */}
       {showSkipModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -1372,13 +1312,13 @@ function DashboardContent() {
               // Reason selection view
               <>
                 <div className="flex items-center justify-between p-4 border-b">
-                  <h3 className="text-lg font-semibold">Skip Appointment</h3>
+                  <h3 className="text-lg font-semibold">Handle Appointment</h3>
                   <button onClick={closeSkipModal} className="btn btn-ghost btn-sm btn-circle">
                     <X className="h-5 w-5" />
                   </button>
                 </div>
                 <div className="p-4">
-                  <p className="text-gray-600 mb-4">Why are you skipping this appointment?</p>
+                  <p className="text-gray-600 mb-4">What happened with this appointment?</p>
 
                   <div className="space-y-2 mb-4">
                     <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "CANCELLED" ? "border-red-500 bg-red-50" : "hover:bg-gray-50"}`}>
@@ -1471,7 +1411,7 @@ function DashboardContent() {
                       {isSkipping ? (
                         <span className="loading loading-spinner loading-sm"></span>
                       ) : (
-                        "Skip Appointment"
+                        "Continue"
                       )}
                     </button>
                   </div>
