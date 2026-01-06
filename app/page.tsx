@@ -170,10 +170,14 @@ export default function Home() {
             </div>
           </div>
 
-          <p className="text-lg text-gray-700 mt-10 font-medium">
-            Most grooming software promises &quot;more appointments&quot; and &quot;more revenue.&quot;<br />
-            <span className="text-[#A5744A]">But what if you just want a calm, predictable day?</span>
-          </p>
+          <div className="mt-10 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 mb-4">
+              Most grooming software promises &quot;more appointments&quot; and &quot;more revenue.&quot;
+            </p>
+            <p className="text-2xl lg:text-3xl font-bold text-[#A5744A]">
+              But what if you just want a calm, predictable day?
+            </p>
+          </div>
         </div>
       </section>
 
