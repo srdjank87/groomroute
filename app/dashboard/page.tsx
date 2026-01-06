@@ -728,11 +728,11 @@ function DashboardContent() {
         <div className={`text-white ${
           stats.nextAppointment.status === "IN_PROGRESS"
             ? (isFullscreen
-              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700'
-              : 'rounded-xl shadow-lg p-6 mb-6 border border-blue-300/30 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700')
+              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800'
+              : 'rounded-xl shadow-lg p-6 mb-6 border border-blue-400/30 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800')
             : (isFullscreen
-              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-emerald-600 via-teal-600 to-teal-700'
-              : 'rounded-xl shadow-lg p-6 mb-6 border border-emerald-300/30 bg-gradient-to-br from-emerald-600 via-teal-600 to-teal-700')
+              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-emerald-700 via-teal-700 to-teal-800'
+              : 'rounded-xl shadow-lg p-6 mb-6 border border-emerald-400/30 bg-gradient-to-br from-emerald-700 via-teal-700 to-teal-800')
         }`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">

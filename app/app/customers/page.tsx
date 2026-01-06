@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search, Calendar, DollarSign, ArrowUpDown, MapPin } from "lucide-react";
+import { Plus, Search, Calendar, DollarSign, ArrowUpDown, MapPin, Users } from "lucide-react";
 
 interface ServiceArea {
   id: string;
@@ -382,24 +382,26 @@ export default function CustomersPage() {
         </div>
       ) : sortedCustomers.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Plus className="h-8 w-8 text-gray-400" />
+          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <Users className="h-8 w-8 text-emerald-600" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No Customers Found
+            {searchQuery || filterBy !== "all" || areaFilter !== "all"
+              ? "No matches found"
+              : "Ready to grow your client base"}
           </h3>
           <p className="text-gray-600 mb-4">
-            {searchQuery || filterBy !== "all"
-              ? "Try a different search term or filter"
-              : "Get started by adding your first customer"}
+            {searchQuery || filterBy !== "all" || areaFilter !== "all"
+              ? "Try adjusting your search or filters"
+              : "Every great grooming business starts with one happy customer"}
           </p>
-          {!searchQuery && filterBy === "all" && (
+          {!searchQuery && filterBy === "all" && areaFilter === "all" && (
             <Link
               href="/app/customers/new"
               className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
             >
               <Plus className="h-5 w-5" />
-              Add Customer
+              Add Your First Customer
             </Link>
           )}
         </div>

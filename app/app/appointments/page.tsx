@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw, CheckCircle, Play, ThumbsUp, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw, CheckCircle, Play, ThumbsUp, Filter, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -334,14 +334,18 @@ export default function AppointmentsPage() {
         </div>
       ) : filterByStatus(appointments).length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center">
-          <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <Sparkles className="h-8 w-8 text-emerald-600" />
+          </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No Appointments
+            {isToday ? "Your day is wide open" : "Schedule is clear"}
           </h3>
           <p className="text-gray-600 mb-4">
             {statusFilter !== "ALL"
               ? `No ${STATUS_OPTIONS.find(s => s.value === statusFilter)?.label.toLowerCase()} appointments for ${format(new Date(selectedDate + 'T00:00:00'), "MMMM d, yyyy")}`
-              : `No appointments scheduled for ${format(new Date(selectedDate + 'T00:00:00'), "MMMM d, yyyy")}`
+              : isToday
+                ? "A fresh slate awaits — book some appointments or enjoy a well-deserved break"
+                : `Nothing scheduled for ${format(new Date(selectedDate + 'T00:00:00'), "MMMM d, yyyy")} yet`
             }
           </p>
           <Link
@@ -523,14 +527,16 @@ export default function AppointmentsPage() {
           </div>
         ) : otherAppointmentsFiltered.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
-            <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Calendar className="h-8 w-8 text-blue-600" />
+            </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Other Appointments
+              {otherStatusFilter !== "ALL" ? "No matches" : "All caught up"}
             </h3>
             <p className="text-gray-600 mb-4">
               {otherStatusFilter !== "ALL"
                 ? `No ${STATUS_OPTIONS.find(s => s.value === otherStatusFilter)?.label.toLowerCase()} appointments on other dates`
-                : "No appointments scheduled on other dates"
+                : "No upcoming appointments on your calendar — time to fill some slots!"
               }
             </p>
             <Link

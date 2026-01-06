@@ -548,9 +548,11 @@ export default function TodaysRoutePage() {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="text-center py-12">
-          <MapPin className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No appointments today</h3>
-          <p className="text-gray-600 mb-6">You have a free day! Enjoy some time off.</p>
+          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Coffee className="h-8 w-8 text-emerald-600" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Your schedule is clear today</h3>
+          <p className="text-gray-600 mb-6">Take this time to rest, recharge, or tackle some personal projects.</p>
         </div>
       </div>
     );
@@ -737,7 +739,7 @@ export default function TodaysRoutePage() {
         <div className={`mb-6 rounded-xl shadow-lg text-white p-6 ${
           nextAppointment.status === "IN_PROGRESS"
             ? "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 border border-blue-400/30"
-            : "bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] border border-[#A5744A]/30"
+            : "bg-gradient-to-br from-emerald-700 via-teal-700 to-teal-800 border border-emerald-400/30"
         }`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">
@@ -754,7 +756,7 @@ export default function TodaysRoutePage() {
           <div className={`backdrop-blur-sm rounded-lg p-4 mb-4 border ${
             nextAppointment.status === "IN_PROGRESS"
               ? "bg-white/10 border-white/20"
-              : "bg-[#A5744A]/10 border-[#A5744A]/20"
+              : "bg-white/10 border-white/20"
           }`}>
             <div className="flex flex-col md:flex-row items-start gap-4">
               {/* Info Column */}
@@ -833,7 +835,7 @@ export default function TodaysRoutePage() {
             {nextAppointment.status !== "IN_PROGRESS" && (
               <button
                 onClick={() => openInMaps(nextAppointment.customer.address)}
-                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-[#A5744A] hover:bg-[#8B6239] text-white"
+                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-white/20 hover:bg-white/30 text-white border border-white/30"
               >
                 <Navigation className="h-6 w-6" />
                 Start Driving
@@ -854,13 +856,14 @@ export default function TodaysRoutePage() {
                     <span className="sm:hidden">Start</span>
                   </button>
                 )}
-                {/* Skip button - always shown */}
+                {/* Handle/Reschedule button - softer language */}
                 <button
                   onClick={() => openSkipModal(nextAppointment.id)}
-                  className="bg-red-500/80 hover:bg-red-500/90 border border-red-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="bg-gray-500/80 hover:bg-gray-500/90 border border-gray-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
                   <SkipForward className="h-5 w-5" />
-                  Skip
+                  <span className="hidden sm:inline">Can&apos;t Make It</span>
+                  <span className="sm:hidden">Handle</span>
                 </button>
                 {/* Status action button */}
                 {nextAppointment.status === "BOOKED" && (
@@ -1152,13 +1155,13 @@ export default function TodaysRoutePage() {
               // Reason selection view
               <>
                 <div className="flex items-center justify-between p-4 border-b">
-                  <h3 className="text-lg font-semibold">Skip Appointment</h3>
+                  <h3 className="text-lg font-semibold">Handle Appointment</h3>
                   <button onClick={closeSkipModal} className="btn btn-ghost btn-sm btn-circle">
                     <X className="h-5 w-5" />
                   </button>
                 </div>
                 <div className="p-4">
-                  <p className="text-gray-600 mb-4">Why are you skipping this appointment?</p>
+                  <p className="text-gray-600 mb-4">What happened with this appointment?</p>
 
                   <div className="space-y-2 mb-4">
                     <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "CANCELLED" ? "border-red-500 bg-red-50" : "hover:bg-gray-50"}`}>
@@ -1241,17 +1244,17 @@ export default function TodaysRoutePage() {
                       className="btn btn-ghost flex-1"
                       disabled={isSkipping}
                     >
-                      Cancel
+                      Go Back
                     </button>
                     <button
                       onClick={handleSkipAppointment}
-                      className="btn bg-red-500 hover:bg-red-600 text-white flex-1"
+                      className="btn bg-gray-600 hover:bg-gray-700 text-white flex-1"
                       disabled={!skipReason || isSkipping}
                     >
                       {isSkipping ? (
                         <span className="loading loading-spinner loading-sm"></span>
                       ) : (
-                        "Skip Appointment"
+                        "Confirm"
                       )}
                     </button>
                   </div>

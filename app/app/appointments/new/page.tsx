@@ -280,7 +280,7 @@ function NewAppointmentContent() {
       }
 
       const data = await response.json();
-      toast.success("Appointment booked successfully!");
+      toast.success("All set! Appointment scheduled");
       router.push("/app/appointments");
     } catch (error) {
       console.error("Create appointment error:", error);
@@ -434,7 +434,7 @@ function NewAppointmentContent() {
 
             {selectedCustomer.pets.length > 0 ? (
               <>
-                <h2 className="text-lg font-semibold text-gray-900">Select Pet</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Who are we grooming today?</h2>
                 <div className="space-y-3">
                   {selectedCustomer.pets.map((pet) => (
                     <button
@@ -475,7 +475,11 @@ function NewAppointmentContent() {
               </>
             ) : (
               <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                <p className="text-gray-600 mb-4">No pets found for this customer</p>
+                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🐾</span>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No furry friends yet</h3>
+                <p className="text-gray-600 mb-4">Let&apos;s add {selectedCustomer.name}&apos;s pet to get started</p>
                 <button
                   onClick={() => router.push(`/app/customers/${selectedCustomer.id}/pets/new`)}
                   className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
