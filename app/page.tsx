@@ -68,7 +68,7 @@ export default function Home() {
             </h1>
 
             <p className="text-base sm:text-lg lg:text-2xl mb-4 sm:mb-6 leading-relaxed max-w-3xl mx-auto text-gray-700">
-              The scheduling system built only for mobile groomers.<br className="hidden lg:block" />
+              The scheduling system built only for mobile groomers.&nbsp;<br className="hidden lg:block" />
               Keep routes tight, days predictable, and your energy protected.
             </p>
 
@@ -172,7 +172,7 @@ export default function Home() {
 
           <div className="mt-10 max-w-2xl mx-auto">
             <p className="text-lg text-gray-600 mb-4">
-              Most grooming software promises &quot;more appointments&quot; and &quot;more revenue.&quot;
+              Most grooming software promises &quot;more appointments&quot; and &quot;more revenue&quot;.
             </p>
             <p className="text-2xl lg:text-3xl font-bold text-[#A5744A]">
               But what if you just want a calm, predictable day?
@@ -189,7 +189,8 @@ export default function Home() {
               How GroomRoute brings calm to your day
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Not &quot;more appointments.&quot; Not &quot;faster scheduling.&quot;<br />
+              Not &quot;more appointments&quot;. Not &quot;faster scheduling&quot;.</p>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               A sustainable pace that protects your energy and your income.
             </p>
           </div>
@@ -319,7 +320,8 @@ export default function Home() {
               One tap. Problem solved.
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              You work in noise, motion, and time pressure.<br />
+              You work in noise, motion, and time pressure.</p>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Every action in GroomRoute is designed for one-handed use.
             </p>
           </div>
@@ -345,7 +347,7 @@ export default function Home() {
                 </div>
                 <h3 className="card-title text-lg">Start Driving</h3>
                 <p className="text-gray-600 text-sm">
-                  One tap opens Google Maps with your next stop. No copying addresses, no fumbling.
+                  One tap opens Google/Apple Maps with your next stop. No copying addresses, no fumbling.
                 </p>
               </div>
             </div>
@@ -736,7 +738,8 @@ export default function Home() {
             Ready for calmer days?
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Stop zigzagging. Stop overcommitting. Stop the stress spirals.<br />
+            Stop zigzagging. Stop overcommitting. Stop the stress spirals.</p>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Start your free trial and see what a calm day feels like.
           </p>
 
