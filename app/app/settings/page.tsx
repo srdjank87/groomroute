@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, User, Bell, CreditCard, ChevronRight } from "lucide-react";
+import { MapPin, Shield, Bell, CreditCard, ChevronRight } from "lucide-react";
 
 const settingsCategories = [
   {
@@ -13,12 +13,12 @@ const settingsCategories = [
     badgeColor: "bg-emerald-100 text-emerald-700",
   },
   {
-    name: "Profile",
-    description: "Manage your workload preferences and limits",
+    name: "Workload Protection",
+    description: "Set limits to protect your energy and prevent burnout",
     href: "/app/settings/profile",
-    icon: User,
-    badge: "New",
-    badgeColor: "bg-blue-100 text-blue-700",
+    icon: Shield,
+    badge: null,
+    badgeColor: "",
   },
   {
     name: "Notifications",

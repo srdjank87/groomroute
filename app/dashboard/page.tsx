@@ -172,6 +172,93 @@ function formatTime(isoString: string): string {
   return `${displayHours}:${displayMinutes} ${period}`;
 }
 
+// Get contextual greeting based on time of day and schedule status
+function getContextualGreeting(stats: TodaysStats | null, userName?: string | null): { greeting: string; subtext: string } {
+  const hour = new Date().getHours();
+  const firstName = userName?.split(' ')[0] || '';
+
+  // Time-based base greeting
+  let timeGreeting = '';
+  if (hour < 12) {
+    timeGreeting = 'Good morning';
+  } else if (hour < 17) {
+    timeGreeting = 'Good afternoon';
+  } else {
+    timeGreeting = 'Good evening';
+  }
+
+  // If no stats yet, simple greeting
+  if (!stats) {
+    return {
+      greeting: `${timeGreeting}${firstName ? `, ${firstName}` : ''}`,
+      subtext: 'Loading your day...'
+    };
+  }
+
+  // Context-aware greeting based on schedule status
+  if (!stats.hasData || stats.totalAppointments === 0) {
+    return {
+      greeting: `${timeGreeting}${firstName ? `, ${firstName}` : ''}`,
+      subtext: 'Your schedule is clear today. Time to plan or relax.'
+    };
+  }
+
+  if (stats.dayStatus === 'completed') {
+    return {
+      greeting: `Great work${firstName ? `, ${firstName}` : ''}!`,
+      subtext: `You've completed all ${stats.totalAppointments} appointment${stats.totalAppointments !== 1 ? 's' : ''} today.`
+    };
+  }
+
+  if (stats.dayStatus === 'in-progress') {
+    const remaining = stats.appointments;
+    if (remaining === 1) {
+      return {
+        greeting: `Almost there${firstName ? `, ${firstName}` : ''}!`,
+        subtext: 'One appointment left. You\'ve got this.'
+      };
+    }
+    return {
+      greeting: `Keep going${firstName ? `, ${firstName}` : ''}`,
+      subtext: `${remaining} appointment${remaining !== 1 ? 's' : ''} remaining today.`
+    };
+  }
+
+  // Day ready to start
+  if (stats.totalAppointments <= 3) {
+    return {
+      greeting: `${timeGreeting}${firstName ? `, ${firstName}` : ''}`,
+      subtext: `A calm day ahead with ${stats.totalAppointments} appointment${stats.totalAppointments !== 1 ? 's' : ''}.`
+    };
+  }
+
+  return {
+    greeting: `${timeGreeting}${firstName ? `, ${firstName}` : ''}`,
+    subtext: `${stats.totalAppointments} appointments today. Your route is ready.`
+  };
+}
+
+// Get day status color based on appointments and progress
+function getDayStatusColor(stats: TodaysStats | null): { color: string; label: string } {
+  if (!stats || !stats.hasData || stats.totalAppointments === 0) {
+    return { color: 'bg-gray-400', label: 'No appointments' };
+  }
+
+  if (stats.dayStatus === 'completed') {
+    return { color: 'bg-emerald-500', label: 'Day complete' };
+  }
+
+  // Calculate workload status
+  const remaining = stats.appointments;
+  if (remaining <= 2) {
+    return { color: 'bg-emerald-500', label: 'Smooth day' };
+  }
+  if (remaining <= 5) {
+    return { color: 'bg-amber-500', label: 'Busy day' };
+  }
+  return { color: 'bg-red-500', label: 'Heavy day' };
+}
+
 function DashboardContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
@@ -547,8 +634,31 @@ function DashboardContent() {
     );
   }
 
+  // Get greeting and status
+  const greeting = getContextualGreeting(stats, session?.user?.name);
+  const dayStatus = getDayStatusColor(stats);
+
   return (
     <div className={`max-w-7xl mx-auto pb-20 ${isFullscreen ? 'fixed inset-0 z-[60] bg-gradient-to-br from-[#2D2D2D] via-[#3D3D3D] to-[#4A4A4A] overflow-hidden max-w-none px-0 pb-0 pt-0' : ''}`}>
+      {/* Contextual Greeting Header */}
+      {!isFullscreen && (
+        <div className="mb-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{greeting.greeting}</h1>
+              <p className="text-gray-600 mt-1">{greeting.subtext}</p>
+            </div>
+            {/* Day Status Indicator */}
+            {stats?.hasData && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full">
+                <div className={`w-2.5 h-2.5 rounded-full ${dayStatus.color}`}></div>
+                <span className="text-sm text-gray-600">{dayStatus.label}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Demo Button - Only show when no appointments */}
       {!stats?.hasData && !isFullscreen && (
         <div className="mb-4 flex justify-end">
@@ -787,21 +897,24 @@ function DashboardContent() {
           </div>
         </div>
       ) : (
-        // Empty state - No appointments today
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-6 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Calendar className="h-8 w-8 text-gray-400" />
+        // Empty state - No appointments today (encouraging copy)
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl shadow-lg p-8 mb-6 text-center border border-emerald-100">
+          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Smile className="h-8 w-8 text-emerald-600" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">No Appointments Today</h2>
-          <p className="text-gray-600 mb-6">
-            Start by adding your first customer and scheduling an appointment
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Your day is open</h2>
+          <p className="text-gray-600 mb-2">
+            No appointments scheduled — a chance to catch up, plan ahead, or simply rest.
+          </p>
+          <p className="text-emerald-700 text-sm italic mb-6">
+            &ldquo;A clear schedule is an opportunity, not a problem.&rdquo;
           </p>
           <Link
-            href="/app/appointments"
+            href="/app/appointments/new"
             className="btn btn-lg bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 font-semibold"
           >
             <Plus className="h-5 w-5" />
-            Schedule Appointment
+            Schedule an Appointment
           </Link>
         </div>
       )}

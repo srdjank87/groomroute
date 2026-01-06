@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  LayoutDashboard,
+  Sun,
   Users,
   Calendar,
   Route as RouteIcon,
@@ -21,7 +21,7 @@ const GroomRouteLogo = () => (
 );
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Today", href: "/dashboard", icon: Sun },
   { name: "Calm Center", href: "/dashboard/calm", icon: Heart, special: true },
   { name: "Customers", href: "/app/customers", icon: Users },
   { name: "Appointments", href: "/app/appointments", icon: Calendar },

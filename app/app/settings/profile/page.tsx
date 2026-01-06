@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, Save, Dog, AlertTriangle, Clock } from "lucide-react";
+import { ArrowLeft, Save, Dog, AlertTriangle, Clock, Shield } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -94,10 +94,17 @@ export default function ProfileSettingsPage() {
           <ArrowLeft className="h-4 w-4" />
           Back to Settings
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
-        <p className="text-gray-600 mt-1">
-          Manage your workload preferences and defaults
-        </p>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-emerald-100 rounded-lg">
+            <Shield className="h-6 w-6 text-emerald-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Workload Protection</h1>
+            <p className="text-gray-600">
+              Set limits to protect your energy and prevent burnout
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Workload Preferences */}
