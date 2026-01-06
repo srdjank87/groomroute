@@ -14,7 +14,9 @@ import {
   Mail,
   MapPin,
   PawPrint,
-  CheckCircle
+  CheckCircle,
+  Heart,
+  Sparkles
 } from "lucide-react";
 import toast from "react-hot-toast";
 import MapPreview from "@/components/MapPreview";
@@ -181,10 +183,10 @@ export default function CustomerEditPage() {
       });
 
       if (response.ok) {
-        toast.success("Customer updated successfully");
+        toast.success("Changes saved");
         fetchCustomer();
       } else {
-        toast.error("Failed to update customer");
+        toast.error("Couldn't save changes. Please try again.");
       }
     } catch (error) {
       console.error("Failed to update customer:", error);
@@ -195,7 +197,7 @@ export default function CustomerEditPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this customer? This will also delete all associated pets and appointments.")) {
+    if (!confirm("Remove this customer? This will also remove all their pets and appointment history.")) {
       return;
     }
 
@@ -206,15 +208,15 @@ export default function CustomerEditPage() {
       });
 
       if (response.ok) {
-        toast.success("Customer deleted successfully");
+        toast.success("Customer removed");
         router.push("/app/customers");
       } else {
         const data = await response.json();
-        toast.error(data.error || "Failed to delete customer");
+        toast.error(data.error || "Couldn't remove customer. Please try again.");
       }
     } catch (error) {
       console.error("Failed to delete customer:", error);
-      toast.error("Failed to delete customer");
+      toast.error("Couldn't remove customer. Please try again.");
     } finally {
       setIsDeleting(false);
     }
@@ -302,9 +304,12 @@ export default function CustomerEditPage() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </button>
-        <h1 className="text-2xl font-bold text-gray-900 flex-1">
-          Edit Customer
-        </h1>
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold text-gray-900">
+            {customer.name}
+          </h1>
+          <p className="text-gray-500 text-sm mt-0.5">Customer Profile</p>
+        </div>
       </div>
 
       {/* Service Area Badge */}
@@ -386,9 +391,10 @@ export default function CustomerEditPage() {
 
       {/* Customer Details Form */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Customer Information
-        </h2>
+        <div className="flex items-center gap-2 mb-4">
+          <Edit2 className="h-5 w-5 text-blue-500" />
+          <h2 className="text-lg font-semibold text-gray-900">Contact Details</h2>
+        </div>
 
         <div className="space-y-4">
           <div>
@@ -515,14 +521,14 @@ export default function CustomerEditPage() {
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="btn h-12 px-4 btn-error text-white gap-2"
+            className="btn h-12 px-4 btn-ghost text-gray-500 hover:text-red-600 hover:bg-red-50 gap-2"
           >
             {isDeleting ? (
               <span className="loading loading-spinner loading-sm"></span>
             ) : (
               <Trash2 className="h-5 w-5" />
             )}
-            Delete
+            <span className="hidden sm:inline">Remove</span>
           </button>
         </div>
       </div>
@@ -530,7 +536,10 @@ export default function CustomerEditPage() {
       {/* Pets Section */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Pets</h2>
+          <div className="flex items-center gap-2">
+            <Heart className="h-5 w-5 text-pink-500" />
+            <h2 className="text-lg font-semibold text-gray-900">Furry Friends</h2>
+          </div>
           <Link
             href={`/app/customers/${customerId}/pets/new`}
             className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
@@ -541,9 +550,19 @@ export default function CustomerEditPage() {
         </div>
 
         {customer.pets.length === 0 ? (
-          <div className="text-center py-8">
-            <PawPrint className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No pets added yet</p>
+          <div className="text-center py-8 bg-gradient-to-br from-pink-50 to-amber-50 rounded-xl">
+            <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <PawPrint className="h-8 w-8 text-pink-500" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No furry friends yet</h3>
+            <p className="text-gray-600 mb-4">Add {customer.name}&apos;s pets to start booking appointments</p>
+            <Link
+              href={`/app/customers/${customerId}/pets/new`}
+              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Their First Pet
+            </Link>
           </div>
         ) : (
           <div className="space-y-3">
@@ -583,7 +602,10 @@ export default function CustomerEditPage() {
       {/* Appointments Section */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Appointments</h2>
+          <div className="flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-emerald-600" />
+            <h2 className="text-lg font-semibold text-gray-900">Appointments</h2>
+          </div>
           <Link
             href={`/app/appointments/new?customerId=${customerId}`}
             className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
@@ -594,9 +616,19 @@ export default function CustomerEditPage() {
         </div>
 
         {customer.appointments.length === 0 ? (
-          <div className="text-center py-8">
-            <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No appointments scheduled</p>
+          <div className="text-center py-8 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl">
+            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="h-8 w-8 text-emerald-600" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Ready for their first groom</h3>
+            <p className="text-gray-600 mb-4">Schedule an appointment to get {customer.name} on your calendar</p>
+            <Link
+              href={`/app/appointments/new?customerId=${customerId}`}
+              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Book First Appointment
+            </Link>
           </div>
         ) : (
           <div className="space-y-3">
