@@ -660,9 +660,22 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Demo Button - Only show when no appointments */}
+      {/* Demo Buttons - Show when no appointments today */}
       {!stats?.hasData && !isFullscreen && (
-        <div className="mb-4 flex justify-end">
+        <div className="mb-4 flex justify-end gap-2">
+          <button
+            onClick={async () => {
+              if (confirm("Clear all sample data and start fresh?")) {
+                await fetch("/api/dashboard/clear-sample", { method: "POST" });
+                toast.success("Sample data cleared");
+                window.location.reload();
+              }
+            }}
+            className="btn btn-sm btn-ghost text-gray-500 hover:text-gray-700 gap-2"
+          >
+            <X className="h-4 w-4" />
+            Clear Sample Data
+          </button>
           <button
             onClick={generateDemoData}
             className="btn btn-sm bg-purple-600 hover:bg-purple-700 text-white border-0 gap-2"
