@@ -569,7 +569,7 @@ export default function TodaysRoutePage() {
               {assistantStatus?.hasAssistant && (
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
                   <UserPlus className="h-3.5 w-3.5" />
-                  With Bather
+                  With Assistant
                 </div>
               )}
             </div>

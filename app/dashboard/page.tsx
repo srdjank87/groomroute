@@ -1047,7 +1047,7 @@ function DashboardContent() {
                 }`}
               >
                 <UserPlus className="h-4 w-4" />
-                {performanceData.hasAssistant ? "With Bather" : "Solo"}
+                {performanceData.hasAssistant ? "With Assistant" : "Solo"}
               </button>
               {/* Capacity indicator - shows when working with assistant and has capacity */}
               {performanceData.assistantCapacity?.canAddMore && (

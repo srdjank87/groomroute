@@ -274,7 +274,7 @@ export default function Home() {
                 {[
                   "Route clustering by neighborhood",
                   "Large dog limits & working hours",
-                  "One-tap navigation to Google Maps",
+                  "One-tap navigation to Google or Apple Maps",
                   "Quick customer messaging",
                   "Pet details & behavior flags",
                   "Simple, clean daily view",
