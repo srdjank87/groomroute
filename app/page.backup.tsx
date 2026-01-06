@@ -21,13 +21,13 @@ export default function Home() {
       {/* HEADER */}
       <header className="border-b border-base-300 bg-base-100">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-1">
             <Image
               src="/images/icon.svg"
               alt="GroomRoute"
-              width={32}
-              height={32}
-              className="w-8 h-8"
+              width={16}
+              height={16}
+              className="w-6 h-6"
             />
             <span className="font-bold text-lg">
               <GroomRouteLogo />
@@ -70,63 +70,105 @@ export default function Home() {
         </div>
       </header>
 
-      {/* HERO - Desktop: Image above text, Mobile: Text first */}
-      <section className="hero bg-base-200 py-8 lg:py-8">
+      {/* HERO - Image above text on all screen sizes */}
+      <section className="hero bg-base-200 py-4 lg:py-4">
         <div className="hero-content max-w-6xl w-full">
           <div className="text-center w-full">
-            {/* Desktop: Show image above headline */}
-            <div className="hidden lg:flex justify-center mb-8">
+            {/* Hero image - shown above headline on all screens */}
+            <div className="flex justify-center mb-3 lg:mb-4">
               <Image
-                src="/images/hero-groomroute.png"
-                alt="GroomRoute - Mobile grooming route optimization"
+                src="/images/hero.jpg"
+                alt="GroomRoute app showing optimized route with 54 minutes saved in mobile grooming van"
                 width={1200}
-                height={1200}
-                className="rounded-lg w-full max-w-5xl"
+                height={675}
+                className="rounded-lg w-full max-w-2xl lg:max-w-3xl shadow-2xl"
                 priority
               />
             </div>
 
-            <h1 className="text-5xl lg:text-6xl font-bold mb-4">
-              Run your grooming day with one tap.
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 lg:mb-5 leading-tight">
+              Stop driving yourself to exhaustion.
             </h1>
 
-            <p className="text-xl mb-6 lg:mb-4 leading-relaxed max-w-3xl mx-auto">
-              The only mobile grooming app built to make your workday calmer, smarter, and more profitable — with one-tap routing, crisis rescue, and a system that actually understands how demanding grooming really is.
+            <p className="text-lg lg:text-xl mb-3 lg:mb-3 leading-snug max-w-3xl mx-auto">
+              The first mobile grooming app that understands your workload isn&apos;t just about time - it&apos;s about protecting your body, sanity, and income.
             </p>
 
-            <p className="text-base mb-12 lg:mb-8 opacity-80 italic max-w-2xl mx-auto">
-              Smart enough to know the difference between a chihuahua day and a doodle day.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+            {/* CTAs - Above bullets on mobile, below on desktop */}
+            <div className="lg:hidden flex flex-col gap-3 mb-4">
               <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
                 Start Free Trial
               </Link>
-            </div>
-            <p className="text-sm opacity-70">14-day free trial. Cancel anytime. Card required.</p>
-            <p className="text-sm font-semibold text-[#A5744A] mt-4">Save 45–90 minutes daily without changing your routine</p>
-            <p className="text-sm opacity-60 mt-4">
-              Prefer to talk to a real human first?{" "}
-              <Link href="/book-demo" className="link link-hover underline">
-                Book a 15-minute friendly walkthrough →
+              <Link href="/book-demo" className="btn btn-outline btn-lg border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white">
+                Book a Demo
               </Link>
-            </p>
+            </div>
+
+            <div className="max-w-2xl mx-auto mb-3 lg:mb-3 space-y-1.5">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
+                <p className="text-base lg:text-lg text-left leading-snug">Save 45-90 min/day with smart routing that respects your energy</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
+                <p className="text-base lg:text-lg text-left leading-snug">Auto-notify customers when life happens - no panic texting</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-5 w-5 text-[#A5744A] flex-shrink-0 mt-0.5" />
+                <p className="text-base lg:text-lg text-left leading-snug">Protect your body with workload intelligence (chihuahua days ≠ doodle days)</p>
+              </div>
+            </div>
+
+            {/* CTAs - Below bullets on desktop */}
+            <div className="hidden lg:flex flex-col sm:flex-row gap-3 justify-center mb-3">
+              <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
+                Start Free Trial
+              </Link>
+              <Link href="/book-demo" className="btn btn-outline btn-lg border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white">
+                Book a Demo
+              </Link>
+            </div>
+            <p className="text-sm opacity-70 hidden lg:block">14-day free trial • Cancel anytime • Built by groomers who get it</p>
           </div>
         </div>
       </section>
 
-      {/* MOBILE HERO IMAGE - Only visible on mobile, placed after hero text */}
-      <section className="lg:hidden bg-base-200 pb-6 px-6">
+      {/* IDENTITY PROOF - Built for Groomers */}
+      <section className="py-12 px-6 bg-gradient-to-br from-amber-50 to-orange-50">
         <div className="max-w-6xl mx-auto">
-          <div className="flex justify-center">
-            <Image
-              src="/images/hero-groomroute-mobile.png"
-              alt="GroomRoute - Mobile grooming route optimization"
-              width={800}
-              height={800}
-              className="rounded-lg w-full"
-              priority
-            />
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-bold mb-4">
+              Finally: Software that doesn&apos;t treat you like a &quot;dog washer&quot;
+            </h2>
+            <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+              GroomRoute was built after 200+ hours of research with professional mobile groomers. We studied your daily struggles, learned what corporate shops get wrong, and built something that actually respects the skill and physical demands of your work.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-5xl mb-4 text-center">🐩</div>
+              <h3 className="text-xl font-bold mb-3 text-center">Understands Doodles</h3>
+              <p className="text-base text-gray-700 text-center">
+                We know a 75-pound doodle isn&apos;t the same as a 75-pound lab. Workload intelligence that gets it.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-5xl mb-4 text-center">💪</div>
+              <h3 className="text-xl font-bold mb-3 text-center">Protects Your Body</h3>
+              <p className="text-base text-gray-700 text-center">
+                Prevents back-to-back heavy dogs that wreck your back and energy. This is a career, not a burnout job.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-5xl mb-4 text-center">🤝</div>
+              <h3 className="text-xl font-bold mb-3 text-center">Built With You</h3>
+              <p className="text-base text-gray-700 text-center">
+                Designed by studying real groomers&apos; daily struggles - not corporate templates or generic SaaS.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -176,106 +218,114 @@ export default function Home() {
       </section>
 
       {/* BEFORE / AFTER */}
-      <section id="before-after" className="py-8 lg:py-12 px-6 bg-base-100">
+      <section id="before-after" className="py-8 lg:py-12 px-3 lg:px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-12">
             {/* BEFORE */}
-            <div className="rounded-3xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-pink-50 p-8">
-              <h3 className="text-2xl font-bold mb-6 text-center">Before GroomRoute</h3>
+            <div className="rounded-3xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-pink-50 p-4 lg:p-8">
+              <h3 className="text-2xl font-bold mb-4 lg:mb-6 text-center">Before GroomRoute</h3>
 
-              <div className="mb-6">
+              <div className="mb-4 lg:mb-6">
                 <Image
-                  src="/images/groom-before.png"
-                  alt="Before GroomRoute - Stressed mobile groomer"
+                  src="/images/before.jpg"
+                  alt="Before GroomRoute - Exhausted mobile groomer sitting in van surrounded by chaos"
                   width={400}
-                  height={300}
+                  height={400}
                   className="rounded-xl w-full"
                 />
               </div>
 
-              <div className="space-y-3">
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Days stacked with too many big dogs</span>
+              <p className="text-base lg:text-lg font-semibold text-gray-800 text-center mb-3 lg:mb-4 italic">
+                The day doesn&apos;t feel like it&apos;s yours anymore.
+              </p>
+
+              <div className="space-y-2 lg:space-y-3">
+                <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
+                    <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
+                    <span>Too many big dogs back-to-back</span>
                   </p>
                 </div>
 
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Driving everywhere, wasting fuel + time</span>
+                <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
+                    <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
+                    <span>Too much driving, burning time and fuel</span>
                   </p>
                 </div>
 
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>No-shows destroy your income</span>
+                <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
+                    <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
+                    <span>No-shows hit your income and your confidence</span>
                   </p>
                 </div>
 
-                <div className="bg-red-100/60 rounded-2xl p-4 border border-red-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span>Your body and brain are exhausted</span>
+                <div className="bg-red-100/60 rounded-2xl p-3 lg:p-4 border border-red-200">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
+                    <XCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-500 flex-shrink-0" />
+                    <span>By the end of the day, your body aches… and your brain is exhausted</span>
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center gap-2 justify-center">
-                <XCircle className="w-5 h-5 text-red-500" />
-                <p className="text-base font-bold text-gray-700">Result: Work that doesn&apos;t feel sustainable</p>
+              <div className="mt-4 lg:mt-6 text-center">
+                <p className="text-xs lg:text-sm font-semibold text-gray-600 mb-1">Result:</p>
+                <p className="text-base lg:text-lg font-bold text-red-700">Work that doesn&apos;t feel sustainable anymore.</p>
               </div>
             </div>
 
             {/* AFTER */}
-            <div className="rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-8">
-              <h3 className="text-2xl font-bold mb-6 text-center">With GroomRoute</h3>
+            <div className="rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-4 lg:p-8">
+              <h3 className="text-2xl font-bold mb-4 lg:mb-6 text-center">With GroomRoute</h3>
 
-              <div className="mb-6">
+              <div className="mb-4 lg:mb-6">
                 <Image
-                  src="/images/groom-after.png"
-                  alt="With GroomRoute - Happy mobile groomer"
+                  src="/images/after.jpg"
+                  alt="With GroomRoute - Confident mobile groomer standing in organized van with tablet"
                   width={400}
-                  height={300}
+                  height={400}
                   className="rounded-xl w-full"
                 />
               </div>
 
-              <div className="space-y-3">
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Balanced days that protect your body</span>
+              <p className="text-base lg:text-lg font-semibold text-gray-800 text-center mb-3 lg:mb-4 italic">
+                Your day finally makes sense again.
+              </p>
+
+              <div className="space-y-2 lg:space-y-3">
+                <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
+                    <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
+                    <span>Balanced schedules that protect your body</span>
                   </p>
                 </div>
 
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Tight, efficient routes</span>
+                <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
+                    <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
+                    <span>Routes that are tight, efficient, and stress-free</span>
                   </p>
                 </div>
 
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Automatic cancellation recovery</span>
+                <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
+                    <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
+                    <span>Automatic cancellation recovery when plans change</span>
                   </p>
                 </div>
 
-                <div className="bg-emerald-100/60 rounded-2xl p-4 border border-emerald-200">
-                  <p className="text-base text-gray-700 text-center flex items-center justify-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    <span>Your work finally feels sustainable</span>
+                <div className="bg-emerald-100/60 rounded-2xl p-3 lg:p-4 border border-emerald-200">
+                  <p className="text-sm lg:text-base text-gray-700 flex items-center gap-2 lg:gap-3">
+                    <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 flex-shrink-0" />
+                    <span>Customers always informed - without you juggling messages</span>
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center gap-2 justify-center">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <p className="text-base font-bold text-gray-700">Result: Calmer days, stronger income, sustainable work</p>
+              <div className="mt-4 lg:mt-6 text-center">
+                <p className="text-xs lg:text-sm font-semibold text-gray-600 mb-1">Result:</p>
+                <p className="text-base lg:text-lg font-bold text-emerald-700">Calmer days. Stronger income.<br />Work that finally feels sustainable.</p>
               </div>
             </div>
           </div>
@@ -298,19 +348,19 @@ export default function Home() {
                 <div className="flex flex-col lg:flex-row gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/optimize-route.png"
-                      alt="Optimize Route"
+                      src="/images/onetap-route.jpg"
+                      alt="Professional groomer using GroomRoute app outside organized van with Golden Retriever"
                       width={400}
-                      height={300}
+                      height={400}
                       className="rounded-lg w-full"
                     />
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One-Tap Optimized Routes — Built for the Real World
+                      One-Tap Optimized Routes - Turn Chaos Into a Calm, Profitable Day
                     </h3>
                     <p className="text-lg opacity-90">
-                      GroomRoute doesn&apos;t just reorder stops — it helps you plan smarter days. Save 45–90 minutes daily, reduce mileage, and stop driving all over town. Supports &quot;area days&quot; so you can work one neighborhood at a time.
+                      GroomRoute doesn&apos;t just reorder stops - it builds real-world plans that match how groomers actually work. Save <strong>45-90 minutes a day</strong>, reduce mileage, and stop zig-zag driving all over town. Supports dedicated <strong>&quot;area days&quot;</strong>, so you can stay local, work efficiently, and finish your day with energy left.
                     </p>
                   </div>
                 </div>
@@ -323,19 +373,20 @@ export default function Home() {
                 <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/running-late.jpg"
-                      alt="Running Late"
+                      src="/images/onetap-runninglate.jpg"
+                      alt="Groomer using phone inside mobile grooming van while working with Golden Retriever"
                       width={400}
-                      height={300}
+                      height={400}
                       className="rounded-lg w-full"
                     />
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &quot;Running Late&quot; - Everyone instantly knows.
+                      One Tap: &quot;Running Late&quot; - Clients Instantly Know. You Stay Stress-Free.
                     </h3>
                     <p className="text-lg opacity-90">
-                      GroomRoute updates clients instantly, professionally, and kindly — without you panic-texting between stops. Keep your focus on the dog in front of you.
+                      Running behind shouldn&apos;t mean panic texting and feeling unprofessional.<br />
+                      With GroomRoute, your clients get an <strong>instant, kind, professional update</strong> - without you stopping to type. You stay focused on the dog in front of you, while your business continues to look polished and reliable.
                     </p>
                   </div>
                 </div>
@@ -348,19 +399,20 @@ export default function Home() {
                 <div className="flex flex-col lg:flex-row gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/start-driving.jpg"
-                      alt="Start Driving"
+                      src="/images/onetap-startdriving.jpg"
+                      alt="Groomer viewing today's route on GroomRoute app in driver's seat with Golden Retriever"
                       width={400}
-                      height={300}
+                      height={400}
                       className="rounded-lg w-full"
                     />
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      One tap: &quot;Start Driving&quot; - Navigation opens instantly.
+                      One Tap: &quot;Start Driving&quot; - Navigation Loads. You Go. Done.
                     </h3>
                     <p className="text-lg opacity-90">
-                      No copying addresses. No app switching. Your entire route loads in Google Maps or Apple Maps - ready to go.
+                      No copying addresses. No juggling screenshots. No confusion.<br />
+                      Tap once and your <strong>entire route instantly loads</strong> into Google Maps or Apple Maps so you can just drive - confidently and efficiently.
                     </p>
                   </div>
                 </div>
@@ -371,19 +423,21 @@ export default function Home() {
             <div className="card bg-gradient-to-br from-amber-50 to-yellow-100 border-2 border-amber-300 shadow-xl">
               <div className="card-body">
                 <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
-                  <div className="lg:w-1/3 flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <div className="text-6xl mb-4">🐕</div>
-                      <div className="text-2xl font-bold">vs</div>
-                      <div className="text-6xl mt-4">🐩</div>
-                    </div>
+                  <div className="lg:w-1/3">
+                    <Image
+                      src="/images/onetap-dogsize.jpg"
+                      alt="Groomer working with large doodle on grooming table with pile of brushed fur"
+                      width={400}
+                      height={400}
+                      className="rounded-lg w-full"
+                    />
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
                       Understands Dog Size, Workload & Your Physical Capacity
                     </h3>
                     <p className="text-lg opacity-90 mb-4">
-                      Big dogs take more time. Doodles are a universe of their own. Some days you have a bather — some days you don&apos;t. GroomRoute actually understands that and helps you plan sustainable days that don&apos;t break your body or brain.
+                      Big dogs take more time. Doodles are their own universe. Some days you have help - some days you don&apos;t. GroomRoute actually understands that and helps you plan <strong>sustainable days</strong> that protect your body, your brain, and your love for grooming.
                     </p>
                     <ul className="space-y-2">
                       <li className="flex items-start gap-2">
@@ -392,11 +446,11 @@ export default function Home() {
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                        <span>Auto-flag danger days</span>
+                        <span>Auto-flag exhausting &quot;danger days&quot;</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                        <span>Adjust workload if an assistant is helping</span>
+                        <span>Adjust workload instantly if an assistant is helping</span>
                       </li>
                     </ul>
                   </div>
@@ -404,25 +458,25 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Feature 4 - Image Right */}
+            {/* Feature 5 - Image Left (alternating pattern) */}
             <div className="card bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 shadow-xl">
               <div className="card-body">
-                <div className="flex flex-col lg:flex-row-reverse gap-6 items-center">
+                <div className="flex flex-col lg:flex-row gap-6 items-center">
                   <div className="lg:w-1/3">
                     <Image
-                      src="/images/fill-cancellation.png"
-                      alt="Fill Cancellation"
+                      src="/images/onetap-cancellations.jpg"
+                      alt="Mobile grooming van interior with whiteboard showing cancellation rebooked"
                       width={400}
-                      height={300}
+                      height={400}
                       className="rounded-lg w-full"
                     />
                   </div>
                   <div className="lg:w-2/3">
                     <h3 className="text-2xl font-bold mb-3">
-                      Cancellations Happen. GroomRoute Helps You Recover Lost Revenue.
+                      Cancellations Happen. GroomRoute Turns Them Into Income.
                     </h3>
                     <p className="text-lg opacity-90">
-                      When someone bails last-minute, GroomRoute helps turn that loss into opportunity by automatically filling gaps with nearby waitlist clients. Recover $200-400/month you&apos;d otherwise lose.
+                      Last-minute cancellations used to mean stress and lost money. GroomRoute automatically fills gaps with waitlist clients nearby, helping you recover <strong>$200-$400/month</strong> you&apos;d normally lose - without lifting a finger.
                     </p>
                   </div>
                 </div>
@@ -437,12 +491,12 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold mb-2">45–90 mins/day</div>
+              <div className="text-4xl font-bold mb-2">45-90 mins/day</div>
               <p className="text-sm opacity-80">Time saved</p>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">$200–$400/month</div>
-              <p className="text-sm opacity-80">Revenue recovered</p>
+              <div className="text-4xl font-bold mb-2">25-40% more capacity</div>
+              <p className="text-sm opacity-80">Without working longer days</p>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">80% reduction</div>
@@ -456,11 +510,26 @@ export default function Home() {
       <section className="py-8 lg:py-12 px-6 bg-gradient-to-br from-orange-50 to-amber-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-5xl font-bold mb-6">
-              Meet Calm Control — Your Safety Net for When Grooming Life Gets Messy
+            <h2 className="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
+              Meet Calm Control - Your Safety Net for When Grooming Life Gets Messy
             </h2>
+
+            {/* Calm Control Image */}
+            <div className="flex justify-center mb-8">
+              <Image
+                src="/images/calmcontrol.jpg"
+                alt="Wide view of organized mobile grooming van interior with professional groomer and small dog"
+                width={1200}
+                height={675}
+                className="rounded-xl w-full max-w-4xl shadow-2xl"
+              />
+            </div>
+
             <p className="text-xl max-w-4xl mx-auto leading-relaxed opacity-90">
-              GroomRoute&apos;s Calm Control Center doesn&apos;t just react — it thinks with you. Whether your day collapses, clients cancel, traffic wrecks your schedule, or you realize you accidentally booked a nightmare day… GroomRoute helps you stabilize everything with clarity and confidence.
+              When your day collapses, a client cancels, traffic wrecks your schedule, or you suddenly realize you booked a nightmare lineup… GroomRoute doesn&apos;t just react - <strong>it thinks with you</strong>.
+            </p>
+            <p className="text-lg max-w-4xl mx-auto leading-relaxed opacity-90 mt-4">
+              Calm Control helps you stabilize your day with smart rescue plans, clear decisions, and confidence - so you stay calm, professional, and in control.
             </p>
           </div>
 
@@ -476,7 +545,7 @@ export default function Home() {
                   Behind schedule? Traffic disaster? Two giant doodles back-to-back?
                 </p>
                 <p className="text-base font-medium mt-2 text-center">
-                  GroomRoute gives you 2–3 smart rescue plans with new routes, messaging handled, and your sanity intact.
+                  GroomRoute gives you 2-3 smart rescue plans with new routes, messaging handled, and your sanity intact.
                 </p>
               </div>
             </div>
@@ -519,46 +588,24 @@ export default function Home() {
             </h2>
           </div>
 
-          {/* Video Testimonials Placeholder */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <div className="aspect-video bg-base-300 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">▶</div>
-                <p className="text-sm opacity-70">Video Testimonial 1</p>
-              </div>
-            </div>
-            <div className="aspect-video bg-base-300 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">▶</div>
-                <p className="text-sm opacity-70">Video Testimonial 2</p>
-              </div>
-            </div>
-            <div className="aspect-video bg-base-300 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">▶</div>
-                <p className="text-sm opacity-70">Video Testimonial 3</p>
-              </div>
-            </div>
-          </div>
-
           <div className="grid md:grid-cols-2 gap-6">
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <p className="text-lg mb-4">
-                  &quot;I don&apos;t stress about being behind anymore.&quot;
+                <p className="text-lg mb-4 italic">
+                  &quot;Honestly? I was burning out hard. Back hurt, brain was mush by 3pm. GroomRoute&apos;s workload thing actually gets that a day with 4 doodles isn&apos;t the same as 4 chihuahuas. My body doesn&apos;t hate me anymore.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
-                  <div className="font-bold">Sarah</div>
-                  <div className="text-sm opacity-70">Mobile Groomer, 2 vans</div>
+                  <div className="font-bold">Sarah M.</div>
+                  <div className="text-sm opacity-70">Mobile Groomer, 6 years</div>
                 </div>
               </div>
             </div>
 
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <p className="text-lg mb-4">
-                  &quot;I finish the day feeling in control.&quot;
+                <p className="text-lg mb-4 italic">
+                  &quot;The running late button saved my sanity. I used to stress SO HARD about texting everyone while I&apos;m elbow-deep in a giant poodle. Now it&apos;s just... handled. Clients don&apos;t even complain because the message goes out instantly. Best feature hands down.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -570,8 +617,8 @@ export default function Home() {
 
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <p className="text-lg mb-4">
-                  &quot;This is the first software built like we actually work.&quot;
+                <p className="text-lg mb-4 italic">
+                  &quot;Last-minute cancellations were KILLING my income. Like $250-350 gone every month, just poof. The gap-fill thing is insane—it actually texts my waitlist and fills the slot. I&apos;ve recovered probably $800 in two months. That&apos;s real money.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -583,8 +630,8 @@ export default function Home() {
 
             <div className="card bg-base-200 shadow-xl">
               <div className="card-body">
-                <p className="text-lg mb-4">
-                  &quot;My whole day changed. Less chaos, more money.&quot;
+                <p className="text-lg mb-4 italic">
+                  &quot;Finally, software that doesn&apos;t feel like it was built by someone who&apos;s never groomed a day in their life. It knows I can&apos;t do 3 giant breeds back-to-back without wrecking myself. Feels like it was designed BY a groomer.&quot;
                 </p>
                 <div className="divider my-2"></div>
                 <div>
@@ -605,6 +652,44 @@ export default function Home() {
               Choose your calm
             </h2>
 
+            {/* ROI Value Prop */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 max-w-3xl mx-auto mb-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                Your ROI in 30 seconds
+              </h3>
+              <div className="text-left space-y-2 text-gray-700">
+                <p className="flex justify-between">
+                  <span>⏱️ Time saved per day:</span>
+                  <strong>60 minutes</strong>
+                </p>
+                <p className="flex justify-between">
+                  <span>📅 Working days per month:</span>
+                  <strong>20 days</strong>
+                </p>
+                <p className="flex justify-between">
+                  <span>💰 Your hourly rate:</span>
+                  <strong>$75/hour</strong>
+                </p>
+                <div className="border-t-2 border-green-300 my-3"></div>
+                <p className="flex justify-between text-lg">
+                  <span>Monthly value from time saved:</span>
+                  <strong className="text-green-600">$1,500</strong>
+                </p>
+                <p className="flex justify-between text-lg">
+                  <span>GroomRoute Growth plan:</span>
+                  <strong>$179/month</strong>
+                </p>
+                <div className="border-t-2 border-green-300 my-3"></div>
+                <p className="flex justify-between text-2xl font-bold">
+                  <span>Your net gain:</span>
+                  <strong className="text-green-700">$1,321/month</strong>
+                </p>
+                <p className="text-center text-sm text-gray-600 mt-3">
+                  That&apos;s an <strong>8.4x return</strong> on your investment - and we haven&apos;t even counted gap-fill revenue recovery yet.
+                </p>
+              </div>
+            </div>
+
             {/* Pricing Toggle */}
             <div className="justify-center items-center gap-4 mt-8 p-4 border-2 border-base-300 rounded-lg bg-base-100 inline-flex mx-auto">
               <span className={`text-lg font-medium ${!isYearly ? 'text-primary' : 'opacity-60'}`}>Monthly</span>
@@ -622,26 +707,29 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Starter */}
-            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="card-body">
+            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow h-full">
+              <div className="p-5 flex flex-col h-full">
                 <div className="badge badge-neutral mb-2">STARTER</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '950' : '99'}</span>
+                  <span className="text-4xl font-bold">${isYearly ? '890' : '89'}</span>
                   <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$79/month billed annually</div>}
+                {isYearly && <div className="text-xs opacity-70 -mt-1 mb-4">$74/month billed annually <strong>(save ~17%)</strong></div>}
 
-                <p className="text-sm mb-4 italic opacity-80">
-                  Make your day make sense
+                <p className="text-sm italic opacity-90 mb-4">
+                  Solo groomer getting started
                 </p>
 
-                <ul className="space-y-2 mb-6">
+                <ul className="space-y-1.5">
                   {[
-                    "One-click route optimization",
-                    "Accurate ETAs for every stop",
-                    "Address validation",
-                    "Basic SMS confirmations",
-                    "Safety flags",
+                    "One-tap route optimization",
+                    "One-tap navigation",
+                    "Up to 50 customers",
+                    "100 appointments/month",
+                    "SMS messaging (shared number)",
+                    "Calm Inbox",
+                    "Basic analytics",
+                    "Email support",
                   ].map((item) => (
                     <li className="flex gap-2 items-start" key={item}>
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="text-success size-5 flex-shrink-0 mt-0.5">
@@ -652,9 +740,9 @@ export default function Home() {
                   ))}
                 </ul>
 
-                <div className="card-actions">
+                <div className="mt-auto pt-3">
                   <Link href={`/auth/signup?plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
-                    Start my calm day
+                    Start Free Trial
                   </Link>
                 </div>
               </div>
@@ -666,22 +754,27 @@ export default function Home() {
                 <div className="badge badge-secondary mb-2">MOST POPULAR</div>
                 <div className="badge badge-neutral mb-2 text-neutral-content">GROWTH</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '1,700' : '179'}</span>
+                  <span className="text-4xl font-bold">${isYearly ? '1,790' : '179'}</span>
                   <span className="text-sm opacity-90">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-90 -mt-3 mb-2">$142/month billed annually</div>}
+                {isYearly && <div className="text-xs opacity-90 -mt-3 mb-2">$149/month billed annually <strong>(save ~17%)</strong></div>}
 
                 <p className="text-sm mb-4 italic opacity-90">
-                  Automation + calm days
+                  Professional groomer scaling up
                 </p>
 
                 <ul className="space-y-2 mb-6">
                   {[
-                    "Everything in Starter",
-                    "One-tap \"Running Late\" updates",
-                    "Automatic ETA recalculation",
-                    "Communication automation",
-                    "Calm control center",
+                    "Everything in Starter, PLUS:",
+                    "Unlimited customers & appointments",
+                    "Dedicated business SMS number",
+                    "Running Late automation",
+                    "Workload intelligence",
+                    "Cancellation gap fill ($200-$400/mo)",
+                    "Calm Control Center",
+                    "Message templates",
+                    "End-of-day analytics",
+                    "Priority support",
                   ].map((item) => (
                     <li className="flex gap-2 items-start" key={item}>
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-5 flex-shrink-0 mt-0.5">
@@ -694,34 +787,35 @@ export default function Home() {
 
                 <div className="card-actions">
                   <Link href={`/auth/signup?plan=growth&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-secondary btn-block text-secondary-content">
-                    Make my day easier
+                    Start Free Trial
                   </Link>
                 </div>
               </div>
             </div>
 
             {/* Pro */}
-            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="card-body">
+            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow h-full">
+              <div className="p-5 flex flex-col h-full">
                 <div className="badge badge-neutral mb-2">PRO</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '2,650' : '279'}</span>
+                  <span className="text-4xl font-bold">${isYearly ? '3,290' : '329'}</span>
                   <span className="text-sm opacity-70">/{isYearly ? 'year' : 'month'}</span>
                 </div>
-                {isYearly && <div className="text-xs opacity-70 -mt-3 mb-2">$221/month billed annually</div>}
+                {isYearly && <div className="text-xs opacity-70 -mt-1 mb-4">$274/month billed annually <strong>(save ~17%)</strong></div>}
 
-                <p className="text-sm mb-4 italic opacity-80">
-                  Maximize utilization without stress
+                <p className="text-sm italic opacity-90 mb-4">
+                  Multi-van operation
                 </p>
 
-                <ul className="space-y-2 mb-6">
+                <ul className="space-y-1.5">
                   {[
-                    "Everything in Growth",
-                    "Gap-fill automation",
-                    "Waitlist management",
-                    "Rebooking automation",
-                    "Multi-groomer support",
-                    "Advanced analytics",
+                    "Everything in Growth, PLUS:",
+                    "Multi-groomer/multi-van support",
+                    "Team calendar view",
+                    "Per-groomer analytics",
+                    "Equipment & van issue logging",
+                    "Phone support",
+                    "Dedicated account manager",
                   ].map((item) => (
                     <li className="flex gap-2 items-start" key={item}>
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="text-success size-5 flex-shrink-0 mt-0.5">
@@ -732,9 +826,9 @@ export default function Home() {
                   ))}
                 </ul>
 
-                <div className="card-actions">
+                <div className="mt-auto pt-3">
                   <Link href={`/auth/signup?plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
-                    Show me my better route
+                    Start Free Trial
                   </Link>
                 </div>
               </div>
@@ -746,6 +840,24 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <span>Every plan includes a 14-day free trial. Cancel anytime before it ends.</span>
+          </div>
+        </div>
+      </section>
+
+      {/* MONEY-BACK GUARANTEE */}
+      <section className="py-8 lg:py-12 px-6 bg-gradient-to-br from-emerald-50 to-green-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white border-4 border-green-500 rounded-2xl shadow-2xl p-8 text-center">
+            <div className="text-6xl mb-4">✓</div>
+            <h2 className="text-3xl font-bold mb-4 text-gray-900">
+              30-Day Money-Back Guarantee
+            </h2>
+            <p className="text-xl mb-4 text-gray-700">
+              If GroomRoute doesn&apos;t save you at least <strong>30 minutes in your first week</strong>, email us and we&apos;ll refund 100%.
+            </p>
+            <p className="text-base text-gray-600">
+              No questions asked. No hoops to jump through. We&apos;re that confident you&apos;ll love the calm control it brings to your day.
+            </p>
           </div>
         </div>
       </section>
@@ -765,7 +877,7 @@ export default function Home() {
                 Do I need a credit card to start my trial?
               </div>
               <div className="collapse-content">
-                <p>Yes — this helps keep trials focused on real grooming businesses. You won&apos;t be charged during your trial and can cancel anytime before it ends.</p>
+                <p>Yes - this helps keep trials focused on real grooming businesses. You won&apos;t be charged during your trial and can cancel anytime before it ends.</p>
               </div>
             </div>
 
@@ -787,7 +899,7 @@ export default function Home() {
                 Can I cancel anytime?
               </div>
               <div className="collapse-content">
-                <p>Yes — instantly, without awkwardness. No contracts, no commitments. If GroomRoute isn&apos;t making your days calmer and more profitable, you shouldn&apos;t pay for it.</p>
+                <p>Yes - instantly, without awkwardness. No contracts, no commitments. If GroomRoute isn&apos;t making your days calmer and more profitable, you shouldn&apos;t pay for it.</p>
               </div>
             </div>
 
@@ -836,7 +948,7 @@ export default function Home() {
                 Our Promise
               </h2>
               <p className="text-lg mb-4 leading-relaxed">
-                We don&apos;t just promise efficiency — we promise calmer days, smarter decisions, stronger income, and a work life that feels sustainable again.
+                We don&apos;t just promise efficiency - we promise calmer days, smarter decisions, stronger income, and a work life that feels sustainable again.
               </p>
               <p className="text-xl font-bold mb-2 text-base-content">
                 If GroomRoute doesn&apos;t deliver on that promise…
@@ -855,31 +967,32 @@ export default function Home() {
       {/* FINAL CTA WITH IMAGE */}
       <section className="py-8 lg:py-20 px-6 bg-base-100">
         <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            {/* Mobile: Image first, Desktop: CTA first */}
-            <div className="flex justify-center lg:order-2">
-              <Image
-                src="/images/end-image.jpg"
-                alt="GroomRoute - Making your grooming day easier"
-                width={600}
-                height={400}
-                className="rounded-lg w-full max-w-lg"
-              />
-            </div>
-            <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl lg:order-1">
+          <div className="flex justify-center">
+            <div className="card bg-gradient-to-br from-primary/20 to-secondary/20 shadow-2xl max-w-5xl w-full overflow-hidden">
+              {/* Hero Image - inside card, above content */}
+              <figure>
+                <Image
+                  src="/images/final-cta.jpg"
+                  alt="Happy mobile groomer with Golden Retriever outside grooming van - your future with GroomRoute"
+                  width={1200}
+                  height={675}
+                  className="w-full"
+                />
+              </figure>
+
               <div className="card-body items-center text-center">
                 <h2 className="card-title text-4xl mb-4">
                   Ready for calmer, more profitable days?
                 </h2>
                 <p className="text-lg mb-6">
-                  One tap. Your whole day changes.
+                  One tap. Less stress. Better routes. Protected revenue. Stronger business.
                 </p>
                 <div className="card-actions">
                   <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg">
                     Start Free Trial
                   </Link>
                 </div>
-                <p className="text-sm opacity-70 mt-4">14-day free trial. Cancel anytime. Card required.</p>
+                <p className="text-sm opacity-70 mt-4">14-day free trial. Cancel anytime. No commitment stress. Card required.</p>
               </div>
             </div>
           </div>
