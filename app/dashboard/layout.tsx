@@ -14,6 +14,7 @@ import {
   Menu,
   Heart,
   Sparkles,
+  BarChart3,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -25,6 +26,7 @@ const GroomRouteLogo = () => (
 const mainNavigation = [
   { name: "Today", href: "/dashboard", icon: Sun },
   { name: "Routes", href: "/app/routes", icon: RouteIcon },
+  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
 ];
 
 const businessNavigation = [
