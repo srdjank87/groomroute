@@ -813,7 +813,7 @@ function DashboardContent() {
           <button
             onClick={handleStartWorkday}
             disabled={isStartingWorkday}
-            className="btn btn-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white border-0 font-semibold shadow-lg gap-2"
+            className="btn btn-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white border-0 font-semibold shadow-lg gap-2 px-8"
           >
             {isStartingWorkday ? (
               <span className="loading loading-spinner loading-sm"></span>
