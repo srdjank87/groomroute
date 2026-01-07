@@ -645,26 +645,6 @@ function DashboardContent() {
     }
   }
 
-  async function handleStartGrooming(appointmentId: string) {
-    try {
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "IN_PROGRESS" }),
-      });
-
-      if (response.ok) {
-        toast.success("Grooming started!");
-        await fetchDashboardData();
-      } else {
-        toast.error("Failed to start grooming");
-      }
-    } catch (error) {
-      console.error("Start grooming error:", error);
-      toast.error("Failed to start grooming");
-    }
-  }
-
   async function toggleAssistant() {
     if (!performanceData) return;
 
@@ -1001,30 +981,19 @@ function DashboardContent() {
             {stats.nextAppointment.status !== "IN_PROGRESS" && (
               <button
                 onClick={startDriving}
-                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-gray-800 hover:bg-gray-900 text-white shadow-md"
+                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-teal-600 hover:bg-teal-700 text-white shadow-md"
               >
                 <Navigation className="h-6 w-6" />
                 Start Driving
               </button>
             )}
 
-            {/* Secondary Actions - Start Grooming, Skip & Complete */}
-            <div className={`grid gap-2 ${stats.nextAppointment.status === "CONFIRMED" ? "grid-cols-3" : "grid-cols-2"}`}>
-              {/* Start Grooming - Only show when CONFIRMED */}
-              {stats.nextAppointment.status === "CONFIRMED" && (
-                <button
-                  onClick={() => stats.nextAppointment && handleStartGrooming(stats.nextAppointment.appointmentId)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
-                >
-                  <Play className="h-5 w-5" />
-                  <span className="hidden sm:inline">Start Grooming</span>
-                  <span className="sm:hidden">Start</span>
-                </button>
-              )}
+            {/* Secondary Actions - Handle & Complete */}
+            <div className="grid gap-2 grid-cols-2">
               {/* Handle/Reschedule button - softer language */}
               <button
                 onClick={() => stats.nextAppointment && openSkipModal(stats.nextAppointment.appointmentId)}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
+                className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
               >
                 <SkipForward className="h-5 w-5" />
                 <span className="hidden sm:inline">Can&apos;t Make It</span>
