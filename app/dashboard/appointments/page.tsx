@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Calendar, MapPin, Clock, Edit2, X, ThumbsUp, Filter, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Plus, Calendar, MapPin, Clock, Edit2, X, Filter, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -34,7 +34,6 @@ interface Appointment {
 
 const STATUS_OPTIONS = [
   { value: "ALL", label: "All Statuses" },
-  { value: "BOOKED", label: "Booked" },
   { value: "CONFIRMED", label: "Confirmed" },
   { value: "IN_PROGRESS", label: "In Progress" },
   { value: "COMPLETED", label: "Completed" },
@@ -168,27 +167,6 @@ export default function AppointmentsPage() {
       NO_SHOW: "bg-gray-100 text-gray-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
-  };
-
-  const handleConfirmAppointment = async (appointmentId: string) => {
-    try {
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "CONFIRMED" }),
-      });
-
-      if (response.ok) {
-        toast.success("Appointment confirmed");
-        fetchAppointments();
-        fetchAllAppointments();
-      } else {
-        toast.error("Failed to confirm appointment");
-      }
-    } catch (error) {
-      console.error("Failed to confirm appointment:", error);
-      toast.error("Failed to confirm appointment");
-    }
   };
 
   const handleCancelAppointment = async (appointmentId: string) => {
@@ -407,16 +385,6 @@ export default function AppointmentsPage() {
               {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
               {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                 <div className="flex gap-2 pt-3 border-t border-gray-100">
-                  {/* Confirm button for BOOKED appointments */}
-                  {appointment.status === "BOOKED" && (
-                    <button
-                      onClick={() => handleConfirmAppointment(appointment.id)}
-                      className="btn btn-sm gap-2 flex-1 bg-emerald-500 hover:bg-emerald-600 text-white border-0"
-                    >
-                      <ThumbsUp className="h-4 w-4" />
-                      Confirm
-                    </button>
-                  )}
                   <Link
                     href={`/dashboard/appointments/${appointment.id}/edit`}
                     className="btn btn-ghost btn-sm gap-2 flex-1"
@@ -583,16 +551,6 @@ export default function AppointmentsPage() {
                 {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
                 {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
-                    {/* Confirm button for BOOKED appointments */}
-                    {appointment.status === "BOOKED" && (
-                      <button
-                        onClick={() => handleConfirmAppointment(appointment.id)}
-                        className="btn btn-sm gap-2 flex-1 bg-emerald-500 hover:bg-emerald-600 text-white border-0"
-                      >
-                        <ThumbsUp className="h-4 w-4" />
-                        Confirm
-                      </button>
-                    )}
                     <Link
                       href={`/dashboard/appointments/${appointment.id}/edit`}
                       className="btn btn-ghost btn-sm gap-2 flex-1"

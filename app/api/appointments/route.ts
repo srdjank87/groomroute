@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
         serviceMinutes: validatedData.serviceMinutes,
         price: validatedData.price,
         notes: validatedData.notes || null,
-        status: AppointmentStatus.BOOKED,
+        status: AppointmentStatus.CONFIRMED,
         accountId,
       },
       include: {
