@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Calendar, MapPin, Clock, Edit2, X, RotateCcw, CheckCircle, Play, ThumbsUp, Filter, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Plus, Calendar, MapPin, Clock, Edit2, X, ThumbsUp, Filter, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -183,48 +183,6 @@ export default function AppointmentsPage() {
     } catch (error) {
       console.error("Failed to confirm appointment:", error);
       toast.error("Failed to confirm appointment");
-    }
-  };
-
-  const handleStartAppointment = async (appointmentId: string) => {
-    try {
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "IN_PROGRESS" }),
-      });
-
-      if (response.ok) {
-        toast.success("Appointment started");
-        fetchAppointments();
-        fetchAllAppointments();
-      } else {
-        toast.error("Failed to start appointment");
-      }
-    } catch (error) {
-      console.error("Failed to start appointment:", error);
-      toast.error("Failed to start appointment");
-    }
-  };
-
-  const handleCompleteAppointment = async (appointmentId: string) => {
-    try {
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "COMPLETED" }),
-      });
-
-      if (response.ok) {
-        toast.success("Appointment completed");
-        fetchAppointments();
-        fetchAllAppointments();
-      } else {
-        toast.error("Failed to complete appointment");
-      }
-    } catch (error) {
-      console.error("Failed to complete appointment:", error);
-      toast.error("Failed to complete appointment");
     }
   };
 
@@ -444,7 +402,7 @@ export default function AppointmentsPage() {
               {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
               {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                 <div className="flex gap-2 pt-3 border-t border-gray-100">
-                  {/* Status-specific primary action */}
+                  {/* Confirm button for BOOKED appointments */}
                   {appointment.status === "BOOKED" && (
                     <button
                       onClick={() => handleConfirmAppointment(appointment.id)}
@@ -452,24 +410,6 @@ export default function AppointmentsPage() {
                     >
                       <ThumbsUp className="h-4 w-4" />
                       Confirm
-                    </button>
-                  )}
-                  {appointment.status === "CONFIRMED" && (
-                    <button
-                      onClick={() => handleStartAppointment(appointment.id)}
-                      className="btn btn-sm gap-2 flex-1 bg-blue-500 hover:bg-blue-600 text-white border-0"
-                    >
-                      <Play className="h-4 w-4" />
-                      Start
-                    </button>
-                  )}
-                  {appointment.status === "IN_PROGRESS" && (
-                    <button
-                      onClick={() => handleCompleteAppointment(appointment.id)}
-                      className="btn btn-sm gap-2 flex-1 bg-green-500 hover:bg-green-600 text-white border-0"
-                    >
-                      <CheckCircle className="h-4 w-4" />
-                      Complete
                     </button>
                   )}
                   <Link
@@ -638,7 +578,7 @@ export default function AppointmentsPage() {
                 {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
                 {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
-                    {/* Status-specific primary action */}
+                    {/* Confirm button for BOOKED appointments */}
                     {appointment.status === "BOOKED" && (
                       <button
                         onClick={() => handleConfirmAppointment(appointment.id)}
@@ -646,24 +586,6 @@ export default function AppointmentsPage() {
                       >
                         <ThumbsUp className="h-4 w-4" />
                         Confirm
-                      </button>
-                    )}
-                    {appointment.status === "CONFIRMED" && (
-                      <button
-                        onClick={() => handleStartAppointment(appointment.id)}
-                        className="btn btn-sm gap-2 flex-1 bg-blue-500 hover:bg-blue-600 text-white border-0"
-                      >
-                        <Play className="h-4 w-4" />
-                        Start
-                      </button>
-                    )}
-                    {appointment.status === "IN_PROGRESS" && (
-                      <button
-                        onClick={() => handleCompleteAppointment(appointment.id)}
-                        className="btn btn-sm gap-2 flex-1 bg-green-500 hover:bg-green-600 text-white border-0"
-                      >
-                        <CheckCircle className="h-4 w-4" />
-                        Complete
                       </button>
                     )}
                     <Link
