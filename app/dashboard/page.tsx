@@ -31,6 +31,7 @@ import {
   Dog,
   Heart,
   BarChart3,
+  Info,
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
@@ -830,14 +831,14 @@ function DashboardContent() {
           </p>
         </div>
       ) : stats?.hasData && stats.nextAppointment && stats.workdayStarted ? (
-        <div className={`text-white ${
+        <div className={`text-gray-900 ${
           stats.nextAppointment.status === "IN_PROGRESS"
             ? (isFullscreen
-              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800'
-              : 'rounded-xl shadow-lg p-6 mb-6 border border-blue-400/30 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800')
+              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100'
+              : 'rounded-xl shadow-lg p-6 mb-6 border border-blue-200 bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100')
             : (isFullscreen
-              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-emerald-700 via-teal-700 to-teal-800'
-              : 'rounded-xl shadow-lg p-6 mb-6 border border-emerald-400/30 bg-gradient-to-br from-emerald-700 via-teal-700 to-teal-800')
+              ? 'min-h-screen flex flex-col justify-start p-4 rounded-none border-0 shadow-none bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100'
+              : 'rounded-xl shadow-lg p-6 mb-6 border border-emerald-200 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100')
         }`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">
@@ -845,14 +846,14 @@ function DashboardContent() {
             </h2>
             <div className="flex items-center gap-2">
               {/* Badge hidden on mobile - shown below buttons instead */}
-              <p className="hidden sm:block text-white/60 text-sm">
+              <p className="hidden sm:block text-gray-500 text-sm">
                 {stats.appointments - 1 === 0
                   ? "Last one — you got this! 🎉"
                   : `${stats.appointments - 1} more after this one`}
               </p>
               <button
                 onClick={toggleFullscreen}
-                className="btn btn-md bg-white/20 hover:bg-white/30 border-0 text-white gap-1 md:hidden px-4"
+                className="btn btn-md bg-gray-900/10 hover:bg-gray-900/20 border-0 text-gray-700 gap-1 md:hidden px-4"
                 title={isFullscreen ? "Exit focus mode" : "Enter focus mode"}
               >
                 <Maximize className="h-5 w-5" />
@@ -862,34 +863,34 @@ function DashboardContent() {
 
           <div className={`backdrop-blur-sm rounded-lg p-4 mb-4 border ${
             stats.nextAppointment.status === "IN_PROGRESS"
-              ? "bg-white/10 border-white/20"
-              : "bg-white/10 border-white/20"
+              ? "bg-white/60 border-blue-200"
+              : "bg-white/60 border-emerald-200"
           }`}>
             <div className="flex flex-col md:flex-row items-start gap-4">
               {/* Column 1: Info and Contact Methods */}
               <div className="flex-1 min-w-0 w-full">
                 <div className="text-center md:text-left">
-                  <p className="font-bold text-lg mb-1">{stats.nextAppointment.customerName}</p>
+                  <p className="font-bold text-lg mb-1 text-gray-900">{stats.nextAppointment.customerName}</p>
                   {/* Enhanced Pet Display */}
                   {stats.nextAppointment.petName && (
-                    <div className="bg-white/10 rounded-lg px-3 py-2 inline-block mb-2">
-                      <p className="text-white font-medium text-sm flex items-center gap-2">
+                    <div className="bg-emerald-100/80 rounded-lg px-3 py-2 inline-block mb-2">
+                      <p className="text-emerald-800 font-medium text-sm flex items-center gap-2">
                         <span>🐕</span>
                         <span>{stats.nextAppointment.petName}</span>
                         {stats.nextAppointment.petBreed && (
-                          <span className="text-white/70">({stats.nextAppointment.petBreed})</span>
+                          <span className="text-emerald-600">({stats.nextAppointment.petBreed})</span>
                         )}
                         {stats.nextAppointment.petWeight && (
-                          <span className="text-white/70">• {stats.nextAppointment.petWeight} lbs</span>
+                          <span className="text-emerald-600">• {stats.nextAppointment.petWeight} lbs</span>
                         )}
                       </p>
-                      <p className="text-white/90 text-xs mt-1 font-medium">
+                      <p className="text-emerald-700 text-xs mt-1 font-medium">
                         {stats.nextAppointment.serviceType}
                       </p>
                     </div>
                   )}
-                  <p className="text-white/90 text-sm">{stats.nextAppointment.address}</p>
-                  <p className="text-white/80 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
+                  <p className="text-gray-700 text-sm">{stats.nextAppointment.address}</p>
+                  <p className="text-gray-500 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
                     <Clock className="h-3 w-3" />
                     {formatTime(stats.nextAppointment.startAt)}
                     {stats.nextAppointment.serviceMinutes && ` (${stats.nextAppointment.serviceMinutes} min)`}
@@ -902,7 +903,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("call") && (
                       <button
                         onClick={() => handleCall(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
                       >
                         <Phone className="h-4 w-4" />
                         Call
@@ -911,7 +912,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("sms") && (
                       <button
                         onClick={() => handleSMS(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
                       >
                         <MessageSquare className="h-4 w-4" />
                         SMS
@@ -920,7 +921,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("whatsapp") && (
                       <button
                         onClick={() => handleWhatsApp(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
                       >
                         💚 WhatsApp
                       </button>
@@ -928,7 +929,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("signal") && (
                       <button
                         onClick={() => handleSignal(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
                       >
                         🔵 Signal
                       </button>
@@ -936,7 +937,7 @@ function DashboardContent() {
                     {stats.contactMethods.includes("telegram") && (
                       <button
                         onClick={() => handleTelegram(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 px-4 bg-white/20 hover:bg-white/30 border-0 text-white gap-2"
+                        className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
                       >
                         ✈️ Telegram
                       </button>
@@ -947,7 +948,7 @@ function DashboardContent() {
 
               {/* Column 2: Map Preview */}
               <div className="w-full md:w-auto flex justify-center md:justify-end">
-                <div className="rounded-lg overflow-hidden border-2 border-white/20">
+                <div className="rounded-lg overflow-hidden border-2 border-emerald-200 shadow-md">
                   <Image
                     src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(stats.nextAppointment.address)}&zoom=15&size=200x200&maptype=roadmap&markers=color:red%7C${encodeURIComponent(stats.nextAppointment.address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
                     alt="Location map"
@@ -968,7 +969,7 @@ function DashboardContent() {
               <div className="flex flex-col gap-1">
                 <button
                   onClick={() => handleOnMyWay(stats.nextAppointment?.customerPhone)}
-                  className="w-full font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 bg-teal-500/80 hover:bg-teal-500/90 text-white border border-teal-300/30"
+                  className="w-full font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white shadow-md"
                 >
                   <Clock className="h-5 w-5" />
                   On My Way
@@ -977,7 +978,7 @@ function DashboardContent() {
                 {canUseRunningLate && (stats.remainingAppointments?.length || 0) > 0 && (
                   <button
                     onClick={() => setShowRunningLateModal(true)}
-                    className="text-white/60 hover:text-white/80 text-sm underline underline-offset-2 transition-colors"
+                    className="text-gray-500 hover:text-gray-700 text-sm underline underline-offset-2 transition-colors"
                   >
                     Running late? Notify all customers
                   </button>
@@ -989,7 +990,7 @@ function DashboardContent() {
             {stats.nextAppointment.status !== "IN_PROGRESS" && (
               <button
                 onClick={startDriving}
-                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                className="w-full font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg bg-gray-800 hover:bg-gray-900 text-white shadow-md"
               >
                 <Navigation className="h-6 w-6" />
                 Start Driving
@@ -1002,7 +1003,7 @@ function DashboardContent() {
               {stats.nextAppointment.status === "CONFIRMED" && (
                 <button
                   onClick={() => stats.nextAppointment && handleStartGrooming(stats.nextAppointment.appointmentId)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
                 >
                   <Play className="h-5 w-5" />
                   <span className="hidden sm:inline">Start Grooming</span>
@@ -1012,7 +1013,7 @@ function DashboardContent() {
               {/* Handle/Reschedule button - softer language */}
               <button
                 onClick={() => stats.nextAppointment && openSkipModal(stats.nextAppointment.appointmentId)}
-                className="bg-gray-500/80 hover:bg-gray-500/90 border border-gray-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
               >
                 <SkipForward className="h-5 w-5" />
                 <span className="hidden sm:inline">Can&apos;t Make It</span>
@@ -1021,7 +1022,7 @@ function DashboardContent() {
               {/* Complete button with confirmation */}
               <button
                 onClick={() => stats.nextAppointment && openCompleteConfirm(stats.nextAppointment.appointmentId)}
-                className="bg-green-500/80 hover:bg-green-500/90 border border-green-300/30 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
               >
                 <CheckCircle className="h-5 w-5" />
                 Complete
@@ -1030,7 +1031,7 @@ function DashboardContent() {
 
             {/* Appointments left - separate row on mobile */}
             <div className="flex justify-center sm:hidden mt-3">
-              <p className="text-white/60 text-sm">
+              <p className="text-gray-500 text-sm">
                 {stats.appointments - 1 === 0
                   ? "Last one — you got this! 🎉"
                   : `${stats.appointments - 1} more after this one`}
@@ -1081,8 +1082,8 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Day Status Card - Calm & Control messaging */}
-      {stats?.hasData && !isFullscreen && (
+      {/* Day Status Card - Calm & Control messaging (hide at end of day to avoid repetition) */}
+      {stats?.hasData && !isFullscreen && stats.dayStatus !== "completed" && (
         <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl shadow-sm border border-emerald-100 p-6 mb-6">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-emerald-100 rounded-full">
@@ -1090,11 +1091,9 @@ function DashboardContent() {
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900">
-                {stats.dayStatus === "completed"
-                  ? "Day Complete"
-                  : stats.dayStatus === "in-progress"
-                    ? "Day in Progress"
-                    : "Your Day is Ready"}
+                {stats.dayStatus === "in-progress"
+                  ? "Day in Progress"
+                  : "Your Day is Ready"}
               </h3>
               <p className="text-gray-600 text-sm mt-0.5">
                 {stats.totalAppointments} appointment{stats.totalAppointments !== 1 ? "s" : ""}
@@ -1227,34 +1226,79 @@ function DashboardContent() {
             <div className="mt-4 pt-4 border-t border-gray-100">
               <div className="grid gap-3 text-sm">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Energy load today</span>
+                  <div className="flex items-center gap-1.5 group relative">
+                    <span className="text-gray-500">Energy load today</span>
+                    <div className="relative">
+                      <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 z-50">
+                        Measures your workload based on dog size and service type. Helps track sustainable pace.
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                      </div>
+                    </div>
+                  </div>
                   <span className="font-medium text-gray-700">
                     {performanceData.today.energyLoad}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Dogs per day (30d avg)</span>
+                  <div className="flex items-center gap-1.5 group relative">
+                    <span className="text-gray-500">Dogs per day (30d avg)</span>
+                    <div className="relative">
+                      <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 z-50">
+                        Your average number of dogs groomed per working day over the past 30 days.
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                      </div>
+                    </div>
+                  </div>
                   <span className="font-medium text-gray-700">
                     {performanceData.insights.dogsPerDay.user30Day.toFixed(1)}
                   </span>
                 </div>
                 {performanceData.insights.driveTime.userAvg !== null && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-500">Avg drive time</span>
+                    <div className="flex items-center gap-1.5 group relative">
+                      <span className="text-gray-500">Avg drive time</span>
+                      <div className="relative">
+                        <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 z-50">
+                          Average time spent driving between appointments based on your route history.
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                        </div>
+                      </div>
+                    </div>
                     <span className="font-medium text-gray-700">
                       {performanceData.insights.driveTime.userAvg} min
                     </span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Completion rate</span>
+                  <div className="flex items-center gap-1.5 group relative">
+                    <span className="text-gray-500">Completion rate</span>
+                    <div className="relative">
+                      <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 z-50">
+                        Percentage of scheduled appointments that were completed (not cancelled or no-show).
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                      </div>
+                    </div>
+                  </div>
                   <span className="font-medium text-gray-700">
                     {(100 - performanceData.insights.cancellationRate.user).toFixed(0)}%
                   </span>
                 </div>
                 {performanceData.routeEfficiency && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-500">Route efficiency</span>
+                    <div className="flex items-center gap-1.5 group relative">
+                      <span className="text-gray-500">Route efficiency</span>
+                      <div className="relative">
+                        <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-52 z-50">
+                          Rates how well your route is organized geographically. Higher ratings mean less time driving between appointments.
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                        </div>
+                      </div>
+                    </div>
                     <span className="font-medium text-gray-700">
                       {performanceData.routeEfficiency.rating}
                     </span>
