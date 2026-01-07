@@ -104,16 +104,13 @@ export async function GET(req: NextRequest) {
     const today = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate(), 0, 0, 0, 0));
     const tomorrow = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate() + 1, 0, 0, 0, 0));
 
-    // Fetch ALL today's appointments (including completed) for status tracking
+    // Fetch ALL today's appointments (including completed, cancelled, no-show) for status tracking
     const allTodayAppointments = await prisma.appointment.findMany({
       where: {
         accountId,
         startAt: {
           gte: today,
           lt: tomorrow,
-        },
-        status: {
-          notIn: ["CANCELLED", "NO_SHOW"],
         },
       },
       include: {
@@ -125,9 +122,9 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Filter for active appointments (not completed) for next appointment
+    // Filter for active appointments (not completed, cancelled, or no-show) for next appointment
     const activeAppointments = allTodayAppointments.filter(
-      (apt) => apt.status !== "COMPLETED"
+      (apt) => !["COMPLETED", "CANCELLED", "NO_SHOW"].includes(apt.status)
     );
 
     // Count by status
@@ -140,14 +137,25 @@ export async function GET(req: NextRequest) {
     const inProgressCount = allTodayAppointments.filter(
       (apt) => apt.status === "IN_PROGRESS"
     ).length;
+    const cancelledCount = allTodayAppointments.filter(
+      (apt) => apt.status === "CANCELLED"
+    ).length;
+    const noShowCount = allTodayAppointments.filter(
+      (apt) => apt.status === "NO_SHOW"
+    ).length;
 
-    const totalAppointments = allTodayAppointments.length;
-    const hasData = totalAppointments > 0;
+    // Total scheduled appointments (excluding cancelled/no-show for "hasData" purposes)
+    const scheduledAppointments = allTodayAppointments.filter(
+      (apt) => !["CANCELLED", "NO_SHOW"].includes(apt.status)
+    );
+    const totalAppointments = scheduledAppointments.length;
+    const totalScheduledToday = allTodayAppointments.length; // Including cancelled/no-show
+    const hasData = totalScheduledToday > 0;
 
     // Check if this is sample data (we'll mark sample customers with a special tag)
     const showSampleData =
       hasData &&
-      allTodayAppointments.some((apt) =>
+      scheduledAppointments.some((apt) =>
         apt.customer.notes?.includes("[SAMPLE_DATA]")
       );
 
@@ -197,6 +205,8 @@ export async function GET(req: NextRequest) {
       totalAppointments,
       confirmedCount,
       completedCount,
+      cancelledCount,
+      noShowCount,
       dayStatus,
       calmMessage,
       hasRoute,

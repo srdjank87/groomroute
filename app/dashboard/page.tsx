@@ -40,6 +40,8 @@ interface TodaysStats {
   totalAppointments: number;
   confirmedCount: number;
   completedCount: number;
+  cancelledCount: number;
+  noShowCount: number;
   dayStatus: "ready" | "in-progress" | "completed" | "no-appointments";
   calmMessage: string;
   hasRoute: boolean;
@@ -1035,17 +1037,37 @@ function DashboardContent() {
             </div>
           </div>
         </div>
+      ) : stats?.hasData && stats.dayStatus === "completed" ? (
+        // End of day - All appointments completed
+        <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-xl shadow-lg p-8 mb-6 text-center border border-emerald-200">
+          <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mx-auto mb-5">
+            <CheckCircle className="h-10 w-10 text-emerald-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Great work today!</h2>
+          <p className="text-gray-600 mb-1">
+            You completed {stats.completedCount} appointment{stats.completedCount !== 1 ? "s" : ""} today.
+            {(stats.cancelledCount > 0 || stats.noShowCount > 0) && (
+              <span className="text-gray-500">
+                {stats.cancelledCount > 0 && ` ${stats.cancelledCount} cancelled.`}
+                {stats.noShowCount > 0 && ` ${stats.noShowCount} no-show.`}
+              </span>
+            )}
+          </p>
+          <p className="text-emerald-600 text-sm italic mt-4">
+            &ldquo;Another smooth day in the books. You&apos;ve earned your rest.&rdquo;
+          </p>
+        </div>
       ) : (
-        // Empty state - No appointments today (encouraging copy)
-        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl shadow-lg p-8 mb-6 text-center border border-emerald-100">
-          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Smile className="h-8 w-8 text-emerald-600" />
+        // Empty state - No appointments scheduled today
+        <div className="bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 rounded-xl shadow-lg p-8 mb-6 text-center border border-slate-200">
+          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Smile className="h-8 w-8 text-slate-500" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Your day is open</h2>
           <p className="text-gray-600 mb-2">
             No appointments scheduled — a chance to catch up, plan ahead, or simply rest.
           </p>
-          <p className="text-emerald-700 text-sm italic mb-6">
+          <p className="text-slate-500 text-sm italic mb-6">
             &ldquo;A clear schedule is an opportunity, not a problem.&rdquo;
           </p>
           <Link
