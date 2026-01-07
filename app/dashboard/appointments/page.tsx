@@ -34,7 +34,7 @@ interface Appointment {
 
 const STATUS_OPTIONS = [
   { value: "ALL", label: "All Statuses" },
-  { value: "CONFIRMED", label: "Confirmed" },
+  { value: "CONFIRMED", label: "Scheduled" },
   { value: "IN_PROGRESS", label: "In Progress" },
   { value: "COMPLETED", label: "Completed" },
   { value: "CANCELLED", label: "Cancelled" },
@@ -161,13 +161,25 @@ export default function AppointmentsPage() {
     const colors: Record<string, string> = {
       SCHEDULED: "bg-blue-100 text-blue-800",
       BOOKED: "bg-blue-100 text-blue-800",
-      CONFIRMED: "bg-emerald-100 text-emerald-800",
+      CONFIRMED: "bg-blue-100 text-blue-800",
       IN_PROGRESS: "bg-yellow-100 text-yellow-800",
       COMPLETED: "bg-green-100 text-green-800",
       CANCELLED: "bg-red-100 text-red-800",
       NO_SHOW: "bg-gray-100 text-gray-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      CONFIRMED: "Scheduled",
+      IN_PROGRESS: "In Progress",
+      COMPLETED: "Completed",
+      CANCELLED: "Cancelled",
+      NO_SHOW: "No Show",
+      BOOKED: "Booked",
+    };
+    return labels[status] || status.replace("_", " ");
   };
 
   const handleCancelAppointment = async (appointmentId: string) => {
@@ -316,7 +328,7 @@ export default function AppointmentsPage() {
                         appointment.status
                       )}`}
                     >
-                      {appointment.status.replace("_", " ")}
+                      {getStatusLabel(appointment.status)}
                     </span>
                   </div>
                   {appointment.pet && (
@@ -479,7 +491,7 @@ export default function AppointmentsPage() {
                           appointment.status
                         )}`}
                       >
-                        {appointment.status.replace("_", " ")}
+                        {getStatusLabel(appointment.status)}
                       </span>
                     </div>
                     {appointment.pet && (

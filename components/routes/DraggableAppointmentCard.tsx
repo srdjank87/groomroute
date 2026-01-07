@@ -71,7 +71,7 @@ function getStatusBadge(status: string) {
     case "BOOKED":
       return <span className="badge badge-info badge-sm">Booked</span>;
     case "CONFIRMED":
-      return <span className="badge badge-success badge-sm">Confirmed</span>;
+      return <span className="badge badge-info badge-sm">Scheduled</span>;
     case "IN_PROGRESS":
       return <span className="badge badge-warning badge-sm">In Progress</span>;
     default:
