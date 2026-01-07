@@ -270,6 +270,7 @@ model Route {
   efficiencyScore     Float?                 // 0-100, higher = better (work time / total time)
   estimatedGasCost    Float?
   hasAssistant        Boolean                @default(false) // Per-day override for working with bather
+  workdayStarted      Boolean                @default(false) // User clicked "Start My Workday"
   status              RouteStatus            @default(DRAFT)
   provider            String?                // google | mapbox | custom
   polyline            String?                @db.Text // Encoded polyline for map display

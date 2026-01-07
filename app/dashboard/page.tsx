@@ -58,6 +58,7 @@ interface TodaysStats {
   };
   hasData: boolean;
   showSampleData: boolean;
+  workdayStarted: boolean;
   contactMethods?: string[];
   remainingAppointments?: {
     customerName: string;
@@ -301,6 +302,7 @@ function DashboardContent() {
   const [isCompleting, setIsCompleting] = useState(false);
   const [showRunningLateModal, setShowRunningLateModal] = useState(false);
   const [delayMinutes, setDelayMinutes] = useState(15);
+  const [isStartingWorkday, setIsStartingWorkday] = useState(false);
 
   // Check if user can use Running Late feature (GROWTH+ only)
   const canUseRunningLate = ['GROWTH', 'PRO', 'TRIAL'].includes(
@@ -671,6 +673,28 @@ function DashboardContent() {
     }
   }
 
+  async function handleStartWorkday() {
+    setIsStartingWorkday(true);
+    try {
+      const response = await fetch("/api/routes/start-workday", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        toast.success("Let's do this! Your workday has begun.");
+        // Refresh dashboard data to show the Next Stop card
+        await fetchDashboardData();
+      } else {
+        toast.error("Failed to start workday");
+      }
+    } catch (error) {
+      console.error("Start workday error:", error);
+      toast.error("Failed to start workday");
+    } finally {
+      setIsStartingWorkday(false);
+    }
+  }
+
   if (isLoading || isGeneratingSample) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -773,7 +797,36 @@ function DashboardContent() {
       )}
 
       {/* Hero Section - Today's Route */}
-      {stats?.hasData && stats.nextAppointment ? (
+      {stats?.hasData && stats.nextAppointment && !stats.workdayStarted ? (
+        // Pre-workday state - Show calm message with Start My Workday button
+        <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-xl shadow-lg p-8 mb-6 text-center border border-slate-200">
+          <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-5">
+            <Coffee className="h-10 w-10 text-indigo-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Ready when you are</h2>
+          <p className="text-gray-600 mb-1">
+            You have {stats.totalAppointments} appointment{stats.totalAppointments !== 1 ? "s" : ""} scheduled for today.
+          </p>
+          <p className="text-indigo-600 text-sm italic mb-6">
+            Take a moment, grab your coffee, and start when you&apos;re ready.
+          </p>
+          <button
+            onClick={handleStartWorkday}
+            disabled={isStartingWorkday}
+            className="btn btn-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white border-0 font-semibold shadow-lg gap-2"
+          >
+            {isStartingWorkday ? (
+              <span className="loading loading-spinner loading-sm"></span>
+            ) : (
+              <Play className="h-5 w-5" />
+            )}
+            Start My Workday
+          </button>
+          <p className="text-gray-400 text-xs mt-4">
+            Your first stop: {stats.nextAppointment.customerName} at {formatTime(stats.nextAppointment.startAt)}
+          </p>
+        </div>
+      ) : stats?.hasData && stats.nextAppointment && stats.workdayStarted ? (
         <div className={`text-white ${
           stats.nextAppointment.status === "IN_PROGRESS"
             ? (isFullscreen

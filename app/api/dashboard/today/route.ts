@@ -137,17 +137,22 @@ export async function GET(req: NextRequest) {
         apt.customer.notes?.includes("[SAMPLE_DATA]")
       );
 
-    // Get today's route to check if optimized
+    // Get today's route to check if optimized and workday started
     const route = hasData
       ? await prisma.route.findFirst({
           where: {
             accountId,
             routeDate: today,
           },
+          select: {
+            id: true,
+            workdayStarted: true,
+          },
         })
       : null;
 
     const hasRoute = !!route;
+    const workdayStarted = route?.workdayStarted ?? false;
 
     // Generate status and calm message
     const dayStatus = getDayStatus(
@@ -208,6 +213,7 @@ export async function GET(req: NextRequest) {
         : undefined,
       hasData,
       showSampleData,
+      workdayStarted,
       contactMethods: groomer?.contactMethods || ["call", "sms"],
       remainingAppointments,
     };
