@@ -28,9 +28,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get today's date in UTC
+    // Get today's date based on LOCAL date (not UTC)
+    // Routes use the same date convention as appointments
     const now = new Date();
-    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+    const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0));
 
     // Upsert route for today with workdayStarted = true
     const route = await prisma.route.upsert({

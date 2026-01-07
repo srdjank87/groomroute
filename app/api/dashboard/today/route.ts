@@ -84,11 +84,14 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Get today's date range in UTC
-    // Appointments are stored with UTC timestamps (e.g., T09:00:00.000Z for 9 AM)
+    // Get today's date range based on LOCAL date (not UTC)
+    // Appointments are stored with UTC timestamps that represent local display times
+    // (e.g., 9 AM local is stored as T09:00:00.000Z)
+    // So we query using local date boundaries in UTC format
     const now = new Date();
-    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
-    const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0));
+    // Use local date components, not UTC
+    const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0));
+    const tomorrow = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0));
 
     // Fetch ALL today's appointments (including completed) for status tracking
     const allTodayAppointments = await prisma.appointment.findMany({
