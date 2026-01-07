@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { toZonedTime } from "date-fns-tz";
 
 /**
  * POST /api/routes/start-workday
@@ -16,9 +17,16 @@ export async function POST(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get groomer for this account
+    // Get groomer for this account with account timezone
     const groomer = await prisma.groomer.findFirst({
       where: { accountId },
+      include: {
+        account: {
+          select: {
+            timezone: true,
+          },
+        },
+      },
     });
 
     if (!groomer) {
@@ -28,10 +36,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get today's date based on LOCAL date (not UTC)
+    // Get the account's timezone (default to America/New_York)
+    const timezone = groomer.account?.timezone || "America/New_York";
+
+    // Get today's date based on ACCOUNT'S LOCAL timezone
     // Routes use the same date convention as appointments
     const now = new Date();
-    const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0));
+    const localNow = toZonedTime(now, timezone);
+    const today = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate(), 0, 0, 0, 0));
 
     // Upsert route for today with workdayStarted = true
     const route = await prisma.route.upsert({

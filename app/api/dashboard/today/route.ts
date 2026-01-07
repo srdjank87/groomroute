@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { toZonedTime } from "date-fns-tz";
 
 // Generate calm, affirming messages based on day status
 function getCalmMessage(
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get groomer profile for contact methods
+    // Get groomer profile for contact methods and account for timezone
     const groomer = await prisma.groomer.findFirst({
       where: {
         accountId,
@@ -81,17 +82,27 @@ export async function GET(req: NextRequest) {
       },
       select: {
         contactMethods: true,
+        account: {
+          select: {
+            timezone: true,
+          },
+        },
       },
     });
 
-    // Get today's date range based on LOCAL date (not UTC)
+    // Get the account's timezone (default to America/New_York)
+    const timezone = groomer?.account?.timezone || "America/New_York";
+
+    // Get today's date range based on the ACCOUNT'S LOCAL timezone
     // Appointments are stored with UTC timestamps that represent local display times
     // (e.g., 9 AM local is stored as T09:00:00.000Z)
     // So we query using local date boundaries in UTC format
     const now = new Date();
-    // Use local date components, not UTC
-    const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0));
-    const tomorrow = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0));
+    // Convert current time to account's timezone to get local date
+    const localNow = toZonedTime(now, timezone);
+    // Use the local date components to build UTC query boundaries
+    const today = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate(), 0, 0, 0, 0));
+    const tomorrow = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate() + 1, 0, 0, 0, 0));
 
     // Fetch ALL today's appointments (including completed) for status tracking
     const allTodayAppointments = await prisma.appointment.findMany({
