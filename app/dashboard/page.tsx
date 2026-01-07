@@ -391,7 +391,8 @@ function DashboardContent() {
       }
 
       // Also fetch today's appointments for Start Driving
-      const today = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const appointmentsResponse = await fetch(`/api/appointments?date=${today}`);
       if (appointmentsResponse.ok) {
         const appointmentsData = await appointmentsResponse.json();

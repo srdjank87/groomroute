@@ -84,11 +84,11 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Get today's date range
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Get today's date range in UTC
+    // Appointments are stored with UTC timestamps (e.g., T09:00:00.000Z for 9 AM)
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+    const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0));
 
     // Fetch ALL today's appointments (including completed) for status tracking
     const allTodayAppointments = await prisma.appointment.findMany({

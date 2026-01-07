@@ -38,8 +38,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Ensure we're only reordering today's route
-    const today = new Date().toISOString().split("T")[0];
+    // Ensure we're only reordering today's route (use UTC date)
+    const now = new Date();
+    const today = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-${String(now.getUTCDate()).padStart(2, '0')}`;
     if (date !== today) {
       return NextResponse.json(
         { error: "Can only reorder today's route" },

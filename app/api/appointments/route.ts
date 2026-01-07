@@ -228,10 +228,10 @@ export async function GET(req: NextRequest) {
     // If 'all' is not set, apply date/customer filters
     if (!all) {
       if (date) {
-        const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
+        // Parse date as UTC to match how appointments are stored
+        // Appointments are stored with UTC timestamps (e.g., T09:00:00.000Z for 9 AM)
+        const startOfDay = new Date(date + "T00:00:00.000Z");
+        const endOfDay = new Date(date + "T23:59:59.999Z");
 
         where.startAt = {
           gte: startOfDay,

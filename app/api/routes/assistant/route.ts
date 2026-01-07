@@ -28,9 +28,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get today's route
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Get today's route (use UTC date to match how routes are stored)
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
 
     const route = await prisma.route.findFirst({
       where: {
@@ -92,9 +92,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get today's date
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Get today's date (use UTC to match how routes are stored)
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
 
     // Update or create today's route with the assistant setting
     const route = await prisma.route.upsert({

@@ -184,7 +184,8 @@ export default function TodaysRoutePage() {
 
   async function fetchTodaysRoute() {
     try {
-      const today = new Date().toISOString().split("T")[0];
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const response = await fetch(`/api/appointments?date=${today}`);
 
       if (!response.ok) throw new Error("Failed to fetch appointments");
@@ -232,7 +233,8 @@ export default function TodaysRoutePage() {
   async function optimizeRoute() {
     setIsOptimizing(true);
     try {
-      const today = new Date().toISOString().split("T")[0];
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const response = await fetch("/api/routes/optimize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -318,7 +320,8 @@ export default function TodaysRoutePage() {
 
     setIsReordering(true);
     try {
-      const today = new Date().toISOString().split("T")[0];
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       const response = await fetch("/api/routes/reorder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

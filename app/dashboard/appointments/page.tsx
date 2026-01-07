@@ -81,7 +81,8 @@ export default function AppointmentsPage() {
 
   // Filter "Other Appointments" to exclude the selected date
   const otherAppointmentsBase = allAppointments.filter(apt => {
-    const aptDate = new Date(apt.startAt).toISOString().split("T")[0];
+    const aptDateObj = new Date(apt.startAt);
+    const aptDate = `${aptDateObj.getFullYear()}-${String(aptDateObj.getMonth() + 1).padStart(2, '0')}-${String(aptDateObj.getDate()).padStart(2, '0')}`;
     return aptDate !== selectedDate;
   });
 
