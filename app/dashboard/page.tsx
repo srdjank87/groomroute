@@ -719,16 +719,17 @@ function DashboardContent() {
       {/* Contextual Greeting Header */}
       {!isFullscreen && (
         <div className="mb-6">
-          <div className="flex items-start justify-between">
+          {/* Desktop: side by side, Mobile: stacked */}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{greeting.greeting}</h1>
               <p className="text-gray-600 mt-1">{greeting.subtext}</p>
             </div>
-            {/* Day Status Indicator */}
+            {/* Day Status Indicator - Below greeting on mobile */}
             {stats?.hasData && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full">
-                <div className={`w-2.5 h-2.5 rounded-full ${dayStatus.color}`}></div>
-                <span className="text-sm text-gray-600">{dayStatus.label}</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full w-fit">
+                <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dayStatus.color}`}></div>
+                <span className="text-sm text-gray-600 whitespace-nowrap">{dayStatus.label}</span>
               </div>
             )}
           </div>
@@ -1072,10 +1073,10 @@ function DashboardContent() {
           </p>
           <Link
             href="/dashboard/appointments/new"
-            className="btn btn-lg bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 font-semibold"
+            className="btn btn-lg bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 font-semibold px-6 py-3 h-auto min-h-0"
           >
-            <Plus className="h-5 w-5" />
-            Schedule an Appointment
+            <Plus className="h-5 w-5 flex-shrink-0" />
+            <span>Schedule an Appointment</span>
           </Link>
         </div>
       )}
@@ -1168,34 +1169,34 @@ function DashboardContent() {
           )}
 
           {/* Simplified Stats - Just 3 key metrics */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
             {/* Est. Finish Time */}
-            <div className="text-center p-4 bg-emerald-50 rounded-xl">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <Clock className="h-4 w-4 text-emerald-600" />
-                <p className="text-xs text-emerald-700 font-medium">Est. Finish</p>
+            <div className="text-center p-3 sm:p-4 bg-emerald-50 rounded-xl">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 mb-1">
+                <Clock className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                <p className="text-[10px] sm:text-xs text-emerald-700 font-medium">Est. Finish</p>
               </div>
-              <p className="text-xl font-bold text-emerald-700">
+              <p className="text-lg sm:text-xl font-bold text-emerald-700">
                 {performanceData.today.estimatedFinish || "—"}
               </p>
             </div>
             {/* Large Dogs */}
-            <div className="text-center p-4 bg-amber-50 rounded-xl">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <Dog className="h-4 w-4 text-amber-600" />
-                <p className="text-xs text-amber-700 font-medium">Large Dogs</p>
+            <div className="text-center p-3 sm:p-4 bg-amber-50 rounded-xl">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 mb-1">
+                <Dog className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                <p className="text-[10px] sm:text-xs text-amber-700 font-medium">Large Dogs</p>
               </div>
-              <p className="text-xl font-bold text-amber-700">
+              <p className="text-lg sm:text-xl font-bold text-amber-700">
                 {performanceData.today.largeDogCount}
               </p>
             </div>
             {/* Today's Earnings */}
-            <div className="text-center p-4 bg-blue-50 rounded-xl">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <DollarSign className="h-4 w-4 text-blue-600" />
-                <p className="text-xs text-blue-700 font-medium">Earnings</p>
+            <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-xl">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 mb-1">
+                <DollarSign className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                <p className="text-[10px] sm:text-xs text-blue-700 font-medium">Earnings</p>
               </div>
-              <p className="text-xl font-bold text-blue-700">
+              <p className="text-lg sm:text-xl font-bold text-blue-700">
                 ${performanceData.today.revenue.toFixed(0)}
               </p>
             </div>
@@ -1290,43 +1291,44 @@ function DashboardContent() {
       {!isFullscreen && (
       <div className="mb-8">
         <h3 className="text-sm font-medium text-gray-500 mb-3">Quick Actions</h3>
-        <div className="grid grid-cols-3 gap-4">
+        {/* Stack vertically on mobile, 3 columns on desktop */}
+        <div className="flex flex-col sm:grid sm:grid-cols-3 gap-3 sm:gap-4">
           <Link
             href="/dashboard/appointments/new"
-            className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-emerald-300 hover:shadow-sm transition-all"
+            className="flex items-center gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-emerald-300 hover:shadow-sm transition-all"
           >
-            <div className="p-2.5 bg-emerald-100 rounded-lg">
+            <div className="p-2 sm:p-2.5 bg-emerald-100 rounded-lg flex-shrink-0">
               <Calendar className="h-5 w-5 text-emerald-600" />
             </div>
-            <div>
-              <span className="font-medium text-gray-900 block">New Appointment</span>
-              <span className="text-xs text-gray-500">Schedule a visit</span>
+            <div className="min-w-0">
+              <span className="font-medium text-gray-900 block truncate">New Appointment</span>
+              <span className="text-xs text-gray-500 hidden sm:block">Schedule a visit</span>
             </div>
           </Link>
 
           <Link
             href="/dashboard/customers/new"
-            className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all"
+            className="flex items-center gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all"
           >
-            <div className="p-2.5 bg-blue-100 rounded-lg">
+            <div className="p-2 sm:p-2.5 bg-blue-100 rounded-lg flex-shrink-0">
               <UserPlus className="h-5 w-5 text-blue-600" />
             </div>
-            <div>
-              <span className="font-medium text-gray-900 block">Add Customer</span>
-              <span className="text-xs text-gray-500">New client</span>
+            <div className="min-w-0">
+              <span className="font-medium text-gray-900 block truncate">Add Customer</span>
+              <span className="text-xs text-gray-500 hidden sm:block">New client</span>
             </div>
           </Link>
 
           <Link
             href="/dashboard/analytics"
-            className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all"
+            className="flex items-center gap-3 p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all"
           >
-            <div className="p-2.5 bg-purple-100 rounded-lg">
+            <div className="p-2 sm:p-2.5 bg-purple-100 rounded-lg flex-shrink-0">
               <BarChart3 className="h-5 w-5 text-purple-600" />
             </div>
-            <div>
-              <span className="font-medium text-gray-900 block">Analytics</span>
-              <span className="text-xs text-gray-500">View stats</span>
+            <div className="min-w-0">
+              <span className="font-medium text-gray-900 block truncate">Analytics</span>
+              <span className="text-xs text-gray-500 hidden sm:block">View stats</span>
             </div>
           </Link>
         </div>
