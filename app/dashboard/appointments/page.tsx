@@ -47,9 +47,10 @@ export default function AppointmentsPage() {
   const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingAll, setIsLoadingAll] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  });
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [otherStatusFilter, setOtherStatusFilter] = useState("ALL");
   const [otherPage, setOtherPage] = useState(1);
@@ -58,7 +59,11 @@ export default function AppointmentsPage() {
   const dateInputRef = useRef<HTMLInputElement>(null);
 
   // Check if selected date is today
-  const isToday = selectedDate === new Date().toISOString().split("T")[0];
+  const isToday = (() => {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    return selectedDate === todayStr;
+  })();
 
   // Format the section header based on selected date
   const getSectionHeader = () => {
