@@ -231,7 +231,7 @@ export default function CustomersPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
         <Link
-          href="/app/customers/new"
+          href="/dashboard/customers/new"
           className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
         >
           <Plus className="h-5 w-5" />
@@ -397,7 +397,7 @@ export default function CustomersPage() {
           </p>
           {!searchQuery && filterBy === "all" && areaFilter === "all" && (
             <Link
-              href="/app/customers/new"
+              href="/dashboard/customers/new"
               className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
             >
               <Plus className="h-5 w-5" />
@@ -414,7 +414,7 @@ export default function CustomersPage() {
             return (
               <Link
                 key={customer.id}
-                href={`/app/customers/${customer.id}`}
+                href={`/dashboard/customers/${customer.id}`}
                 className="block bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-2">
@@ -472,7 +472,7 @@ export default function CustomersPage() {
                   <button
                     onClick={(e) => {
                       e.preventDefault();
-                      window.location.href = `/app/appointments/new?customerId=${customer.id}`;
+                      window.location.href = `/dashboard/appointments/new?customerId=${customer.id}`;
                     }}
                     className="btn btn-sm h-9 px-4 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
                   >

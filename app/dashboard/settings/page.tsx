@@ -7,7 +7,7 @@ const settingsCategories = [
   {
     name: "Service Areas",
     description: "Define geographic areas and assign them to days of the week",
-    href: "/app/settings/areas",
+    href: "/dashboard/settings/areas",
     icon: MapPin,
     iconBg: "bg-emerald-100",
     iconColor: "text-emerald-600",
@@ -17,7 +17,7 @@ const settingsCategories = [
   {
     name: "Workload Protection",
     description: "Set limits to protect your energy and prevent burnout",
-    href: "/app/settings/profile",
+    href: "/dashboard/settings/profile",
     icon: Shield,
     iconBg: "bg-blue-100",
     iconColor: "text-blue-600",
@@ -27,7 +27,7 @@ const settingsCategories = [
   {
     name: "Notifications",
     description: "Configure reminders and message templates",
-    href: "/app/settings/notifications",
+    href: "/dashboard/settings/notifications",
     icon: Bell,
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
@@ -36,7 +36,7 @@ const settingsCategories = [
   {
     name: "Billing",
     description: "Manage your subscription and payment methods",
-    href: "/app/settings/billing",
+    href: "/dashboard/settings/billing",
     icon: CreditCard,
     iconBg: "bg-purple-100",
     iconColor: "text-purple-600",

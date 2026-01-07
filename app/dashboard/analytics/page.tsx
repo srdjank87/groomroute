@@ -452,7 +452,7 @@ export default function AnalyticsPage() {
           <p className="text-gray-600 mb-4">
             Complete some appointments to start seeing your business analytics.
           </p>
-          <Link href="/app/appointments/new" className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0">
+          <Link href="/dashboard/appointments/new" className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0">
             Schedule an Appointment
           </Link>
         </div>

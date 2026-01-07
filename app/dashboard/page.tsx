@@ -749,7 +749,7 @@ function DashboardContent() {
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href="/app/routes"
+                  href="/dashboard/routes"
                   className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0 font-semibold"
                 >
                   View Sample Route
@@ -995,7 +995,7 @@ function DashboardContent() {
             &ldquo;A clear schedule is an opportunity, not a problem.&rdquo;
           </p>
           <Link
-            href="/app/appointments/new"
+            href="/dashboard/appointments/new"
             className="btn btn-lg bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 font-semibold"
           >
             <Plus className="h-5 w-5" />
@@ -1216,7 +1216,7 @@ function DashboardContent() {
         <h3 className="text-sm font-medium text-gray-500 mb-3">Quick Actions</h3>
         <div className="grid grid-cols-3 gap-4">
           <Link
-            href="/app/appointments/new"
+            href="/dashboard/appointments/new"
             className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-emerald-300 hover:shadow-sm transition-all"
           >
             <div className="p-2.5 bg-emerald-100 rounded-lg">
@@ -1229,7 +1229,7 @@ function DashboardContent() {
           </Link>
 
           <Link
-            href="/app/customers/new"
+            href="/dashboard/customers/new"
             className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all"
           >
             <div className="p-2.5 bg-blue-100 rounded-lg">

@@ -217,7 +217,7 @@ export default function AppointmentsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
         <Link
-          href="/app/appointments/new"
+          href="/dashboard/appointments/new"
           className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
         >
           <Plus className="h-5 w-5" />
@@ -307,7 +307,7 @@ export default function AppointmentsPage() {
             }
           </p>
           <Link
-            href="/app/appointments/new"
+            href="/dashboard/appointments/new"
             className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
           >
             <Plus className="h-5 w-5" />
@@ -413,7 +413,7 @@ export default function AppointmentsPage() {
                     </button>
                   )}
                   <Link
-                    href={`/app/appointments/${appointment.id}/edit`}
+                    href={`/dashboard/appointments/${appointment.id}/edit`}
                     className="btn btn-ghost btn-sm gap-2 flex-1"
                   >
                     <Edit2 className="h-4 w-4" />
@@ -480,7 +480,7 @@ export default function AppointmentsPage() {
               }
             </p>
             <Link
-              href="/app/appointments/new"
+              href="/dashboard/appointments/new"
               className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
             >
               <Plus className="h-5 w-5" />
@@ -589,7 +589,7 @@ export default function AppointmentsPage() {
                       </button>
                     )}
                     <Link
-                      href={`/app/appointments/${appointment.id}/edit`}
+                      href={`/dashboard/appointments/${appointment.id}/edit`}
                       className="btn btn-ghost btn-sm gap-2 flex-1"
                     >
                       <Edit2 className="h-4 w-4" />

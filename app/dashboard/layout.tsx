@@ -26,13 +26,13 @@ const GroomRouteLogo = () => (
 // Navigation grouped by purpose
 const mainNavigation = [
   { name: "Today", href: "/dashboard", icon: Sun },
-  { name: "Routes", href: "/app/routes", icon: RouteIcon },
+  { name: "Routes", href: "/dashboard/routes", icon: RouteIcon },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
 ];
 
 const businessNavigation = [
-  { name: "Customers", href: "/app/customers", icon: Users },
-  { name: "Appointments", href: "/app/appointments", icon: Calendar },
+  { name: "Customers", href: "/dashboard/customers", icon: Users },
+  { name: "Appointments", href: "/dashboard/appointments", icon: Calendar },
 ];
 
 const supportNavigation = [
@@ -40,7 +40,7 @@ const supportNavigation = [
 ];
 
 const settingsNavigation = [
-  { name: "Settings", href: "/app/settings", icon: Settings },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export default function DashboardLayout({

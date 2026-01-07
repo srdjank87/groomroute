@@ -205,9 +205,9 @@ export default function NewCustomerPage() {
       toast.success("Customer saved successfully!");
 
       if (action === "saveAndBook") {
-        router.push(`/app/appointments/new?customerId=${data.customer.id}`);
+        router.push(`/dashboard/appointments/new?customerId=${data.customer.id}`);
       } else {
-        router.push("/app/customers");
+        router.push("/dashboard/customers");
       }
     } catch (error) {
       console.error("Save customer error:", error);

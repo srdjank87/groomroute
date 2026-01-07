@@ -281,7 +281,7 @@ function NewAppointmentContent() {
 
       const data = await response.json();
       toast.success("All set! Appointment scheduled");
-      router.push("/app/appointments");
+      router.push("/dashboard/appointments");
     } catch (error) {
       console.error("Create appointment error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to create appointment");
@@ -391,7 +391,7 @@ function NewAppointmentContent() {
             </div>
 
             <button
-              onClick={() => router.push("/app/customers/new")}
+              onClick={() => router.push("/dashboard/customers/new")}
               className="w-full btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
             >
               <Plus className="h-5 w-5" />
@@ -481,7 +481,7 @@ function NewAppointmentContent() {
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No furry friends yet</h3>
                 <p className="text-gray-600 mb-4">Let&apos;s add {selectedCustomer.name}&apos;s pet to get started</p>
                 <button
-                  onClick={() => router.push(`/app/customers/${selectedCustomer.id}/pets/new`)}
+                  onClick={() => router.push(`/dashboard/customers/${selectedCustomer.id}/pets/new`)}
                   className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
                 >
                   <Plus className="h-5 w-5" />

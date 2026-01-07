@@ -115,7 +115,7 @@ export default function CustomerEditPage() {
         });
       } else {
         toast.error("Customer not found");
-        router.push("/app/customers");
+        router.push("/dashboard/customers");
       }
     } catch (error) {
       console.error("Failed to fetch customer:", error);
@@ -209,7 +209,7 @@ export default function CustomerEditPage() {
 
       if (response.ok) {
         toast.success("Customer removed");
-        router.push("/app/customers");
+        router.push("/dashboard/customers");
       } else {
         const data = await response.json();
         toast.error(data.error || "Couldn't remove customer. Please try again.");
@@ -541,7 +541,7 @@ export default function CustomerEditPage() {
             <h2 className="text-lg font-semibold text-gray-900">Furry Friends</h2>
           </div>
           <Link
-            href={`/app/customers/${customerId}/pets/new`}
+            href={`/dashboard/customers/${customerId}/pets/new`}
             className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
           >
             <Plus className="h-4 w-4" />
@@ -557,7 +557,7 @@ export default function CustomerEditPage() {
             <h3 className="text-lg font-medium text-gray-900 mb-2">No furry friends yet</h3>
             <p className="text-gray-600 mb-4">Add {customer.name}&apos;s pets to start booking appointments</p>
             <Link
-              href={`/app/customers/${customerId}/pets/new`}
+              href={`/dashboard/customers/${customerId}/pets/new`}
               className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
             >
               <Plus className="h-4 w-4" />
@@ -587,7 +587,7 @@ export default function CustomerEditPage() {
                   )}
                 </div>
                 <Link
-                  href={`/app/customers/${customerId}/pets/${pet.id}`}
+                  href={`/dashboard/customers/${customerId}/pets/${pet.id}`}
                   className="btn btn-ghost btn-sm gap-2"
                 >
                   <Edit2 className="h-4 w-4" />
@@ -607,7 +607,7 @@ export default function CustomerEditPage() {
             <h2 className="text-lg font-semibold text-gray-900">Appointments</h2>
           </div>
           <Link
-            href={`/app/appointments/new?customerId=${customerId}`}
+            href={`/dashboard/appointments/new?customerId=${customerId}`}
             className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
           >
             <Plus className="h-4 w-4" />
@@ -623,7 +623,7 @@ export default function CustomerEditPage() {
             <h3 className="text-lg font-medium text-gray-900 mb-2">Ready for their first groom</h3>
             <p className="text-gray-600 mb-4">Schedule an appointment to get {customer.name} on your calendar</p>
             <Link
-              href={`/app/appointments/new?customerId=${customerId}`}
+              href={`/dashboard/appointments/new?customerId=${customerId}`}
               className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
             >
               <Plus className="h-4 w-4" />
@@ -675,7 +675,7 @@ export default function CustomerEditPage() {
                       </div>
                     </div>
                     <Link
-                      href={`/app/appointments/${appointment.id}`}
+                      href={`/dashboard/appointments/${appointment.id}`}
                       className="btn btn-ghost btn-sm gap-2"
                     >
                       View
@@ -689,7 +689,7 @@ export default function CustomerEditPage() {
         {customer.appointments.length > 5 && (
           <div className="mt-4 text-center">
             <Link
-              href={`/app/appointments?customerId=${customerId}`}
+              href={`/dashboard/appointments?customerId=${customerId}`}
               className="text-[#A5744A] hover:underline text-sm font-medium"
             >
               View all {customer.appointments.length} appointments
