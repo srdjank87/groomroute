@@ -456,13 +456,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Create appointments for today and the last 14 days (15 days total)
-    // Random number of appointments (4-8) per day with staggered times
+    // Random number of appointments (4-6) per day with staggered times
     for (let dayOffset = 14; dayOffset >= 0; dayOffset--) {
       const date = new Date(today);
       date.setDate(today.getDate() - dayOffset);
 
-      // Random number of appointments between 4 and 8
-      const numAppointments = Math.floor(Math.random() * 5) + 4; // 4, 5, 6, 7, or 8
+      // Random number of appointments between 4 and 6
+      const numAppointments = Math.floor(Math.random() * 3) + 4; // 4, 5, or 6
 
       // Shuffle customers and pick the random number
       const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
