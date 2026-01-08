@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon, MapPin, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon, MapPin, AlertTriangle, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -10,12 +10,24 @@ const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frid
 
 type Step = "customer" | "pet" | "details" | "datetime";
 
+interface ServiceArea {
+  id: string;
+  name: string;
+  color: string;
+}
+
 interface Customer {
   id: string;
   name: string;
   address: string;
   phone?: string;
+  email?: string;
   pets: Pet[];
+  serviceArea?: ServiceArea | null;
+  _count?: {
+    appointments: number;
+  };
+  totalRevenue?: number;
 }
 
 interface Pet {
@@ -302,11 +314,18 @@ function NewAppointmentContent() {
     setCurrentStep("details"); // Go to details step now (before datetime)
   };
 
+  const [isCustomService, setIsCustomService] = useState(false);
+  const [customServiceName, setCustomServiceName] = useState("");
+
   const serviceTypes = [
-    { value: "FULL_GROOM", label: "Full Groom", emoji: "💇", minutes: 90, price: 85 },
-    { value: "BATH_ONLY", label: "Bath Only", emoji: "🛁", minutes: 60, price: 65 },
-    { value: "NAIL_TRIM", label: "Nail Trim", emoji: "✂️", minutes: 15, price: 25 },
-    { value: "FACE_FEET_FANNY", label: "Face/Feet/Fanny", emoji: "🐾", minutes: 45, price: 55 },
+    { value: "FULL_GROOM", label: "Full Groom", emoji: "🐕", description: "Complete grooming package", minutes: 90, price: 85 },
+    { value: "BATH_BRUSH", label: "Bath & Brush", emoji: "🛁", description: "Bath, blow-dry & brush out", minutes: 60, price: 65 },
+    { value: "DESHED", label: "De-shed Treatment", emoji: "🪮", description: "Deep undercoat removal", minutes: 75, price: 75 },
+    { value: "PUPPY_INTRO", label: "Puppy Intro", emoji: "🐶", description: "First groom experience", minutes: 45, price: 55 },
+    { value: "NAIL_TRIM", label: "Nail Trim", emoji: "✂️", description: "Quick nail maintenance", minutes: 15, price: 25 },
+    { value: "FACE_FEET_FANNY", label: "Tidy Up", emoji: "🐾", description: "Face, feet & sanitary trim", minutes: 45, price: 55 },
+    { value: "HAND_STRIP", label: "Hand Stripping", emoji: "🧤", description: "For wire-coated breeds", minutes: 120, price: 120 },
+    { value: "CUSTOM", label: "Custom", emoji: "⭐", description: "Define your own service", minutes: 60, price: 65 },
   ];
 
   const handleSubmit = async () => {
@@ -453,20 +472,47 @@ function NewAppointmentContent() {
                 <button
                   key={customer.id}
                   onClick={() => selectCustomer(customer)}
-                  className="w-full bg-white rounded-xl shadow-sm p-4 text-left hover:shadow-md transition-shadow border-2 border-transparent hover:border-[#A5744A]"
+                  className="w-full bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 text-left border-2 border-transparent hover:border-[#A5744A]"
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{customer.name}</h3>
-                      <p className="text-sm text-gray-600">{customer.address}</p>
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 className="font-semibold text-gray-900">{customer.name}</h3>
+                        {customer.serviceArea && (
+                          <span
+                            className="badge badge-sm text-white"
+                            style={{ backgroundColor: customer.serviceArea.color }}
+                          >
+                            {customer.serviceArea.name}
+                          </span>
+                        )}
+                      </div>
                       {customer.phone && (
-                        <p className="text-sm text-gray-500">{customer.phone}</p>
+                        <p className="text-sm text-gray-600">{customer.phone}</p>
                       )}
-                      <p className="text-xs text-gray-500 mt-1">
-                        {customer.pets.length} {customer.pets.length === 1 ? "pet" : "pets"}
-                      </p>
+                      <p className="text-sm text-gray-500">{customer.address}</p>
                     </div>
-                    <ChevronLeft className="h-5 w-5 text-gray-400 rotate-180" />
+                    <ChevronLeft className="h-5 w-5 text-gray-400 rotate-180 flex-shrink-0" />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                    <div className="flex gap-4 text-sm text-gray-600">
+                      <span>
+                        {customer.pets.length} {customer.pets.length === 1 ? "pet" : "pets"}
+                      </span>
+                      {customer._count?.appointments !== undefined && (
+                        <span className="flex items-center gap-1">
+                          <CalendarIcon className="h-4 w-4" />
+                          {customer._count.appointments}
+                        </span>
+                      )}
+                      {customer.totalRevenue !== undefined && customer.totalRevenue > 0 && (
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="h-4 w-4" />
+                          {customer.totalRevenue.toFixed(0)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </button>
               ))}
@@ -557,11 +603,13 @@ function NewAppointmentContent() {
               <p className="text-sm font-medium text-blue-900">Service Details</p>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-lg">
-                  {serviceTypes.find(s => s.value === appointmentData.serviceType)?.emoji || "💇"}
+                  {serviceTypes.find(s => s.value === appointmentData.serviceType)?.emoji || "🐕"}
                 </span>
                 <div>
                   <p className="text-blue-700 font-medium">
-                    {serviceTypes.find(s => s.value === appointmentData.serviceType)?.label || "Full Groom"}
+                    {isCustomService && customServiceName
+                      ? customServiceName
+                      : serviceTypes.find(s => s.value === appointmentData.serviceType)?.label || "Full Groom"}
                   </p>
                   <p className="text-xs text-blue-600">
                     {appointmentData.serviceMinutes} minutes • ${appointmentData.price}
@@ -913,27 +961,47 @@ function NewAppointmentContent() {
                     <button
                       key={service.value}
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
+                        setIsCustomService(service.value === "CUSTOM");
                         setAppointmentData({
                           ...appointmentData,
                           serviceType: service.value,
                           serviceMinutes: service.minutes,
                           price: service.price,
-                        })
-                      }
-                      className={`p-4 rounded-lg border-2 transition-colors ${
+                        });
+                      }}
+                      className={`p-3 rounded-lg border-2 transition-colors text-left ${
                         appointmentData.serviceType === service.value
                           ? "border-[#A5744A] bg-orange-50"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      <div className="text-3xl mb-1">{service.emoji}</div>
-                      <div className="text-sm font-medium">{service.label}</div>
-                      <div className="text-xs text-gray-500">{service.minutes} min</div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xl">{service.emoji}</span>
+                        <span className="text-sm font-medium">{service.label}</span>
+                      </div>
+                      <p className="text-xs text-gray-500">{service.description}</p>
+                      <p className="text-xs text-gray-400 mt-1">{service.minutes} min • ${service.price}</p>
                     </button>
                   ))}
                 </div>
               </div>
+
+              {/* Custom service name input */}
+              {isCustomService && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Custom Service Name
+                  </label>
+                  <input
+                    type="text"
+                    value={customServiceName}
+                    onChange={(e) => setCustomServiceName(e.target.value)}
+                    className="input input-bordered w-full h-12 text-base"
+                    placeholder="e.g., Breed-specific cut, Show prep..."
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
