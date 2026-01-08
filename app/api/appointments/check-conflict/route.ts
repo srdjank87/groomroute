@@ -115,6 +115,92 @@ export async function GET(req: NextRequest) {
 
     const hasConflict = conflicts.length > 0;
 
+    // Find next available time slot if there's a conflict
+    let nextAvailable: { time: string; timeFormatted: string } | null = null;
+
+    if (hasConflict) {
+      // Get working hours (default 9 AM - 5 PM if not set)
+      const workStart = groomer.workingHoursStart
+        ? parseInt(groomer.workingHoursStart.split(":")[0])
+        : 9;
+      const workEnd = groomer.workingHoursEnd
+        ? parseInt(groomer.workingHoursEnd.split(":")[0])
+        : 17;
+
+      // Build list of busy periods (sorted by start time)
+      const busyPeriods = existingAppointments.map((apt) => {
+        const start = new Date(apt.startAt);
+        const end = new Date(start.getTime() + apt.serviceMinutes * 60 * 1000);
+        return { start, end };
+      }).sort((a, b) => a.start.getTime() - b.start.getTime());
+
+      // Try to find a gap that fits the requested duration
+      // Start from the proposed time and look forward
+      let searchStart = new Date(proposedStart);
+
+      // If proposed time is before work start, start from work start
+      const workStartToday = new Date(`${date}T${String(workStart).padStart(2, "0")}:00:00`);
+      if (searchStart < workStartToday) {
+        searchStart = workStartToday;
+      }
+
+      const workEndToday = new Date(`${date}T${String(workEnd).padStart(2, "0")}:00:00`);
+
+      for (let i = 0; i <= busyPeriods.length; i++) {
+        let gapStart: Date;
+        let gapEnd: Date;
+
+        if (i === 0) {
+          // Gap before first appointment
+          gapStart = searchStart;
+          gapEnd = busyPeriods.length > 0 ? busyPeriods[0].start : workEndToday;
+        } else if (i === busyPeriods.length) {
+          // Gap after last appointment
+          gapStart = busyPeriods[i - 1].end;
+          gapEnd = workEndToday;
+        } else {
+          // Gap between appointments
+          gapStart = busyPeriods[i - 1].end;
+          gapEnd = busyPeriods[i].start;
+        }
+
+        // Ensure gap starts at or after our search start
+        if (gapStart < searchStart) {
+          gapStart = searchStart;
+        }
+
+        // Check if this gap is big enough for our appointment
+        const gapDuration = (gapEnd.getTime() - gapStart.getTime()) / (60 * 1000);
+
+        if (gapDuration >= duration && gapStart < workEndToday) {
+          // Found a valid slot!
+          // Add 15 min buffer after previous appointment end if applicable
+          if (i > 0) {
+            const bufferStart = new Date(busyPeriods[i - 1].end.getTime() + 15 * 60 * 1000);
+            if (bufferStart > gapStart && bufferStart.getTime() + duration * 60 * 1000 <= gapEnd.getTime()) {
+              gapStart = bufferStart;
+            }
+          }
+
+          // Round to nearest 15 minutes
+          const minutes = gapStart.getMinutes();
+          const roundedMinutes = Math.ceil(minutes / 15) * 15;
+          gapStart.setMinutes(roundedMinutes, 0, 0);
+
+          // Make sure we still fit after rounding
+          if (gapStart.getTime() + duration * 60 * 1000 <= gapEnd.getTime() &&
+              gapStart.getTime() + duration * 60 * 1000 <= workEndToday.getTime()) {
+            const timeStr = `${String(gapStart.getHours()).padStart(2, "0")}:${String(gapStart.getMinutes()).padStart(2, "0")}`;
+            nextAvailable = {
+              time: timeStr,
+              timeFormatted: formatTime(gapStart),
+            };
+            break;
+          }
+        }
+      }
+    }
+
     return NextResponse.json({
       hasConflict,
       conflicts,
@@ -123,6 +209,7 @@ export async function GET(req: NextRequest) {
       date,
       time,
       duration,
+      nextAvailable,
     });
   } catch (error) {
     console.error("Check conflict error:", error);

@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-type Step = "customer" | "pet" | "datetime" | "details";
+type Step = "customer" | "pet" | "details" | "datetime";
 
 interface Customer {
   id: string;
@@ -76,6 +76,10 @@ interface ConflictCheck {
   }>;
   proposedStart: string;
   proposedEnd: string;
+  nextAvailable: {
+    time: string;
+    timeFormatted: string;
+  } | null;
 }
 
 const LARGE_DOG_WEIGHT_THRESHOLD = 50;
@@ -295,7 +299,7 @@ function NewAppointmentContent() {
         setAppointmentData({ ...appointmentData, petId: pet.id, serviceMinutes: 120, price: 105 });
       }
     }
-    setCurrentStep("datetime");
+    setCurrentStep("details"); // Go to details step now (before datetime)
   };
 
   const serviceTypes = [
@@ -338,8 +342,8 @@ function NewAppointmentContent() {
   const steps = [
     { id: "customer", label: "Customer", active: currentStep === "customer" },
     { id: "pet", label: "Pet", active: currentStep === "pet" },
-    { id: "datetime", label: "Time", active: currentStep === "datetime" },
     { id: "details", label: "Details", active: currentStep === "details" },
+    { id: "datetime", label: "Time", active: currentStep === "datetime" },
   ];
 
   // Get today's date as minimum (allow same-day appointments)
@@ -545,9 +549,27 @@ function NewAppointmentContent() {
           </div>
         )}
 
-        {/* Step 3: Date & Time */}
+        {/* Step 4: Date & Time - Final step, now knows exact duration */}
         {currentStep === "datetime" && (
           <div className="space-y-6">
+            {/* Service summary - shows what was selected in previous step */}
+            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+              <p className="text-sm font-medium text-blue-900">Service Details</p>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="text-lg">
+                  {serviceTypes.find(s => s.value === appointmentData.serviceType)?.emoji || "💇"}
+                </span>
+                <div>
+                  <p className="text-blue-700 font-medium">
+                    {serviceTypes.find(s => s.value === appointmentData.serviceType)?.label || "Full Groom"}
+                  </p>
+                  <p className="text-xs text-blue-600">
+                    {appointmentData.serviceMinutes} minutes • ${appointmentData.price}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Area Day Suggestion */}
             {areaSuggestion?.customer?.serviceAreaName && areaSuggestion.suggestedDays.length > 0 && (
               <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
@@ -800,7 +822,7 @@ function NewAppointmentContent() {
                           Time Conflict Detected
                         </span>
                         <p className="text-xs mt-1 text-red-700">
-                          Your proposed appointment ({conflictCheck.proposedStart} - {conflictCheck.proposedEnd}) overlaps with:
+                          Your {appointmentData.serviceMinutes}-minute appointment ({conflictCheck.proposedStart} - {conflictCheck.proposedEnd}) overlaps with:
                         </p>
                         <ul className="mt-2 space-y-1">
                           {conflictCheck.conflicts.map((conflict) => (
@@ -810,9 +832,27 @@ function NewAppointmentContent() {
                             </li>
                           ))}
                         </ul>
-                        <p className="text-xs mt-2 text-red-600 font-medium">
-                          Please select a different time that doesn&apos;t overlap with existing appointments.
-                        </p>
+
+                        {/* Suggest next available time */}
+                        {conflictCheck.nextAvailable ? (
+                          <div className="mt-3 p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                            <p className="text-xs text-emerald-800 font-medium mb-2">
+                              Next available slot: {conflictCheck.nextAvailable.timeFormatted}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setAppointmentData({ ...appointmentData, time: conflictCheck.nextAvailable!.time })}
+                              className="w-full btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0"
+                            >
+                              <CalendarIcon className="h-4 w-4" />
+                              Use {conflictCheck.nextAvailable.timeFormatted}
+                            </button>
+                          </div>
+                        ) : (
+                          <p className="text-xs mt-2 text-red-600 font-medium">
+                            No available slots found on this date. Please try a different date.
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -834,27 +874,33 @@ function NewAppointmentContent() {
 
             <div className="flex gap-3">
               <button
-                onClick={() => setCurrentStep("pet")}
+                onClick={() => setCurrentStep("details")}
                 className="btn flex-1 h-12"
               >
                 Back
               </button>
               <button
-                onClick={() => setCurrentStep("details")}
-                disabled={!appointmentData.date || !appointmentData.time || conflictCheck?.hasConflict || isCheckingConflict}
+                onClick={handleSubmit}
+                disabled={!appointmentData.date || !appointmentData.time || conflictCheck?.hasConflict || isCheckingConflict || isLoading}
                 className="btn flex-1 h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 disabled:bg-gray-300 disabled:text-gray-500"
               >
                 {isCheckingConflict ? (
                   <span className="loading loading-spinner loading-sm"></span>
+                ) : isLoading ? (
+                  <span className="loading loading-spinner"></span>
                 ) : (
-                  "Next"
+                  <>
+                    <Check className="h-4 w-4" />
+                    <span className="hidden sm:inline">Schedule Appointment</span>
+                    <span className="sm:hidden">Schedule</span>
+                  </>
                 )}
               </button>
             </div>
           </div>
         )}
 
-        {/* Step 4: Service Details */}
+        {/* Step 3: Service Details - Now comes before Time */}
         {currentStep === "details" && (
           <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
@@ -957,25 +1003,16 @@ function NewAppointmentContent() {
 
             <div className="flex gap-3">
               <button
-                onClick={() => setCurrentStep("datetime")}
+                onClick={() => setCurrentStep("pet")}
                 className="btn flex-1 h-12"
               >
                 Back
               </button>
               <button
-                onClick={handleSubmit}
-                disabled={isLoading}
+                onClick={() => setCurrentStep("datetime")}
                 className="btn flex-1 h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
               >
-                {isLoading ? (
-                  <span className="loading loading-spinner"></span>
-                ) : (
-                  <>
-                    <Check className="h-4 w-4" />
-                    <span className="hidden sm:inline">Schedule Appointment</span>
-                    <span className="sm:hidden">Schedule</span>
-                  </>
-                )}
+                Next
               </button>
             </div>
           </div>
