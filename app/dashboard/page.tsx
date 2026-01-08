@@ -256,24 +256,24 @@ function getContextualGreeting(stats: TodaysStats | null, userName?: string | nu
 }
 
 // Get day status color based on appointments and progress
-function getDayStatusColor(stats: TodaysStats | null): { color: string; label: string } {
+function getDayStatusColor(stats: TodaysStats | null): { color: string; label: string; showCalmLink: boolean } {
   if (!stats || !stats.hasData || stats.totalAppointments === 0) {
-    return { color: 'bg-gray-400', label: 'No appointments' };
+    return { color: 'bg-gray-400', label: 'No appointments', showCalmLink: false };
   }
 
   if (stats.dayStatus === 'completed') {
-    return { color: 'bg-emerald-500', label: 'Day complete' };
+    return { color: 'bg-emerald-500', label: 'Day complete', showCalmLink: false };
   }
 
   // Calculate workload status
   const remaining = stats.appointments;
   if (remaining <= 2) {
-    return { color: 'bg-emerald-500', label: 'Smooth day' };
+    return { color: 'bg-emerald-500', label: 'Smooth day', showCalmLink: false };
   }
   if (remaining <= 5) {
-    return { color: 'bg-amber-500', label: 'Busy day' };
+    return { color: 'bg-amber-500', label: 'Busy day', showCalmLink: true };
   }
-  return { color: 'bg-red-500', label: 'Heavy day' };
+  return { color: 'bg-red-500', label: 'Heavy day', showCalmLink: true };
 }
 
 function DashboardContent() {
@@ -731,10 +731,21 @@ function DashboardContent() {
             </div>
             {/* Day Status Indicator - Below greeting on mobile */}
             {stats?.hasData && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full w-fit">
-                <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dayStatus.color}`}></div>
-                <span className="text-sm text-gray-600 whitespace-nowrap">{dayStatus.label}</span>
-              </div>
+              dayStatus.showCalmLink ? (
+                <Link
+                  href="/dashboard/calm"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-full w-fit transition-colors group"
+                >
+                  <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dayStatus.color} animate-pulse`}></div>
+                  <span className="text-sm text-gray-600 whitespace-nowrap group-hover:text-gray-900">{dayStatus.label}</span>
+                  <Heart className="h-3.5 w-3.5 text-gray-400 group-hover:text-pink-500 transition-colors" />
+                </Link>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full w-fit">
+                  <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dayStatus.color}`}></div>
+                  <span className="text-sm text-gray-600 whitespace-nowrap">{dayStatus.label}</span>
+                </div>
+              )
             )}
           </div>
         </div>

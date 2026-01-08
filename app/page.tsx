@@ -650,6 +650,7 @@ export default function Home() {
                     "Workload protection limits",
                     "Working hours warnings",
                     "Running late notifications",
+                    "Calm Center (stress relief tools)",
                     "Pet behavior flags",
                     "Customer cancellation history",
                     "Priority support",
