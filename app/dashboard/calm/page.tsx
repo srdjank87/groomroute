@@ -23,6 +23,8 @@ import {
   MessageSquare,
   Minus,
   Plus,
+  Navigation,
+  AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -176,6 +178,29 @@ interface BreakDuration {
   description: string;
 }
 
+interface TravelRiskSegment {
+  id: string;
+  fromCustomer: string;
+  fromAddress: string;
+  fromEndTime: string;
+  toCustomer: string;
+  toAddress: string;
+  toStartTime: string;
+  gapMinutes: number;
+  estimatedTravelMinutes: number;
+  riskLevel: "tight" | "risky" | "impossible";
+  suggestion: string;
+}
+
+interface TravelRiskSummary {
+  totalSegments: number;
+  riskySegments: number;
+  impossibleCount: number;
+  riskyCount: number;
+  tightCount: number;
+  message: string;
+}
+
 function CalmCenterContent() {
   const { data: session } = useSession();
   const [data, setData] = useState<CalmCenterData | null>(null);
@@ -264,6 +289,12 @@ function CalmCenterContent() {
   const [isLoadingBreather, setIsLoadingBreather] = useState(false);
   const [breakTaken, setBreakTaken] = useState(false);
   const [breakMessage, setBreakMessage] = useState("");
+
+  // Travel Risk modal state
+  const [showTravelRiskModal, setShowTravelRiskModal] = useState(false);
+  const [travelRiskSegments, setTravelRiskSegments] = useState<TravelRiskSegment[]>([]);
+  const [travelRiskSummary, setTravelRiskSummary] = useState<TravelRiskSummary | null>(null);
+  const [isLoadingTravelRisk, setIsLoadingTravelRisk] = useState(false);
 
   useEffect(() => {
     async function fetchCalmCenterData() {
@@ -847,6 +878,43 @@ function CalmCenterContent() {
     }
   }
 
+  // Open Travel Risk modal
+  async function openTravelRiskModal() {
+    setShowTravelRiskModal(true);
+    setIsLoadingTravelRisk(true);
+
+    try {
+      const response = await fetch("/api/calm/travel-risk");
+      if (response.ok) {
+        const result = await response.json();
+        setTravelRiskSegments(result.segments || []);
+        setTravelRiskSummary(result.summary || null);
+      } else {
+        toast.error("Failed to analyze travel risks");
+      }
+    } catch (error) {
+      console.error("Travel risk fetch error:", error);
+      toast.error("Failed to analyze travel risks");
+    } finally {
+      setIsLoadingTravelRisk(false);
+    }
+  }
+
+  // Handle travel risk actions
+  function handleTravelRiskAction(action: string) {
+    if (action === "add_buffer") {
+      // Close travel risk modal and open lighten day modal
+      setShowTravelRiskModal(false);
+      openLightenDayModal();
+    } else if (action === "optimize_route") {
+      // Navigate to routes page
+      window.location.href = "/dashboard/routes";
+    } else if (action === "view_map") {
+      // Navigate to routes page
+      window.location.href = "/dashboard/routes";
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -960,19 +1028,50 @@ function CalmCenterContent() {
           </h2>
 
           <div className="space-y-3">
-            {data.quickRescues.map((rescue) => (
+            {data.quickRescues.map((rescue) => {
+              // Determine border color based on rescue type
+              const borderColor = rescue.type === "travel_risk" ? "border-orange-500" :
+                rescue.type === "running_behind" ? "border-red-500" :
+                rescue.type === "schedule_gap" ? "border-blue-500" :
+                "border-purple-500";
+
+              // Determine button action based on rescue type
+              const handleRescueAction = () => {
+                switch (rescue.type) {
+                  case "travel_risk":
+                    openTravelRiskModal();
+                    break;
+                  case "running_behind":
+                    openLightenDayModal();
+                    break;
+                  case "schedule_gap":
+                    openBreatherModal();
+                    break;
+                  case "missing_confirmations":
+                    openContactModal();
+                    break;
+                  default:
+                    break;
+                }
+              };
+
+              return (
               <div
                 key={rescue.id}
-                className="bg-white rounded-lg shadow-md border-l-4 border-purple-500 p-5"
+                className={`bg-white rounded-lg shadow-md border-l-4 ${borderColor} p-5`}
               >
                 <h3 className="font-semibold text-gray-900 mb-2">{rescue.title}</h3>
                 <p className="text-gray-600 text-sm mb-4">{rescue.description}</p>
-                <button className="btn btn-primary btn-block">
+                <button
+                  onClick={handleRescueAction}
+                  className="btn btn-primary btn-block border-2 border-purple-600"
+                >
                   <CheckCircle className="h-5 w-5" />
                   {rescue.action}
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -2415,6 +2514,158 @@ function CalmCenterContent() {
                 className="btn w-full bg-gray-200 hover:bg-gray-300 text-gray-700 border-0"
               >
                 {breakTaken ? "Done" : "Close"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Travel Risk Modal - "Fix My Route" */}
+      {showTravelRiskModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 text-white">
+                  <Navigation className="h-6 w-6" />
+                  <h3 className="text-xl font-bold">Travel Time Risk</h3>
+                </div>
+                <button
+                  onClick={() => setShowTravelRiskModal(false)}
+                  className="text-white/80 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {isLoadingTravelRisk ? (
+                <div className="flex items-center justify-center py-12">
+                  <span className="loading loading-spinner loading-lg text-orange-500"></span>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Summary */}
+                  {travelRiskSummary && (
+                    <div className={`p-4 rounded-lg ${
+                      travelRiskSummary.impossibleCount > 0 ? "bg-red-50 border border-red-200" :
+                      travelRiskSummary.riskyCount > 0 ? "bg-orange-50 border border-orange-200" :
+                      travelRiskSummary.tightCount > 0 ? "bg-amber-50 border border-amber-200" :
+                      "bg-green-50 border border-green-200"
+                    }`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className={`h-5 w-5 ${
+                          travelRiskSummary.impossibleCount > 0 ? "text-red-600" :
+                          travelRiskSummary.riskyCount > 0 ? "text-orange-600" :
+                          travelRiskSummary.tightCount > 0 ? "text-amber-600" :
+                          "text-green-600"
+                        }`} />
+                        <p className="font-semibold">{travelRiskSummary.message}</p>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        {travelRiskSummary.riskySegments} of {travelRiskSummary.totalSegments} segments need attention
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Risk Segments */}
+                  {travelRiskSegments.length > 0 ? (
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3">Problem Areas:</h4>
+                      <div className="space-y-3">
+                        {travelRiskSegments.map((segment) => (
+                          <div
+                            key={segment.id}
+                            className={`rounded-lg p-4 border-l-4 ${
+                              segment.riskLevel === "impossible" ? "bg-red-50 border-red-500" :
+                              segment.riskLevel === "risky" ? "bg-orange-50 border-orange-500" :
+                              "bg-amber-50 border-amber-500"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                    segment.riskLevel === "impossible" ? "bg-red-200 text-red-800" :
+                                    segment.riskLevel === "risky" ? "bg-orange-200 text-orange-800" :
+                                    "bg-amber-200 text-amber-800"
+                                  }`}>
+                                    {segment.riskLevel === "impossible" ? "Impossible" :
+                                     segment.riskLevel === "risky" ? "High Risk" : "Tight"}
+                                  </span>
+                                  <span className="text-sm text-gray-500">
+                                    {segment.gapMinutes} min gap
+                                  </span>
+                                </div>
+                                <p className="font-medium text-gray-900">
+                                  {segment.fromCustomer} → {segment.toCustomer}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  {segment.fromEndTime} → {segment.toStartTime}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-700 mt-2">{segment.suggestion}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="h-8 w-8 text-green-600" />
+                      </div>
+                      <p className="text-gray-600">Your route looks good! All travel times are adequate.</p>
+                    </div>
+                  )}
+
+                  {/* Quick Actions */}
+                  {travelRiskSegments.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3">Quick Fixes:</h4>
+                      <div className="grid gap-2">
+                        <button
+                          onClick={() => handleTravelRiskAction("add_buffer")}
+                          className="flex items-center gap-3 p-4 bg-white rounded-lg border-2 border-orange-200 hover:border-orange-400 transition text-left"
+                        >
+                          <div className="p-2 bg-orange-100 rounded-lg">
+                            <Clock className="h-5 w-5 text-orange-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">Add Buffer Time</p>
+                            <p className="text-sm text-gray-600">Automatically add buffer between appointments</p>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => handleTravelRiskAction("optimize_route")}
+                          className="flex items-center gap-3 p-4 bg-white rounded-lg border-2 border-blue-200 hover:border-blue-400 transition text-left"
+                        >
+                          <div className="p-2 bg-blue-100 rounded-lg">
+                            <Navigation className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">Go to Routes Page</p>
+                            <p className="text-sm text-gray-600">Optimize route order or reschedule appointments</p>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t px-6 py-4 bg-gray-50">
+              <button
+                onClick={() => setShowTravelRiskModal(false)}
+                className="btn w-full bg-gray-200 hover:bg-gray-300 text-gray-700 border-0"
+              >
+                Close
               </button>
             </div>
           </div>
