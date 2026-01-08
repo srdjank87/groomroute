@@ -97,6 +97,85 @@ interface NoShowAppointment {
   isRepeatOffender: boolean;
 }
 
+interface LightenDaySuggestion {
+  id: string;
+  type: "reschedule" | "shorten" | "delegate" | "break";
+  title: string;
+  description: string;
+  action: string;
+  appointmentId?: string;
+  customerName?: string;
+  petName?: string;
+  time?: string;
+  impact: string;
+}
+
+interface LightenDayAppointment {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  petName?: string;
+  formattedTime: string;
+  status: string;
+  canReschedule: boolean;
+}
+
+interface MessageTemplate {
+  id: string;
+  category: string;
+  title: string;
+  preview: string;
+  message: string;
+}
+
+interface ReplyHelpCustomer {
+  id: string;
+  appointmentId: string;
+  name: string;
+  phone: string;
+  petName?: string;
+  time: string;
+}
+
+interface UpsetScenario {
+  id: string;
+  title: string;
+  description: string;
+  suggestedResponses: {
+    id: string;
+    tone: "empathetic" | "professional" | "apologetic";
+    label: string;
+    message: string;
+  }[];
+}
+
+interface ProtectEveningOption {
+  id: string;
+  label: string;
+  description: string;
+  hour: number;
+  appointmentsAffected: number;
+}
+
+interface BreakSlot {
+  id: string;
+  afterAppointmentId: string;
+  afterCustomerName: string;
+  beforeAppointmentId?: string;
+  beforeCustomerName?: string;
+  startTime: string;
+  endTime: string;
+  duration: number;
+  suggestedBreakDuration: number;
+  type: "gap" | "extend" | "end";
+}
+
+interface BreakDuration {
+  minutes: number;
+  label: string;
+  description: string;
+}
+
 function CalmCenterContent() {
   const { data: session } = useSession();
   const [data, setData] = useState<CalmCenterData | null>(null);
@@ -135,6 +214,49 @@ function CalmCenterContent() {
     status: string;
   }[]>([]);
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
+
+  // Lighten Day modal state
+  const [showLightenDayModal, setShowLightenDayModal] = useState(false);
+  const [lightenDaySuggestions, setLightenDaySuggestions] = useState<LightenDaySuggestion[]>([]);
+  const [lightenDayAppointments, setLightenDayAppointments] = useState<LightenDayAppointment[]>([]);
+  const [lightenDayAssessment, setLightenDayAssessment] = useState<{ status: string; message: string } | null>(null);
+  const [isLoadingLightenDay, setIsLoadingLightenDay] = useState(false);
+
+  // Reply Help modal state
+  const [showReplyHelpModal, setShowReplyHelpModal] = useState(false);
+  const [replyTemplates, setReplyTemplates] = useState<MessageTemplate[]>([]);
+  const [replyCustomers, setReplyCustomers] = useState<ReplyHelpCustomer[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<MessageTemplate | null>(null);
+  const [selectedReplyCustomer, setSelectedReplyCustomer] = useState<ReplyHelpCustomer | null>(null);
+  const [customizedMessage, setCustomizedMessage] = useState("");
+  const [isLoadingReplyHelp, setIsLoadingReplyHelp] = useState(false);
+
+  // Upset Customer modal state
+  const [showUpsetModal, setShowUpsetModal] = useState(false);
+  const [upsetScenarios, setUpsetScenarios] = useState<UpsetScenario[]>([]);
+  const [upsetCustomers, setUpsetCustomers] = useState<ReplyHelpCustomer[]>([]);
+  const [selectedScenario, setSelectedScenario] = useState<UpsetScenario | null>(null);
+  const [selectedUpsetCustomer, setSelectedUpsetCustomer] = useState<ReplyHelpCustomer | null>(null);
+  const [selectedUpsetResponse, setSelectedUpsetResponse] = useState<string>("");
+  const [isLoadingUpset, setIsLoadingUpset] = useState(false);
+
+  // Protect Evening modal state
+  const [showProtectEveningModal, setShowProtectEveningModal] = useState(false);
+  const [protectEveningOptions, setProtectEveningOptions] = useState<ProtectEveningOption[]>([]);
+  const [currentEndHour, setCurrentEndHour] = useState<number>(18);
+  const [estimatedEndTime, setEstimatedEndTime] = useState<string | null>(null);
+  const [isLoadingProtectEvening, setIsLoadingProtectEvening] = useState(false);
+  const [isSavingProtectEvening, setIsSavingProtectEvening] = useState(false);
+
+  // Breather modal state
+  const [showBreatherModal, setShowBreatherModal] = useState(false);
+  const [breakSlots, setBreakSlots] = useState<BreakSlot[]>([]);
+  const [breakDurations, setBreakDurations] = useState<BreakDuration[]>([]);
+  const [selectedBreakSlot, setSelectedBreakSlot] = useState<BreakSlot | null>(null);
+  const [selectedBreakDuration, setSelectedBreakDuration] = useState<number>(15);
+  const [isLoadingBreather, setIsLoadingBreather] = useState(false);
+  const [breakTaken, setBreakTaken] = useState(false);
+  const [breakMessage, setBreakMessage] = useState("");
 
   useEffect(() => {
     async function fetchCalmCenterData() {
@@ -407,6 +529,271 @@ function CalmCenterContent() {
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`, "_blank");
   }
 
+  // Open Lighten Day modal
+  async function openLightenDayModal() {
+    setShowLightenDayModal(true);
+    setIsLoadingLightenDay(true);
+
+    try {
+      const response = await fetch("/api/calm/lighten-day");
+      if (response.ok) {
+        const result = await response.json();
+        setLightenDaySuggestions(result.suggestions);
+        setLightenDayAppointments(result.appointments);
+        setLightenDayAssessment(result.dayAssessment);
+        setContactMethods(result.contactMethods || ["sms", "call"]);
+      } else {
+        toast.error("Failed to analyze your day");
+      }
+    } catch (error) {
+      console.error("Lighten day fetch error:", error);
+      toast.error("Failed to analyze your day");
+    } finally {
+      setIsLoadingLightenDay(false);
+    }
+  }
+
+  function sendRescheduleMessage(phone: string, customerName: string, petName?: string, method: "sms" | "whatsapp" = "sms") {
+    const message = `Hi ${customerName}! I'm having a packed day and want to give ${petName || "your pet"} my full attention. Would you be open to rescheduling to tomorrow or later this week? I'll prioritize you!`;
+    const encodedMessage = encodeURIComponent(message);
+
+    if (method === "sms") {
+      window.location.href = `sms:${phone}?body=${encodedMessage}`;
+    } else {
+      const cleanPhone = phone.replace(/\D/g, "");
+      window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
+    }
+  }
+
+  // Open Reply Help modal
+  async function openReplyHelpModal() {
+    setShowReplyHelpModal(true);
+    setIsLoadingReplyHelp(true);
+    setSelectedTemplate(null);
+    setSelectedReplyCustomer(null);
+    setCustomizedMessage("");
+
+    try {
+      const response = await fetch("/api/calm/reply-help");
+      if (response.ok) {
+        const result = await response.json();
+        setReplyTemplates(result.templates);
+        setReplyCustomers(result.customers);
+        setContactMethods(result.contactMethods || ["sms", "call"]);
+      } else {
+        toast.error("Failed to load message templates");
+      }
+    } catch (error) {
+      console.error("Reply help fetch error:", error);
+      toast.error("Failed to load message templates");
+    } finally {
+      setIsLoadingReplyHelp(false);
+    }
+  }
+
+  function selectTemplate(template: MessageTemplate) {
+    setSelectedTemplate(template);
+    // Pre-fill the customized message with placeholders replaced if customer is selected
+    if (selectedReplyCustomer) {
+      const msg = template.message
+        .replace(/\[CUSTOMER\]/g, selectedReplyCustomer.name)
+        .replace(/\[PET\]/g, selectedReplyCustomer.petName || "your pet")
+        .replace(/\[TIME\]/g, selectedReplyCustomer.time);
+      setCustomizedMessage(msg);
+    } else {
+      setCustomizedMessage(template.message);
+    }
+  }
+
+  function selectReplyCustomer(customer: ReplyHelpCustomer) {
+    setSelectedReplyCustomer(customer);
+    // Update message with customer info if template is selected
+    if (selectedTemplate) {
+      const msg = selectedTemplate.message
+        .replace(/\[CUSTOMER\]/g, customer.name)
+        .replace(/\[PET\]/g, customer.petName || "your pet")
+        .replace(/\[TIME\]/g, customer.time);
+      setCustomizedMessage(msg);
+    }
+  }
+
+  function sendReplyMessage(method: "sms" | "whatsapp") {
+    if (!selectedReplyCustomer || !customizedMessage) {
+      toast.error("Please select a customer and message");
+      return;
+    }
+
+    const encodedMessage = encodeURIComponent(customizedMessage);
+    const phone = selectedReplyCustomer.phone;
+
+    if (method === "sms") {
+      window.location.href = `sms:${phone}?body=${encodedMessage}`;
+    } else {
+      const cleanPhone = phone.replace(/\D/g, "");
+      window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
+    }
+  }
+
+  // Open Upset Customer modal
+  async function openUpsetModal() {
+    setShowUpsetModal(true);
+    setIsLoadingUpset(true);
+    setSelectedScenario(null);
+    setSelectedUpsetCustomer(null);
+    setSelectedUpsetResponse("");
+
+    try {
+      const response = await fetch("/api/calm/upset-customer");
+      if (response.ok) {
+        const result = await response.json();
+        setUpsetScenarios(result.scenarios);
+        setUpsetCustomers(result.customers);
+        setContactMethods(result.contactMethods || ["sms", "call"]);
+      } else {
+        toast.error("Failed to load responses");
+      }
+    } catch (error) {
+      console.error("Upset customer fetch error:", error);
+      toast.error("Failed to load responses");
+    } finally {
+      setIsLoadingUpset(false);
+    }
+  }
+
+  function selectUpsetScenario(scenario: UpsetScenario) {
+    setSelectedScenario(scenario);
+    setSelectedUpsetResponse("");
+  }
+
+  function selectUpsetResponse(responseMessage: string) {
+    // Replace placeholders with customer info if selected
+    if (selectedUpsetCustomer) {
+      const msg = responseMessage
+        .replace(/\[CUSTOMER\]/g, selectedUpsetCustomer.name)
+        .replace(/\[PET\]/g, selectedUpsetCustomer.petName || "your pet")
+        .replace(/\[TIME\]/g, selectedUpsetCustomer.time);
+      setSelectedUpsetResponse(msg);
+    } else {
+      setSelectedUpsetResponse(responseMessage);
+    }
+  }
+
+  function sendUpsetResponse(method: "sms" | "whatsapp") {
+    if (!selectedUpsetCustomer || !selectedUpsetResponse) {
+      toast.error("Please select a customer and response");
+      return;
+    }
+
+    const encodedMessage = encodeURIComponent(selectedUpsetResponse);
+    const phone = selectedUpsetCustomer.phone;
+
+    if (method === "sms") {
+      window.location.href = `sms:${phone}?body=${encodedMessage}`;
+    } else {
+      const cleanPhone = phone.replace(/\D/g, "");
+      window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
+    }
+  }
+
+  // Open Protect Evening modal
+  async function openProtectEveningModal() {
+    setShowProtectEveningModal(true);
+    setIsLoadingProtectEvening(true);
+
+    try {
+      const response = await fetch("/api/calm/protect-evening");
+      if (response.ok) {
+        const result = await response.json();
+        setProtectEveningOptions(result.protectionOptions);
+        setCurrentEndHour(result.currentEndHourSetting);
+        setEstimatedEndTime(result.formattedEstimatedEndTime);
+        setContactMethods(result.contactMethods || ["sms", "call"]);
+      } else {
+        toast.error("Failed to load evening protection options");
+      }
+    } catch (error) {
+      console.error("Protect evening fetch error:", error);
+      toast.error("Failed to load evening protection options");
+    } finally {
+      setIsLoadingProtectEvening(false);
+    }
+  }
+
+  async function saveEveningProtection(endHour: number) {
+    setIsSavingProtectEvening(true);
+
+    try {
+      const response = await fetch("/api/calm/protect-evening", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endHour }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setCurrentEndHour(endHour);
+        toast.success(result.message);
+      } else {
+        toast.error("Failed to update evening protection");
+      }
+    } catch (error) {
+      console.error("Save evening protection error:", error);
+      toast.error("Failed to update evening protection");
+    } finally {
+      setIsSavingProtectEvening(false);
+    }
+  }
+
+  // Open Breather modal
+  async function openBreatherModal() {
+    setShowBreatherModal(true);
+    setIsLoadingBreather(true);
+    setBreakTaken(false);
+    setBreakMessage("");
+    setSelectedBreakSlot(null);
+
+    try {
+      const response = await fetch("/api/calm/breather");
+      if (response.ok) {
+        const result = await response.json();
+        setBreakSlots(result.breakSlots);
+        setBreakDurations(result.breakDurations);
+      } else {
+        toast.error("Failed to find break slots");
+      }
+    } catch (error) {
+      console.error("Breather fetch error:", error);
+      toast.error("Failed to find break slots");
+    } finally {
+      setIsLoadingBreather(false);
+    }
+  }
+
+  async function takeBreak() {
+    try {
+      const response = await fetch("/api/calm/breather", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          breakDuration: selectedBreakDuration,
+          afterAppointmentId: selectedBreakSlot?.afterAppointmentId,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setBreakTaken(true);
+        setBreakMessage(result.message);
+        toast.success("Break time! Enjoy your rest.");
+      } else {
+        toast.error("Failed to log break");
+      }
+    } catch (error) {
+      console.error("Take break error:", error);
+      toast.error("Failed to log break");
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -537,7 +924,10 @@ function CalmCenterContent() {
               <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
             </button>
 
-            <button className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left">
+            <button
+              onClick={openLightenDayModal}
+              className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left w-full"
+            >
               <div className="p-3 bg-orange-100 rounded-lg flex-shrink-0">
                 <Battery className="h-6 w-6 text-orange-600" />
               </div>
@@ -592,7 +982,10 @@ function CalmCenterContent() {
             Tough Conversations
           </h3>
           <div className="grid grid-cols-1 gap-3">
-            <button className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left">
+            <button
+              onClick={openReplyHelpModal}
+              className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left w-full"
+            >
               <div className="p-3 bg-green-100 rounded-lg flex-shrink-0">
                 <MessageCircle className="h-6 w-6 text-green-600" />
               </div>
@@ -603,7 +996,10 @@ function CalmCenterContent() {
               <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
             </button>
 
-            <button className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left">
+            <button
+              onClick={openUpsetModal}
+              className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left w-full"
+            >
               <div className="p-3 bg-pink-100 rounded-lg flex-shrink-0">
                 <Heart className="h-6 w-6 text-pink-600" />
               </div>
@@ -622,7 +1018,10 @@ function CalmCenterContent() {
             Boundaries & Wellbeing
           </h3>
           <div className="grid grid-cols-1 gap-3">
-            <button className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left">
+            <button
+              onClick={openProtectEveningModal}
+              className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left w-full"
+            >
               <div className="p-3 bg-indigo-100 rounded-lg flex-shrink-0">
                 <Shield className="h-6 w-6 text-indigo-600" />
               </div>
@@ -633,7 +1032,10 @@ function CalmCenterContent() {
               <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
             </button>
 
-            <button className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left">
+            <button
+              onClick={openBreatherModal}
+              className="flex items-center gap-3 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 text-left w-full"
+            >
               <div className="p-3 bg-teal-100 rounded-lg flex-shrink-0">
                 <Coffee className="h-6 w-6 text-teal-600" />
               </div>
@@ -1243,6 +1645,635 @@ function CalmCenterContent() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lighten Day Modal - "Today Is Too Heavy" */}
+      {showLightenDayModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 text-white">
+                  <Battery className="h-6 w-6" />
+                  <h3 className="text-xl font-bold">Today Is Too Heavy</h3>
+                </div>
+                <button
+                  onClick={() => setShowLightenDayModal(false)}
+                  className="text-white/80 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {isLoadingLightenDay ? (
+                <div className="flex items-center justify-center py-12">
+                  <span className="loading loading-spinner loading-lg text-amber-500"></span>
+                </div>
+              ) : (
+                <>
+                  {/* Day Assessment */}
+                  {lightenDayAssessment && (
+                    <div className={`p-4 rounded-lg mb-6 ${
+                      lightenDayAssessment.status === "heavy" ? "bg-red-50 border border-red-200" :
+                      lightenDayAssessment.status === "moderate" ? "bg-amber-50 border border-amber-200" :
+                      "bg-green-50 border border-green-200"
+                    }`}>
+                      <p className="font-medium">{lightenDayAssessment.message}</p>
+                    </div>
+                  )}
+
+                  {/* Suggestions */}
+                  {lightenDaySuggestions.length > 0 ? (
+                    <div className="space-y-4 mb-6">
+                      <h4 className="font-semibold text-gray-700">Suggestions to lighten your day:</h4>
+                      {lightenDaySuggestions.map((suggestion) => (
+                        <div key={suggestion.id} className="bg-gray-50 rounded-lg p-4">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h5 className="font-medium text-gray-900">{suggestion.title}</h5>
+                              <p className="text-gray-600 text-sm mt-1">{suggestion.description}</p>
+                              {suggestion.customerName && (
+                                <p className="text-amber-600 text-sm mt-2">
+                                  {suggestion.customerName} {suggestion.petName && `(${suggestion.petName})`} at {suggestion.time}
+                                </p>
+                              )}
+                              <p className="text-green-600 text-xs mt-1">{suggestion.impact}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 text-center py-8">Your schedule looks manageable today!</p>
+                  )}
+
+                  {/* Appointments that can be rescheduled */}
+                  {lightenDayAppointments.filter(a => a.canReschedule).length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3">Appointments you could reschedule:</h4>
+                      <div className="space-y-3">
+                        {lightenDayAppointments.filter(a => a.canReschedule).map((apt) => (
+                          <div key={apt.id} className="bg-white border rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium">{apt.customerName}</p>
+                                <p className="text-sm text-gray-600">
+                                  {apt.petName && `${apt.petName} - `}{apt.formattedTime}
+                                </p>
+                              </div>
+                              <div className="flex gap-2">
+                                {contactMethods.includes("sms") && apt.customerPhone && (
+                                  <button
+                                    onClick={() => sendRescheduleMessage(apt.customerPhone, apt.customerName, apt.petName, "sms")}
+                                    className="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0"
+                                  >
+                                    <MessageSquare className="h-4 w-4" />
+                                    SMS
+                                  </button>
+                                )}
+                                {contactMethods.includes("whatsapp") && apt.customerPhone && (
+                                  <button
+                                    onClick={() => sendRescheduleMessage(apt.customerPhone, apt.customerName, apt.petName, "whatsapp")}
+                                    className="btn btn-sm bg-green-500 hover:bg-green-600 text-white border-0"
+                                  >
+                                    WhatsApp
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t px-6 py-4 bg-gray-50">
+              <button
+                onClick={() => setShowLightenDayModal(false)}
+                className="btn w-full bg-gray-200 hover:bg-gray-300 text-gray-700 border-0"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reply Help Modal - "Help me reply to this customer" */}
+      {showReplyHelpModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 text-white">
+                  <MessageCircle className="h-6 w-6" />
+                  <h3 className="text-xl font-bold">Help Me Reply</h3>
+                </div>
+                <button
+                  onClick={() => setShowReplyHelpModal(false)}
+                  className="text-white/80 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {isLoadingReplyHelp ? (
+                <div className="flex items-center justify-center py-12">
+                  <span className="loading loading-spinner loading-lg text-blue-500"></span>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Step 1: Select Customer */}
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3">1. Select Customer</h4>
+                    {replyCustomers.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {replyCustomers.map((customer) => (
+                          <button
+                            key={customer.id}
+                            onClick={() => selectReplyCustomer(customer)}
+                            className={`px-4 py-2 rounded-lg text-sm transition ${
+                              selectedReplyCustomer?.id === customer.id
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                            }`}
+                          >
+                            {customer.name} {customer.petName && `(${customer.petName})`}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm">No appointments today</p>
+                    )}
+                  </div>
+
+                  {/* Step 2: Select Template */}
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3">2. Choose a Message Template</h4>
+                    <div className="space-y-2">
+                      {Array.from(new Set(replyTemplates.map(t => t.category))).map(category => (
+                        <div key={category}>
+                          <p className="text-xs uppercase text-gray-500 mb-2">{category}</p>
+                          <div className="grid gap-2">
+                            {replyTemplates.filter(t => t.category === category).map(template => (
+                              <button
+                                key={template.id}
+                                onClick={() => selectTemplate(template)}
+                                className={`text-left p-3 rounded-lg transition ${
+                                  selectedTemplate?.id === template.id
+                                    ? "bg-blue-50 border-2 border-blue-500"
+                                    : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent"
+                                }`}
+                              >
+                                <p className="font-medium text-gray-900">{template.title}</p>
+                                <p className="text-sm text-gray-600 truncate">{template.preview}</p>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Step 3: Customize & Send */}
+                  {selectedTemplate && (
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3">3. Customize & Send</h4>
+                      <textarea
+                        value={customizedMessage}
+                        onChange={(e) => setCustomizedMessage(e.target.value)}
+                        className="textarea textarea-bordered w-full h-32"
+                        placeholder="Your message..."
+                      />
+                      <div className="flex gap-2 mt-3">
+                        {contactMethods.includes("sms") && selectedReplyCustomer && (
+                          <button
+                            onClick={() => sendReplyMessage("sms")}
+                            className="btn flex-1 bg-blue-500 hover:bg-blue-600 text-white border-0"
+                          >
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Send SMS
+                          </button>
+                        )}
+                        {contactMethods.includes("whatsapp") && selectedReplyCustomer && (
+                          <button
+                            onClick={() => sendReplyMessage("whatsapp")}
+                            className="btn flex-1 bg-green-500 hover:bg-green-600 text-white border-0"
+                          >
+                            Send WhatsApp
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t px-6 py-4 bg-gray-50">
+              <button
+                onClick={() => setShowReplyHelpModal(false)}
+                className="btn w-full bg-gray-200 hover:bg-gray-300 text-gray-700 border-0"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upset Customer Modal */}
+      {showUpsetModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-rose-500 to-pink-500 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 text-white">
+                  <Heart className="h-6 w-6" />
+                  <h3 className="text-xl font-bold">Customer Is Upset</h3>
+                </div>
+                <button
+                  onClick={() => setShowUpsetModal(false)}
+                  className="text-white/80 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {isLoadingUpset ? (
+                <div className="flex items-center justify-center py-12">
+                  <span className="loading loading-spinner loading-lg text-rose-500"></span>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Calming Tips */}
+                  <div className="bg-rose-50 rounded-lg p-4">
+                    <p className="font-medium text-rose-700 mb-2">Take a breath first:</p>
+                    <ul className="text-sm text-rose-600 space-y-1">
+                      <li>• Take a deep breath before responding</li>
+                      <li>• Acknowledge their feelings first</li>
+                      <li>• Focus on solutions, not excuses</li>
+                    </ul>
+                  </div>
+
+                  {/* Step 1: Select Customer */}
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3">1. Which Customer?</h4>
+                    {upsetCustomers.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {upsetCustomers.map((customer) => (
+                          <button
+                            key={customer.id}
+                            onClick={() => setSelectedUpsetCustomer(customer)}
+                            className={`px-4 py-2 rounded-lg text-sm transition ${
+                              selectedUpsetCustomer?.id === customer.id
+                                ? "bg-rose-500 text-white"
+                                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                            }`}
+                          >
+                            {customer.name} {customer.petName && `(${customer.petName})`}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm">No appointments today. You can still select a scenario below.</p>
+                    )}
+                  </div>
+
+                  {/* Step 2: What happened */}
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3">2. What Happened?</h4>
+                    <div className="grid gap-2">
+                      {upsetScenarios.map((scenario) => (
+                        <button
+                          key={scenario.id}
+                          onClick={() => selectUpsetScenario(scenario)}
+                          className={`text-left p-4 rounded-lg transition ${
+                            selectedScenario?.id === scenario.id
+                              ? "bg-rose-50 border-2 border-rose-500"
+                              : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent"
+                          }`}
+                        >
+                          <p className="font-medium text-gray-900">{scenario.title}</p>
+                          <p className="text-sm text-gray-600">{scenario.description}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Step 3: Choose Response Tone */}
+                  {selectedScenario && (
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3">3. Choose Your Response Tone</h4>
+                      <div className="grid gap-2">
+                        {selectedScenario.suggestedResponses.map((response) => (
+                          <button
+                            key={response.id}
+                            onClick={() => selectUpsetResponse(response.message)}
+                            className={`text-left p-4 rounded-lg transition ${
+                              selectedUpsetResponse.includes(response.message.substring(0, 20))
+                                ? "bg-rose-50 border-2 border-rose-500"
+                                : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent"
+                            }`}
+                          >
+                            <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-2 ${
+                              response.tone === "empathetic" ? "bg-blue-100 text-blue-700" :
+                              response.tone === "professional" ? "bg-gray-200 text-gray-700" :
+                              "bg-purple-100 text-purple-700"
+                            }`}>
+                              {response.label}
+                            </span>
+                            <p className="text-sm text-gray-700">{response.message}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 4: Send */}
+                  {selectedUpsetResponse && (
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3">4. Review & Send</h4>
+                      <div className="bg-gray-50 rounded-lg p-4 mb-3">
+                        <p className="text-sm text-gray-700">{selectedUpsetResponse}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        {contactMethods.includes("sms") && selectedUpsetCustomer && (
+                          <button
+                            onClick={() => sendUpsetResponse("sms")}
+                            className="btn flex-1 bg-rose-500 hover:bg-rose-600 text-white border-0"
+                          >
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Send SMS
+                          </button>
+                        )}
+                        {contactMethods.includes("whatsapp") && selectedUpsetCustomer && (
+                          <button
+                            onClick={() => sendUpsetResponse("whatsapp")}
+                            className="btn flex-1 bg-green-500 hover:bg-green-600 text-white border-0"
+                          >
+                            Send WhatsApp
+                          </button>
+                        )}
+                      </div>
+                      {!selectedUpsetCustomer && (
+                        <p className="text-sm text-gray-500 mt-2 text-center">Select a customer above to send</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t px-6 py-4 bg-gray-50">
+              <button
+                onClick={() => setShowUpsetModal(false)}
+                className="btn w-full bg-gray-200 hover:bg-gray-300 text-gray-700 border-0"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Protect Evening Modal */}
+      {showProtectEveningModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 text-white">
+                  <Shield className="h-6 w-6" />
+                  <h3 className="text-xl font-bold">Protect My Evening</h3>
+                </div>
+                <button
+                  onClick={() => setShowProtectEveningModal(false)}
+                  className="text-white/80 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {isLoadingProtectEvening ? (
+                <div className="flex items-center justify-center py-12">
+                  <span className="loading loading-spinner loading-lg text-indigo-500"></span>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Current Status */}
+                  <div className="bg-indigo-50 rounded-lg p-4">
+                    <p className="text-sm text-indigo-600">
+                      {estimatedEndTime
+                        ? `Your day currently ends around ${estimatedEndTime}`
+                        : "No appointments scheduled for today"
+                      }
+                    </p>
+                    <p className="text-sm text-indigo-500 mt-1">
+                      Current end time setting: {currentEndHour > 12 ? currentEndHour - 12 : currentEndHour}:00 {currentEndHour >= 12 ? "PM" : "AM"}
+                    </p>
+                  </div>
+
+                  {/* Protection Options */}
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3">Set your workday end time:</h4>
+                    <div className="space-y-2">
+                      {protectEveningOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => saveEveningProtection(option.hour)}
+                          disabled={isSavingProtectEvening}
+                          className={`w-full text-left p-4 rounded-lg transition border-2 ${
+                            currentEndHour === option.hour
+                              ? "bg-indigo-50 border-indigo-500"
+                              : "bg-gray-50 hover:bg-gray-100 border-transparent"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium text-gray-900">{option.label}</p>
+                              <p className="text-sm text-gray-600">{option.description}</p>
+                            </div>
+                            {option.appointmentsAffected > 0 && (
+                              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
+                                {option.appointmentsAffected} affected
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tips */}
+                  <div className="bg-purple-50 rounded-lg p-4">
+                    <p className="text-sm text-purple-700 font-medium mb-2">Why protect your evening?</p>
+                    <ul className="text-sm text-purple-600 space-y-1">
+                      <li>• Better work-life balance</li>
+                      <li>• Time for family and self-care</li>
+                      <li>• More energy for tomorrow</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t px-6 py-4 bg-gray-50">
+              <button
+                onClick={() => setShowProtectEveningModal(false)}
+                className="btn w-full bg-gray-200 hover:bg-gray-300 text-gray-700 border-0"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Breather Modal - "Give Me a Breather" */}
+      {showBreatherModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 text-white">
+                  <Coffee className="h-6 w-6" />
+                  <h3 className="text-xl font-bold">Take a Breather</h3>
+                </div>
+                <button
+                  onClick={() => setShowBreatherModal(false)}
+                  className="text-white/80 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {isLoadingBreather ? (
+                <div className="flex items-center justify-center py-12">
+                  <span className="loading loading-spinner loading-lg text-teal-500"></span>
+                </div>
+              ) : breakTaken ? (
+                /* Break Taken Confirmation */
+                <div className="text-center py-8">
+                  <div className="text-6xl mb-4">🧘</div>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">Enjoy Your Break!</h4>
+                  <p className="text-gray-600 mb-4">{breakMessage}</p>
+                  <p className="text-sm text-teal-600">
+                    You selected a {selectedBreakDuration}-minute break.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Available Break Slots */}
+                  {breakSlots.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-gray-700 mb-3">When to take a break:</h4>
+                      <div className="space-y-2">
+                        {breakSlots.map((slot) => (
+                          <button
+                            key={slot.id}
+                            onClick={() => setSelectedBreakSlot(slot)}
+                            className={`w-full text-left p-4 rounded-lg transition border-2 ${
+                              selectedBreakSlot?.id === slot.id
+                                ? "bg-teal-50 border-teal-500"
+                                : "bg-gray-50 hover:bg-gray-100 border-transparent"
+                            }`}
+                          >
+                            <p className="font-medium text-gray-900">
+                              After {slot.afterCustomerName}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {slot.startTime} - {slot.endTime}
+                              {slot.type === "gap" && ` (${slot.duration} min gap)`}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Break Duration Selection */}
+                  <div>
+                    <h4 className="font-semibold text-gray-700 mb-3">How long?</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {breakDurations.map((duration) => (
+                        <button
+                          key={duration.minutes}
+                          onClick={() => setSelectedBreakDuration(duration.minutes)}
+                          className={`p-3 rounded-lg text-left transition border-2 ${
+                            selectedBreakDuration === duration.minutes
+                              ? "bg-teal-50 border-teal-500"
+                              : "bg-gray-50 hover:bg-gray-100 border-transparent"
+                          }`}
+                        >
+                          <p className="font-medium text-gray-900">{duration.label}</p>
+                          <p className="text-xs text-gray-600">{duration.description}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Take Break Button */}
+                  <button
+                    onClick={takeBreak}
+                    className="btn w-full bg-teal-500 hover:bg-teal-600 text-white border-0"
+                  >
+                    <Coffee className="h-4 w-4 mr-2" />
+                    Start My {selectedBreakDuration}-Minute Break
+                  </button>
+
+                  {/* Tips */}
+                  <div className="bg-cyan-50 rounded-lg p-4">
+                    <p className="text-sm text-cyan-700 font-medium mb-2">Break ideas:</p>
+                    <ul className="text-sm text-cyan-600 space-y-1">
+                      <li>• Stretch and move around</li>
+                      <li>• Hydrate - drink some water</li>
+                      <li>• Step outside for fresh air</li>
+                      <li>• Close your eyes for a moment</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t px-6 py-4 bg-gray-50">
+              <button
+                onClick={() => setShowBreatherModal(false)}
+                className="btn w-full bg-gray-200 hover:bg-gray-300 text-gray-700 border-0"
+              >
+                {breakTaken ? "Done" : "Close"}
+              </button>
             </div>
           </div>
         </div>
