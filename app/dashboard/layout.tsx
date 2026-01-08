@@ -31,8 +31,8 @@ const mainNavigation = [
 ];
 
 const businessNavigation = [
-  { name: "Customers", href: "/dashboard/customers", icon: Users },
   { name: "Appointments", href: "/dashboard/appointments", icon: Calendar },
+  { name: "Customers", href: "/dashboard/customers", icon: Users },
 ];
 
 const supportNavigation = [
