@@ -468,21 +468,28 @@ export async function POST(req: NextRequest) {
       const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
       const selectedCustomers = shuffledCustomers.slice(0, numAppointments);
 
-      // Define appointment time slots (9 AM to 5 PM in local time)
-      const timeSlots = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+      // Generate appointments with realistic gaps between them
+      // Start at 9 AM and add service duration + drive time (15-25 min) between each
+      let currentMinutes = 9 * 60; // Start at 9:00 AM in minutes from midnight
 
       for (let i = 0; i < selectedCustomers.length; i++) {
         const { customer, pet, sampleData } = selectedCustomers[i];
 
-        // Assign staggered times based on index (ensures different times)
-        const hour = timeSlots[i % timeSlots.length];
+        // Calculate hour and minute from current minutes
+        const hour = Math.floor(currentMinutes / 60);
+        const minute = currentMinutes % 60;
 
         // Create date with explicit UTC timezone
         // We store times as UTC - the frontend will convert to local time for display
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const dayNum = String(date.getDate()).padStart(2, '0');
-        const appointmentTime = new Date(`${year}-${month}-${dayNum}T${String(hour).padStart(2, '0')}:00:00.000Z`);
+        const appointmentTime = new Date(`${year}-${month}-${dayNum}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00.000Z`);
+
+        // Calculate next appointment start time:
+        // Current appointment duration + drive/buffer time (15-25 minutes randomly)
+        const driveTime = Math.floor(Math.random() * 11) + 15; // 15-25 minutes
+        currentMinutes += sampleData.duration + driveTime;
 
         // Vary price slightly
         const basePrice = sampleData.duration >= 90 ? 85 : 65;
