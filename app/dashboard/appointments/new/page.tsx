@@ -65,6 +65,19 @@ interface WorkingHoursCheck {
   outsideReason: string;
 }
 
+interface ConflictCheck {
+  hasConflict: boolean;
+  conflicts: Array<{
+    id: string;
+    customerName: string;
+    petName: string;
+    startTime: string;
+    endTime: string;
+  }>;
+  proposedStart: string;
+  proposedEnd: string;
+}
+
 const LARGE_DOG_WEIGHT_THRESHOLD = 50;
 
 function NewAppointmentContent() {
@@ -96,6 +109,8 @@ function NewAppointmentContent() {
   const [largeDogWarningDismissed, setLargeDogWarningDismissed] = useState(false);
   const [workingHoursCheck, setWorkingHoursCheck] = useState<WorkingHoursCheck | null>(null);
   const [workingHoursWarningDismissed, setWorkingHoursWarningDismissed] = useState(false);
+  const [conflictCheck, setConflictCheck] = useState<ConflictCheck | null>(null);
+  const [isCheckingConflict, setIsCheckingConflict] = useState(false);
 
   const dateInputRef = useRef<HTMLInputElement>(null);
   const timeInputRef = useRef<HTMLInputElement>(null);
@@ -152,6 +167,28 @@ function NewAppointmentContent() {
       }
     } catch (error) {
       console.error("Failed to fetch working hours check:", error);
+    }
+  }, []);
+
+  // Fetch conflict check for date and time
+  const fetchConflictCheck = useCallback(async (date: string, time: string, duration: number) => {
+    if (!date || !time) {
+      setConflictCheck(null);
+      return;
+    }
+    setIsCheckingConflict(true);
+    try {
+      const response = await fetch(
+        `/api/appointments/check-conflict?date=${date}&time=${time}&duration=${duration}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setConflictCheck(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch conflict check:", error);
+    } finally {
+      setIsCheckingConflict(false);
     }
   }, []);
 
@@ -227,6 +264,15 @@ function NewAppointmentContent() {
       setWorkingHoursCheck(null);
     }
   }, [appointmentData.time, appointmentData.serviceMinutes, fetchWorkingHoursCheck]);
+
+  // Fetch conflict check when date, time, or duration changes
+  useEffect(() => {
+    if (appointmentData.date && appointmentData.time) {
+      fetchConflictCheck(appointmentData.date, appointmentData.time, appointmentData.serviceMinutes);
+    } else {
+      setConflictCheck(null);
+    }
+  }, [appointmentData.date, appointmentData.time, appointmentData.serviceMinutes, fetchConflictCheck]);
 
   // Helper to check if current booking would exceed limit
   const wouldExceedLargeDogLimit = () => {
@@ -434,7 +480,7 @@ function NewAppointmentContent() {
 
             {selectedCustomer.pets.length > 0 ? (
               <>
-                <h2 className="text-lg font-semibold text-gray-900">Who are we grooming today?</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Who are we grooming?</h2>
                 <div className="space-y-3">
                   {selectedCustomer.pets.map((pet) => (
                     <button
@@ -518,6 +564,21 @@ function NewAppointmentContent() {
                     <p className="text-sm text-emerald-700 mt-1">
                       <span className="font-medium">Best days to book:</span> {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(", ")}
                     </p>
+
+                    {/* Quick-apply suggested date button */}
+                    {areaSuggestion.nextSuggestedDate && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAppointmentData({ ...appointmentData, date: areaSuggestion.nextSuggestedDate! });
+                        }}
+                        className="mt-3 w-full btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0"
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                        Use Suggested Date: {format(new Date(areaSuggestion.nextSuggestedDate + 'T00:00:00'), "EEEE, MMM d")}
+                      </button>
+                    )}
+
                     <div className="mt-2 p-2 bg-emerald-100/50 rounded-lg">
                       <p className="text-xs text-emerald-800">
                         <span className="font-semibold">Why these days?</span> You work in {areaSuggestion.customer.serviceAreaName} on {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" and ")}.
@@ -718,6 +779,56 @@ function NewAppointmentContent() {
                     </div>
                   </div>
                 )}
+
+                {/* Conflict checking indicator */}
+                {isCheckingConflict && appointmentData.date && appointmentData.time && (
+                  <div className="mt-2 p-3 rounded-lg text-sm bg-gray-50 text-gray-600 border border-gray-200">
+                    <div className="flex items-center gap-2">
+                      <span className="loading loading-spinner loading-xs"></span>
+                      <p className="text-xs">Checking for scheduling conflicts...</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Conflict error - blocks booking */}
+                {conflictCheck?.hasConflict && (
+                  <div className="mt-2 p-3 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <span className="font-medium block">
+                          Time Conflict Detected
+                        </span>
+                        <p className="text-xs mt-1 text-red-700">
+                          Your proposed appointment ({conflictCheck.proposedStart} - {conflictCheck.proposedEnd}) overlaps with:
+                        </p>
+                        <ul className="mt-2 space-y-1">
+                          {conflictCheck.conflicts.map((conflict) => (
+                            <li key={conflict.id} className="text-xs text-red-700 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                              <span className="font-medium">{conflict.petName}</span> ({conflict.customerName}) - {conflict.startTime} to {conflict.endTime}
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="text-xs mt-2 text-red-600 font-medium">
+                          Please select a different time that doesn&apos;t overlap with existing appointments.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* No conflict - success indicator */}
+                {conflictCheck && !conflictCheck.hasConflict && appointmentData.date && appointmentData.time && !isCheckingConflict && (
+                  <div className="mt-2 p-3 rounded-lg text-sm bg-green-50 text-green-800 border border-green-200">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <p className="text-xs">
+                        <span className="font-medium">Time slot available</span> ({conflictCheck.proposedStart} - {conflictCheck.proposedEnd})
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -730,10 +841,14 @@ function NewAppointmentContent() {
               </button>
               <button
                 onClick={() => setCurrentStep("details")}
-                disabled={!appointmentData.date || !appointmentData.time}
-                className="btn flex-1 h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
+                disabled={!appointmentData.date || !appointmentData.time || conflictCheck?.hasConflict || isCheckingConflict}
+                className="btn flex-1 h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 disabled:bg-gray-300 disabled:text-gray-500"
               >
-                Next
+                {isCheckingConflict ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  "Next"
+                )}
               </button>
             </div>
           </div>
