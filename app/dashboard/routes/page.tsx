@@ -638,10 +638,10 @@ export default function TodaysRoutePage() {
             <div className="text-xs text-gray-600">Completed</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-900">
-              ${appointments.reduce((sum, a) => sum + a.price, 0).toFixed(0)}
+            <div className="text-2xl font-bold text-emerald-600">
+              ${appointments.filter((a) => a.status === "COMPLETED").reduce((sum, a) => sum + a.price, 0).toFixed(0)}
             </div>
-            <div className="text-xs text-gray-600">Total Revenue</div>
+            <div className="text-xs text-gray-600">Revenue</div>
           </div>
         </div>
       </div>
