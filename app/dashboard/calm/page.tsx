@@ -866,10 +866,37 @@ function CalmCenterContent() {
     );
   }
 
-  const statusColors = {
-    smooth: "from-emerald-400 to-teal-500",
-    tight: "from-amber-400 to-orange-400",
-    overloaded: "from-rose-400 to-pink-400",
+  const statusStyles = {
+    smooth: {
+      bg: "from-emerald-50 via-teal-50 to-cyan-100",
+      border: "border-emerald-200",
+      iconColor: "text-emerald-600",
+      titleColor: "text-gray-900",
+      textColor: "text-gray-700",
+      cardBg: "bg-white/60 border-emerald-200",
+      statBg: "bg-emerald-100/50",
+      statText: "text-emerald-800",
+    },
+    tight: {
+      bg: "from-amber-50 via-orange-50 to-yellow-100",
+      border: "border-amber-200",
+      iconColor: "text-amber-600",
+      titleColor: "text-gray-900",
+      textColor: "text-gray-700",
+      cardBg: "bg-white/60 border-amber-200",
+      statBg: "bg-amber-100/50",
+      statText: "text-amber-800",
+    },
+    overloaded: {
+      bg: "from-rose-50 via-pink-50 to-red-100",
+      border: "border-rose-200",
+      iconColor: "text-rose-600",
+      titleColor: "text-gray-900",
+      textColor: "text-gray-700",
+      cardBg: "bg-white/60 border-rose-200",
+      statBg: "bg-rose-100/50",
+      statText: "text-rose-800",
+    },
   };
 
   const statusIcons = {
@@ -878,43 +905,43 @@ function CalmCenterContent() {
     overloaded: "💪",
   };
 
+  const currentStyle = statusStyles[data.dayStatus.status];
+
   return (
     <div className="max-w-4xl mx-auto pb-20">
       {/* Header - Today at a Glance */}
       <div
-        className={`bg-gradient-to-br ${
-          statusColors[data.dayStatus.status]
-        } rounded-xl shadow-lg text-white p-6 mb-6`}
+        className={`bg-gradient-to-br ${currentStyle.bg} rounded-xl shadow-lg p-6 mb-6 border ${currentStyle.border}`}
       >
         <div className="flex items-start gap-3 mb-4">
-          <Heart className="h-8 w-8 flex-shrink-0" />
+          <Heart className={`h-8 w-8 flex-shrink-0 ${currentStyle.iconColor}`} />
           <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-1">Today at a Glance</h1>
-            <p className="text-white/90 text-lg">
+            <h1 className={`text-2xl font-bold mb-1 ${currentStyle.titleColor}`}>Today at a Glance</h1>
+            <p className={`${currentStyle.textColor} text-lg`}>
               {data.dayStatus.message} {statusIcons[data.dayStatus.status]}
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-4">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-            <p className="text-white/80 text-xs mb-1">Total Today</p>
-            <p className="text-2xl font-bold">{data.dayStatus.totalAppointments}</p>
-            <p className="text-white/80 text-xs">appointments</p>
+          <div className={`${currentStyle.statBg} backdrop-blur-sm rounded-lg p-3 border ${currentStyle.border}`}>
+            <p className="text-gray-500 text-xs mb-1">Total Today</p>
+            <p className={`text-2xl font-bold ${currentStyle.statText}`}>{data.dayStatus.totalAppointments}</p>
+            <p className="text-gray-500 text-xs">appointments</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-            <p className="text-white/80 text-xs mb-1">Attention Needed</p>
-            <p className="text-2xl font-bold">{data.quickRescues.length}</p>
-            <p className="text-white/80 text-xs">items</p>
+          <div className={`${currentStyle.statBg} backdrop-blur-sm rounded-lg p-3 border ${currentStyle.border}`}>
+            <p className="text-gray-500 text-xs mb-1">Attention Needed</p>
+            <p className={`text-2xl font-bold ${currentStyle.statText}`}>{data.quickRescues.length}</p>
+            <p className="text-gray-500 text-xs">items</p>
           </div>
         </div>
 
         {data.dayStatus.stressPoints.length > 0 && (
-          <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-lg p-3">
-            <p className="text-white/90 text-sm font-semibold mb-2">Watch for:</p>
+          <div className={`mt-4 bg-white/60 backdrop-blur-sm rounded-lg p-3 border ${currentStyle.border}`}>
+            <p className={`${currentStyle.textColor} text-sm font-semibold mb-2`}>Watch for:</p>
             <ul className="space-y-1">
               {data.dayStatus.stressPoints.map((point, idx) => (
-                <li key={idx} className="text-white/80 text-sm flex items-center gap-2">
+                <li key={idx} className="text-gray-600 text-sm flex items-center gap-2">
                   <span className="text-xs">•</span>
                   {point}
                 </li>
