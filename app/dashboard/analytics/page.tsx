@@ -11,6 +11,9 @@ import {
   CheckCircle,
   BarChart3,
   Calendar,
+  Info,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 interface CalmImpact {
@@ -85,6 +88,7 @@ export default function AnalyticsPage() {
   const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPerformanceCharts, setShowPerformanceCharts] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -377,14 +381,32 @@ export default function AnalyticsPage() {
 
           <div className="grid gap-3 text-sm">
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">Dogs per day (30-day avg)</span>
+              <div className="flex items-center gap-1.5 group relative">
+                <span className="text-gray-600">Dogs per day (30-day avg)</span>
+                <div className="relative">
+                  <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 z-50">
+                    Your average number of dogs groomed per working day over the past 30 days.
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                  </div>
+                </div>
+              </div>
               <span className="font-semibold text-gray-900">
                 {performanceData.insights.dogsPerDay.user30Day.toFixed(1)}
               </span>
             </div>
 
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">Average energy load</span>
+              <div className="flex items-center gap-1.5 group relative">
+                <span className="text-gray-600">Average energy load</span>
+                <div className="relative">
+                  <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 z-50">
+                    Measures your workload based on dog size and service type. Helps track sustainable pace.
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                  </div>
+                </div>
+              </div>
               <span className="font-semibold text-gray-900">
                 {performanceData.insights.energyLoad.userAvg.toFixed(1)}
               </span>
@@ -392,7 +414,16 @@ export default function AnalyticsPage() {
 
             {performanceData.insights.driveTime.userAvg !== null && (
               <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-600">Avg drive time between stops</span>
+                <div className="flex items-center gap-1.5 group relative">
+                  <span className="text-gray-600">Avg drive time between stops</span>
+                  <div className="relative">
+                    <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 z-50">
+                      Average time spent driving between appointments based on your route history.
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                    </div>
+                  </div>
+                </div>
                 <span className="font-semibold text-gray-900">
                   {performanceData.insights.driveTime.userAvg} min
                 </span>
@@ -400,19 +431,139 @@ export default function AnalyticsPage() {
             )}
 
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">Completion rate</span>
+              <div className="flex items-center gap-1.5 group relative">
+                <span className="text-gray-600">Completion rate</span>
+                <div className="relative">
+                  <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 z-50">
+                    Percentage of scheduled appointments that were completed (not cancelled or no-show).
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                  </div>
+                </div>
+              </div>
               <span className="font-semibold text-gray-900">
                 {(100 - performanceData.insights.cancellationRate.user).toFixed(0)}%
               </span>
             </div>
 
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">Large dogs (avg per day)</span>
+              <div className="flex items-center gap-1.5 group relative">
+                <span className="text-gray-600">Large dogs (avg per day)</span>
+                <div className="relative">
+                  <Info className="h-3.5 w-3.5 text-gray-400 cursor-help" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-48 z-50">
+                    Average number of large or giant dogs groomed per working day. Higher counts increase physical demand.
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                  </div>
+                </div>
+              </div>
               <span className="font-semibold text-gray-900">
                 {performanceData.insights.largeDogs.userAvg.toFixed(1)}
               </span>
             </div>
           </div>
+
+          {/* Expandable Charts Section */}
+          <button
+            onClick={() => setShowPerformanceCharts(!showPerformanceCharts)}
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 transition-colors mt-6 w-full justify-center"
+          >
+            {showPerformanceCharts ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {showPerformanceCharts ? "Hide charts" : "Show charts"}
+          </button>
+
+          {showPerformanceCharts && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              {/* Dogs by Size Chart */}
+              {performanceData.weekly.dogsBySize && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Dogs Groomed by Size (This Week)</h4>
+                  <div className="space-y-2">
+                    {[
+                      { label: "Small", value: performanceData.weekly.dogsBySize.small, color: "bg-green-400" },
+                      { label: "Medium", value: performanceData.weekly.dogsBySize.medium, color: "bg-blue-400" },
+                      { label: "Large", value: performanceData.weekly.dogsBySize.large, color: "bg-amber-400" },
+                      { label: "Giant", value: performanceData.weekly.dogsBySize.giant, color: "bg-red-400" },
+                    ].map((item) => {
+                      const total = performanceData.weekly.dogsGroomed || 1;
+                      const percent = (item.value / total) * 100;
+                      return (
+                        <div key={item.label} className="flex items-center gap-3">
+                          <span className="text-xs text-gray-600 w-14">{item.label}</span>
+                          <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${item.color} rounded-full transition-all duration-500`}
+                              style={{ width: `${percent}%` }}
+                            />
+                          </div>
+                          <span className="text-xs font-medium text-gray-700 w-8 text-right">{item.value}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Energy Load Visualization */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Energy Load Comparison</h4>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                      <span>Your Average</span>
+                      <span>{performanceData.insights.energyLoad.userAvg.toFixed(1)}</span>
+                    </div>
+                    <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
+                        style={{ width: `${Math.min((performanceData.insights.energyLoad.userAvg / 50) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  {performanceData.insights.energyLoad.comparison}
+                </p>
+              </div>
+
+              {/* Completion Rate Gauge */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Completion Rate</h4>
+                <div className="flex items-center justify-center">
+                  <div className="relative w-32 h-32">
+                    <svg className="w-full h-full transform -rotate-90">
+                      <circle
+                        cx="64"
+                        cy="64"
+                        r="56"
+                        fill="none"
+                        stroke="#e5e7eb"
+                        strokeWidth="12"
+                      />
+                      <circle
+                        cx="64"
+                        cy="64"
+                        r="56"
+                        fill="none"
+                        stroke="#10b981"
+                        strokeWidth="12"
+                        strokeDasharray={`${(100 - performanceData.insights.cancellationRate.user) * 3.52} 352`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-2xl font-bold text-gray-900">
+                        {(100 - performanceData.insights.cancellationRate.user).toFixed(0)}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  {performanceData.insights.cancellationRate.comparison}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
