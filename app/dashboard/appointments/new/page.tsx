@@ -47,6 +47,10 @@ interface AreaDaySuggestion {
   };
   suggestedDays: number[];
   nextSuggestedDate: string | null;
+  suggestedTime: {
+    time: string;
+    timeFormatted: string;
+  } | null;
   reason: string | null;
 }
 
@@ -632,27 +636,46 @@ function NewAppointmentContent() {
                       {areaSuggestion.customer.serviceAreaName} Customer
                     </p>
                     <p className="text-sm text-emerald-700 mt-1">
-                      <span className="font-medium">Best days to book:</span> {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(", ")}
+                      <span className="font-medium">Best days:</span> {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(", ")}
                     </p>
 
-                    {/* Quick-apply suggested date button */}
+                    {/* Quick-apply suggested date and time button */}
                     {areaSuggestion.nextSuggestedDate && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAppointmentData({ ...appointmentData, date: areaSuggestion.nextSuggestedDate! });
-                        }}
-                        className="mt-3 w-full btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0"
-                      >
-                        <CalendarIcon className="h-4 w-4" />
-                        Use Suggested Date: {format(new Date(areaSuggestion.nextSuggestedDate + 'T00:00:00'), "EEEE, MMM d")}
-                      </button>
+                      <div className="mt-3 space-y-2">
+                        {areaSuggestion.suggestedTime ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAppointmentData({
+                                ...appointmentData,
+                                date: areaSuggestion.nextSuggestedDate!,
+                                time: areaSuggestion.suggestedTime!.time,
+                              });
+                            }}
+                            className="w-full btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0"
+                          >
+                            <CalendarIcon className="h-4 w-4" />
+                            Use {format(new Date(areaSuggestion.nextSuggestedDate + 'T00:00:00'), "EEE, MMM d")} at {areaSuggestion.suggestedTime.timeFormatted}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAppointmentData({ ...appointmentData, date: areaSuggestion.nextSuggestedDate! });
+                            }}
+                            className="w-full btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0"
+                          >
+                            <CalendarIcon className="h-4 w-4" />
+                            Use {format(new Date(areaSuggestion.nextSuggestedDate + 'T00:00:00'), "EEEE, MMM d")}
+                          </button>
+                        )}
+                      </div>
                     )}
 
                     <div className="mt-2 p-2 bg-emerald-100/50 rounded-lg">
                       <p className="text-xs text-emerald-800">
                         <span className="font-semibold">Why these days?</span> You work in {areaSuggestion.customer.serviceAreaName} on {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" and ")}.
-                        Booking on these days means shorter routes, less driving between appointments, and more time for grooming.
+                        Booking on these days means shorter routes and less driving.
                       </p>
                     </div>
                   </div>

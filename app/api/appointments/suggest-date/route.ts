@@ -7,6 +7,14 @@ import {
   DAY_NAMES,
 } from "@/lib/area-matcher";
 
+function formatTime(date: Date): string {
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const period = hours >= 12 ? "PM" : "AM";
+  const hour12 = hours % 12 || 12;
+  return `${hour12}:${minutes.toString().padStart(2, "0")} ${period}`;
+}
+
 // GET - Get suggested booking date based on customer's area and groomer's schedule
 export async function GET(request: Request) {
   try {
@@ -106,6 +114,98 @@ export async function GET(request: Request) {
       reason = `${groomer.name} works in ${customer.serviceArea.name} on ${dayNames}`;
     }
 
+    // Find first available time slot on the suggested date
+    let suggestedTime: { time: string; timeFormatted: string } | null = null;
+
+    if (nextSuggestedDate) {
+      const dateStr = nextSuggestedDate.toISOString().split("T")[0];
+
+      // Get working hours (default 9 AM - 5 PM if not set)
+      const workStart = groomer.workingHoursStart
+        ? parseInt(groomer.workingHoursStart.split(":")[0])
+        : 9;
+      const workEnd = groomer.workingHoursEnd
+        ? parseInt(groomer.workingHoursEnd.split(":")[0])
+        : 17;
+
+      // Get existing appointments on this date
+      const startOfDay = new Date(`${dateStr}T00:00:00`);
+      const endOfDay = new Date(`${dateStr}T23:59:59`);
+
+      const existingAppointments = await prisma.appointment.findMany({
+        where: {
+          accountId: session.user.accountId,
+          groomerId: groomer.id,
+          startAt: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+          status: {
+            notIn: ["CANCELLED", "NO_SHOW"],
+          },
+        },
+        orderBy: {
+          startAt: "asc",
+        },
+      });
+
+      // Build busy periods
+      const busyPeriods = existingAppointments.map((apt) => {
+        const start = new Date(apt.startAt);
+        const end = new Date(start.getTime() + apt.serviceMinutes * 60 * 1000);
+        return { start, end };
+      }).sort((a, b) => a.start.getTime() - b.start.getTime());
+
+      // Default duration for finding slot (90 min for full groom)
+      const defaultDuration = 90;
+      const workStartToday = new Date(`${dateStr}T${String(workStart).padStart(2, "0")}:00:00`);
+      const workEndToday = new Date(`${dateStr}T${String(workEnd).padStart(2, "0")}:00:00`);
+
+      // Find first available slot
+      for (let i = 0; i <= busyPeriods.length; i++) {
+        let gapStart: Date;
+        let gapEnd: Date;
+
+        if (i === 0) {
+          gapStart = workStartToday;
+          gapEnd = busyPeriods.length > 0 ? busyPeriods[0].start : workEndToday;
+        } else if (i === busyPeriods.length) {
+          gapStart = busyPeriods[i - 1].end;
+          gapEnd = workEndToday;
+        } else {
+          gapStart = busyPeriods[i - 1].end;
+          gapEnd = busyPeriods[i].start;
+        }
+
+        const gapDuration = (gapEnd.getTime() - gapStart.getTime()) / (60 * 1000);
+
+        if (gapDuration >= defaultDuration && gapStart < workEndToday) {
+          // Add 15 min buffer after previous appointment
+          if (i > 0) {
+            const bufferStart = new Date(busyPeriods[i - 1].end.getTime() + 15 * 60 * 1000);
+            if (bufferStart.getTime() + defaultDuration * 60 * 1000 <= gapEnd.getTime()) {
+              gapStart = bufferStart;
+            }
+          }
+
+          // Round to nearest 15 minutes
+          const minutes = gapStart.getMinutes();
+          const roundedMinutes = Math.ceil(minutes / 15) * 15;
+          gapStart.setMinutes(roundedMinutes, 0, 0);
+
+          if (gapStart.getTime() + defaultDuration * 60 * 1000 <= gapEnd.getTime() &&
+              gapStart.getTime() + defaultDuration * 60 * 1000 <= workEndToday.getTime()) {
+            const timeStr = `${String(gapStart.getHours()).padStart(2, "0")}:${String(gapStart.getMinutes()).padStart(2, "0")}`;
+            suggestedTime = {
+              time: timeStr,
+              timeFormatted: formatTime(gapStart),
+            };
+            break;
+          }
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       customer: {
@@ -117,6 +217,7 @@ export async function GET(request: Request) {
       },
       suggestedDays,
       nextSuggestedDate: nextSuggestedDate?.toISOString().split("T")[0] || null,
+      suggestedTime,
       reason,
     });
   } catch (error) {
