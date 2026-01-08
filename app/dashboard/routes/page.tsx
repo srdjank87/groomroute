@@ -570,6 +570,60 @@ export default function TodaysRoutePage() {
         </div>
       )}
 
+      {/* No Show appointments (non-draggable) */}
+      {appointments.filter((a) => a.status === "NO_SHOW").length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-sm font-medium text-gray-500 mb-3">No Shows</h3>
+          <div className="space-y-2 opacity-60">
+            {appointments
+              .filter((a) => a.status === "NO_SHOW")
+              .map((appointment) => (
+                <div
+                  key={appointment.id}
+                  className="bg-amber-50 border border-amber-200 rounded-lg p-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-gray-900">{appointment.customer.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {appointment.pet?.name} - ${appointment.price}
+                      </p>
+                    </div>
+                    <span className="badge badge-warning badge-sm">No Show</span>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* Cancelled appointments (non-draggable) */}
+      {appointments.filter((a) => a.status === "CANCELLED").length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-sm font-medium text-gray-500 mb-3">Cancellations</h3>
+          <div className="space-y-2 opacity-60">
+            {appointments
+              .filter((a) => a.status === "CANCELLED")
+              .map((appointment) => (
+                <div
+                  key={appointment.id}
+                  className="bg-red-50 border border-red-200 rounded-lg p-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-gray-900">{appointment.customer.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {appointment.pet?.name} - ${appointment.price}
+                      </p>
+                    </div>
+                    <span className="badge badge-error badge-sm">Cancelled</span>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Summary Footer */}
       <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <div className="grid grid-cols-3 gap-4 text-center">
