@@ -506,23 +506,45 @@ export default function AnalyticsPage() {
 
               {/* Energy Load Visualization */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Energy Load Comparison</h4>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                      <span>Your Average</span>
-                      <span>{performanceData.insights.energyLoad.userAvg.toFixed(1)}</span>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Energy Load (Daily Average)</h4>
+                <div className="relative">
+                  {/* Scale labels */}
+                  <div className="flex justify-between text-xs text-gray-400 mb-1">
+                    <span>Light</span>
+                    <span>Balanced</span>
+                    <span>Heavy</span>
+                  </div>
+                  {/* Progress bar with zones */}
+                  <div className="h-6 bg-gray-100 rounded-full overflow-hidden relative">
+                    {/* Zone indicators */}
+                    <div className="absolute inset-0 flex">
+                      <div className="w-[40%] bg-green-100 border-r border-green-200" />
+                      <div className="w-[30%] bg-amber-50 border-r border-amber-200" />
+                      <div className="w-[30%] bg-red-50" />
                     </div>
-                    <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
-                        style={{ width: `${Math.min((performanceData.insights.energyLoad.userAvg / 50) * 100, 100)}%` }}
-                      />
-                    </div>
+                    {/* User's value indicator */}
+                    <div
+                      className="absolute h-full w-1 bg-blue-600 rounded-full shadow-md"
+                      style={{
+                        left: `${Math.min(Math.max((performanceData.insights.energyLoad.userAvg / 12) * 100, 2), 98)}%`,
+                        transform: 'translateX(-50%)'
+                      }}
+                    />
+                  </div>
+                  {/* Scale numbers */}
+                  <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>0</span>
+                    <span>4</span>
+                    <span>7</span>
+                    <span>12+</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-2 text-center">
-                  {performanceData.insights.energyLoad.comparison}
+                <div className="mt-3 text-center">
+                  <span className="text-lg font-bold text-gray-900">{performanceData.insights.energyLoad.userAvg.toFixed(1)}</span>
+                  <span className="text-sm text-gray-500 ml-1">energy units/day</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1 text-center">
+                  {performanceData.insights.energyLoad.comparison} • Industry range: 4-7 units/day
                 </p>
               </div>
 
