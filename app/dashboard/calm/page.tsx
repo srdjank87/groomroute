@@ -221,6 +221,13 @@ function CalmCenterContent() {
   const [lightenDayAppointments, setLightenDayAppointments] = useState<LightenDayAppointment[]>([]);
   const [lightenDayAssessment, setLightenDayAssessment] = useState<{ status: string; message: string } | null>(null);
   const [isLoadingLightenDay, setIsLoadingLightenDay] = useState(false);
+  const [selectedBufferMinutes, setSelectedBufferMinutes] = useState<number>(10);
+  const [isAddingBuffer, setIsAddingBuffer] = useState(false);
+  const [bufferResult, setBufferResult] = useState<{
+    success: boolean;
+    message: string;
+    adjustedAppointments: { customerName: string; oldTime: string; newTime: string }[];
+  } | null>(null);
 
   // Reply Help modal state
   const [showReplyHelpModal, setShowReplyHelpModal] = useState(false);
@@ -533,6 +540,8 @@ function CalmCenterContent() {
   async function openLightenDayModal() {
     setShowLightenDayModal(true);
     setIsLoadingLightenDay(true);
+    setBufferResult(null);
+    setSelectedBufferMinutes(10);
 
     try {
       const response = await fetch("/api/calm/lighten-day");
@@ -553,8 +562,44 @@ function CalmCenterContent() {
     }
   }
 
+  // Add buffer time between appointments
+  async function addBufferTime() {
+    setIsAddingBuffer(true);
+
+    try {
+      const response = await fetch("/api/calm/lighten-day", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bufferMinutes: selectedBufferMinutes }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setBufferResult({
+          success: result.success,
+          message: result.message,
+          adjustedAppointments: result.adjustedAppointments || [],
+        });
+        if (result.adjustedCount > 0) {
+          toast.success(result.message);
+        } else {
+          toast.success("No adjustments needed - appointments already have buffer time");
+        }
+      } else {
+        toast.error("Failed to add buffer time");
+      }
+    } catch (error) {
+      console.error("Add buffer error:", error);
+      toast.error("Failed to add buffer time");
+    } finally {
+      setIsAddingBuffer(false);
+    }
+  }
+
   function sendRescheduleMessage(phone: string, customerName: string, petName?: string, method: "sms" | "whatsapp" = "sms") {
-    const message = `Hi ${customerName}! I'm having a packed day and want to give ${petName || "your pet"} my full attention. Would you be open to rescheduling to tomorrow or later this week? I'll prioritize you!`;
+    // Extract first name only
+    const firstName = customerName.split(" ")[0];
+    const message = `Hi ${firstName}! I'm having a packed day and want to give ${petName || "your pet"} my full attention. Would you be open to rescheduling to tomorrow or later this week? I'll prioritize you!`;
     const encodedMessage = encodeURIComponent(message);
 
     if (method === "sms") {
@@ -591,12 +636,18 @@ function CalmCenterContent() {
     }
   }
 
+  // Helper to get first name only
+  function getFirstName(fullName: string): string {
+    return fullName.split(" ")[0];
+  }
+
   function selectTemplate(template: MessageTemplate) {
     setSelectedTemplate(template);
     // Pre-fill the customized message with placeholders replaced if customer is selected
     if (selectedReplyCustomer) {
+      const firstName = getFirstName(selectedReplyCustomer.name);
       const msg = template.message
-        .replace(/\[CUSTOMER\]/g, selectedReplyCustomer.name)
+        .replace(/\[CUSTOMER\]/g, firstName)
         .replace(/\[PET\]/g, selectedReplyCustomer.petName || "your pet")
         .replace(/\[TIME\]/g, selectedReplyCustomer.time);
       setCustomizedMessage(msg);
@@ -609,8 +660,9 @@ function CalmCenterContent() {
     setSelectedReplyCustomer(customer);
     // Update message with customer info if template is selected
     if (selectedTemplate) {
+      const firstName = getFirstName(customer.name);
       const msg = selectedTemplate.message
-        .replace(/\[CUSTOMER\]/g, customer.name)
+        .replace(/\[CUSTOMER\]/g, firstName)
         .replace(/\[PET\]/g, customer.petName || "your pet")
         .replace(/\[TIME\]/g, customer.time);
       setCustomizedMessage(msg);
@@ -668,8 +720,9 @@ function CalmCenterContent() {
   function selectUpsetResponse(responseMessage: string) {
     // Replace placeholders with customer info if selected
     if (selectedUpsetCustomer) {
+      const firstName = getFirstName(selectedUpsetCustomer.name);
       const msg = responseMessage
-        .replace(/\[CUSTOMER\]/g, selectedUpsetCustomer.name)
+        .replace(/\[CUSTOMER\]/g, firstName)
         .replace(/\[PET\]/g, selectedUpsetCustomer.petName || "your pet")
         .replace(/\[TIME\]/g, selectedUpsetCustomer.time);
       setSelectedUpsetResponse(msg);
@@ -814,9 +867,9 @@ function CalmCenterContent() {
   }
 
   const statusColors = {
-    smooth: "from-green-500 to-emerald-600",
-    tight: "from-yellow-500 to-orange-500",
-    overloaded: "from-red-500 to-pink-600",
+    smooth: "from-emerald-400 to-teal-500",
+    tight: "from-amber-400 to-orange-400",
+    overloaded: "from-rose-400 to-pink-400",
   };
 
   const statusIcons = {
@@ -1603,7 +1656,7 @@ function CalmCenterContent() {
                         {contactMethods.includes("call") && apt.customerPhone && (
                           <button
                             onClick={() => handleQuickCall(apt.customerPhone)}
-                            className="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 gap-1"
+                            className="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 gap-1 px-3"
                           >
                             <Phone className="h-3.5 w-3.5" />
                             Call
@@ -1612,7 +1665,7 @@ function CalmCenterContent() {
                         {contactMethods.includes("sms") && apt.customerPhone && (
                           <button
                             onClick={() => handleQuickSMS(apt.customerPhone, apt.customerName, apt.petName)}
-                            className="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 gap-1"
+                            className="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 gap-1 px-3"
                           >
                             <MessageSquare className="h-3.5 w-3.5" />
                             SMS
@@ -1621,7 +1674,7 @@ function CalmCenterContent() {
                         {contactMethods.includes("whatsapp") && apt.customerPhone && (
                           <button
                             onClick={() => handleQuickWhatsApp(apt.customerPhone, apt.customerName, apt.petName)}
-                            className="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 gap-1"
+                            className="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-0 gap-1 px-3"
                           >
                             💚 WhatsApp
                           </button>
@@ -1629,7 +1682,7 @@ function CalmCenterContent() {
                         {apt.customerAddress && (
                           <button
                             onClick={() => handleNavigate(apt.customerAddress)}
-                            className="btn btn-sm bg-gray-600 hover:bg-gray-700 text-white border-0 gap-1"
+                            className="btn btn-sm bg-gray-600 hover:bg-gray-700 text-white border-0 gap-1 px-3"
                           >
                             <MapPin className="h-3.5 w-3.5" />
                             Navigate
@@ -1689,11 +1742,75 @@ function CalmCenterContent() {
                     </div>
                   )}
 
+                  {/* Buffer Time Section */}
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-700 mb-3">Add Buffer Time Between Appointments</h4>
+                    {bufferResult ? (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <p className="font-medium text-green-700">{bufferResult.message}</p>
+                        {bufferResult.adjustedAppointments.length > 0 && (
+                          <div className="mt-3 space-y-2">
+                            <p className="text-sm text-green-600 font-medium">Adjusted appointments:</p>
+                            {bufferResult.adjustedAppointments.map((apt, idx) => (
+                              <div key={idx} className="text-sm text-green-700 flex items-center gap-2">
+                                <span>{apt.customerName}:</span>
+                                <span className="line-through text-gray-400">{apt.oldTime}</span>
+                                <span>→</span>
+                                <span className="font-medium">{apt.newTime}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <p className="text-sm text-amber-700 mb-3">
+                          Add breathing room between back-to-back appointments to reduce stress.
+                        </p>
+                        <div className="flex items-center gap-4 mb-4">
+                          <span className="text-sm text-gray-600">Buffer time:</span>
+                          <div className="flex gap-2">
+                            {[5, 10, 15, 20].map((mins) => (
+                              <button
+                                key={mins}
+                                onClick={() => setSelectedBufferMinutes(mins)}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                                  selectedBufferMinutes === mins
+                                    ? "bg-amber-500 text-white"
+                                    : "bg-white border border-amber-300 text-amber-700 hover:bg-amber-100"
+                                }`}
+                              >
+                                {mins} min
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <button
+                          onClick={addBufferTime}
+                          disabled={isAddingBuffer}
+                          className="btn w-full bg-amber-500 hover:bg-amber-600 text-white border-0"
+                        >
+                          {isAddingBuffer ? (
+                            <>
+                              <span className="loading loading-spinner loading-sm"></span>
+                              Adding buffers...
+                            </>
+                          ) : (
+                            <>
+                              <Clock className="h-4 w-4 mr-2" />
+                              Add {selectedBufferMinutes}-min Buffers
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Suggestions */}
-                  {lightenDaySuggestions.length > 0 ? (
+                  {lightenDaySuggestions.filter(s => s.type !== "break").length > 0 && (
                     <div className="space-y-4 mb-6">
-                      <h4 className="font-semibold text-gray-700">Suggestions to lighten your day:</h4>
-                      {lightenDaySuggestions.map((suggestion) => (
+                      <h4 className="font-semibold text-gray-700">Other suggestions:</h4>
+                      {lightenDaySuggestions.filter(s => s.type !== "break").map((suggestion) => (
                         <div key={suggestion.id} className="bg-gray-50 rounded-lg p-4">
                           <div className="flex items-start justify-between">
                             <div>
@@ -1710,8 +1827,6 @@ function CalmCenterContent() {
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <p className="text-gray-600 text-center py-8">Your schedule looks manageable today!</p>
                   )}
 
                   {/* Appointments that can be rescheduled */}
@@ -1732,7 +1847,7 @@ function CalmCenterContent() {
                                 {contactMethods.includes("sms") && apt.customerPhone && (
                                   <button
                                     onClick={() => sendRescheduleMessage(apt.customerPhone, apt.customerName, apt.petName, "sms")}
-                                    className="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0"
+                                    className="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0 px-3"
                                   >
                                     <MessageSquare className="h-4 w-4" />
                                     SMS
@@ -1741,7 +1856,7 @@ function CalmCenterContent() {
                                 {contactMethods.includes("whatsapp") && apt.customerPhone && (
                                   <button
                                     onClick={() => sendRescheduleMessage(apt.customerPhone, apt.customerName, apt.petName, "whatsapp")}
-                                    className="btn btn-sm bg-green-500 hover:bg-green-600 text-white border-0"
+                                    className="btn btn-sm bg-green-500 hover:bg-green-600 text-white border-0 px-3"
                                   >
                                     WhatsApp
                                   </button>

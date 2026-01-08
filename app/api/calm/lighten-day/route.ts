@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canAccessCalmControl } from "@/lib/feature-helpers";
 import { toZonedTime } from "date-fns-tz";
-import { format, addMinutes } from "date-fns";
+import { format, addMinutes, parseISO } from "date-fns";
 
 /**
  * GET /api/calm/lighten-day
@@ -218,6 +218,213 @@ export async function GET(req: NextRequest) {
     console.error("Lighten Day GET error:", error);
     return NextResponse.json(
       { error: "Failed to analyze day" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST /api/calm/lighten-day
+ * Add buffer time between appointments
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.accountId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const accountId = session.user.accountId;
+    const body = await req.json();
+    const { bufferMinutes = 10 } = body;
+
+    // Validate buffer minutes
+    if (bufferMinutes < 5 || bufferMinutes > 30) {
+      return NextResponse.json(
+        { error: "Buffer time must be between 5 and 30 minutes" },
+        { status: 400 }
+      );
+    }
+
+    // Get account to check subscription plan
+    const account = await prisma.account.findUnique({
+      where: { id: accountId },
+      select: { subscriptionPlan: true, timezone: true },
+    });
+
+    if (!account) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    }
+
+    // Check if user can access Calm Control
+    if (!canAccessCalmControl(account)) {
+      return NextResponse.json(
+        {
+          error: "This feature requires the Growth or Pro plan.",
+          upgradeRequired: true,
+          suggestedPlan: "GROWTH",
+        },
+        { status: 403 }
+      );
+    }
+
+    const timezone = account.timezone || "America/New_York";
+
+    // Get today's date based on account's timezone
+    const now = new Date();
+    const localNow = toZonedTime(now, timezone);
+    const today = new Date(
+      Date.UTC(
+        localNow.getFullYear(),
+        localNow.getMonth(),
+        localNow.getDate(),
+        0,
+        0,
+        0,
+        0
+      )
+    );
+    const tomorrow = new Date(
+      Date.UTC(
+        localNow.getFullYear(),
+        localNow.getMonth(),
+        localNow.getDate() + 1,
+        0,
+        0,
+        0,
+        0
+      )
+    );
+
+    // Get today's active appointments sorted by time
+    const appointments = await prisma.appointment.findMany({
+      where: {
+        accountId,
+        startAt: {
+          gte: today,
+          lt: tomorrow,
+        },
+        status: {
+          notIn: ["COMPLETED", "CANCELLED", "NO_SHOW"],
+        },
+      },
+      include: {
+        customer: {
+          select: {
+            name: true,
+            phone: true,
+          },
+        },
+        pet: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        startAt: "asc",
+      },
+    });
+
+    if (appointments.length < 2) {
+      return NextResponse.json({
+        success: true,
+        message: "Not enough appointments to add buffer time",
+        adjustedCount: 0,
+        adjustedAppointments: [],
+      });
+    }
+
+    // Calculate new times with buffer
+    // First appointment stays fixed, subsequent ones shift forward
+    const adjustedAppointments: {
+      id: string;
+      customerName: string;
+      petName?: string;
+      oldTime: string;
+      newTime: string;
+      shifted: number;
+    }[] = [];
+
+    let accumulatedShift = 0;
+
+    for (let i = 0; i < appointments.length; i++) {
+      const apt = appointments[i];
+
+      if (i === 0) {
+        // First appointment stays fixed
+        adjustedAppointments.push({
+          id: apt.id,
+          customerName: apt.customer.name,
+          petName: apt.pet?.name,
+          oldTime: format(apt.startAt, "h:mm a"),
+          newTime: format(apt.startAt, "h:mm a"),
+          shifted: 0,
+        });
+        continue;
+      }
+
+      const prev = appointments[i - 1];
+      const prevEnd = addMinutes(prev.startAt, prev.serviceMinutes + accumulatedShift);
+      const currentGap = (apt.startAt.getTime() - prevEnd.getTime()) / (1000 * 60);
+
+      // If gap is less than buffer, add buffer time
+      if (currentGap < bufferMinutes) {
+        const neededShift = bufferMinutes - currentGap;
+        accumulatedShift += neededShift;
+      }
+
+      const newStartTime = addMinutes(apt.startAt, accumulatedShift);
+
+      adjustedAppointments.push({
+        id: apt.id,
+        customerName: apt.customer.name,
+        petName: apt.pet?.name,
+        oldTime: format(apt.startAt, "h:mm a"),
+        newTime: format(newStartTime, "h:mm a"),
+        shifted: accumulatedShift,
+      });
+    }
+
+    // Apply the changes to the database
+    const updates = adjustedAppointments
+      .filter((apt) => apt.shifted > 0)
+      .map((apt) => {
+        const originalApt = appointments.find((a) => a.id === apt.id);
+        if (!originalApt) return null;
+
+        return prisma.appointment.update({
+          where: { id: apt.id },
+          data: {
+            startAt: addMinutes(originalApt.startAt, apt.shifted),
+          },
+        });
+      })
+      .filter(Boolean);
+
+    await Promise.all(updates);
+
+    const adjustedCount = adjustedAppointments.filter((a) => a.shifted > 0).length;
+    const totalShiftedMinutes = accumulatedShift;
+
+    return NextResponse.json({
+      success: true,
+      message: adjustedCount > 0
+        ? `Added ${bufferMinutes}-min buffers. ${adjustedCount} appointments adjusted.`
+        : "All appointments already have sufficient buffer time.",
+      bufferMinutes,
+      adjustedCount,
+      totalShiftedMinutes,
+      adjustedAppointments: adjustedAppointments.filter((a) => a.shifted > 0),
+      newEndTime: adjustedAppointments.length > 0
+        ? adjustedAppointments[adjustedAppointments.length - 1].newTime
+        : null,
+    });
+  } catch (error) {
+    console.error("Lighten Day POST error:", error);
+    return NextResponse.json(
+      { error: "Failed to add buffer time" },
       { status: 500 }
     );
   }
