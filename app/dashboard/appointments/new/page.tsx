@@ -230,10 +230,16 @@ function NewAppointmentContent() {
     return null;
   }, []);
 
+  // Scroll to top when changing steps
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   const selectCustomer = useCallback(async (customer: Customer) => {
     setSelectedCustomer(customer);
     setAppointmentData((prev) => ({ ...prev, customerId: customer.id }));
     setCurrentStep("pet");
+    scrollToTop();
 
     // Fetch area day suggestion
     let currentGroomerId = groomerId;
@@ -243,7 +249,7 @@ function NewAppointmentContent() {
     if (currentGroomerId) {
       fetchAreaSuggestion(customer.id, currentGroomerId);
     }
-  }, [groomerId, fetchDefaultGroomer, fetchAreaSuggestion]);
+  }, [groomerId, fetchDefaultGroomer, fetchAreaSuggestion, scrollToTop]);
 
   // Fetch customers on mount
   useEffect(() => {
@@ -317,6 +323,7 @@ function NewAppointmentContent() {
       }
     }
     setCurrentStep("details"); // Go to details step now (before datetime)
+    scrollToTop();
   };
 
   const [isCustomService, setIsCustomService] = useState(false);
@@ -592,7 +599,10 @@ function NewAppointmentContent() {
             )}
 
             <button
-              onClick={() => setCurrentStep("customer")}
+              onClick={() => {
+                setCurrentStep("customer");
+                scrollToTop();
+              }}
               className="w-full btn btn-ghost"
             >
               Back to Clients
@@ -935,7 +945,10 @@ function NewAppointmentContent() {
 
             <div className="flex gap-3">
               <button
-                onClick={() => setCurrentStep("details")}
+                onClick={() => {
+                  setCurrentStep("details");
+                  scrollToTop();
+                }}
                 className="btn flex-1 h-12"
               >
                 Back
@@ -1084,13 +1097,19 @@ function NewAppointmentContent() {
 
             <div className="flex gap-3">
               <button
-                onClick={() => setCurrentStep("pet")}
+                onClick={() => {
+                  setCurrentStep("pet");
+                  scrollToTop();
+                }}
                 className="btn flex-1 h-12"
               >
                 Back
               </button>
               <button
-                onClick={() => setCurrentStep("datetime")}
+                onClick={() => {
+                  setCurrentStep("datetime");
+                  scrollToTop();
+                }}
                 className="btn flex-1 h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
               >
                 Next
