@@ -416,6 +416,20 @@ function CalmCenterContent() {
     }
   }, [session]);
 
+  // Handle hash navigation (e.g., #body-care)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        const id = window.location.hash.substring(1);
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, [isLoading]); // Re-run when loading completes
+
   // Open Running Late modal and calculate new times
   async function openRunningLateModal() {
     setShowRunningLateModal(true);
@@ -1406,7 +1420,7 @@ function CalmCenterContent() {
       )}
 
       {/* Section D - Body Care */}
-      <div className="mb-6">
+      <div id="body-care" className="mb-6 scroll-mt-4">
         <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
           <span className="text-2xl">🧘</span>
           Body Care
