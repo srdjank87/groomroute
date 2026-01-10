@@ -364,7 +364,7 @@ function NewAppointmentContent() {
   };
 
   const steps = [
-    { id: "customer", label: "Customer", active: currentStep === "customer" },
+    { id: "customer", label: "Client", active: currentStep === "customer" },
     { id: "pet", label: "Pet", active: currentStep === "pet" },
     { id: "details", label: "Details", active: currentStep === "details" },
     { id: "datetime", label: "Time", active: currentStep === "datetime" },
@@ -459,7 +459,7 @@ function NewAppointmentContent() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="input input-bordered w-full h-12 pl-10"
-                  placeholder="Search customers..."
+                  placeholder="Search clients..."
                 />
               </div>
             </div>
@@ -469,7 +469,7 @@ function NewAppointmentContent() {
               className="w-full btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
             >
               <Plus className="h-5 w-5" />
-              Add New Customer
+              Add New Client
             </button>
 
             <div className="space-y-3">
@@ -529,7 +529,7 @@ function NewAppointmentContent() {
         {currentStep === "pet" && selectedCustomer && (
           <div className="space-y-4">
             <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-              <p className="text-sm font-medium text-blue-900">Selected Customer</p>
+              <p className="text-sm font-medium text-blue-900">Selected Client</p>
               <p className="text-blue-700">{selectedCustomer.name}</p>
             </div>
 
@@ -595,7 +595,7 @@ function NewAppointmentContent() {
               onClick={() => setCurrentStep("customer")}
               className="w-full btn btn-ghost"
             >
-              Back to Customers
+              Back to Clients
             </button>
           </div>
         )}
@@ -634,7 +634,7 @@ function NewAppointmentContent() {
                   <div className="flex-1">
                     <p className="text-sm font-medium text-emerald-900">
                       <MapPin className="h-4 w-4 inline mr-1" />
-                      {areaSuggestion.customer.serviceAreaName} Customer
+                      {areaSuggestion.customer.serviceAreaName} Client
                     </p>
                     <p className="text-sm text-emerald-700 mt-1">
                       <span className="font-medium">Best days:</span> {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(", ")}

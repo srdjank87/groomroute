@@ -183,7 +183,7 @@ export default function NewCustomerPage() {
     e.preventDefault();
 
     if (!formData.name || !formData.address) {
-      toast.error("Please fill in customer name and address");
+      toast.error("Please fill in client name and address");
       return;
     }
 
@@ -198,11 +198,11 @@ export default function NewCustomerPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to save customer");
+        throw new Error(error.error || "Failed to save client");
       }
 
       const data = await response.json();
-      toast.success("Customer saved successfully!");
+      toast.success("Client saved successfully!");
 
       if (action === "saveAndBook") {
         router.push(`/dashboard/appointments/new?customerId=${data.customer.id}`);
@@ -210,8 +210,8 @@ export default function NewCustomerPage() {
         router.push("/dashboard/customers");
       }
     } catch (error) {
-      console.error("Save customer error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to save customer");
+      console.error("Save client error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to save client");
       setIsLoading(false);
     }
   };
@@ -227,15 +227,15 @@ export default function NewCustomerPage() {
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
-          <h1 className="text-xl font-bold text-gray-900">New Customer</h1>
+          <h1 className="text-xl font-bold text-gray-900">New Client</h1>
         </div>
       </div>
 
       {/* Form */}
       <form className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-        {/* Customer Info Section */}
+        {/* Client Info Section */}
         <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Customer Information</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Client Information</h2>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -247,7 +247,7 @@ export default function NewCustomerPage() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="input input-bordered w-full h-12 text-base"
-              placeholder="Customer name"
+              placeholder="Client name"
             />
           </div>
 
@@ -273,7 +273,7 @@ export default function NewCustomerPage() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="input input-bordered w-full h-12 text-base"
-              placeholder="customer@example.com"
+              placeholder="client@example.com"
             />
           </div>
         </div>
@@ -658,7 +658,7 @@ export default function NewCustomerPage() {
             disabled={isLoading}
             className="btn flex-1 h-12 bg-white border-2 border-[#A5744A] text-[#A5744A] hover:bg-orange-50"
           >
-            {isLoading ? <span className="loading loading-spinner"></span> : "Save Customer"}
+            {isLoading ? <span className="loading loading-spinner"></span> : "Save Client"}
           </button>
           <button
             type="button"

@@ -114,12 +114,12 @@ export default function CustomerEditPage() {
           accessInstructions: data.accessInstructions || "",
         });
       } else {
-        toast.error("Customer not found");
+        toast.error("Client not found");
         router.push("/dashboard/customers");
       }
     } catch (error) {
       console.error("Failed to fetch customer:", error);
-      toast.error("Failed to load customer");
+      toast.error("Failed to load client");
     } finally {
       setIsLoading(false);
     }
@@ -190,14 +190,14 @@ export default function CustomerEditPage() {
       }
     } catch (error) {
       console.error("Failed to update customer:", error);
-      toast.error("Failed to update customer");
+      toast.error("Failed to update client");
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm("Remove this customer? This will also remove all their pets and appointment history.")) {
+    if (!confirm("Remove this client? This will also remove all their pets and appointment history.")) {
       return;
     }
 
@@ -208,15 +208,15 @@ export default function CustomerEditPage() {
       });
 
       if (response.ok) {
-        toast.success("Customer removed");
+        toast.success("Client removed");
         router.push("/dashboard/customers");
       } else {
         const data = await response.json();
-        toast.error(data.error || "Couldn't remove customer. Please try again.");
+        toast.error(data.error || "Couldn't remove client. Please try again.");
       }
     } catch (error) {
       console.error("Failed to delete customer:", error);
-      toast.error("Couldn't remove customer. Please try again.");
+      toast.error("Couldn't remove client. Please try again.");
     } finally {
       setIsDeleting(false);
     }
@@ -308,7 +308,7 @@ export default function CustomerEditPage() {
           <h1 className="text-2xl font-bold text-gray-900">
             {customer.name}
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">Customer Profile</p>
+          <p className="text-gray-500 text-sm mt-0.5">Client Profile</p>
         </div>
       </div>
 
@@ -406,7 +406,7 @@ export default function CustomerEditPage() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="input input-bordered w-full h-12"
-              placeholder="Customer name"
+              placeholder="Client name"
               required
             />
           </div>
@@ -439,7 +439,7 @@ export default function CustomerEditPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="input input-bordered w-full h-12 pl-10"
-                  placeholder="customer@email.com"
+                  placeholder="client@email.com"
                 />
               </div>
             </div>

@@ -229,13 +229,13 @@ export default function CustomersPage() {
     <div className="max-w-4xl mx-auto pb-20">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
         <Link
           href="/dashboard/customers/new"
           className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
         >
           <Plus className="h-5 w-5" />
-          Add Customer
+          Add Client
         </Link>
       </div>
 
@@ -361,7 +361,7 @@ export default function CustomersPage() {
 
       {/* Results Count */}
       <div className="mb-4 text-sm text-gray-600">
-        Showing {sortedCustomers.length} {sortedCustomers.length === 1 ? "customer" : "customers"}
+        Showing {sortedCustomers.length} {sortedCustomers.length === 1 ? "client" : "clients"}
         {(filterBy !== "all" || areaFilter !== "all") && (
           <button
             onClick={() => {
@@ -375,7 +375,7 @@ export default function CustomersPage() {
         )}
       </div>
 
-      {/* Customers List */}
+      {/* Clients List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <span className="loading loading-spinner loading-lg"></span>
@@ -393,7 +393,7 @@ export default function CustomersPage() {
           <p className="text-gray-600 mb-4">
             {searchQuery || filterBy !== "all" || areaFilter !== "all"
               ? "Try adjusting your search or filters"
-              : "Every great grooming business starts with one happy customer"}
+              : "Every great grooming business starts with one happy client"}
           </p>
           {!searchQuery && filterBy === "all" && areaFilter === "all" && (
             <Link
@@ -401,7 +401,7 @@ export default function CustomersPage() {
               className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
             >
               <Plus className="h-5 w-5" />
-              Add Your First Customer
+              Add Your First Client
             </Link>
           )}
         </div>

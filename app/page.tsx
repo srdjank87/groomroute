@@ -275,7 +275,7 @@ export default function Home() {
                   "Route clustering by neighborhood",
                   "Large dog limits & working hours",
                   "One-tap navigation to Google or Apple Maps",
-                  "Quick customer messaging",
+                  "Quick client messaging",
                   "Pet details & behavior flags",
                   "Simple, clean daily view",
                 ].map((item) => (
@@ -360,7 +360,7 @@ export default function Home() {
                 </div>
                 <h3 className="card-title text-lg">Running Late</h3>
                 <p className="text-gray-600 text-sm">
-                  One tap notifies all affected customers. Stay professional without panic texting.
+                  One tap notifies all affected clients. Stay professional without panic texting.
                 </p>
               </div>
             </div>
@@ -384,7 +384,7 @@ export default function Home() {
                 </div>
                 <h3 className="card-title text-lg">Skip with Reason</h3>
                 <p className="text-gray-600 text-sm">
-                  Cancellation or no-show? One tap logs it, warns you about problem customers, and moves on.
+                  Cancellation or no-show? One tap logs it, warns you about problem clients, and moves on.
                 </p>
               </div>
             </div>
@@ -396,7 +396,7 @@ export default function Home() {
                 </div>
                 <h3 className="card-title text-lg">On My Way</h3>
                 <p className="text-gray-600 text-sm">
-                  One tap lets your customer know you&apos;re heading over. Build trust without extra effort.
+                  One tap lets your client know you&apos;re heading over. Build trust without extra effort.
                 </p>
               </div>
             </div>
@@ -457,7 +457,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">One tap handles customer communication</span>
+                  <span className="text-gray-700">One tap handles client communication</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
@@ -608,11 +608,11 @@ export default function Home() {
 
                 <ul className="space-y-3 mb-6 flex-grow">
                   {[
-                    "Up to 50 customers",
+                    "Up to 50 clients",
                     "Route optimization",
                     "Area day scheduling",
                     "One-tap navigation",
-                    "Basic customer notes",
+                    "Basic client notes",
                     "Email support",
                   ].map((item) => (
                     <li className="flex gap-2 items-start" key={item}>
@@ -645,14 +645,14 @@ export default function Home() {
 
                 <ul className="space-y-3 mb-6 flex-grow">
                   {[
-                    "Unlimited customers",
+                    "Unlimited clients",
                     "Everything in Starter, plus:",
                     "Workload protection limits",
                     "Working hours warnings",
                     "Running late notifications",
                     "Calm Center (stress relief tools)",
                     "Pet behavior flags",
-                    "Customer cancellation history",
+                    "Client cancellation history",
                     "Priority support",
                   ].map((item) => (
                     <li className="flex gap-2 items-start" key={item}>

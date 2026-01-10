@@ -935,7 +935,21 @@ function DashboardContent() {
                   <p className="text-gray-500 text-xs mt-2 flex items-center justify-center md:justify-start gap-1">
                     <Clock className="h-3 w-3" />
                     {formatTime(stats.nextAppointment.startAt)}
-                    {stats.nextAppointment.serviceMinutes && ` (${stats.nextAppointment.serviceMinutes} min)`}
+                    {stats.nextAppointment.serviceMinutes && (
+                      <>
+                        {" - "}
+                        {(() => {
+                          const startDate = new Date(stats.nextAppointment.startAt);
+                          const endDate = new Date(startDate.getTime() + stats.nextAppointment.serviceMinutes * 60000);
+                          const hours = endDate.getUTCHours();
+                          const minutes = endDate.getUTCMinutes();
+                          const period = hours >= 12 ? 'PM' : 'AM';
+                          const displayHours = hours % 12 || 12;
+                          return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+                        })()}
+                        {` (${stats.nextAppointment.serviceMinutes} min)`}
+                      </>
+                    )}
                   </p>
                 </div>
 

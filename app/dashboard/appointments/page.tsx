@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Calendar, MapPin, Clock, Edit2, X, Filter, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Plus, Calendar, MapPin, Clock, X, Filter, ChevronLeft, ChevronRight, Sparkles, Check } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -40,6 +40,149 @@ const STATUS_OPTIONS = [
   { value: "CANCELLED", label: "Cancelled" },
   { value: "NO_SHOW", label: "No Show" },
 ];
+
+// Inline time editor component
+function TimeEditor({
+  appointment,
+  onUpdate,
+}: {
+  appointment: Appointment;
+  onUpdate: () => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const startInputRef = useRef<HTMLInputElement>(null);
+
+  const date = new Date(appointment.startAt);
+  const hours = date.getUTCHours();
+  const minutes = date.getUTCMinutes();
+  const endDate = new Date(date.getTime() + appointment.serviceMinutes * 60000);
+  const endHours = endDate.getUTCHours();
+  const endMinutes = endDate.getUTCMinutes();
+
+  const formatTime12 = (h: number, m: number) => {
+    const period = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 || 12;
+    return `${hour12}:${m.toString().padStart(2, "0")} ${period}`;
+  };
+
+  const formatTime24 = (h: number, m: number) => {
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+  };
+
+  const handleStartEdit = () => {
+    setStartTime(formatTime24(hours, minutes));
+    setEndTime(formatTime24(endHours, endMinutes));
+    setIsEditing(true);
+    setTimeout(() => startInputRef.current?.focus(), 0);
+  };
+
+  const handleSave = async () => {
+    if (!startTime || !endTime) return;
+
+    // Calculate new duration from times
+    const [startH, startM] = startTime.split(":").map(Number);
+    const [endH, endM] = endTime.split(":").map(Number);
+    const startMinutesTotal = startH * 60 + startM;
+    const endMinutesTotal = endH * 60 + endM;
+    const newDuration = endMinutesTotal - startMinutesTotal;
+
+    if (newDuration <= 0) {
+      toast.error("End time must be after start time");
+      return;
+    }
+
+    // Build new startAt date
+    const originalDate = new Date(appointment.startAt);
+    const dateStr = `${originalDate.getUTCFullYear()}-${String(originalDate.getUTCMonth() + 1).padStart(2, "0")}-${String(originalDate.getUTCDate()).padStart(2, "0")}`;
+    const newStartAt = `${dateStr}T${startTime}:00.000Z`;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/appointments/${appointment.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          startAt: newStartAt,
+          serviceMinutes: newDuration,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Time updated");
+        setIsEditing(false);
+        onUpdate();
+      } else {
+        toast.error("Failed to update time");
+      }
+    } catch (error) {
+      toast.error("Failed to update time");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
+
+  const isEditable = appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW";
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-2">
+        <Clock className="h-4 w-4 text-gray-400" />
+        <input
+          ref={startInputRef}
+          type="time"
+          value={startTime}
+          onChange={(e) => setStartTime(e.target.value)}
+          className="input input-bordered input-sm w-24 text-sm"
+        />
+        <span className="text-gray-400">-</span>
+        <input
+          type="time"
+          value={endTime}
+          onChange={(e) => setEndTime(e.target.value)}
+          className="input input-bordered input-sm w-24 text-sm"
+        />
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="btn btn-ghost btn-xs text-green-600 hover:bg-green-50"
+        >
+          {isSaving ? <span className="loading loading-spinner loading-xs"></span> : <Check className="h-4 w-4" />}
+        </button>
+        <button
+          onClick={handleCancel}
+          className="btn btn-ghost btn-xs text-gray-500 hover:bg-gray-100"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={isEditable ? handleStartEdit : undefined}
+      className={`flex items-center gap-1 ${isEditable ? "hover:bg-gray-100 rounded px-1 -mx-1 cursor-pointer group" : ""}`}
+      disabled={!isEditable}
+    >
+      <Clock className="h-4 w-4" />
+      <span>
+        {formatTime12(hours, minutes)} - {formatTime12(endHours, endMinutes)}
+      </span>
+      {isEditable && (
+        <span className="text-xs text-[#A5744A] opacity-0 group-hover:opacity-100 ml-1">
+          edit
+        </span>
+      )}
+    </button>
+  );
+}
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -139,6 +282,11 @@ export default function AppointmentsPage() {
     }
   }, []);
 
+  const refreshAll = useCallback(() => {
+    fetchAppointments();
+    fetchAllAppointments();
+  }, [fetchAppointments, fetchAllAppointments]);
+
   useEffect(() => {
     fetchAppointments();
   }, [fetchAppointments]);
@@ -151,8 +299,13 @@ export default function AppointmentsPage() {
     const labels: Record<string, string> = {
       FULL_GROOM: "Full Groom 💇",
       BATH_ONLY: "Bath Only 🛁",
+      BATH_BRUSH: "Bath & Brush 🛁",
       NAIL_TRIM: "Nail Trim ✂️",
-      FACE_FEET_FANNY: "Face/Feet/Fanny 🐾",
+      FACE_FEET_FANNY: "Tidy Up 🐾",
+      DESHED: "De-shed 🪮",
+      PUPPY_INTRO: "Puppy Intro 🐶",
+      HAND_STRIP: "Hand Stripping 🧤",
+      CUSTOM: "Custom ⭐",
     };
     return labels[type] || type;
   };
@@ -196,8 +349,7 @@ export default function AppointmentsPage() {
 
       if (response.ok) {
         toast.success("Appointment cancelled successfully");
-        fetchAppointments();
-        fetchAllAppointments();
+        refreshAll();
       } else {
         toast.error("Failed to cancel appointment");
       }
@@ -369,25 +521,7 @@ export default function AppointmentsPage() {
               </div>
 
               <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {(() => {
-                    const date = new Date(appointment.startAt);
-                    const hours = date.getUTCHours();
-                    const minutes = date.getUTCMinutes();
-                    const endDate = new Date(date.getTime() + appointment.serviceMinutes * 60000);
-                    const endHours = endDate.getUTCHours();
-                    const endMinutes = endDate.getUTCMinutes();
-
-                    const formatTime = (h: number, m: number) => {
-                      const period = h >= 12 ? 'PM' : 'AM';
-                      const hour12 = h % 12 || 12;
-                      return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
-                    };
-
-                    return `${formatTime(hours, minutes)} - ${formatTime(endHours, endMinutes)}`;
-                  })()}
-                </div>
+                <TimeEditor appointment={appointment} onUpdate={refreshAll} />
                 {/* Address hidden on mobile to save space */}
                 <div className="hidden sm:flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
@@ -395,21 +529,15 @@ export default function AppointmentsPage() {
                 </div>
               </div>
 
-              {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
+              {/* Cancel Button - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
               {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                 <div className="flex gap-2 pt-3 border-t border-gray-100">
-                  <Link
-                    href={`/dashboard/appointments/${appointment.id}/edit`}
-                    className="btn btn-ghost btn-sm gap-2 flex-1"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                    Modify
-                  </Link>
                   <button
                     onClick={() => handleCancelAppointment(appointment.id)}
                     className="btn btn-ghost btn-sm gap-2 text-red-600 hover:bg-red-50"
                   >
                     <X className="h-4 w-4" />
+                    Cancel
                   </button>
                 </div>
               )}
@@ -535,25 +663,7 @@ export default function AppointmentsPage() {
                 </div>
 
                 <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {(() => {
-                      const date = new Date(appointment.startAt);
-                      const hours = date.getUTCHours();
-                      const minutes = date.getUTCMinutes();
-                      const endDate = new Date(date.getTime() + appointment.serviceMinutes * 60000);
-                      const endHours = endDate.getUTCHours();
-                      const endMinutes = endDate.getUTCMinutes();
-
-                      const formatTime = (h: number, m: number) => {
-                        const period = h >= 12 ? 'PM' : 'AM';
-                        const hour12 = h % 12 || 12;
-                        return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
-                      };
-
-                      return `${formatTime(hours, minutes)} - ${formatTime(endHours, endMinutes)}`;
-                    })()}
-                  </div>
+                  <TimeEditor appointment={appointment} onUpdate={refreshAll} />
                   {/* Address hidden on mobile to save space */}
                   <div className="hidden sm:flex items-center gap-1">
                     <MapPin className="h-4 w-4" />
@@ -561,21 +671,15 @@ export default function AppointmentsPage() {
                   </div>
                 </div>
 
-                {/* Action Buttons - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
+                {/* Cancel Button - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
                 {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                   <div className="flex gap-2 pt-3 border-t border-gray-100">
-                    <Link
-                      href={`/dashboard/appointments/${appointment.id}/edit`}
-                      className="btn btn-ghost btn-sm gap-2 flex-1"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                      Modify
-                    </Link>
                     <button
                       onClick={() => handleCancelAppointment(appointment.id)}
                       className="btn btn-ghost btn-sm gap-2 text-red-600 hover:bg-red-50"
                     >
                       <X className="h-4 w-4" />
+                      Cancel
                     </button>
                   </div>
                 )}

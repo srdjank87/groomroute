@@ -33,6 +33,7 @@ interface SortableAppointmentProps {
   onCall: (phone: string) => void;
   onSMS: (phone: string) => void;
   onWhatsApp: (phone: string) => void;
+  onTimeUpdate?: () => void;
 }
 
 export default function SortableAppointment({
@@ -41,6 +42,7 @@ export default function SortableAppointment({
   onCall,
   onSMS,
   onWhatsApp,
+  onTimeUpdate,
 }: SortableAppointmentProps) {
   const {
     attributes,
@@ -67,6 +69,7 @@ export default function SortableAppointment({
         onCall={onCall}
         onSMS={onSMS}
         onWhatsApp={onWhatsApp}
+        onTimeUpdate={onTimeUpdate}
       />
     </div>
   );

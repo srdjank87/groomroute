@@ -32,7 +32,7 @@ const mainNavigation = [
 
 const businessNavigation = [
   { name: "Appointments", href: "/dashboard/appointments", icon: Calendar },
-  { name: "Customers", href: "/dashboard/customers", icon: Users },
+  { name: "Clients", href: "/dashboard/customers", icon: Users },
 ];
 
 const supportNavigation = [

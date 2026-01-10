@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Navigation, MapPin, AlertCircle, CheckCircle2, Zap, UserPlus, Coffee } from "lucide-react";
+import { Navigation, MapPin, AlertCircle, CheckCircle2, Zap, UserPlus, Coffee, X, Clock } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   DndContext,
@@ -100,6 +100,9 @@ export default function TodaysRoutePage() {
   const [showReorderModal, setShowReorderModal] = useState(false);
   const [isReordering, setIsReordering] = useState(false);
   const [pendingNewOrder, setPendingNewOrder] = useState<Appointment[]>([]);
+
+  // Optimize route confirmation state
+  const [showOptimizeModal, setShowOptimizeModal] = useState(false);
 
   // Configure sensors for both desktop and mobile
   const sensors = useSensors(
@@ -230,29 +233,56 @@ export default function TodaysRoutePage() {
     toast.success(`Opened route with ${validAppointments.length} stops in Google Maps`);
   }
 
-  async function optimizeRoute() {
+  function handleOptimizeClick() {
+    setShowOptimizeModal(true);
+  }
+
+  async function optimizeRoute(mode: "reorder" | "tighten") {
+    setShowOptimizeModal(false);
     setIsOptimizing(true);
     try {
       const now = new Date();
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      const response = await fetch("/api/routes/optimize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date: today }),
-      });
 
-      if (!response.ok) {
-        throw new Error("Failed to optimize route");
-      }
+      if (mode === "reorder") {
+        // Full optimization - reorder by distance
+        const response = await fetch("/api/routes/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date: today }),
+        });
 
-      const data = await response.json();
+        if (!response.ok) {
+          throw new Error("Failed to optimize route");
+        }
 
-      if (data.success) {
-        toast.success(data.message);
-        setOptimizationResult(data);
-        await fetchTodaysRoute();
+        const data = await response.json();
+
+        if (data.success) {
+          toast.success(data.message);
+          setOptimizationResult(data);
+          await fetchTodaysRoute();
+        } else {
+          toast.error(data.message || "Could not optimize route");
+        }
       } else {
-        toast.error(data.message || "Could not optimize route");
+        // Tighten mode - keep order, just adjust times
+        const response = await fetch("/api/routes/reorder", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: today,
+            appointmentIds: activeAppointments.map((a) => a.id),
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          toast.success("Times tightened! Gaps between appointments reduced.");
+          await fetchTodaysRoute();
+        } else {
+          toast.error("Failed to tighten times");
+        }
       }
     } catch (error) {
       console.error("Route optimization error:", error);
@@ -427,7 +457,7 @@ export default function TodaysRoutePage() {
             <div className="flex gap-2">
               {activeAppointments.length > 1 && (
                 <button
-                  onClick={optimizeRoute}
+                  onClick={handleOptimizeClick}
                   disabled={isOptimizing}
                   className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 px-6"
                 >
@@ -537,6 +567,7 @@ export default function TodaysRoutePage() {
                 onCall={handleCall}
                 onSMS={handleSMS}
                 onWhatsApp={handleWhatsApp}
+                onTimeUpdate={fetchTodaysRoute}
               />
             ))}
           </div>
@@ -655,6 +686,83 @@ export default function TodaysRoutePage() {
         isLoading={isReordering}
         contactMethods={contactMethods}
       />
+
+      {/* Optimize Route Confirmation Modal */}
+      {showOptimizeModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-amber-50 to-orange-50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-100 rounded-lg">
+                  <Zap className="h-5 w-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Optimize Route</h3>
+                  <p className="text-sm text-gray-600">Choose how to optimize</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowOptimizeModal(false)}
+                className="btn btn-ghost btn-sm btn-circle"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-4 space-y-3">
+              {/* Option 1: Tighten Times */}
+              <button
+                onClick={() => optimizeRoute("tighten")}
+                className="w-full p-4 rounded-lg border-2 border-gray-200 hover:border-[#A5744A] hover:bg-orange-50 transition-all text-left group"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                    <Clock className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Tighten Times</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Keep the current appointment order but reduce gaps between appointments.
+                      Good when you&apos;ve already arranged the route the way you like.
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              {/* Option 2: Reorder by Distance */}
+              <button
+                onClick={() => optimizeRoute("reorder")}
+                className="w-full p-4 rounded-lg border-2 border-gray-200 hover:border-[#A5744A] hover:bg-orange-50 transition-all text-left group"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                    <Navigation className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Optimize by Distance</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Reorder appointments to minimize driving distance between stops.
+                      Best for reducing drive time and fuel costs.
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t bg-gray-50">
+              <button
+                onClick={() => setShowOptimizeModal(false)}
+                className="btn btn-ghost w-full"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

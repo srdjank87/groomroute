@@ -247,8 +247,13 @@ enum AppointmentStatus {
 enum AppointmentType {
   FULL_GROOM
   BATH_ONLY
+  BATH_BRUSH
   NAIL_TRIM
   FACE_FEET_FANNY
+  DESHED
+  PUPPY_INTRO
+  HAND_STRIP
+  CUSTOM
   SQUEEZE_IN // Quick service for filling gaps (MVP Breakage Fix #4)
   ADDON
 }

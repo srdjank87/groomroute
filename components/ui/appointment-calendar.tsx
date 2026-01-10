@@ -60,20 +60,20 @@ export function AppointmentCalendar({
     <div className="flex items-center justify-between mb-4">
       <button
         onClick={handlePrevMonth}
-        className="p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
         type="button"
       >
-        <ChevronLeft className="w-5 h-5 text-zinc-400" />
+        <ChevronLeft className="w-5 h-5 text-gray-500" />
       </button>
-      <h3 className="text-lg font-semibold text-zinc-100">
+      <h3 className="text-lg font-semibold text-gray-900">
         {format(currentMonth, "MMMM yyyy")}
       </h3>
       <button
         onClick={handleNextMonth}
-        className="p-2 rounded-lg hover:bg-zinc-700 transition-colors"
+        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
         type="button"
       >
-        <ChevronRight className="w-5 h-5 text-zinc-400" />
+        <ChevronRight className="w-5 h-5 text-gray-500" />
       </button>
     </div>
   );
@@ -92,10 +92,10 @@ export function AppointmentCalendar({
             <div key={day} className="relative text-center">
               <span className={`text-xs font-medium ${
                 isSuggestedDay && customerAreaColor
-                  ? "text-green-400"
+                  ? "text-emerald-600"
                   : hasAreaAssignment
-                    ? "text-zinc-200"
-                    : "text-zinc-500"
+                    ? "text-gray-700"
+                    : "text-gray-400"
               }`}>
                 {day}
               </span>
@@ -160,22 +160,22 @@ export function AppointmentCalendar({
             onClick={() => isCurrentMonth && !isPast && onDateSelect(currentDay)}
             className={`
               relative p-2 min-h-[52px] rounded-lg transition-all
-              ${!isCurrentMonth ? "text-zinc-700 cursor-default" : ""}
-              ${isPast ? "text-zinc-600 cursor-not-allowed" : ""}
+              ${!isCurrentMonth ? "text-gray-300 cursor-default" : ""}
+              ${isPast ? "text-gray-300 cursor-not-allowed" : ""}
               ${isSelected
-                ? "bg-green-600 text-white ring-2 ring-green-400"
+                ? "bg-[#A5744A] text-white ring-2 ring-[#C4956A]"
                 : isCurrentMonth && !isPast
                   ? isCustomerAreaDay
-                    ? "bg-zinc-700/50 hover:bg-zinc-600 border border-dashed border-green-500/50"
-                    : "hover:bg-zinc-700"
+                    ? "bg-emerald-50 hover:bg-emerald-100 border border-dashed border-emerald-400"
+                    : "hover:bg-gray-100"
                   : ""
               }
-              ${isToday && !isSelected ? "ring-1 ring-zinc-500" : ""}
+              ${isToday && !isSelected ? "ring-1 ring-gray-300" : ""}
             `}
           >
             <span className={`
               text-sm font-medium
-              ${isSelected ? "text-white" : isCurrentMonth && !isPast ? "text-zinc-100" : ""}
+              ${isSelected ? "text-white" : isCurrentMonth && !isPast ? "text-gray-900" : ""}
             `}>
               {format(currentDay, "d")}
             </span>
@@ -234,14 +234,14 @@ export function AppointmentCalendar({
     }
 
     return (
-      <div className="mt-4 pt-3 border-t border-zinc-700">
-        <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-zinc-400">
+      <div className="mt-4 pt-3 border-t border-gray-200">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-blue-400" />
+            <div className="w-2 h-2 rounded-full bg-blue-500" />
             <span>Appointments</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-amber-400" />
+            <div className="w-2 h-2 rounded-full bg-amber-500" />
             <span>Unconfirmed</span>
           </div>
           {uniqueAreas.map(area => (
@@ -255,7 +255,7 @@ export function AppointmentCalendar({
           ))}
           {suggestedDays.length > 0 && customerAreaColor && (
             <div className="flex items-center gap-1.5">
-              <div className="w-4 h-4 rounded border border-dashed border-green-500/50 bg-zinc-700/50" />
+              <div className="w-4 h-4 rounded border border-dashed border-emerald-400 bg-emerald-50" />
               <span>Suggested</span>
             </div>
           )}
@@ -265,12 +265,12 @@ export function AppointmentCalendar({
   };
 
   return (
-    <div className="bg-zinc-800 rounded-xl p-4">
+    <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
       {renderHeader()}
       {renderDaysOfWeek()}
       {isLoading ? (
         <div className="h-[280px] flex items-center justify-center">
-          <div className="w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-[#A5744A] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         renderCells()

@@ -1220,7 +1220,7 @@ function CalmCenterContent() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900">I&apos;m Running Late</p>
-                <p className="text-sm text-gray-600">Adjust schedule & notify customers</p>
+                <p className="text-sm text-gray-600">Adjust schedule & notify clients</p>
               </div>
               <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
             </button>
@@ -1241,10 +1241,10 @@ function CalmCenterContent() {
           </div>
         </div>
 
-        {/* Group 2 - Customer Changes */}
+        {/* Group 2 - Client Changes */}
         <div className="mb-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-            Customer Changes
+            Client Changes
           </h3>
           <div className="grid grid-cols-1 gap-3">
             <button
@@ -1255,7 +1255,7 @@ function CalmCenterContent() {
                 <Calendar className="h-6 w-6 text-blue-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900">Contact Customer</p>
+                <p className="font-semibold text-gray-900">Contact Client</p>
                 <p className="text-sm text-gray-600">Quick call, text, or navigate</p>
               </div>
               <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
@@ -1291,7 +1291,7 @@ function CalmCenterContent() {
                 <MessageCircle className="h-6 w-6 text-green-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900">Help Me Reply to This Customer</p>
+                <p className="font-semibold text-gray-900">Help Me Reply to This Client</p>
                 <p className="text-sm text-gray-600">Get message templates</p>
               </div>
               <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
@@ -1305,7 +1305,7 @@ function CalmCenterContent() {
                 <Heart className="h-6 w-6 text-pink-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900">Customer Is Upset</p>
+                <p className="font-semibold text-gray-900">Client Is Upset</p>
                 <p className="text-sm text-gray-600">Get suggested responses</p>
               </div>
               <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
@@ -1355,7 +1355,7 @@ function CalmCenterContent() {
         <div className="mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
             <MessageCircle className="h-6 w-6 text-green-500" />
-            Customer Situations
+            Client Situations
           </h2>
 
           <div className="bg-white rounded-lg shadow border border-gray-200 divide-y divide-gray-200">
@@ -1405,32 +1405,7 @@ function CalmCenterContent() {
         </div>
       )}
 
-      {/* Section D - You & Your Day */}
-      {data.wellnessAlerts.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Heart className="h-6 w-6 text-pink-500" />
-            You & Your Day
-          </h2>
-
-          <div className="space-y-3">
-            {data.wellnessAlerts.map((alert) => (
-              <div
-                key={alert.id}
-                className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg border border-pink-200 p-5"
-              >
-                <p className="text-gray-800 mb-3">{alert.message}</p>
-                <p className="text-sm text-gray-600 mb-4">{alert.suggestion}</p>
-                <button className="btn btn-sm btn-outline btn-primary">
-                  Tell Me More
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Section E - Body Care */}
+      {/* Section D - Body Care */}
       <div className="mb-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
           <span className="text-2xl">🧘</span>
@@ -1494,7 +1469,7 @@ function CalmCenterContent() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Running Late</h3>
-                  <p className="text-sm text-gray-600">Notify your customers with new ETAs</p>
+                  <p className="text-sm text-gray-600">Notify your clients with new ETAs</p>
                 </div>
               </div>
               <button
@@ -1561,7 +1536,7 @@ function CalmCenterContent() {
               ) : (
                 <div className="space-y-3">
                   <p className="text-sm text-gray-600 mb-3">
-                    {runningLateAppointments.length} customer{runningLateAppointments.length !== 1 ? "s" : ""} will be affected:
+                    {runningLateAppointments.length} client{runningLateAppointments.length !== 1 ? "s" : ""} will be affected:
                   </p>
                   {runningLateAppointments.map((apt) => (
                     <div
@@ -1626,7 +1601,7 @@ function CalmCenterContent() {
             {runningLateAppointments.length > 0 && !isCalculating && (
               <div className="p-4 border-t bg-gray-50">
                 <p className="text-xs text-gray-500 mb-3 text-center">
-                  Notify all customers at once, or individually above
+                  Notify all clients at once, or individually above
                 </p>
                 <div className="flex gap-2">
                   {contactMethods.includes("sms") && (
@@ -1651,7 +1626,7 @@ function CalmCenterContent() {
                 </div>
                 {notifiedCustomers.size > 0 && (
                   <p className="text-sm text-green-600 text-center mt-3">
-                    {notifiedCustomers.size} of {runningLateAppointments.length} customers notified
+                    {notifiedCustomers.size} of {runningLateAppointments.length} clients notified
                   </p>
                 )}
               </div>
@@ -1882,7 +1857,7 @@ function CalmCenterContent() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Quick Contact</h3>
-                  <p className="text-sm text-gray-600">Call, text, or navigate to customers</p>
+                  <p className="text-sm text-gray-600">Call, text, or navigate to clients</p>
                 </div>
               </div>
               <button

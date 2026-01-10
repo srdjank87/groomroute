@@ -1,6 +1,8 @@
 "use client";
 
-import { GripVertical, Phone, MessageSquare, MapPin, Clock } from "lucide-react";
+import { useState, useRef } from "react";
+import { GripVertical, Phone, MessageSquare, MapPin, Clock, Check, X } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface Appointment {
   id: string;
@@ -33,22 +35,18 @@ interface DraggableAppointmentCardProps {
   onCall: (phone: string) => void;
   onSMS: (phone: string) => void;
   onWhatsApp: (phone: string) => void;
+  onTimeUpdate?: () => void;
 }
 
-function formatTimeRange(startAt: string, serviceMinutes: number): string {
-  const startDate = new Date(startAt);
-  const endDate = new Date(startDate.getTime() + serviceMinutes * 60 * 1000);
+function formatTime12(h: number, m: number): string {
+  const period = h >= 12 ? "PM" : "AM";
+  const displayHours = h % 12 || 12;
+  const displayMinutes = m.toString().padStart(2, "0");
+  return `${displayHours}:${displayMinutes} ${period}`;
+}
 
-  const formatTimeFromDate = (date: Date) => {
-    const hours = date.getUTCHours();
-    const minutes = date.getUTCMinutes();
-    const period = hours >= 12 ? "PM" : "AM";
-    const displayHours = hours % 12 || 12;
-    const displayMinutes = minutes.toString().padStart(2, "0");
-    return `${displayHours}:${displayMinutes} ${period}`;
-  };
-
-  return `${formatTimeFromDate(startDate)} - ${formatTimeFromDate(endDate)}`;
+function formatTime24(h: number, m: number): string {
+  return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 }
 
 function formatAppointmentType(type: string): string {
@@ -57,10 +55,20 @@ function formatAppointmentType(type: string): string {
       return "Full Groom";
     case "BATH_ONLY":
       return "Bath Only";
+    case "BATH_BRUSH":
+      return "Bath & Brush";
     case "NAIL_TRIM":
       return "Nail Trim";
     case "FACE_FEET_FANNY":
-      return "Face, Feet & Fanny";
+      return "Tidy Up";
+    case "DESHED":
+      return "De-shed";
+    case "PUPPY_INTRO":
+      return "Puppy Intro";
+    case "HAND_STRIP":
+      return "Hand Stripping";
+    case "CUSTOM":
+      return "Custom";
     default:
       return type;
   }
@@ -87,7 +95,75 @@ export default function DraggableAppointmentCard({
   onCall,
   onSMS,
   onWhatsApp,
+  onTimeUpdate,
 }: DraggableAppointmentCardProps) {
+  const [isEditingTime, setIsEditingTime] = useState(false);
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const startInputRef = useRef<HTMLInputElement>(null);
+
+  const startDate = new Date(appointment.startAt);
+  const startHours = startDate.getUTCHours();
+  const startMinutes = startDate.getUTCMinutes();
+  const endDate = new Date(startDate.getTime() + appointment.serviceMinutes * 60 * 1000);
+  const endHours = endDate.getUTCHours();
+  const endMinutes = endDate.getUTCMinutes();
+
+  const handleStartEdit = () => {
+    setStartTime(formatTime24(startHours, startMinutes));
+    setEndTime(formatTime24(endHours, endMinutes));
+    setIsEditingTime(true);
+    setTimeout(() => startInputRef.current?.focus(), 0);
+  };
+
+  const handleSaveTime = async () => {
+    if (!startTime || !endTime) return;
+
+    const [startH, startM] = startTime.split(":").map(Number);
+    const [endH, endM] = endTime.split(":").map(Number);
+    const startMinutesTotal = startH * 60 + startM;
+    const endMinutesTotal = endH * 60 + endM;
+    const newDuration = endMinutesTotal - startMinutesTotal;
+
+    if (newDuration <= 0) {
+      toast.error("End time must be after start time");
+      return;
+    }
+
+    const originalDate = new Date(appointment.startAt);
+    const dateStr = `${originalDate.getUTCFullYear()}-${String(originalDate.getUTCMonth() + 1).padStart(2, "0")}-${String(originalDate.getUTCDate()).padStart(2, "0")}`;
+    const newStartAt = `${dateStr}T${startTime}:00.000Z`;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/appointments/${appointment.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          startAt: newStartAt,
+          serviceMinutes: newDuration,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Time updated");
+        setIsEditingTime(false);
+        onTimeUpdate?.();
+      } else {
+        toast.error("Failed to update time");
+      }
+    } catch (error) {
+      toast.error("Failed to update time");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingTime(false);
+  };
+
   return (
     <div
       className={`bg-white border-2 rounded-xl p-4 shadow transition-shadow ${
@@ -110,16 +186,57 @@ export default function DraggableAppointmentCard({
           <GripVertical className="h-5 w-5" />
         </div>
 
-        {/* Time */}
+        {/* Time - Editable */}
         <div className="flex items-center gap-2 flex-1">
-          <Clock className="h-4 w-4 text-gray-500" />
-          <span className="font-semibold text-gray-900">
-            {formatTimeRange(appointment.startAt, appointment.serviceMinutes)}
-          </span>
+          {isEditingTime ? (
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-gray-400" />
+              <input
+                ref={startInputRef}
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className="input input-bordered input-sm w-24 text-sm"
+              />
+              <span className="text-gray-400">-</span>
+              <input
+                type="time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className="input input-bordered input-sm w-24 text-sm"
+              />
+              <button
+                onClick={handleSaveTime}
+                disabled={isSaving}
+                className="btn btn-ghost btn-xs text-green-600 hover:bg-green-50"
+              >
+                {isSaving ? <span className="loading loading-spinner loading-xs"></span> : <Check className="h-4 w-4" />}
+              </button>
+              <button
+                onClick={handleCancelEdit}
+                className="btn btn-ghost btn-xs text-gray-500 hover:bg-gray-100"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleStartEdit}
+              className="flex items-center gap-2 hover:bg-gray-100 rounded px-2 py-1 -mx-2 -my-1 cursor-pointer group"
+            >
+              <Clock className="h-4 w-4 text-gray-500" />
+              <span className="font-semibold text-gray-900">
+                {formatTime12(startHours, startMinutes)} - {formatTime12(endHours, endMinutes)}
+              </span>
+              <span className="text-xs text-[#A5744A] opacity-0 group-hover:opacity-100">
+                edit
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Status badge */}
-        {getStatusBadge(appointment.status)}
+        {!isEditingTime && getStatusBadge(appointment.status)}
       </div>
 
       {/* Customer and pet info */}
