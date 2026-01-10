@@ -305,6 +305,97 @@ function CalmCenterContent() {
   const [travelRiskSummary, setTravelRiskSummary] = useState<TravelRiskSummary | null>(null);
   const [isLoadingTravelRisk, setIsLoadingTravelRisk] = useState(false);
 
+  // Body Care / Exercise state
+  const [showExerciseModal, setShowExerciseModal] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState<typeof bodyExercises[0] | null>(null);
+  const [exerciseStep, setExerciseStep] = useState(0);
+
+  // Body Care exercises specifically for groomers
+  const bodyExercises = [
+    {
+      id: "hands-wrists",
+      area: "Hands & Wrists",
+      emoji: "🤲",
+      color: "from-blue-500 to-indigo-500",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+      duration: "2 min",
+      description: "Relief for tired hands from scissoring and clipping",
+      steps: [
+        { title: "Finger Spreads", instruction: "Spread your fingers wide, hold for 5 seconds, then make a fist. Repeat 10 times.", duration: 30 },
+        { title: "Wrist Circles", instruction: "Rotate each wrist slowly in circles - 10 times clockwise, 10 times counter-clockwise.", duration: 30 },
+        { title: "Prayer Stretch", instruction: "Press palms together in front of chest, fingers pointing up. Slowly lower hands while keeping palms together until you feel a stretch. Hold 15 seconds.", duration: 20 },
+        { title: "Shake It Out", instruction: "Let your hands hang loose and shake them vigorously for 10 seconds. Feel the tension release.", duration: 10 },
+      ],
+    },
+    {
+      id: "shoulders-upper-back",
+      area: "Shoulders & Upper Back",
+      emoji: "💪",
+      color: "from-purple-500 to-pink-500",
+      bgColor: "bg-purple-50",
+      borderColor: "border-purple-200",
+      duration: "3 min",
+      description: "Release tension from holding arms up while grooming",
+      steps: [
+        { title: "Shoulder Rolls", instruction: "Roll shoulders forward 5 times in big circles, then backward 5 times. Keep movements slow and controlled.", duration: 30 },
+        { title: "Cross-Body Stretch", instruction: "Bring right arm across your chest, use left hand to gently press it closer. Hold 15 seconds, then switch sides.", duration: 40 },
+        { title: "Shoulder Blade Squeeze", instruction: "Stand tall, squeeze your shoulder blades together as if holding a pencil between them. Hold 5 seconds, release. Repeat 8 times.", duration: 40 },
+        { title: "Neck Release", instruction: "Drop your right ear toward your right shoulder. Gently press with your right hand for a deeper stretch. Hold 20 seconds, then switch sides.", duration: 50 },
+        { title: "Upper Back Stretch", instruction: "Clasp hands in front, round your upper back like a cat, push hands away from chest. Hold 15 seconds.", duration: 20 },
+      ],
+    },
+    {
+      id: "lower-back",
+      area: "Lower Back",
+      emoji: "🦴",
+      color: "from-amber-500 to-orange-500",
+      bgColor: "bg-amber-50",
+      borderColor: "border-amber-200",
+      duration: "3 min",
+      description: "Ease strain from bending over grooming tables",
+      steps: [
+        { title: "Standing Back Extension", instruction: "Place hands on lower back, gently arch backward, looking up at the ceiling. Hold 10 seconds. Repeat 3 times.", duration: 40 },
+        { title: "Hip Flexor Stretch", instruction: "Step one foot forward into a lunge, keep back straight, push hips forward gently. Hold 20 seconds each side.", duration: 50 },
+        { title: "Cat-Cow (Standing)", instruction: "With hands on thighs, round your back up like a cat, then arch it down. Flow between positions 8 times.", duration: 40 },
+        { title: "Gentle Twist", instruction: "Feet shoulder-width apart, cross arms over chest, slowly rotate torso left, then right. 10 times each direction.", duration: 40 },
+        { title: "Forward Fold", instruction: "Let your upper body hang down toward your toes (bend knees if needed). Let gravity stretch your lower back. Hold 20 seconds.", duration: 20 },
+      ],
+    },
+    {
+      id: "legs-feet",
+      area: "Legs & Feet",
+      emoji: "🦶",
+      color: "from-green-500 to-teal-500",
+      bgColor: "bg-green-50",
+      borderColor: "border-green-200",
+      duration: "2 min",
+      description: "Recovery for standing and moving all day",
+      steps: [
+        { title: "Calf Raises", instruction: "Rise up onto your toes, hold 2 seconds, lower slowly. Repeat 15 times. Hold onto something for balance if needed.", duration: 40 },
+        { title: "Ankle Circles", instruction: "Lift one foot, rotate ankle 10 times each direction. Switch feet.", duration: 30 },
+        { title: "Toe Stretches", instruction: "If you can, slip off your shoes and spread your toes wide. Scrunch them up, then spread. Repeat 10 times.", duration: 20 },
+        { title: "Quad Stretch", instruction: "Hold onto something, grab one ankle behind you, gently pull heel toward glutes. Hold 20 seconds each leg.", duration: 45 },
+      ],
+    },
+    {
+      id: "quick-reset",
+      area: "Quick Full-Body Reset",
+      emoji: "⚡",
+      color: "from-cyan-500 to-blue-500",
+      bgColor: "bg-cyan-50",
+      borderColor: "border-cyan-200",
+      duration: "1 min",
+      description: "Fast refresh between appointments",
+      steps: [
+        { title: "Deep Breaths", instruction: "Take 3 slow, deep breaths. Inhale for 4 counts, hold for 4, exhale for 6.", duration: 20 },
+        { title: "Full Body Shake", instruction: "Shake your whole body - hands, arms, shoulders, legs. Let everything loose for 10 seconds.", duration: 15 },
+        { title: "Reach & Release", instruction: "Reach both arms high overhead, stretch tall, then let everything drop and relax. Repeat 3 times.", duration: 20 },
+        { title: "Roll Shoulders Back", instruction: "3 big shoulder rolls backward to reset your posture. Stand tall and confident.", duration: 10 },
+      ],
+    },
+  ];
+
   useEffect(() => {
     async function fetchCalmCenterData() {
       try {
@@ -1338,6 +1429,42 @@ function CalmCenterContent() {
           </div>
         </div>
       )}
+
+      {/* Section E - Body Care */}
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <span className="text-2xl">🧘</span>
+          Body Care
+        </h2>
+        <p className="text-gray-600 text-sm mb-4">
+          Quick stretches and exercises designed for groomers. Take care of the body that takes care of so many pups!
+        </p>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {bodyExercises.map((exercise) => (
+            <button
+              key={exercise.id}
+              onClick={() => {
+                setSelectedExercise(exercise);
+                setExerciseStep(0);
+                setShowExerciseModal(true);
+              }}
+              className={`${exercise.bgColor} ${exercise.borderColor} border rounded-xl p-4 text-left hover:shadow-md transition-all hover:scale-[1.02]`}
+            >
+              <div className="text-2xl mb-2">{exercise.emoji}</div>
+              <p className="font-semibold text-gray-900 text-sm">{exercise.area}</p>
+              <p className="text-xs text-gray-600 mt-1">{exercise.duration}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Tip of the day */}
+        <div className="mt-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200 p-4">
+          <p className="text-sm text-indigo-800">
+            <span className="font-semibold">Pro tip:</span> Try the Quick Reset between appointments to prevent fatigue buildup. Even 60 seconds makes a difference!
+          </p>
+        </div>
+      </div>
 
       {/* Empty State - All Calm */}
       {data.quickRescues.length === 0 &&
@@ -2694,6 +2821,120 @@ function CalmCenterContent() {
             <div className="border-t px-6 py-4 bg-gray-50">
               <button
                 onClick={() => setShowTravelRiskModal(false)}
+                className="btn w-full bg-gray-200 hover:bg-gray-300 text-gray-700 border-0"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Exercise Modal - Body Care */}
+      {showExerciseModal && selectedExercise && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className={`bg-gradient-to-r ${selectedExercise.color} px-6 py-4`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 text-white">
+                  <span className="text-2xl">{selectedExercise.emoji}</span>
+                  <div>
+                    <h3 className="text-xl font-bold">{selectedExercise.area}</h3>
+                    <p className="text-white/80 text-sm">{selectedExercise.duration}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowExerciseModal(false);
+                    setSelectedExercise(null);
+                    setExerciseStep(0);
+                  }}
+                  className="text-white/80 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+              {/* Progress indicator */}
+              <div className="flex gap-1 mb-6">
+                {selectedExercise.steps.map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`h-1.5 flex-1 rounded-full transition-colors ${
+                      idx <= exerciseStep ? "bg-gradient-to-r " + selectedExercise.color : "bg-gray-200"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Current step */}
+              <div className="text-center">
+                <p className="text-sm text-gray-500 mb-2">
+                  Step {exerciseStep + 1} of {selectedExercise.steps.length}
+                </p>
+                <h4 className="text-xl font-bold text-gray-900 mb-4">
+                  {selectedExercise.steps[exerciseStep].title}
+                </h4>
+                <div className={`${selectedExercise.bgColor} ${selectedExercise.borderColor} border rounded-xl p-6 mb-6`}>
+                  <p className="text-gray-700 leading-relaxed">
+                    {selectedExercise.steps[exerciseStep].instruction}
+                  </p>
+                </div>
+
+                {/* Navigation buttons */}
+                <div className="flex gap-3">
+                  {exerciseStep > 0 && (
+                    <button
+                      onClick={() => setExerciseStep(exerciseStep - 1)}
+                      className="btn flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border-0"
+                    >
+                      Previous
+                    </button>
+                  )}
+                  {exerciseStep < selectedExercise.steps.length - 1 ? (
+                    <button
+                      onClick={() => setExerciseStep(exerciseStep + 1)}
+                      className={`btn flex-1 text-white border-0 bg-gradient-to-r ${selectedExercise.color} hover:opacity-90`}
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setShowExerciseModal(false);
+                        setSelectedExercise(null);
+                        setExerciseStep(0);
+                        toast.success("Great job! Your body thanks you", { icon: "💪" });
+                      }}
+                      className="btn flex-1 bg-green-500 hover:bg-green-600 text-white border-0"
+                    >
+                      Complete!
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Encouragement */}
+              <div className="mt-6 text-center text-sm text-gray-500">
+                {exerciseStep === 0 && "Take your time - listen to your body"}
+                {exerciseStep === 1 && "You're doing great!"}
+                {exerciseStep === 2 && "Halfway there - keep going!"}
+                {exerciseStep >= 3 && "Almost done - you've got this!"}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t px-6 py-4 bg-gray-50">
+              <button
+                onClick={() => {
+                  setShowExerciseModal(false);
+                  setSelectedExercise(null);
+                  setExerciseStep(0);
+                }}
                 className="btn w-full bg-gray-200 hover:bg-gray-300 text-gray-700 border-0"
               >
                 Close
