@@ -204,6 +204,9 @@ export default function AppointmentsPage() {
   const [cancellingAppointment, setCancellingAppointment] = useState<Appointment | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
 
+  // Preferences state
+  const [preferredMessaging, setPreferredMessaging] = useState<"SMS" | "WHATSAPP">("SMS");
+
   const dateInputRef = useRef<HTMLInputElement>(null);
 
   // Check if selected date is today
@@ -300,6 +303,24 @@ export default function AppointmentsPage() {
   useEffect(() => {
     fetchAllAppointments();
   }, [fetchAllAppointments]);
+
+  // Fetch preferences
+  useEffect(() => {
+    async function fetchPreferences() {
+      try {
+        const response = await fetch("/api/dashboard/today");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.preferredMessaging) {
+            setPreferredMessaging(data.preferredMessaging);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching preferences:", error);
+      }
+    }
+    fetchPreferences();
+  }, []);
 
   const getServiceTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
@@ -576,7 +597,7 @@ export default function AppointmentsPage() {
               {/* Action Buttons */}
               {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                 <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
-                  {/* Contact buttons */}
+                  {/* Contact buttons - Call + Preferred Messaging */}
                   {appointment.customer.phone && (
                     <>
                       <button
@@ -586,19 +607,22 @@ export default function AppointmentsPage() {
                         <Phone className="h-3.5 w-3.5" />
                         Call
                       </button>
-                      <button
-                        onClick={() => handleSMS(appointment.customer.phone)}
-                        className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
-                      >
-                        <MessageSquare className="h-3.5 w-3.5" />
-                        SMS
-                      </button>
-                      <button
-                        onClick={() => handleWhatsApp(appointment.customer.phone)}
-                        className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
-                      >
-                        💚 WhatsApp
-                      </button>
+                      {preferredMessaging === "WHATSAPP" ? (
+                        <button
+                          onClick={() => handleWhatsApp(appointment.customer.phone)}
+                          className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
+                        >
+                          💚 WhatsApp
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleSMS(appointment.customer.phone)}
+                          className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
+                        >
+                          <MessageSquare className="h-3.5 w-3.5" />
+                          SMS
+                        </button>
+                      )}
                     </>
                   )}
                   {/* Cancel button */}
@@ -744,7 +768,7 @@ export default function AppointmentsPage() {
                 {/* Action Buttons */}
                 {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
                   <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
-                    {/* Contact buttons */}
+                    {/* Contact buttons - Call + Preferred Messaging */}
                     {appointment.customer.phone && (
                       <>
                         <button
@@ -754,19 +778,22 @@ export default function AppointmentsPage() {
                           <Phone className="h-3.5 w-3.5" />
                           Call
                         </button>
-                        <button
-                          onClick={() => handleSMS(appointment.customer.phone)}
-                          className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
-                        >
-                          <MessageSquare className="h-3.5 w-3.5" />
-                          SMS
-                        </button>
-                        <button
-                          onClick={() => handleWhatsApp(appointment.customer.phone)}
-                          className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
-                        >
-                          💚 WhatsApp
-                        </button>
+                        {preferredMessaging === "WHATSAPP" ? (
+                          <button
+                            onClick={() => handleWhatsApp(appointment.customer.phone)}
+                            className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
+                          >
+                            💚 WhatsApp
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleSMS(appointment.customer.phone)}
+                            className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
+                          >
+                            <MessageSquare className="h-3.5 w-3.5" />
+                            SMS
+                          </button>
+                        )}
                       </>
                     )}
                     {/* Cancel button */}

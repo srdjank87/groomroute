@@ -30,6 +30,7 @@ interface Appointment {
 interface SortableAppointmentProps {
   appointment: Appointment;
   contactMethods: string[];
+  preferredMessaging?: "SMS" | "WHATSAPP";
   onCall: (phone: string) => void;
   onSMS: (phone: string) => void;
   onWhatsApp: (phone: string) => void;
@@ -39,6 +40,7 @@ interface SortableAppointmentProps {
 export default function SortableAppointment({
   appointment,
   contactMethods,
+  preferredMessaging = "SMS",
   onCall,
   onSMS,
   onWhatsApp,
@@ -64,6 +66,7 @@ export default function SortableAppointment({
       <DraggableAppointmentCard
         appointment={appointment}
         contactMethods={contactMethods}
+        preferredMessaging={preferredMessaging}
         isDragging={isDragging}
         dragHandleProps={{ ...attributes, ...listeners }}
         onCall={onCall}

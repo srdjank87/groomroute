@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 
-type OnboardingStep = "address" | "hours" | "contact" | "workload" | "complete";
+type OnboardingStep = "address" | "hours" | "contact" | "preferences" | "workload" | "complete";
 
 export default function OnboardingPage() {
   const { data: session, status } = useSession();
@@ -41,6 +41,8 @@ export default function OnboardingPage() {
   });
 
   const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
+  const [preferredMessaging, setPreferredMessaging] = useState<"SMS" | "WHATSAPP">("SMS");
+  const [preferredMaps, setPreferredMaps] = useState<"GOOGLE" | "APPLE">("GOOGLE");
   const [largeDogLimit, setLargeDogLimit] = useState<string>("");
 
 
@@ -77,6 +79,11 @@ export default function OnboardingPage() {
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCurrentStep("preferences");
+  };
+
+  const handlePreferencesSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setCurrentStep("workload");
   };
 
@@ -94,6 +101,8 @@ export default function OnboardingPage() {
           address: addressData,
           hours: hoursData,
           contactMethods,
+          preferredMessaging,
+          preferredMaps,
           largeDogDailyLimit: largeDogLimit === "" ? null : parseInt(largeDogLimit),
         }),
       });
@@ -129,11 +138,14 @@ export default function OnboardingPage() {
             <li className={`step ${currentStep !== "address" ? "step-primary" : ""} text-gray-700 font-medium`}>
               Address
             </li>
-            <li className={`step ${["hours", "contact", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
+            <li className={`step ${["hours", "contact", "preferences", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
               Hours
             </li>
-            <li className={`step ${["contact", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
+            <li className={`step ${["contact", "preferences", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
               Contact
+            </li>
+            <li className={`step ${["preferences", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
+              Apps
             </li>
             <li className={`step ${currentStep === "workload" ? "step-primary" : ""} text-gray-700 font-medium`}>
               Workload
@@ -283,6 +295,133 @@ export default function OnboardingPage() {
             </form>
           )}
 
+          {currentStep === "preferences" && (
+            <form onSubmit={handlePreferencesSubmit} className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                App Preferences
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Choose your preferred apps for messaging and navigation.
+              </p>
+
+              {/* Messaging Preference */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Preferred Messaging App
+                </label>
+                <p className="text-sm text-gray-500 mb-3">
+                  Which messaging button would you like to see on appointment cards?
+                </p>
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setPreferredMessaging("SMS")}
+                    className={`w-full p-4 rounded-lg border-2 transition-colors text-left flex items-center gap-3 ${
+                      preferredMessaging === "SMS"
+                        ? "border-[#A5744A] bg-orange-50"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
+                    }`}
+                  >
+                    <span className="text-2xl">💬</span>
+                    <div>
+                      <span className="font-medium text-gray-900">SMS / Text</span>
+                      <p className="text-sm text-gray-500">Standard text messaging</p>
+                    </div>
+                    {preferredMessaging === "SMS" && (
+                      <span className="ml-auto text-[#A5744A]">✓</span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreferredMessaging("WHATSAPP")}
+                    className={`w-full p-4 rounded-lg border-2 transition-colors text-left flex items-center gap-3 ${
+                      preferredMessaging === "WHATSAPP"
+                        ? "border-[#A5744A] bg-orange-50"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
+                    }`}
+                  >
+                    <span className="text-2xl">💚</span>
+                    <div>
+                      <span className="font-medium text-gray-900">WhatsApp</span>
+                      <p className="text-sm text-gray-500">WhatsApp messaging</p>
+                    </div>
+                    {preferredMessaging === "WHATSAPP" && (
+                      <span className="ml-auto text-[#A5744A]">✓</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Maps Preference */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Preferred Maps App
+                </label>
+                <p className="text-sm text-gray-500 mb-3">
+                  Which maps app would you like to use for navigation?
+                </p>
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setPreferredMaps("GOOGLE")}
+                    className={`w-full p-4 rounded-lg border-2 transition-colors text-left flex items-center gap-3 ${
+                      preferredMaps === "GOOGLE"
+                        ? "border-[#A5744A] bg-orange-50"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
+                    }`}
+                  >
+                    <span className="text-2xl">🗺️</span>
+                    <div>
+                      <span className="font-medium text-gray-900">Google Maps</span>
+                      <p className="text-sm text-gray-500">Works on all devices</p>
+                    </div>
+                    {preferredMaps === "GOOGLE" && (
+                      <span className="ml-auto text-[#A5744A]">✓</span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreferredMaps("APPLE")}
+                    className={`w-full p-4 rounded-lg border-2 transition-colors text-left flex items-center gap-3 ${
+                      preferredMaps === "APPLE"
+                        ? "border-[#A5744A] bg-orange-50"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
+                    }`}
+                  >
+                    <span className="text-2xl">🍎</span>
+                    <div>
+                      <span className="font-medium text-gray-900">Apple Maps</span>
+                      <p className="text-sm text-gray-500">Best for iOS devices</p>
+                    </div>
+                    {preferredMaps === "APPLE" && (
+                      <span className="ml-auto text-[#A5744A]">✓</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-500">
+                You can change these anytime in Settings → Profile.
+              </p>
+
+              <div className="flex gap-2 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep("contact")}
+                  className="btn btn-ghost flex-1 border-2 border-gray-300"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary flex-1 text-white bg-[#A5744A] hover:bg-[#8B6239] border-0"
+                >
+                  Continue
+                </button>
+              </div>
+            </form>
+          )}
+
           {currentStep === "workload" && (
             <form onSubmit={handleWorkloadSubmit} className="space-y-4">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -336,7 +475,7 @@ export default function OnboardingPage() {
               <div className="flex gap-2 mt-6">
                 <button
                   type="button"
-                  onClick={() => setCurrentStep("contact")}
+                  onClick={() => setCurrentStep("preferences")}
                   className="btn btn-ghost flex-1 border-2 border-gray-300"
                   disabled={isLoading}
                 >

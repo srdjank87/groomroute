@@ -180,25 +180,19 @@ export function AppointmentCalendar({
               {format(currentDay, "d")}
             </span>
 
-            {/* Indicators container */}
-            {isCurrentMonth && (
-              <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex items-center gap-0.5">
-                {/* Appointment indicator */}
-                {hasAppointments && (
-                  <div className={`
-                    w-1.5 h-1.5 rounded-full
-                    ${dateData.hasPending ? "bg-amber-400" : "bg-blue-400"}
-                  `} title={`${dateData.count} appointment${dateData.count > 1 ? "s" : ""}`} />
-                )}
-
-                {/* Area day indicator - show first area color if it's an assigned day */}
-                {areasForDay.length > 0 && !isSelected && (
-                  <div
-                    className="w-1.5 h-1.5 rounded-full opacity-70"
-                    style={{ backgroundColor: areasForDay[0].color }}
-                    title={areasForDay.map(a => a.name).join(", ")}
-                  />
-                )}
+            {/* Appointment count badge */}
+            {isCurrentMonth && hasAppointments && (
+              <div className={`
+                absolute bottom-0.5 right-0.5 min-w-[16px] h-[16px] px-1 rounded-full
+                flex items-center justify-center text-[10px] font-bold
+                ${isSelected
+                  ? "bg-white/90 text-[#A5744A]"
+                  : dateData.hasPending
+                    ? "bg-amber-100 text-amber-700 ring-1 ring-amber-300"
+                    : "bg-gray-100 text-gray-600 ring-1 ring-gray-300"
+                }
+              `} title={`${dateData.count} appointment${dateData.count > 1 ? "s" : ""}${dateData.hasPending ? " (some unconfirmed)" : ""}`}>
+                {dateData.count}
               </div>
             )}
           </button>
@@ -236,28 +230,44 @@ export function AppointmentCalendar({
     return (
       <div className="mt-4 pt-3 border-t border-gray-200">
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
+          {/* Appointments legend */}
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-blue-500" />
+            <div className="min-w-[16px] h-[16px] px-1 rounded-full bg-gray-100 ring-1 ring-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-600">
+              2
+            </div>
             <span>Appointments</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-amber-500" />
-            <span>Unconfirmed</span>
+            <div className="min-w-[16px] h-[16px] px-1 rounded-full bg-amber-100 ring-1 ring-amber-300 flex items-center justify-center text-[10px] font-bold text-amber-700">
+              1
+            </div>
+            <span>Has unconfirmed</span>
           </div>
-          {uniqueAreas.map(area => (
-            <div key={area.id} className="flex items-center gap-1.5">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: area.color }}
-              />
-              <span>{area.name}</span>
-            </div>
-          ))}
+          {/* Service areas legend */}
+          {uniqueAreas.length > 0 && (
+            <>
+              <div className="w-px h-4 bg-gray-300 mx-1" />
+              <span className="text-gray-400">Area days:</span>
+              {uniqueAreas.map(area => (
+                <div key={area.id} className="flex items-center gap-1.5">
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: area.color }}
+                  />
+                  <span>{area.name}</span>
+                </div>
+              ))}
+            </>
+          )}
+          {/* Suggested days legend */}
           {suggestedDays.length > 0 && customerAreaColor && (
-            <div className="flex items-center gap-1.5">
-              <div className="w-4 h-4 rounded border border-dashed border-emerald-400 bg-emerald-50" />
-              <span>Suggested</span>
-            </div>
+            <>
+              <div className="w-px h-4 bg-gray-300 mx-1" />
+              <div className="flex items-center gap-1.5">
+                <div className="w-4 h-4 rounded border border-dashed border-emerald-400 bg-emerald-50" />
+                <span>Suggested day</span>
+              </div>
+            </>
           )}
         </div>
       </div>

@@ -92,6 +92,8 @@ export default function TodaysRoutePage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [optimizationResult, setOptimizationResult] = useState<OptimizationResult | null>(null);
   const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
+  const [preferredMessaging, setPreferredMessaging] = useState<"SMS" | "WHATSAPP">("SMS");
+  const [preferredMaps, setPreferredMaps] = useState<"GOOGLE" | "APPLE">("GOOGLE");
   const [assistantStatus, setAssistantStatus] = useState<AssistantStatus | null>(null);
   const [todayAreaDay, setTodayAreaDay] = useState<TodayAreaDay | null>(null);
 
@@ -143,6 +145,12 @@ export default function TodaysRoutePage() {
         const data = await response.json();
         if (data.contactMethods) {
           setContactMethods(data.contactMethods);
+        }
+        if (data.preferredMessaging) {
+          setPreferredMessaging(data.preferredMessaging);
+        }
+        if (data.preferredMaps) {
+          setPreferredMaps(data.preferredMaps);
         }
       }
     } catch (error) {
@@ -216,7 +224,7 @@ export default function TodaysRoutePage() {
     window.open(`https://wa.me/1${cleanPhone}`, "_blank");
   }
 
-  function exportToGoogleMaps() {
+  function startDrivingRoute() {
     const validAppointments = activeAppointments.filter((apt) => apt.customer.address);
 
     if (validAppointments.length === 0) {
@@ -224,13 +232,31 @@ export default function TodaysRoutePage() {
       return;
     }
 
-    let url = "https://www.google.com/maps/dir/";
-    validAppointments.forEach((apt) => {
-      url += encodeURIComponent(apt.customer.address) + "/";
-    });
+    let url: string;
+    const mapsApp = preferredMaps === "APPLE" ? "Apple Maps" : "Google Maps";
+
+    if (preferredMaps === "APPLE") {
+      // Apple Maps URL with multiple waypoints
+      // Apple Maps format: https://maps.apple.com/?daddr=<address1>&daddr=<address2>...
+      url = "https://maps.apple.com/?";
+      validAppointments.forEach((apt, index) => {
+        if (index === 0) {
+          url += `daddr=${encodeURIComponent(apt.customer.address)}`;
+        } else {
+          url += `&daddr=${encodeURIComponent(apt.customer.address)}`;
+        }
+      });
+      url += "&dirflg=d"; // Driving directions
+    } else {
+      // Google Maps
+      url = "https://www.google.com/maps/dir/";
+      validAppointments.forEach((apt) => {
+        url += encodeURIComponent(apt.customer.address) + "/";
+      });
+    }
 
     window.open(url, "_blank");
-    toast.success(`Opened route with ${validAppointments.length} stops in Google Maps`);
+    toast.success(`Opened route with ${validAppointments.length} stops in ${mapsApp}`);
   }
 
   function handleOptimizeClick() {
@@ -466,7 +492,7 @@ export default function TodaysRoutePage() {
                 </button>
               )}
               <button
-                onClick={exportToGoogleMaps}
+                onClick={startDrivingRoute}
                 className="btn h-12 btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white hover:border-[#A5744A] gap-2 px-6"
               >
                 <Navigation className="h-5 w-5" />
@@ -560,6 +586,7 @@ export default function TodaysRoutePage() {
                 key={appointment.id}
                 appointment={appointment}
                 contactMethods={contactMethods}
+                preferredMessaging={preferredMessaging}
                 onCall={handleCall}
                 onSMS={handleSMS}
                 onWhatsApp={handleWhatsApp}
@@ -681,6 +708,7 @@ export default function TodaysRoutePage() {
         timeChanges={pendingTimeChanges}
         isLoading={isReordering}
         contactMethods={contactMethods}
+        preferredMessaging={preferredMessaging}
       />
 
       {/* Optimize Route Confirmation Modal */}

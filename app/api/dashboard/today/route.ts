@@ -37,6 +37,8 @@ export async function GET(req: NextRequest) {
       select: {
         id: true,
         contactMethods: true,
+        preferredMessaging: true,
+        preferredMaps: true,
         defaultHasAssistant: true,
         account: {
           select: {
@@ -207,6 +209,8 @@ export async function GET(req: NextRequest) {
       showSampleData,
       workdayStarted,
       contactMethods: groomer?.contactMethods || ["call", "sms"],
+      preferredMessaging: groomer?.preferredMessaging || "SMS",
+      preferredMaps: groomer?.preferredMaps || "GOOGLE",
       remainingAppointments,
       // Workload assessment data
       workload: {

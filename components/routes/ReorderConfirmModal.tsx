@@ -19,6 +19,7 @@ interface ReorderConfirmModalProps {
   timeChanges: TimeChange[];
   isLoading: boolean;
   contactMethods: string[];
+  preferredMessaging?: "SMS" | "WHATSAPP";
 }
 
 function formatTime(isoString: string): string {
@@ -51,12 +52,12 @@ export default function ReorderConfirmModal({
   timeChanges,
   isLoading,
   contactMethods,
+  preferredMessaging = "SMS",
 }: ReorderConfirmModalProps) {
   if (!isOpen) return null;
 
   const affectedChanges = timeChanges.filter((change) => change.timeChanged);
-  const hasWhatsApp = contactMethods.includes("whatsapp");
-  const hasSMS = contactMethods.includes("sms");
+  const useWhatsApp = preferredMessaging === "WHATSAPP";
 
   function handleNotifyCustomer(change: TimeChange) {
     if (!change.customerPhone) return;
@@ -69,10 +70,10 @@ export default function ReorderConfirmModal({
     );
     const encodedMessage = encodeURIComponent(message);
 
-    if (hasWhatsApp) {
+    if (useWhatsApp) {
       const cleanPhone = change.customerPhone.replace(/\D/g, "");
       window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
-    } else if (hasSMS) {
+    } else {
       window.location.href = `sms:${change.customerPhone}?body=${encodedMessage}`;
     }
   }
@@ -94,10 +95,10 @@ export default function ReorderConfirmModal({
 
       // Use setTimeout to stagger the opening of windows
       setTimeout(() => {
-        if (hasWhatsApp) {
+        if (useWhatsApp) {
           const cleanPhone = change.customerPhone!.replace(/\D/g, "");
           window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
-        } else if (hasSMS) {
+        } else {
           window.location.href = `sms:${change.customerPhone}?body=${encodedMessage}`;
         }
       }, index * 500); // 500ms delay between each
@@ -144,7 +145,7 @@ export default function ReorderConfirmModal({
                         </p>
                         <p className="text-sm text-gray-600">{change.petName}</p>
                       </div>
-                      {change.customerPhone && (hasWhatsApp || hasSMS) && (
+                      {change.customerPhone && (
                         <button
                           onClick={() => handleNotifyCustomer(change)}
                           className="btn btn-sm btn-ghost gap-1 text-blue-600"
@@ -173,8 +174,7 @@ export default function ReorderConfirmModal({
         {/* Footer */}
         <div className="p-4 border-t bg-gray-50">
           {affectedChanges.length > 0 &&
-            affectedChanges.some((c) => c.customerPhone) &&
-            (hasWhatsApp || hasSMS) && (
+            affectedChanges.some((c) => c.customerPhone) && (
               <button
                 onClick={handleNotifyAll}
                 className="btn btn-outline w-full mb-3 gap-2"

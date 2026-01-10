@@ -75,6 +75,8 @@ interface TodaysStats {
   showSampleData: boolean;
   workdayStarted: boolean;
   contactMethods?: string[];
+  preferredMessaging?: "SMS" | "WHATSAPP";
+  preferredMaps?: "GOOGLE" | "APPLE";
   remainingAppointments?: {
     customerName: string;
     customerPhone?: string;
@@ -445,10 +447,17 @@ function DashboardContent() {
       return;
     }
 
-    // Build Google Maps directions URL from current location to next appointment
-    // Using empty string for origin triggers "Your Location" in Google Maps
     const destination = encodeURIComponent(stats.nextAppointment.address);
-    const url = `https://www.google.com/maps/dir/?api=1&origin=&destination=${destination}&travelmode=driving`;
+    let url: string;
+
+    if (stats.preferredMaps === "APPLE") {
+      // Apple Maps URL scheme
+      url = `https://maps.apple.com/?daddr=${destination}&dirflg=d`;
+    } else {
+      // Google Maps (default)
+      // Using empty string for origin triggers "Your Location" in Google Maps
+      url = `https://www.google.com/maps/dir/?api=1&origin=&destination=${destination}&travelmode=driving`;
+    }
 
     // Open in new tab
     window.open(url, '_blank');
@@ -953,49 +962,30 @@ function DashboardContent() {
                   </p>
                 </div>
 
-                {/* Contact Methods */}
-                {stats.nextAppointment.customerPhone && stats.contactMethods && stats.contactMethods.length > 0 && (
+                {/* Contact Methods - Call + Preferred Messaging */}
+                {stats.nextAppointment.customerPhone && (
                   <div className="flex gap-2 mt-3 flex-wrap justify-center md:justify-start">
-                    {stats.contactMethods.includes("call") && (
-                      <button
-                        onClick={() => handleCall(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
-                      >
-                        <Phone className="h-4 w-4" />
-                        Call
-                      </button>
-                    )}
-                    {stats.contactMethods.includes("sms") && (
-                      <button
-                        onClick={() => handleSMS(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
-                      >
-                        <MessageSquare className="h-4 w-4" />
-                        SMS
-                      </button>
-                    )}
-                    {stats.contactMethods.includes("whatsapp") && (
+                    <button
+                      onClick={() => handleCall(stats.nextAppointment?.customerPhone)}
+                      className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
+                    >
+                      <Phone className="h-4 w-4" />
+                      Call
+                    </button>
+                    {stats.preferredMessaging === "WHATSAPP" ? (
                       <button
                         onClick={() => handleWhatsApp(stats.nextAppointment?.customerPhone)}
                         className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
                       >
                         💚 WhatsApp
                       </button>
-                    )}
-                    {stats.contactMethods.includes("signal") && (
+                    ) : (
                       <button
-                        onClick={() => handleSignal(stats.nextAppointment?.customerPhone)}
+                        onClick={() => handleSMS(stats.nextAppointment?.customerPhone)}
                         className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
                       >
-                        🔵 Signal
-                      </button>
-                    )}
-                    {stats.contactMethods.includes("telegram") && (
-                      <button
-                        onClick={() => handleTelegram(stats.nextAppointment?.customerPhone)}
-                        className="btn h-10 px-4 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-2"
-                      >
-                        ✈️ Telegram
+                        <MessageSquare className="h-4 w-4" />
+                        SMS
                       </button>
                     )}
                   </div>

@@ -25,6 +25,8 @@ export async function GET(req: NextRequest) {
         defaultHasAssistant: true,
         workingHoursStart: true,
         workingHoursEnd: true,
+        preferredMessaging: true,
+        preferredMaps: true,
       },
     });
 
@@ -116,6 +118,26 @@ export async function PATCH(req: NextRequest) {
       updateData.workingHoursEnd = body.workingHoursEnd;
     }
 
+    if (body.preferredMessaging !== undefined) {
+      if (!["SMS", "WHATSAPP"].includes(body.preferredMessaging)) {
+        return NextResponse.json(
+          { error: "Preferred messaging must be SMS or WHATSAPP" },
+          { status: 400 }
+        );
+      }
+      updateData.preferredMessaging = body.preferredMessaging;
+    }
+
+    if (body.preferredMaps !== undefined) {
+      if (!["GOOGLE", "APPLE"].includes(body.preferredMaps)) {
+        return NextResponse.json(
+          { error: "Preferred maps must be GOOGLE or APPLE" },
+          { status: 400 }
+        );
+      }
+      updateData.preferredMaps = body.preferredMaps;
+    }
+
     const updatedGroomer = await prisma.groomer.update({
       where: { id: groomer.id },
       data: updateData,
@@ -126,6 +148,8 @@ export async function PATCH(req: NextRequest) {
         defaultHasAssistant: true,
         workingHoursStart: true,
         workingHoursEnd: true,
+        preferredMessaging: true,
+        preferredMaps: true,
       },
     });
 

@@ -95,6 +95,8 @@ model Groomer {
   workingHoursStart   String?       // HH:mm format
   workingHoursEnd     String?       // HH:mm format
   contactMethods      String[]      @default(["call", "sms"]) // call, sms, whatsapp, signal, telegram
+  preferredMessaging  MessagingPreference @default(SMS) // SMS or WhatsApp for messaging buttons
+  preferredMaps       MapsPreference @default(GOOGLE) // Google Maps or Apple Maps for navigation
   defaultHasAssistant Boolean       @default(false) // Default setting for working with a bather
   largeDogDailyLimit  Int?          // Max large/giant dogs per day (null = no limit)
   isActive            Boolean       @default(true)
@@ -107,6 +109,16 @@ model Groomer {
 
   @@index([accountId])
   @@index([accountId, isActive])
+}
+
+enum MessagingPreference {
+  SMS
+  WHATSAPP
+}
+
+enum MapsPreference {
+  GOOGLE
+  APPLE
 }
 
 enum GeocodeStatus {

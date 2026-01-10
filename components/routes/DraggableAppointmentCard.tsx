@@ -30,6 +30,7 @@ interface Appointment {
 interface DraggableAppointmentCardProps {
   appointment: Appointment;
   contactMethods: string[];
+  preferredMessaging?: "SMS" | "WHATSAPP";
   isDragging: boolean;
   dragHandleProps: React.HTMLAttributes<HTMLDivElement>;
   onCall: (phone: string) => void;
@@ -90,6 +91,7 @@ function getStatusBadge(status: string) {
 export default function DraggableAppointmentCard({
   appointment,
   contactMethods,
+  preferredMessaging = "SMS",
   isDragging,
   dragHandleProps,
   onCall,
@@ -262,33 +264,30 @@ export default function DraggableAppointmentCard({
         <span className="line-clamp-1">{appointment.customer.address}</span>
       </div>
 
-      {/* Contact buttons */}
-      {appointment.customer.phone && contactMethods.length > 0 && (
+      {/* Contact buttons - Call + Preferred Messaging */}
+      {appointment.customer.phone && (
         <div className="flex gap-2 pt-3 border-t border-gray-100">
-          {contactMethods.includes("call") && (
+          <button
+            onClick={() => onCall(appointment.customer.phone!)}
+            className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5 flex-1"
+          >
+            <Phone className="h-3.5 w-3.5" />
+            Call
+          </button>
+          {preferredMessaging === "WHATSAPP" ? (
             <button
-              onClick={() => onCall(appointment.customer.phone!)}
+              onClick={() => onWhatsApp(appointment.customer.phone!)}
               className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5 flex-1"
             >
-              <Phone className="h-3.5 w-3.5" />
-              Call
+              💚 WhatsApp
             </button>
-          )}
-          {contactMethods.includes("sms") && (
+          ) : (
             <button
               onClick={() => onSMS(appointment.customer.phone!)}
               className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5 flex-1"
             >
               <MessageSquare className="h-3.5 w-3.5" />
               SMS
-            </button>
-          )}
-          {contactMethods.includes("whatsapp") && (
-            <button
-              onClick={() => onWhatsApp(appointment.customer.phone!)}
-              className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5 flex-1"
-            >
-              💚 WhatsApp
             </button>
           )}
         </div>

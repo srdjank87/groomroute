@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, Save, Dog, AlertTriangle, Clock, Shield } from "lucide-react";
+import { ArrowLeft, Save, Dog, AlertTriangle, Clock, Shield, MessageSquare, Map } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -11,6 +11,8 @@ interface GroomerSettings {
   defaultHasAssistant: boolean;
   workingHoursStart: string;
   workingHoursEnd: string;
+  preferredMessaging: "SMS" | "WHATSAPP";
+  preferredMaps: "GOOGLE" | "APPLE";
 }
 
 export default function ProfileSettingsPage() {
@@ -21,6 +23,8 @@ export default function ProfileSettingsPage() {
   const [hasAssistant, setHasAssistant] = useState(false);
   const [workingHoursStart, setWorkingHoursStart] = useState("08:00");
   const [workingHoursEnd, setWorkingHoursEnd] = useState("17:00");
+  const [preferredMessaging, setPreferredMessaging] = useState<"SMS" | "WHATSAPP">("SMS");
+  const [preferredMaps, setPreferredMaps] = useState<"GOOGLE" | "APPLE">("GOOGLE");
 
   useEffect(() => {
     fetchSettings();
@@ -36,6 +40,8 @@ export default function ProfileSettingsPage() {
         setHasAssistant(data.groomer.defaultHasAssistant);
         setWorkingHoursStart(data.groomer.workingHoursStart || "08:00");
         setWorkingHoursEnd(data.groomer.workingHoursEnd || "17:00");
+        setPreferredMessaging(data.groomer.preferredMessaging || "SMS");
+        setPreferredMaps(data.groomer.preferredMaps || "GOOGLE");
       }
     } catch (error) {
       console.error("Failed to fetch settings:", error);
@@ -56,6 +62,8 @@ export default function ProfileSettingsPage() {
           defaultHasAssistant: hasAssistant,
           workingHoursStart,
           workingHoursEnd,
+          preferredMessaging,
+          preferredMaps,
         }),
       });
 
@@ -233,6 +241,127 @@ export default function ProfileSettingsPage() {
               </>
             ) : "your working hours"}, you&apos;ll see a warning to help you stay balanced.
           </p>
+        </div>
+      </div>
+
+      {/* App Preferences */}
+      <div className="bg-white rounded-xl border p-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-purple-100 rounded-lg">
+            <MessageSquare className="h-5 w-5 text-purple-600" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-gray-900">App Preferences</h2>
+            <p className="text-sm text-gray-500">
+              Choose your preferred messaging and maps apps
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {/* Messaging Preference */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Preferred Messaging App
+            </label>
+            <p className="text-xs text-gray-500 mb-3">
+              Choose which messaging button to show on appointment cards
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPreferredMessaging("SMS")}
+                className={`p-4 rounded-lg border-2 transition-colors text-left ${
+                  preferredMessaging === "SMS"
+                    ? "border-[#A5744A] bg-orange-50"
+                    : "border-gray-200 hover:border-gray-300 bg-white"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">💬</span>
+                  <div>
+                    <span className="font-medium text-gray-900">SMS / Text</span>
+                    <p className="text-xs text-gray-500">Standard text messaging</p>
+                  </div>
+                  {preferredMessaging === "SMS" && (
+                    <span className="ml-auto text-[#A5744A]">✓</span>
+                  )}
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreferredMessaging("WHATSAPP")}
+                className={`p-4 rounded-lg border-2 transition-colors text-left ${
+                  preferredMessaging === "WHATSAPP"
+                    ? "border-[#A5744A] bg-orange-50"
+                    : "border-gray-200 hover:border-gray-300 bg-white"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">💚</span>
+                  <div>
+                    <span className="font-medium text-gray-900">WhatsApp</span>
+                    <p className="text-xs text-gray-500">WhatsApp messaging</p>
+                  </div>
+                  {preferredMessaging === "WHATSAPP" && (
+                    <span className="ml-auto text-[#A5744A]">✓</span>
+                  )}
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Maps Preference */}
+          <div className="pt-4 border-t">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Preferred Maps App
+            </label>
+            <p className="text-xs text-gray-500 mb-3">
+              Choose which maps app to use for navigation and directions
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPreferredMaps("GOOGLE")}
+                className={`p-4 rounded-lg border-2 transition-colors text-left ${
+                  preferredMaps === "GOOGLE"
+                    ? "border-[#A5744A] bg-orange-50"
+                    : "border-gray-200 hover:border-gray-300 bg-white"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Map className="h-6 w-6 text-blue-500" />
+                  <div>
+                    <span className="font-medium text-gray-900">Google Maps</span>
+                    <p className="text-xs text-gray-500">Default option</p>
+                  </div>
+                  {preferredMaps === "GOOGLE" && (
+                    <span className="ml-auto text-[#A5744A]">✓</span>
+                  )}
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreferredMaps("APPLE")}
+                className={`p-4 rounded-lg border-2 transition-colors text-left ${
+                  preferredMaps === "APPLE"
+                    ? "border-[#A5744A] bg-orange-50"
+                    : "border-gray-200 hover:border-gray-300 bg-white"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Map className="h-6 w-6 text-gray-700" />
+                  <div>
+                    <span className="font-medium text-gray-900">Apple Maps</span>
+                    <p className="text-xs text-gray-500">For iOS users</p>
+                  </div>
+                  {preferredMaps === "APPLE" && (
+                    <span className="ml-auto text-[#A5744A]">✓</span>
+                  )}
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
