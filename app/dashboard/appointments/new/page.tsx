@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon, MapPin, AlertTriangle, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
+import { AppointmentCalendar } from "@/components/ui/appointment-calendar";
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -212,19 +213,19 @@ function NewAppointmentContent() {
     }
   }, []);
 
-  // Get the first groomer for the account (used for area day suggestions)
+  // Get the groomer for the account (used for area day suggestions)
   const fetchDefaultGroomer = useCallback(async () => {
     try {
-      const response = await fetch("/api/groomers");
+      const response = await fetch("/api/groomer/settings");
       if (response.ok) {
         const data = await response.json();
-        if (data.groomers && data.groomers.length > 0) {
-          setGroomerId(data.groomers[0].id);
-          return data.groomers[0].id;
+        if (data.groomer?.id) {
+          setGroomerId(data.groomer.id);
+          return data.groomer.id;
         }
       }
     } catch (error) {
-      console.error("Failed to fetch groomers:", error);
+      console.error("Failed to fetch groomer:", error);
     }
     return null;
   }, []);
@@ -683,105 +684,94 @@ function NewAppointmentContent() {
               </div>
             )}
 
-            <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => dateInputRef.current?.showPicker?.()}
-                  >
-                    <input
-                      ref={dateInputRef}
-                      type="date"
-                      value={appointmentData.date}
-                      onChange={(e) => setAppointmentData({ ...appointmentData, date: e.target.value })}
-                      min={todayStr}
-                      className="input input-bordered w-full h-12 text-base cursor-pointer opacity-0 absolute inset-0"
-                      required
-                    />
-                    <div className="input input-bordered w-full h-12 text-base cursor-pointer flex items-center">
-                      {appointmentData.date ? format(new Date(appointmentData.date + 'T00:00:00'), "EEEE, MMMM dd, yyyy") : "Select a date"}
+            {/* Custom Calendar */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Date <span className="text-red-500">*</span>
+              </label>
+              <AppointmentCalendar
+                selectedDate={appointmentData.date ? new Date(appointmentData.date + 'T00:00:00') : null}
+                onDateSelect={(date) => {
+                  const dateStr = format(date, 'yyyy-MM-dd');
+                  setAppointmentData({ ...appointmentData, date: dateStr });
+                }}
+                suggestedDays={areaSuggestion?.suggestedDays || []}
+                customerAreaColor={areaSuggestion?.customer?.serviceAreaColor || undefined}
+                minDate={today}
+              />
+
+              {/* Selected date display with feedback */}
+              {appointmentData.date && (
+                <div className={`mt-3 p-3 rounded-lg text-sm ${
+                  dateMatch?.isMatch
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : dateMatch && areaSuggestion?.customer?.serviceAreaName
+                      ? "bg-amber-50 text-amber-800 border border-amber-200"
+                      : "bg-gray-50 text-gray-700 border border-gray-200"
+                }`}>
+                  <p className="font-medium">
+                    {format(new Date(appointmentData.date + 'T00:00:00'), "EEEE, MMMM dd, yyyy")}
+                  </p>
+                  {dateMatch?.isMatch && areaSuggestion?.customer?.serviceAreaName && (
+                    <p className="text-xs mt-1 text-green-600 flex items-center gap-1">
+                      <Check className="h-3 w-3" />
+                      Great choice! {dateMatch.dayName} is your {areaSuggestion.customer.serviceAreaName} day.
+                    </p>
+                  )}
+                  {dateMatch && !dateMatch.isMatch && areaSuggestion?.customer?.serviceAreaName && (
+                    <p className="text-xs mt-1 text-amber-700 flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      {dateMatch.dayName} is not your {areaSuggestion.customer.serviceAreaName} day.
+                      Consider {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" or ")}.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Large dog limit warning */}
+              {wouldExceedLargeDogLimit() && !largeDogWarningDismissed && largeDogCheck && (
+                <div className="mt-3 p-3 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <span className="font-medium block">
+                        Large Dog Limit Warning
+                      </span>
+                      <p className="text-xs mt-1 text-red-700">
+                        {selectedPet?.name} is {selectedPet?.weight} lbs, which counts as a large dog.
+                        You already have {largeDogCheck.largeDogCount} large dog{largeDogCheck.largeDogCount !== 1 ? 's' : ''} scheduled on this date,
+                        and your daily limit is {largeDogCheck.limit}.
+                      </p>
+                      <p className="text-xs mt-2 text-red-600 font-medium">
+                        Booking this appointment would exceed your limit. Consider choosing a different date to protect your energy.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setLargeDogWarningDismissed(true)}
+                        className="mt-2 text-xs text-red-600 underline hover:text-red-800"
+                      >
+                        I understand, continue anyway
+                      </button>
                     </div>
                   </div>
                 </div>
+              )}
 
-                {/* Date match feedback */}
-                {dateMatch && areaSuggestion?.customer?.serviceAreaName && (
-                  <div className={`mt-2 p-3 rounded-lg text-sm ${
-                    dateMatch.isMatch
-                      ? "bg-green-50 text-green-700 border border-green-200"
-                      : "bg-amber-50 text-amber-800 border border-amber-200"
-                  }`}>
-                    {dateMatch.isMatch ? (
-                      <div>
-                        <span className="flex items-center gap-1 font-medium">
-                          <Check className="h-4 w-4" />
-                          Great choice!
-                        </span>
-                        <p className="text-xs mt-1 text-green-600">
-                          {dateMatch.dayName} is your {areaSuggestion.customer.serviceAreaName} day. This keeps your route tight and efficient.
-                        </p>
-                      </div>
-                    ) : (
-                      <div>
-                        <span className="flex items-center gap-1 font-medium">
-                          <AlertTriangle className="h-4 w-4" />
-                          Heads up - {dateMatch.dayName} is not your {areaSuggestion.customer.serviceAreaName} day
-                        </span>
-                        <p className="text-xs mt-1 text-amber-700">
-                          This customer is in {areaSuggestion.customer.serviceAreaName}, but you typically work elsewhere on {dateMatch.dayName}s.
-                          This may add extra driving time between appointments. Consider booking on {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" or ")} instead.
-                        </p>
-                      </div>
+              {/* Show large dog count info even if not exceeding limit (for awareness) */}
+              {largeDogCheck?.hasLimit && selectedPet?.weight && selectedPet.weight > LARGE_DOG_WEIGHT_THRESHOLD && !wouldExceedLargeDogLimit() && (
+                <div className="mt-3 p-3 rounded-lg text-sm bg-blue-50 text-blue-800 border border-blue-200">
+                  <p className="text-xs">
+                    <span className="font-medium">Large dog count:</span> {largeDogCheck.largeDogCount} of {largeDogCheck.limit} on this date
+                    {largeDogCheck.remainingSlots !== null && largeDogCheck.remainingSlots > 0 && (
+                      <span> ({largeDogCheck.remainingSlots - 1} slot{largeDogCheck.remainingSlots - 1 !== 1 ? 's' : ''} remaining after this booking)</span>
                     )}
-                  </div>
-                )}
+                  </p>
+                </div>
+              )}
+            </div>
 
-                {/* Large dog limit warning */}
-                {wouldExceedLargeDogLimit() && !largeDogWarningDismissed && largeDogCheck && (
-                  <div className="mt-2 p-3 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                      <div className="flex-1">
-                        <span className="font-medium block">
-                          Large Dog Limit Warning
-                        </span>
-                        <p className="text-xs mt-1 text-red-700">
-                          {selectedPet?.name} is {selectedPet?.weight} lbs, which counts as a large dog.
-                          You already have {largeDogCheck.largeDogCount} large dog{largeDogCheck.largeDogCount !== 1 ? 's' : ''} scheduled on this date,
-                          and your daily limit is {largeDogCheck.limit}.
-                        </p>
-                        <p className="text-xs mt-2 text-red-600 font-medium">
-                          Booking this appointment would exceed your limit. Consider choosing a different date to protect your energy.
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => setLargeDogWarningDismissed(true)}
-                          className="mt-2 text-xs text-red-600 underline hover:text-red-800"
-                        >
-                          I understand, continue anyway
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Show large dog count info even if not exceeding limit (for awareness) */}
-                {largeDogCheck?.hasLimit && selectedPet?.weight && selectedPet.weight > LARGE_DOG_WEIGHT_THRESHOLD && !wouldExceedLargeDogLimit() && (
-                  <div className="mt-2 p-3 rounded-lg text-sm bg-blue-50 text-blue-800 border border-blue-200">
-                    <p className="text-xs">
-                      <span className="font-medium">Large dog count:</span> {largeDogCheck.largeDogCount} of {largeDogCheck.limit} on this date
-                      {largeDogCheck.remainingSlots !== null && largeDogCheck.remainingSlots > 0 && (
-                        <span> ({largeDogCheck.remainingSlots - 1} slot{largeDogCheck.remainingSlots - 1 !== 1 ? 's' : ''} remaining after this booking)</span>
-                      )}
-                    </p>
-                  </div>
-                )}
-              </div>
-
+            {/* Time Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Time <span className="text-red-500">*</span>
