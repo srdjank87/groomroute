@@ -211,46 +211,6 @@ export default function SettingsAreasPage() {
     }
   };
 
-  const getDayAssignmentDisplay = (
-    assignment: AreaAssignment,
-    dayOfWeek: number
-  ) => {
-    const dayData = assignment.days[dayOfWeek];
-    if (!dayData) {
-      return (
-        <button
-          onClick={() =>
-            setActiveAssignmentCell({
-              groomerId: assignment.groomerId,
-              dayOfWeek,
-            })
-          }
-          className="w-full h-10 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center text-xs"
-        >
-          +
-        </button>
-      );
-    }
-
-    return (
-      <button
-        onClick={() =>
-          setActiveAssignmentCell({
-            groomerId: assignment.groomerId,
-            dayOfWeek,
-          })
-        }
-        className="w-full h-10 rounded-lg text-white text-xs font-medium truncate px-2 hover:opacity-90 transition-opacity flex items-center justify-center"
-        style={{ backgroundColor: dayData.areaColor }}
-        title={dayData.areaName}
-      >
-        {dayData.areaName.length > 8
-          ? dayData.areaName.substring(0, 8) + "..."
-          : dayData.areaName}
-      </button>
-    );
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -352,93 +312,133 @@ export default function SettingsAreasPage() {
         )}
       </div>
 
-      {/* Weekly Schedule Matrix */}
+      {/* Weekly Schedule */}
       {areas.length > 0 && assignments.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">
             Weekly Area Schedule
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Click a cell to assign an area to that day. Each groomer can have one
-            area per day.
+            Tap a day to assign which area you&apos;ll be working in. This helps optimize your routes.
           </p>
 
-          <div className="bg-white rounded-xl border overflow-x-auto">
-            <table className="w-full min-w-[640px]">
-              <thead>
-                <tr className="border-b">
-                  <th className="p-3 text-left font-medium text-gray-700 w-32">
-                    Groomer
-                  </th>
-                  {DAY_NAMES.map((day, index) => (
-                    <th
-                      key={index}
-                      className="p-3 text-center font-medium text-gray-700 w-20"
+          {/* Simple 7-day grid for the single groomer */}
+          {assignments.slice(0, 1).map((assignment) => (
+            <div key={assignment.groomerId} className="bg-white rounded-xl border p-4">
+              <div className="grid grid-cols-7 gap-2">
+                {[0, 1, 2, 3, 4, 5, 6].map((dayOfWeek) => {
+                  const dayData = assignment.days[dayOfWeek];
+                  return (
+                    <button
+                      key={dayOfWeek}
+                      onClick={() =>
+                        setActiveAssignmentCell({
+                          groomerId: assignment.groomerId,
+                          dayOfWeek,
+                        })
+                      }
+                      className={`flex flex-col items-center p-3 rounded-xl transition-all ${
+                        dayData
+                          ? "text-white hover:opacity-90"
+                          : "bg-gray-50 border-2 border-dashed border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
+                      }`}
+                      style={dayData ? { backgroundColor: dayData.areaColor } : undefined}
                     >
-                      {day}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {assignments.map((assignment) => (
-                  <tr key={assignment.groomerId} className="border-b last:border-b-0">
-                    <td className="p-3 font-medium text-gray-900">
-                      {assignment.groomerName}
-                    </td>
-                    {[0, 1, 2, 3, 4, 5, 6].map((dayOfWeek) => (
-                      <td key={dayOfWeek} className="p-2 relative">
-                        {getDayAssignmentDisplay(assignment, dayOfWeek)}
+                      <span className={`text-xs font-medium ${dayData ? "text-white/80" : "text-gray-500"}`}>
+                        {DAY_NAMES[dayOfWeek]}
+                      </span>
+                      <span className={`text-sm font-semibold mt-1 truncate max-w-full ${dayData ? "" : ""}`}>
+                        {dayData ? dayData.areaName : "—"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
-                        {/* Assignment dropdown */}
-                        {activeAssignmentCell?.groomerId === assignment.groomerId &&
-                          activeAssignmentCell?.dayOfWeek === dayOfWeek && (
-                            <div className="absolute z-10 top-full left-0 mt-1 bg-white border rounded-lg shadow-lg min-w-[150px]">
-                              <button
-                                onClick={() =>
-                                  handleSetAssignment(
-                                    assignment.groomerId,
-                                    dayOfWeek,
-                                    null
-                                  )
-                                }
-                                className="w-full px-3 py-2 text-left text-sm text-gray-500 hover:bg-gray-50 border-b"
-                              >
-                                No area assigned
-                              </button>
-                              {availableAreas.map((area) => (
-                                <button
-                                  key={area.id}
-                                  onClick={() =>
-                                    handleSetAssignment(
-                                      assignment.groomerId,
-                                      dayOfWeek,
-                                      area.id
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
-                                >
-                                  <div
-                                    className="w-3 h-3 rounded-full"
-                                    style={{ backgroundColor: area.color }}
-                                  />
-                                  {area.name}
-                                </button>
-                              ))}
-                              <button
-                                onClick={() => setActiveAssignmentCell(null)}
-                                className="w-full px-3 py-2 text-left text-sm text-gray-400 hover:bg-gray-50 border-t"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Area Selection Modal */}
+      {activeAssignmentCell && assignments.length > 0 && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-sm w-full overflow-hidden">
+            <div className="p-4 border-b bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {DAY_NAMES[activeAssignmentCell.dayOfWeek]} Area
+              </h3>
+              <p className="text-sm text-gray-600">
+                Which area will you work in on {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][activeAssignmentCell.dayOfWeek]}?
+              </p>
+            </div>
+
+            <div className="p-2 max-h-80 overflow-y-auto">
+              {/* No area option */}
+              <button
+                onClick={() =>
+                  handleSetAssignment(
+                    activeAssignmentCell.groomerId,
+                    activeAssignmentCell.dayOfWeek,
+                    null
+                  )
+                }
+                className="w-full p-3 rounded-lg text-left hover:bg-gray-50 flex items-center gap-3 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                  <X className="h-4 w-4 text-gray-500" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-700">No area assigned</p>
+                  <p className="text-xs text-gray-500">Day off or flexible routing</p>
+                </div>
+              </button>
+
+              {/* Area options */}
+              {availableAreas.map((area) => {
+                const currentArea = assignments[0]?.days[activeAssignmentCell.dayOfWeek];
+                const isSelected = currentArea?.areaId === area.id;
+                return (
+                  <button
+                    key={area.id}
+                    onClick={() =>
+                      handleSetAssignment(
+                        activeAssignmentCell.groomerId,
+                        activeAssignmentCell.dayOfWeek,
+                        area.id
+                      )
+                    }
+                    className={`w-full p-3 rounded-lg text-left flex items-center gap-3 transition-colors ${
+                      isSelected ? "bg-gray-100" : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: area.color }}
+                    >
+                      {isSelected && <Check className="h-4 w-4 text-white" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">{area.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {areas.find(a => a.id === area.id)?.customerCount || 0} clients in this area
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <span className="text-xs font-medium text-[#A5744A]">Current</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="p-3 border-t bg-gray-50">
+              <button
+                onClick={() => setActiveAssignmentCell(null)}
+                className="w-full btn btn-ghost"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -525,13 +525,6 @@ export default function SettingsAreasPage() {
         </div>
       )}
 
-      {/* Click outside to close dropdown */}
-      {activeAssignmentCell && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={() => setActiveAssignmentCell(null)}
-        />
-      )}
     </div>
   );
 }
