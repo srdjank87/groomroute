@@ -575,27 +575,27 @@ export default function AppointmentsPage() {
 
               {/* Action Buttons */}
               {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
-                <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
                   {/* Contact buttons */}
                   {appointment.customer.phone && (
                     <>
                       <button
                         onClick={() => handleCall(appointment.customer.phone)}
-                        className="btn btn-ghost btn-sm gap-1.5 text-emerald-600 hover:bg-emerald-50"
+                        className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
                       >
-                        <Phone className="h-4 w-4" />
+                        <Phone className="h-3.5 w-3.5" />
                         Call
                       </button>
                       <button
                         onClick={() => handleSMS(appointment.customer.phone)}
-                        className="btn btn-ghost btn-sm gap-1.5 text-blue-600 hover:bg-blue-50"
+                        className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
                       >
-                        <MessageSquare className="h-4 w-4" />
+                        <MessageSquare className="h-3.5 w-3.5" />
                         SMS
                       </button>
                       <button
                         onClick={() => handleWhatsApp(appointment.customer.phone)}
-                        className="btn btn-ghost btn-sm gap-1.5 text-green-600 hover:bg-green-50"
+                        className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
                       >
                         💚 WhatsApp
                       </button>
@@ -743,27 +743,27 @@ export default function AppointmentsPage() {
 
                 {/* Action Buttons */}
                 {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
-                  <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                  <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
                     {/* Contact buttons */}
                     {appointment.customer.phone && (
                       <>
                         <button
                           onClick={() => handleCall(appointment.customer.phone)}
-                          className="btn btn-ghost btn-sm gap-1.5 text-emerald-600 hover:bg-emerald-50"
+                          className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
                         >
-                          <Phone className="h-4 w-4" />
+                          <Phone className="h-3.5 w-3.5" />
                           Call
                         </button>
                         <button
                           onClick={() => handleSMS(appointment.customer.phone)}
-                          className="btn btn-ghost btn-sm gap-1.5 text-blue-600 hover:bg-blue-50"
+                          className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
                         >
-                          <MessageSquare className="h-4 w-4" />
+                          <MessageSquare className="h-3.5 w-3.5" />
                           SMS
                         </button>
                         <button
                           onClick={() => handleWhatsApp(appointment.customer.phone)}
-                          className="btn btn-ghost btn-sm gap-1.5 text-green-600 hover:bg-green-50"
+                          className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5"
                         >
                           💚 WhatsApp
                         </button>

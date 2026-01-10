@@ -268,27 +268,27 @@ export default function DraggableAppointmentCard({
           {contactMethods.includes("call") && (
             <button
               onClick={() => onCall(appointment.customer.phone!)}
-              className="btn btn-sm btn-ghost gap-1 flex-1"
+              className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5 flex-1"
             >
-              <Phone className="h-4 w-4" />
+              <Phone className="h-3.5 w-3.5" />
               Call
             </button>
           )}
           {contactMethods.includes("sms") && (
             <button
               onClick={() => onSMS(appointment.customer.phone!)}
-              className="btn btn-sm btn-ghost gap-1 flex-1"
+              className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5 flex-1"
             >
-              <MessageSquare className="h-4 w-4" />
+              <MessageSquare className="h-3.5 w-3.5" />
               SMS
             </button>
           )}
           {contactMethods.includes("whatsapp") && (
             <button
               onClick={() => onWhatsApp(appointment.customer.phone!)}
-              className="btn btn-sm btn-ghost gap-1 flex-1"
+              className="btn btn-sm h-8 px-3 bg-emerald-600 hover:bg-emerald-700 border-0 text-white gap-1.5 flex-1"
             >
-              WhatsApp
+              💚 WhatsApp
             </button>
           )}
         </div>
