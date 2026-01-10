@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getAdjustedServiceMinutes, getBufferMinutes } from "@/lib/benchmarks";
 
 /**
  * POST /api/routes/reorder
- * Reorder appointments manually with cascading time recalculation
+ * Reorder appointments by swapping time slots - appointments take the time of their new position
  */
 export async function POST(req: NextRequest) {
   try {
@@ -48,18 +47,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if working with assistant today
-    const routeDate = new Date(date + "T00:00:00.000Z");
-    const existingRoute = await prisma.route.findFirst({
-      where: {
-        accountId,
-        groomerId: groomer.id,
-        routeDate,
-      },
-      select: { id: true, hasAssistant: true },
-    });
-    const hasAssistant = existingRoute?.hasAssistant ?? groomer.defaultHasAssistant;
-
     // Fetch all appointments by their IDs
     const appointments = await prisma.appointment.findMany({
       where: {
@@ -97,12 +84,13 @@ export async function POST(req: NextRequest) {
       appointments.find((apt) => apt.id === id)!
     );
 
-    // Get the first appointment's current start time as anchor
-    const anchorTime = new Date(orderedAppointments[0].startAt);
-    let currentTime = new Date(anchorTime);
+    // Get the original time slots sorted by start time
+    // Each appointment in the new order will take the time slot of that position
+    const originalTimeSlots = [...appointments]
+      .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime())
+      .map((apt) => apt.startAt);
 
-    // Calculate new times for all appointments
-    const bufferMinutes = getBufferMinutes(hasAssistant);
+    // Calculate new times by swapping - each position keeps its time slot
     const timeChanges: {
       id: string;
       customerName: string;
@@ -113,9 +101,10 @@ export async function POST(req: NextRequest) {
       timeChanged: boolean;
     }[] = [];
 
-    for (const appointment of orderedAppointments) {
+    for (let i = 0; i < orderedAppointments.length; i++) {
+      const appointment = orderedAppointments[i];
       const oldStartAt = new Date(appointment.startAt);
-      const newStartAt = new Date(currentTime);
+      const newStartAt = new Date(originalTimeSlots[i]);
       const timeChanged = oldStartAt.getTime() !== newStartAt.getTime();
 
       timeChanges.push({
@@ -127,15 +116,6 @@ export async function POST(req: NextRequest) {
         newStartAt: newStartAt.toISOString(),
         timeChanged,
       });
-
-      // Increment time for next appointment
-      const adjustedServiceMinutes = getAdjustedServiceMinutes(
-        appointment.serviceMinutes,
-        hasAssistant
-      );
-      currentTime = new Date(
-        currentTime.getTime() + (adjustedServiceMinutes + bufferMinutes) * 60000
-      );
     }
 
     // Update all appointments in the database

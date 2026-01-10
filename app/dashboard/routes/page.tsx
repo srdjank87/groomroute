@@ -292,25 +292,24 @@ export default function TodaysRoutePage() {
     }
   }
 
-  // Calculate preview times for new order (client-side preview)
-  function calculatePreviewTimes(orderedAppointments: Appointment[]): TimeChange[] {
-    if (orderedAppointments.length === 0) return [];
-
-    const hasAssistant = assistantStatus?.hasAssistant ?? false;
-    const bufferMinutes = hasAssistant ? 12 : 15;
-    const serviceMultiplier = hasAssistant ? 0.75 : 1;
+  // Calculate preview times for new order by swapping times
+  // When appointments are reordered, they take on the time slots of their new positions
+  function calculatePreviewTimes(newOrder: Appointment[]): TimeChange[] {
+    if (newOrder.length === 0) return [];
 
     const result: TimeChange[] = [];
-    let currentTime = new Date(orderedAppointments[0].startAt);
 
-    // Find original appointments to get old times
-    const originalMap = new Map(appointments.map((apt) => [apt.id, apt]));
+    // Get the original times in order (sorted by startAt)
+    const originalTimes = [...activeAppointments]
+      .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime())
+      .map((apt) => apt.startAt);
 
-    for (const apt of orderedAppointments) {
-      const original = originalMap.get(apt.id);
-      const oldStartAt = original?.startAt || apt.startAt;
-      const newStartAt = currentTime.toISOString();
-      const timeChanged = new Date(oldStartAt).getTime() !== currentTime.getTime();
+    // Each appointment in the new order takes the time slot of that position
+    for (let i = 0; i < newOrder.length; i++) {
+      const apt = newOrder[i];
+      const oldStartAt = apt.startAt;
+      const newStartAt = originalTimes[i];
+      const timeChanged = new Date(oldStartAt).getTime() !== new Date(newStartAt).getTime();
 
       result.push({
         id: apt.id,
@@ -321,9 +320,6 @@ export default function TodaysRoutePage() {
         newStartAt,
         timeChanged,
       });
-
-      const adjustedServiceMinutes = Math.round(apt.serviceMinutes * serviceMultiplier);
-      currentTime = new Date(currentTime.getTime() + (adjustedServiceMinutes + bufferMinutes) * 60000);
     }
 
     return result;
