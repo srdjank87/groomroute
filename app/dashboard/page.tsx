@@ -1343,6 +1343,67 @@ function DashboardContent() {
         </div>
       )}
 
+      {/* Body Care Recommendation - Show based on workload/large dogs */}
+      {!isFullscreen && stats?.hasData && stats.workdayStarted && (
+        (() => {
+          // Determine if we should show body care recommendation
+          const largeDogCount = stats.largeDogCount || 0;
+          const workloadLevel = stats.workload?.level || 'light';
+          const completedCount = stats.completedCount || 0;
+
+          // Show recommendation if:
+          // 1. Heavy/overloaded day
+          // 2. 2+ large dogs groomed
+          // 3. After completing 3+ appointments
+          const shouldShowBodyCare =
+            workloadLevel === 'heavy' ||
+            workloadLevel === 'overloaded' ||
+            largeDogCount >= 2 ||
+            completedCount >= 3;
+
+          if (!shouldShowBodyCare) return null;
+
+          // Choose recommendation message based on context
+          let title = "Time for a quick reset?";
+          let message = "Your body works hard for you. A few stretches can help prevent strain.";
+          let emoji = "🧘";
+
+          if (largeDogCount >= 2) {
+            title = "Heavy lifting today";
+            message = `${largeDogCount} large dogs groomed. Give your back and shoulders some love.`;
+            emoji = "💪";
+          } else if (workloadLevel === 'heavy' || workloadLevel === 'overloaded') {
+            title = "Busy day — take care of yourself";
+            message = "A quick stretch or reset can help you finish strong.";
+            emoji = "🌟";
+          } else if (completedCount >= 3) {
+            title = "You're on a roll!";
+            message = "Great momentum. A quick stretch keeps you going strong.";
+            emoji = "⚡";
+          }
+
+          return (
+            <div className="mb-6">
+              <Link
+                href="/dashboard/calm#body-care"
+                className="block p-4 bg-gradient-to-r from-teal-50 via-cyan-50 to-teal-50 rounded-xl border border-teal-200 hover:border-teal-300 hover:shadow-sm transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-white rounded-full shadow-sm text-2xl">
+                    {emoji}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">{title}</h3>
+                    <p className="text-sm text-gray-600">{message}</p>
+                  </div>
+                  <span className="text-teal-600 font-medium text-sm whitespace-nowrap">Body Care →</span>
+                </div>
+              </Link>
+            </div>
+          );
+        })()
+      )}
+
       {/* Need a Breather? - Calm Center Link */}
       {!isFullscreen && (
         <div className="mb-8">

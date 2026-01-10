@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Calendar, MapPin, Clock, X, Filter, ChevronLeft, ChevronRight, Sparkles, Check } from "lucide-react";
+import { Plus, Calendar, MapPin, Clock, X, Filter, ChevronLeft, ChevronRight, Sparkles, Check, Phone, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -17,6 +17,7 @@ interface Appointment {
     id: string;
     name: string;
     address: string;
+    phone?: string;
     serviceArea?: {
       id: string;
       name: string;
@@ -198,6 +199,11 @@ export default function AppointmentsPage() {
   const [otherPage, setOtherPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
 
+  // Cancel modal state
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancellingAppointment, setCancellingAppointment] = useState<Appointment | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+
   const dateInputRef = useRef<HTMLInputElement>(null);
 
   // Check if selected date is today
@@ -335,13 +341,22 @@ export default function AppointmentsPage() {
     return labels[status] || status.replace("_", " ");
   };
 
-  const handleCancelAppointment = async (appointmentId: string) => {
-    if (!confirm("Are you sure you want to cancel this appointment?")) {
-      return;
-    }
+  const openCancelModal = (appointment: Appointment) => {
+    setCancellingAppointment(appointment);
+    setShowCancelModal(true);
+  };
 
+  const closeCancelModal = () => {
+    setShowCancelModal(false);
+    setCancellingAppointment(null);
+  };
+
+  const handleCancelAppointment = async () => {
+    if (!cancellingAppointment) return;
+
+    setIsCancelling(true);
     try {
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
+      const response = await fetch(`/api/appointments/${cancellingAppointment.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "CANCELLED" }),
@@ -349,6 +364,7 @@ export default function AppointmentsPage() {
 
       if (response.ok) {
         toast.success("Appointment cancelled successfully");
+        closeCancelModal();
         refreshAll();
       } else {
         toast.error("Failed to cancel appointment");
@@ -356,7 +372,35 @@ export default function AppointmentsPage() {
     } catch (error) {
       console.error("Failed to cancel appointment:", error);
       toast.error("Failed to cancel appointment");
+    } finally {
+      setIsCancelling(false);
     }
+  };
+
+  // Contact handlers
+  const handleCall = (phone?: string) => {
+    if (!phone) {
+      toast.error("No phone number available");
+      return;
+    }
+    window.location.href = `tel:${phone}`;
+  };
+
+  const handleSMS = (phone?: string) => {
+    if (!phone) {
+      toast.error("No phone number available");
+      return;
+    }
+    window.location.href = `sms:${phone}`;
+  };
+
+  const handleWhatsApp = (phone?: string) => {
+    if (!phone) {
+      toast.error("No phone number available");
+      return;
+    }
+    const cleanPhone = phone.replace(/\D/g, '');
+    window.open(`https://wa.me/1${cleanPhone}`, '_blank');
   };
 
   return (
@@ -529,12 +573,38 @@ export default function AppointmentsPage() {
                 </div>
               </div>
 
-              {/* Cancel Button - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
+              {/* Action Buttons */}
               {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
-                <div className="flex gap-2 pt-3 border-t border-gray-100">
+                <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                  {/* Contact buttons */}
+                  {appointment.customer.phone && (
+                    <>
+                      <button
+                        onClick={() => handleCall(appointment.customer.phone)}
+                        className="btn btn-ghost btn-sm gap-1.5 text-emerald-600 hover:bg-emerald-50"
+                      >
+                        <Phone className="h-4 w-4" />
+                        Call
+                      </button>
+                      <button
+                        onClick={() => handleSMS(appointment.customer.phone)}
+                        className="btn btn-ghost btn-sm gap-1.5 text-blue-600 hover:bg-blue-50"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        SMS
+                      </button>
+                      <button
+                        onClick={() => handleWhatsApp(appointment.customer.phone)}
+                        className="btn btn-ghost btn-sm gap-1.5 text-green-600 hover:bg-green-50"
+                      >
+                        💚 WhatsApp
+                      </button>
+                    </>
+                  )}
+                  {/* Cancel button */}
                   <button
-                    onClick={() => handleCancelAppointment(appointment.id)}
-                    className="btn btn-ghost btn-sm gap-2 text-red-600 hover:bg-red-50"
+                    onClick={() => openCancelModal(appointment)}
+                    className="btn btn-ghost btn-sm gap-1.5 text-red-600 hover:bg-red-50 ml-auto"
                   >
                     <X className="h-4 w-4" />
                     Cancel
@@ -671,12 +741,38 @@ export default function AppointmentsPage() {
                   </div>
                 </div>
 
-                {/* Cancel Button - Hide for CANCELLED, COMPLETED, and NO_SHOW */}
+                {/* Action Buttons */}
                 {appointment.status !== "CANCELLED" && appointment.status !== "COMPLETED" && appointment.status !== "NO_SHOW" && (
-                  <div className="flex gap-2 pt-3 border-t border-gray-100">
+                  <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                    {/* Contact buttons */}
+                    {appointment.customer.phone && (
+                      <>
+                        <button
+                          onClick={() => handleCall(appointment.customer.phone)}
+                          className="btn btn-ghost btn-sm gap-1.5 text-emerald-600 hover:bg-emerald-50"
+                        >
+                          <Phone className="h-4 w-4" />
+                          Call
+                        </button>
+                        <button
+                          onClick={() => handleSMS(appointment.customer.phone)}
+                          className="btn btn-ghost btn-sm gap-1.5 text-blue-600 hover:bg-blue-50"
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                          SMS
+                        </button>
+                        <button
+                          onClick={() => handleWhatsApp(appointment.customer.phone)}
+                          className="btn btn-ghost btn-sm gap-1.5 text-green-600 hover:bg-green-50"
+                        >
+                          💚 WhatsApp
+                        </button>
+                      </>
+                    )}
+                    {/* Cancel button */}
                     <button
-                      onClick={() => handleCancelAppointment(appointment.id)}
-                      className="btn btn-ghost btn-sm gap-2 text-red-600 hover:bg-red-50"
+                      onClick={() => openCancelModal(appointment)}
+                      className="btn btn-ghost btn-sm gap-1.5 text-red-600 hover:bg-red-50 ml-auto"
                     >
                       <X className="h-4 w-4" />
                       Cancel
@@ -718,6 +814,51 @@ export default function AppointmentsPage() {
           </div>
         )}
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && cancellingAppointment && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full">
+            <div className="p-6">
+              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <X className="h-7 w-7 text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+                Cancel Appointment?
+              </h3>
+              <p className="text-gray-600 text-sm text-center mb-2">
+                Are you sure you want to cancel this appointment with{" "}
+                <span className="font-medium">{cancellingAppointment.customer.name}</span>?
+              </p>
+              {cancellingAppointment.pet && (
+                <p className="text-gray-500 text-xs text-center mb-4">
+                  {cancellingAppointment.pet.name} • {getServiceTypeLabel(cancellingAppointment.appointmentType)}
+                </p>
+              )}
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={closeCancelModal}
+                  className="btn btn-ghost flex-1"
+                  disabled={isCancelling}
+                >
+                  Go Back
+                </button>
+                <button
+                  onClick={handleCancelAppointment}
+                  className="btn bg-red-500 hover:bg-red-600 text-white flex-1"
+                  disabled={isCancelling}
+                >
+                  {isCancelling ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    "Yes, Cancel"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

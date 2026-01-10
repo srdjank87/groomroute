@@ -5,12 +5,10 @@ import Link from "next/link";
 import {
   ArrowLeft,
   DollarSign,
-  TrendingUp,
   Users,
   Shield,
   CheckCircle,
   BarChart3,
-  Calendar,
   Info,
   ChevronDown,
   ChevronUp,
@@ -198,53 +196,6 @@ export default function AnalyticsPage() {
               {revenueStats.calmImpact.calmImpactMessage}
             </p>
           )}
-        </div>
-      )}
-
-      {/* This Month Summary */}
-      {revenueStats?.calmImpact && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">This Month</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Days Organized */}
-            <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Calendar className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-gray-900">
-                  {revenueStats.calmImpact.monthlyOrganizedDays}
-                </p>
-                <p className="text-xs text-gray-600">Days organized</p>
-              </div>
-            </div>
-
-            {/* Appointments Ran Smoothly */}
-            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-gray-900">
-                  {revenueStats.calmImpact.monthlyAppointmentsSmooth}
-                </p>
-                <p className="text-xs text-gray-600">Ran smoothly</p>
-              </div>
-            </div>
-
-            {/* Clients Served */}
-            <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Users className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-gray-900">
-                  {revenueStats.calmImpact.monthlyClientsServed}
-                </p>
-                <p className="text-xs text-gray-600">Happy clients</p>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
