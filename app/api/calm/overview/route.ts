@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canAccessCalmControl } from "@/lib/feature-helpers";
+import { assessWorkload, WorkloadAssessment } from "@/lib/workload-assessment";
+
+const LARGE_DOG_THRESHOLD = 50; // lbs
 
 export async function GET(req: NextRequest) {
   try {
@@ -36,11 +39,29 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Get groomer for assistant preference
+    const groomer = await prisma.groomer.findFirst({
+      where: { accountId, isActive: true },
+      select: { id: true, defaultHasAssistant: true },
+    });
+
     // Get today's date range
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Get today's route for assistant status
+    const route = await prisma.route.findFirst({
+      where: {
+        accountId,
+        routeDate: today,
+      },
+      select: { hasAssistant: true },
+    });
+
+    // Use route's hasAssistant if set, otherwise fall back to groomer's default
+    const hasAssistant = route?.hasAssistant ?? groomer?.defaultHasAssistant ?? false;
 
     // Fetch today's appointments
     const appointments = await prisma.appointment.findMany({
@@ -63,28 +84,38 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Calculate day status
+    // Calculate workload using the unified assessment
     const totalAppointments = appointments.length;
-    let status: "smooth" | "tight" | "overloaded";
-    let message: string;
-    const stressPoints: string[] = [];
+    const totalMinutes = appointments.reduce((sum, apt) => sum + apt.serviceMinutes, 0);
+    const largeDogCount = appointments.filter(
+      apt => apt.pet?.weight && apt.pet.weight > LARGE_DOG_THRESHOLD
+    ).length;
 
-    if (totalAppointments === 0) {
-      status = "smooth";
-      message = "You have a light day ahead";
-    } else if (totalAppointments <= 5) {
-      status = "smooth";
-      message = "Today looks smooth and manageable";
-    } else if (totalAppointments <= 8) {
-      status = "tight";
-      message = "Today is a bit tight, but we've got it";
-      stressPoints.push("Busy schedule with back-to-back appointments");
-    } else {
-      status = "overloaded";
-      message = "Today is overloaded — let's lighten it together";
-      stressPoints.push("Heavy workload - consider taking breaks");
-      stressPoints.push("May need to adjust timing or move appointments");
-    }
+    // Get completed count for remaining workload calculation
+    const completedCount = 0; // Calm center shows active appointments, so no completed ones
+
+    const workloadAssessment = assessWorkload({
+      appointmentCount: totalAppointments,
+      totalMinutes,
+      largeDogCount,
+      hasAssistant,
+      completedCount,
+    });
+
+    // Map workload level to calm center status
+    type CalmStatus = "smooth" | "tight" | "overloaded";
+    const levelToStatus: Record<string, CalmStatus> = {
+      "day-off": "smooth",
+      "light": "smooth",
+      "moderate": "smooth",
+      "busy": "tight",
+      "heavy": "tight",
+      "overloaded": "overloaded",
+    };
+
+    const status: CalmStatus = levelToStatus[workloadAssessment.level] || "smooth";
+    const message = workloadAssessment.message;
+    const stressPoints = workloadAssessment.stressPoints;
 
     // Check for unconfirmed appointments tomorrow
     const tomorrowEnd = new Date(tomorrow);
@@ -270,6 +301,15 @@ export async function GET(req: NextRequest) {
         message,
         totalAppointments,
         stressPoints,
+        // Additional workload context
+        workloadLevel: workloadAssessment.level,
+        workloadLabel: workloadAssessment.label,
+        workloadEmoji: workloadAssessment.emoji,
+        workloadColor: workloadAssessment.color,
+        workloadScore: workloadAssessment.workloadScore,
+        hasAssistant,
+        largeDogCount,
+        totalMinutes,
       },
       quickRescues: quickRescues.slice(0, 5), // Max 5
       customerSituations: customerSituations.slice(0, 10), // Max 10

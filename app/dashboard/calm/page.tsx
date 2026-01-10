@@ -33,6 +33,15 @@ interface DayStatus {
   message: string;
   totalAppointments: number;
   stressPoints: string[];
+  // Additional workload context from unified assessment
+  workloadLevel?: "day-off" | "light" | "moderate" | "busy" | "heavy" | "overloaded";
+  workloadLabel?: string;
+  workloadEmoji?: string;
+  workloadColor?: string;
+  workloadScore?: number;
+  hasAssistant?: boolean;
+  largeDogCount?: number;
+  totalMinutes?: number;
 }
 
 interface QuickRescue {
@@ -984,23 +993,45 @@ function CalmCenterContent() {
         <div className="flex items-start gap-3 mb-4">
           <Heart className={`h-8 w-8 flex-shrink-0 ${currentStyle.iconColor}`} />
           <div className="flex-1">
-            <h1 className={`text-2xl font-bold mb-1 ${currentStyle.titleColor}`}>Today at a Glance</h1>
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className={`text-2xl font-bold ${currentStyle.titleColor}`}>Today at a Glance</h1>
+              {data.dayStatus.workloadEmoji && (
+                <span className="text-xl">{data.dayStatus.workloadEmoji}</span>
+              )}
+              {data.dayStatus.workloadLabel && (
+                <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${currentStyle.statBg} ${currentStyle.statText}`}>
+                  {data.dayStatus.workloadLabel}
+                </span>
+              )}
+            </div>
             <p className={`${currentStyle.textColor} text-lg`}>
-              {data.dayStatus.message} {statusIcons[data.dayStatus.status]}
+              {data.dayStatus.message}
             </p>
+            {data.dayStatus.hasAssistant && (
+              <p className={`${currentStyle.textColor} text-sm mt-1 flex items-center gap-1`}>
+                <span>👥</span> Working with assistant today
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className="grid grid-cols-3 gap-3 mt-4">
           <div className={`${currentStyle.statBg} backdrop-blur-sm rounded-lg p-3 border ${currentStyle.border}`}>
-            <p className="text-gray-500 text-xs mb-1">Total Today</p>
+            <p className="text-gray-500 text-xs mb-1">Appointments</p>
             <p className={`text-2xl font-bold ${currentStyle.statText}`}>{data.dayStatus.totalAppointments}</p>
-            <p className="text-gray-500 text-xs">appointments</p>
+            <p className="text-gray-500 text-xs">today</p>
           </div>
           <div className={`${currentStyle.statBg} backdrop-blur-sm rounded-lg p-3 border ${currentStyle.border}`}>
-            <p className="text-gray-500 text-xs mb-1">Attention Needed</p>
-            <p className={`text-2xl font-bold ${currentStyle.statText}`}>{data.quickRescues.length}</p>
-            <p className="text-gray-500 text-xs">items</p>
+            <p className="text-gray-500 text-xs mb-1">Grooming Time</p>
+            <p className={`text-2xl font-bold ${currentStyle.statText}`}>
+              {data.dayStatus.totalMinutes ? Math.round(data.dayStatus.totalMinutes / 60) : 0}
+            </p>
+            <p className="text-gray-500 text-xs">hours</p>
+          </div>
+          <div className={`${currentStyle.statBg} backdrop-blur-sm rounded-lg p-3 border ${currentStyle.border}`}>
+            <p className="text-gray-500 text-xs mb-1">Large Dogs</p>
+            <p className={`text-2xl font-bold ${currentStyle.statText}`}>{data.dayStatus.largeDogCount || 0}</p>
+            <p className="text-gray-500 text-xs">50+ lbs</p>
           </div>
         </div>
 

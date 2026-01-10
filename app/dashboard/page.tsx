@@ -36,6 +36,18 @@ import {
 import TrialStatus from "@/components/TrialStatus";
 import toast from "react-hot-toast";
 
+interface WorkloadData {
+  level: "day-off" | "light" | "moderate" | "busy" | "heavy" | "overloaded";
+  label: string;
+  message: string;
+  color: string;
+  textColor: string;
+  emoji: string;
+  showCalmLink: boolean;
+  stressPoints: string[];
+  score: number;
+}
+
 interface TodaysStats {
   appointments: number;
   totalAppointments: number;
@@ -68,6 +80,10 @@ interface TodaysStats {
     customerPhone?: string;
     startAt: string;
   }[];
+  workload?: WorkloadData;
+  hasAssistant?: boolean;
+  largeDogCount?: number;
+  totalMinutes?: number;
 }
 
 interface CalmImpact {
@@ -255,17 +271,27 @@ function getContextualGreeting(stats: TodaysStats | null, userName?: string | nu
   };
 }
 
-// Get day status color based on appointments and progress
-function getDayStatusColor(stats: TodaysStats | null): { color: string; label: string; showCalmLink: boolean } {
+// Get day status color based on workload assessment
+function getDayStatusColor(stats: TodaysStats | null): { color: string; label: string; showCalmLink: boolean; emoji?: string } {
   if (!stats || !stats.hasData || stats.totalAppointments === 0) {
     return { color: 'bg-gray-400', label: 'No appointments', showCalmLink: false };
   }
 
   if (stats.dayStatus === 'completed') {
-    return { color: 'bg-emerald-500', label: 'Day complete', showCalmLink: false };
+    return { color: 'bg-emerald-500', label: 'Day complete', showCalmLink: false, emoji: '✓' };
   }
 
-  // Calculate workload status
+  // Use workload assessment if available
+  if (stats.workload) {
+    return {
+      color: stats.workload.color,
+      label: stats.workload.label,
+      showCalmLink: stats.workload.showCalmLink,
+      emoji: stats.workload.emoji,
+    };
+  }
+
+  // Fallback for backward compatibility
   const remaining = stats.appointments;
   if (remaining <= 2) {
     return { color: 'bg-emerald-500', label: 'Smooth day', showCalmLink: false };
@@ -736,12 +762,14 @@ function DashboardContent() {
                   href="/dashboard/calm"
                   className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-full w-fit transition-colors group"
                 >
+                  {dayStatus.emoji && <span className="text-sm">{dayStatus.emoji}</span>}
                   <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dayStatus.color} animate-pulse`}></div>
                   <span className="text-sm text-gray-600 whitespace-nowrap group-hover:text-gray-900">{dayStatus.label}</span>
                   <Heart className="h-3.5 w-3.5 text-gray-400 group-hover:text-pink-500 transition-colors" />
                 </Link>
               ) : (
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full w-fit">
+                  {dayStatus.emoji && <span className="text-sm">{dayStatus.emoji}</span>}
                   <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dayStatus.color}`}></div>
                   <span className="text-sm text-gray-600 whitespace-nowrap">{dayStatus.label}</span>
                 </div>

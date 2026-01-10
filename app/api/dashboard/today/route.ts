@@ -2,55 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { toZonedTime } from "date-fns-tz";
+import { assessWorkload, WorkloadAssessment } from "@/lib/workload-assessment";
 
-// Generate calm, affirming messages based on day status
-function getCalmMessage(
-  appointmentCount: number,
-  confirmedCount: number,
-  completedCount: number,
-  hasRoute: boolean
-): string {
-  const hour = new Date().getHours();
-  const isMorning = hour < 12;
-  const isAfternoon = hour >= 12 && hour < 17;
-
-  if (appointmentCount === 0) {
-    return "Enjoy your day off";
-  }
-
-  if (completedCount === appointmentCount) {
-    return "Another smooth day in the books";
-  }
-
-  if (completedCount > 0) {
-    const remaining = appointmentCount - completedCount;
-    if (remaining === 1) {
-      return "Almost there! One more to go";
-    }
-    return "Great progress. Keep the momentum going";
-  }
-
-  // No appointments completed yet
-  if (hasRoute) {
-    if (isMorning) {
-      return "Your day is organized and ready to go";
-    }
-    if (isAfternoon) {
-      return "Your schedule is set. You've got this";
-    }
-    return "Your route is planned and ready";
-  }
-
-  if (confirmedCount === appointmentCount) {
-    return "All appointments confirmed. Smooth sailing ahead";
-  }
-
-  if (confirmedCount > 0) {
-    return "Your day is coming together nicely";
-  }
-
-  return "Your schedule is ready when you are";
-}
+const LARGE_DOG_THRESHOLD = 50; // lbs
 
 // Determine day status
 function getDayStatus(
@@ -74,14 +28,16 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get groomer profile for contact methods and account for timezone
+    // Get groomer profile for contact methods, assistant preference, and account timezone
     const groomer = await prisma.groomer.findFirst({
       where: {
         accountId,
         isActive: true,
       },
       select: {
+        id: true,
         contactMethods: true,
+        defaultHasAssistant: true,
         account: {
           select: {
             timezone: true,
@@ -159,7 +115,7 @@ export async function GET(req: NextRequest) {
         apt.customer.notes?.includes("[SAMPLE_DATA]")
       );
 
-    // Get today's route to check if optimized and workday started
+    // Get today's route to check if optimized, workday started, and assistant status
     const route = hasData
       ? await prisma.route.findFirst({
           where: {
@@ -169,25 +125,36 @@ export async function GET(req: NextRequest) {
           select: {
             id: true,
             workdayStarted: true,
+            hasAssistant: true,
           },
         })
       : null;
 
     const hasRoute = !!route;
     const workdayStarted = route?.workdayStarted ?? false;
+    // Use route's hasAssistant if set, otherwise fall back to groomer's default
+    const hasAssistant = route?.hasAssistant ?? groomer?.defaultHasAssistant ?? false;
 
-    // Generate status and calm message
+    // Generate day status
     const dayStatus = getDayStatus(
       totalAppointments,
       completedCount,
       inProgressCount
     );
-    const calmMessage = getCalmMessage(
-      totalAppointments,
-      confirmedCount,
+
+    // Calculate workload assessment
+    const totalMinutes = scheduledAppointments.reduce((sum, apt) => sum + apt.serviceMinutes, 0);
+    const largeDogCount = scheduledAppointments.filter(
+      apt => apt.pet?.weight && apt.pet.weight > LARGE_DOG_THRESHOLD
+    ).length;
+
+    const workloadAssessment = assessWorkload({
+      appointmentCount: totalAppointments,
+      totalMinutes,
+      largeDogCount,
+      hasAssistant,
       completedCount,
-      hasRoute
-    );
+    });
 
     // Get next appointment (first active one)
     const nextAppointment =
@@ -208,7 +175,8 @@ export async function GET(req: NextRequest) {
       cancelledCount,
       noShowCount,
       dayStatus,
-      calmMessage,
+      // Use workload assessment message as the primary calm message
+      calmMessage: workloadAssessment.message,
       hasRoute,
       nextAppointment: nextAppointment
         ? {
@@ -240,6 +208,21 @@ export async function GET(req: NextRequest) {
       workdayStarted,
       contactMethods: groomer?.contactMethods || ["call", "sms"],
       remainingAppointments,
+      // Workload assessment data
+      workload: {
+        level: workloadAssessment.level,
+        label: workloadAssessment.label,
+        message: workloadAssessment.message,
+        color: workloadAssessment.color,
+        textColor: workloadAssessment.textColor,
+        emoji: workloadAssessment.emoji,
+        showCalmLink: workloadAssessment.showCalmLink,
+        stressPoints: workloadAssessment.stressPoints,
+        score: workloadAssessment.workloadScore,
+      },
+      hasAssistant,
+      largeDogCount,
+      totalMinutes,
     };
 
     return NextResponse.json(response);
