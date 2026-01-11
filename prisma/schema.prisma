@@ -53,6 +53,7 @@ model Account {
   messageTemplates MessageTemplate[]
   serviceAreas     ServiceArea[]
   areaDayAssignments AreaDayAssignment[]
+  areaDateOverrides  AreaDateOverride[]
 
   @@index([createdAt])
   @@index([subscriptionStatus])
@@ -106,6 +107,7 @@ model Groomer {
   routes              Route[]
   breaks              Break[]
   areaDayAssignments  AreaDayAssignment[]
+  areaDateOverrides   AreaDateOverride[]
 
   @@index([accountId])
   @@index([accountId, isActive])
@@ -467,6 +469,7 @@ model ServiceArea {
 
   // Relationships
   dayAssignments AreaDayAssignment[]
+  dateOverrides  AreaDateOverride[]
   customers      Customer[]
 
   createdAt   DateTime @default(now())
@@ -496,5 +499,29 @@ model AreaDayAssignment {
   @@unique([groomerId, dayOfWeek]) // One area per groomer per day
   @@index([accountId])
   @@index([groomerId])
+  @@index([areaId])
+}
+
+// Date-specific area override (replaces default day-of-week assignment for a specific date)
+model AreaDateOverride {
+  id          String       @id @default(cuid())
+  accountId   String
+  account     Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  groomerId   String
+  groomer     Groomer      @relation(fields: [groomerId], references: [id], onDelete: Cascade)
+
+  date        DateTime     @db.Date  // Specific date (YYYY-MM-DD)
+
+  // Area assignment for this date (null = day off / no area)
+  areaId      String?
+  area        ServiceArea? @relation(fields: [areaId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([groomerId, date])  // One override per groomer per date
+  @@index([accountId])
+  @@index([groomerId, date])
   @@index([areaId])
 }

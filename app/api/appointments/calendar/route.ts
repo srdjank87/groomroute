@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getGroomerAreasForDateRange } from "@/lib/area-matcher";
 
 /**
  * GET /api/appointments/calendar
  * Get calendar data for a month including:
  * - Dates with existing appointments
- * - Area day assignments (which service area is assigned to which day)
+ * - Per-date area assignments (respects date-specific overrides)
  *
  * Query params:
  * - month: YYYY-MM format (required)
@@ -77,7 +78,18 @@ export async function GET(req: NextRequest) {
       appointmentsByDate[dateStr].count++;
     }
 
-    // Get area day assignments for this groomer
+    // Get per-date area assignments (respects overrides)
+    const startDateUTC = new Date(Date.UTC(year, monthNum - 1, 1));
+    const endDateUTC = new Date(Date.UTC(year, monthNum, 0)); // Last day of month
+    const areasMap = await getGroomerAreasForDateRange(groomer.id, startDateUTC, endDateUTC);
+
+    // Convert Map to object for JSON response
+    const areasByDate: Record<string, { areaId: string; areaName: string; areaColor: string; isOverride: boolean } | null> = {};
+    for (const [dateStr, areaInfo] of areasMap.entries()) {
+      areasByDate[dateStr] = areaInfo;
+    }
+
+    // Also return default day-of-week assignments for the week header display
     const areaDayAssignments = await prisma.areaDayAssignment.findMany({
       where: {
         accountId,
@@ -94,9 +106,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Group area day assignments by day of week
     const areasByDay: Record<number, Array<{ id: string; name: string; color: string }>> = {};
-
     for (const assignment of areaDayAssignments) {
       if (!areasByDay[assignment.dayOfWeek]) {
         areasByDay[assignment.dayOfWeek] = [];
@@ -111,7 +121,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       month,
       appointmentsByDate,
-      areasByDay,
+      areasByDate,
+      areasByDay, // Still include for week header
     });
   } catch (error) {
     console.error("Get calendar data error:", error);

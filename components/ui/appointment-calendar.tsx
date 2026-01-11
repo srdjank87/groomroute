@@ -4,8 +4,16 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
 
+interface AreaInfo {
+  areaId: string;
+  areaName: string;
+  areaColor: string;
+  isOverride: boolean;
+}
+
 interface CalendarData {
   appointmentsByDate: Record<string, { count: number }>;
+  areasByDate: Record<string, AreaInfo | null>;
   areasByDay: Record<number, Array<{ id: string; name: string; color: string }>>;
 }
 
@@ -143,11 +151,12 @@ export function AppointmentCalendar({
         const dateData = calendarData?.appointmentsByDate?.[dateStr];
         const hasAppointments = dateData && dateData.count > 0;
 
+        // Get area assignment for this specific date
+        const areaForDate = calendarData?.areasByDate?.[dateStr];
+        const hasArea = !!areaForDate;
+
         // Check if this day is a suggested day for the customer
         const isSuggestedDay = suggestedDays.includes(dayOfWeek);
-
-        // Get area assignments for this day of week
-        const areasForDay = calendarData?.areasByDay?.[dayOfWeek] || [];
 
         // Determine if customer's area matches this day
         const isCustomerAreaDay = isSuggestedDay && customerAreaColor;
@@ -180,6 +189,15 @@ export function AppointmentCalendar({
               {format(currentDay, "d")}
             </span>
 
+            {/* Area color indicator - top left corner */}
+            {isCurrentMonth && hasArea && !isSelected && (
+              <div
+                className={`absolute top-1 left-1 w-2 h-2 rounded-full ${areaForDate.isOverride ? "ring-1 ring-offset-1 ring-gray-400" : ""}`}
+                style={{ backgroundColor: areaForDate.areaColor }}
+                title={`${areaForDate.areaName}${areaForDate.isOverride ? " (override)" : ""}`}
+              />
+            )}
+
             {/* Appointment count badge */}
             {isCurrentMonth && hasAppointments && (
               <div className={`
@@ -211,19 +229,27 @@ export function AppointmentCalendar({
   };
 
   const renderLegend = () => {
-    // Collect unique areas from areasByDay
+    // Collect unique areas from areasByDate
     const uniqueAreas: Array<{ id: string; name: string; color: string }> = [];
-    if (calendarData?.areasByDay) {
-      const seen = new Set<string>();
-      for (const dayAreas of Object.values(calendarData.areasByDay)) {
-        for (const area of dayAreas) {
-          if (!seen.has(area.id)) {
-            seen.add(area.id);
-            uniqueAreas.push(area);
-          }
+    const seen = new Set<string>();
+
+    if (calendarData?.areasByDate) {
+      for (const areaInfo of Object.values(calendarData.areasByDate)) {
+        if (areaInfo && !seen.has(areaInfo.areaId)) {
+          seen.add(areaInfo.areaId);
+          uniqueAreas.push({
+            id: areaInfo.areaId,
+            name: areaInfo.areaName,
+            color: areaInfo.areaColor,
+          });
         }
       }
     }
+
+    // Check if there are any overrides in the current view
+    const hasOverrides = calendarData?.areasByDate
+      ? Object.values(calendarData.areasByDate).some(a => a?.isOverride)
+      : false;
 
     return (
       <div className="mt-4 pt-3 border-t border-gray-200">
@@ -239,7 +265,7 @@ export function AppointmentCalendar({
           {uniqueAreas.length > 0 && (
             <>
               <div className="w-px h-4 bg-gray-300 mx-1" />
-              <span className="text-gray-400">Area days:</span>
+              <span className="text-gray-400">Areas:</span>
               {uniqueAreas.map(area => (
                 <div key={area.id} className="flex items-center gap-1.5">
                   <div
@@ -249,6 +275,16 @@ export function AppointmentCalendar({
                   <span>{area.name}</span>
                 </div>
               ))}
+            </>
+          )}
+          {/* Override indicator */}
+          {hasOverrides && (
+            <>
+              <div className="w-px h-4 bg-gray-300 mx-1" />
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-gray-400 ring-1 ring-offset-1 ring-gray-400" />
+                <span>Schedule change</span>
+              </div>
             </>
           )}
           {/* Suggested days legend */}

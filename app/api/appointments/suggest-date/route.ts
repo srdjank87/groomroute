@@ -101,7 +101,7 @@ export async function GET(request: Request) {
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
 
-    const nextSuggestedDate = await findNextAreaDayDate(
+    const nextAreaDayResult = await findNextAreaDayDate(
       groomerId,
       customer.serviceArea.id,
       tomorrow
@@ -112,10 +112,16 @@ export async function GET(request: Request) {
     if (suggestedDays.length > 0) {
       const dayNames = suggestedDays.map((d) => DAY_NAMES[d]).join(", ");
       reason = `${groomer.name} works in ${customer.serviceArea.name} on ${dayNames}`;
+
+      // Add note if the suggested date is from an override
+      if (nextAreaDayResult?.isOverride) {
+        reason += " (schedule adjusted for this date)";
+      }
     }
 
     // Find first available time slot on the suggested date
     let suggestedTime: { time: string; timeFormatted: string } | null = null;
+    const nextSuggestedDate = nextAreaDayResult?.date || null;
 
     if (nextSuggestedDate) {
       const dateStr = nextSuggestedDate.toISOString().split("T")[0];

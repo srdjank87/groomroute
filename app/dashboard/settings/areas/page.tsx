@@ -10,7 +10,11 @@ import {
   Loader2,
   X,
   Check,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
 } from "lucide-react";
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, addMonths, subMonths } from "date-fns";
 import toast from "react-hot-toast";
 
 interface ServiceArea {
@@ -39,7 +43,25 @@ interface AreaAssignment {
   days: Record<number, { areaId: string; areaName: string; areaColor: string } | null>;
 }
 
+interface DateOverride {
+  id: string;
+  date: string;
+  areaId: string | null;
+  areaName: string | null;
+  areaColor: string | null;
+}
+
+interface MonthAreaData {
+  [date: string]: {
+    areaId: string;
+    areaName: string;
+    areaColor: string;
+    isOverride: boolean;
+  } | null;
+}
+
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const FULL_DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const PRESET_COLORS = [
   "#EF4444", // Red
   "#F97316", // Orange
@@ -72,6 +94,13 @@ export default function SettingsAreasPage() {
     dayOfWeek: number;
   } | null>(null);
 
+  // Monthly schedule state
+  const [monthlyViewMonth, setMonthlyViewMonth] = useState(new Date());
+  const [monthAreaData, setMonthAreaData] = useState<MonthAreaData>({});
+  const [isLoadingMonthData, setIsLoadingMonthData] = useState(false);
+  const [activeDateCell, setActiveDateCell] = useState<string | null>(null); // YYYY-MM-DD
+  const [isSavingOverride, setIsSavingOverride] = useState(false);
+
   const fetchAreas = useCallback(async () => {
     try {
       const response = await fetch("/api/areas");
@@ -98,6 +127,22 @@ export default function SettingsAreasPage() {
     }
   }, []);
 
+  const fetchMonthData = useCallback(async (month: Date) => {
+    setIsLoadingMonthData(true);
+    try {
+      const monthStr = format(month, "yyyy-MM");
+      const response = await fetch(`/api/appointments/calendar?month=${monthStr}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMonthAreaData(data.areasByDate || {});
+      }
+    } catch (error) {
+      console.error("Failed to fetch month data:", error);
+    } finally {
+      setIsLoadingMonthData(false);
+    }
+  }, []);
+
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
@@ -106,6 +151,13 @@ export default function SettingsAreasPage() {
     };
     loadData();
   }, [fetchAreas, fetchAssignments]);
+
+  // Load month data when month changes
+  useEffect(() => {
+    if (areas.length > 0) {
+      fetchMonthData(monthlyViewMonth);
+    }
+  }, [monthlyViewMonth, areas.length, fetchMonthData]);
 
   const openCreateModal = () => {
     setEditingArea(null);
@@ -201,6 +253,8 @@ export default function SettingsAreasPage() {
         toast.success(areaId ? "Assignment updated" : "Assignment removed");
         fetchAssignments();
         fetchAreas();
+        // Refresh month data since default pattern changed
+        fetchMonthData(monthlyViewMonth);
       } else {
         const data = await response.json();
         toast.error(data.error || "Failed to update assignment");
@@ -208,6 +262,56 @@ export default function SettingsAreasPage() {
     } catch (error) {
       console.error("Error setting assignment:", error);
       toast.error("Failed to update assignment");
+    }
+  };
+
+  const handleSetDateOverride = async (date: string, areaId: string | null) => {
+    setIsSavingOverride(true);
+    try {
+      const response = await fetch("/api/area-date-overrides", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, areaId }),
+      });
+
+      if (response.ok) {
+        toast.success("Schedule updated");
+        setActiveDateCell(null);
+        fetchMonthData(monthlyViewMonth);
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to update schedule");
+      }
+    } catch (error) {
+      console.error("Error setting date override:", error);
+      toast.error("Failed to update schedule");
+    } finally {
+      setIsSavingOverride(false);
+    }
+  };
+
+  const handleRemoveOverride = async (date: string) => {
+    setIsSavingOverride(true);
+    try {
+      const response = await fetch("/api/area-date-overrides", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date }),
+      });
+
+      if (response.ok) {
+        toast.success("Reverted to default");
+        setActiveDateCell(null);
+        fetchMonthData(monthlyViewMonth);
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to revert");
+      }
+    } catch (error) {
+      console.error("Error removing override:", error);
+      toast.error("Failed to revert");
+    } finally {
+      setIsSavingOverride(false);
     }
   };
 
@@ -312,14 +416,14 @@ export default function SettingsAreasPage() {
         )}
       </div>
 
-      {/* Weekly Schedule */}
+      {/* Weekly Default Schedule */}
       {areas.length > 0 && assignments.length > 0 && (
-        <div>
+        <div className="mb-10">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            Weekly Area Schedule
+            Default Weekly Pattern
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Tap a day to assign which area you&apos;ll be working in. This helps optimize your routes.
+            Set your typical weekly pattern. You can override specific dates in the monthly view below.
           </p>
 
           {/* Simple 7-day grid for the single groomer */}
@@ -356,6 +460,148 @@ export default function SettingsAreasPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Monthly Schedule View */}
+      {areas.length > 0 && (
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <Calendar className="h-5 w-5 text-gray-500" />
+            <h2 className="text-lg font-semibold text-gray-900">
+              Monthly Schedule
+            </h2>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            Tap any date to change the area for that specific day. Changes here override the default weekly pattern.
+          </p>
+
+          <div className="bg-white rounded-xl border p-4">
+            {/* Month Navigation */}
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => setMonthlyViewMonth(subMonths(monthlyViewMonth, 1))}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                type="button"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-500" />
+              </button>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {format(monthlyViewMonth, "MMMM yyyy")}
+              </h3>
+              <button
+                onClick={() => setMonthlyViewMonth(addMonths(monthlyViewMonth, 1))}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                type="button"
+              >
+                <ChevronRight className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Day of Week Headers */}
+            <div className="grid grid-cols-7 mb-2">
+              {DAY_NAMES.map((day) => (
+                <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar Grid */}
+            {isLoadingMonthData ? (
+              <div className="h-[280px] flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-[#A5744A]" />
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {(() => {
+                  const monthStart = startOfMonth(monthlyViewMonth);
+                  const monthEnd = endOfMonth(monthStart);
+                  const calendarStart = startOfWeek(monthStart);
+                  const calendarEnd = endOfWeek(monthEnd);
+
+                  const rows: React.ReactElement[] = [];
+                  let days: React.ReactElement[] = [];
+                  let day = calendarStart;
+
+                  while (day <= calendarEnd) {
+                    for (let i = 0; i < 7; i++) {
+                      const currentDay = day;
+                      const dateStr = format(currentDay, "yyyy-MM-dd");
+                      const isCurrentMonth = isSameMonth(currentDay, monthStart);
+                      const areaData = monthAreaData[dateStr];
+
+                      days.push(
+                        <button
+                          key={dateStr}
+                          type="button"
+                          disabled={!isCurrentMonth}
+                          onClick={() => isCurrentMonth && setActiveDateCell(dateStr)}
+                          className={`
+                            relative p-2 min-h-[48px] rounded-lg transition-all text-left
+                            ${!isCurrentMonth ? "text-gray-300 cursor-default" : "hover:ring-2 hover:ring-gray-300"}
+                            ${areaData ? "" : isCurrentMonth ? "bg-gray-50 border border-dashed border-gray-200" : ""}
+                          `}
+                          style={isCurrentMonth && areaData ? { backgroundColor: areaData.areaColor + "20" } : undefined}
+                        >
+                          <span className={`text-sm font-medium ${isCurrentMonth ? "text-gray-900" : ""}`}>
+                            {format(currentDay, "d")}
+                          </span>
+
+                          {/* Area indicator */}
+                          {isCurrentMonth && areaData && (
+                            <div className="flex items-center gap-1 mt-1">
+                              <div
+                                className={`w-2 h-2 rounded-full ${areaData.isOverride ? "ring-1 ring-offset-1 ring-gray-400" : ""}`}
+                                style={{ backgroundColor: areaData.areaColor }}
+                              />
+                              <span className="text-[10px] text-gray-600 truncate max-w-[60px]">
+                                {areaData.areaName}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Day off indicator */}
+                          {isCurrentMonth && !areaData && (
+                            <span className="text-[10px] text-gray-400 block mt-1">—</span>
+                          )}
+                        </button>
+                      );
+
+                      day = addDays(day, 1);
+                    }
+
+                    rows.push(
+                      <div key={day.toString()} className="grid grid-cols-7 gap-1">
+                        {days}
+                      </div>
+                    );
+                    days = [];
+                  }
+
+                  return rows;
+                })()}
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="mt-4 pt-3 border-t border-gray-200 flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
+              {availableAreas.map(area => (
+                <div key={area.id} className="flex items-center gap-1.5">
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: area.color }}
+                  />
+                  <span>{area.name}</span>
+                </div>
+              ))}
+              <div className="w-px h-4 bg-gray-300 mx-1" />
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-gray-400 ring-1 ring-offset-1 ring-gray-400" />
+                <span>Override (differs from default)</span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -519,6 +765,106 @@ export default function SettingsAreasPage() {
                   <Check className="h-5 w-5" />
                 )}
                 {editingArea ? "Save Changes" : "Create Area"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Date Override Modal */}
+      {activeDateCell && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-sm w-full overflow-hidden">
+            <div className="p-4 border-b bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {format(new Date(activeDateCell + "T12:00:00"), "EEEE, MMMM d")}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {monthAreaData[activeDateCell]?.isOverride
+                  ? "This date has a custom schedule"
+                  : "Using default weekly pattern"}
+              </p>
+            </div>
+
+            <div className="p-2 max-h-80 overflow-y-auto">
+              {/* Revert to default option (only show if there's an override) */}
+              {monthAreaData[activeDateCell]?.isOverride && (
+                <button
+                  onClick={() => handleRemoveOverride(activeDateCell)}
+                  disabled={isSavingOverride}
+                  className="w-full p-3 rounded-lg text-left hover:bg-blue-50 flex items-center gap-3 transition-colors border-b mb-2"
+                >
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <svg className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-medium text-blue-700">Revert to default</p>
+                    <p className="text-xs text-gray-500">Use the weekly pattern for this date</p>
+                  </div>
+                </button>
+              )}
+
+              {/* Day off option */}
+              <button
+                onClick={() => handleSetDateOverride(activeDateCell, null)}
+                disabled={isSavingOverride}
+                className="w-full p-3 rounded-lg text-left hover:bg-gray-50 flex items-center gap-3 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                  <X className="h-4 w-4 text-gray-500" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-700">Day off</p>
+                  <p className="text-xs text-gray-500">No area scheduled for this day</p>
+                </div>
+              </button>
+
+              {/* Area options */}
+              {availableAreas.map((area) => {
+                const currentArea = monthAreaData[activeDateCell];
+                const isSelected = currentArea?.areaId === area.id;
+                return (
+                  <button
+                    key={area.id}
+                    onClick={() => handleSetDateOverride(activeDateCell, area.id)}
+                    disabled={isSavingOverride}
+                    className={`w-full p-3 rounded-lg text-left flex items-center gap-3 transition-colors ${
+                      isSelected ? "bg-gray-100" : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: area.color }}
+                    >
+                      {isSelected && <Check className="h-4 w-4 text-white" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">{area.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {areas.find(a => a.id === area.id)?.customerCount || 0} clients in this area
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <span className="text-xs font-medium text-[#A5744A]">Current</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="p-3 border-t bg-gray-50">
+              <button
+                onClick={() => setActiveDateCell(null)}
+                disabled={isSavingOverride}
+                className="w-full btn btn-ghost"
+              >
+                {isSavingOverride ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Cancel"
+                )}
               </button>
             </div>
           </div>
