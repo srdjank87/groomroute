@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
 
 interface CalendarData {
-  appointmentsByDate: Record<string, { count: number; hasConfirmed: boolean; hasPending: boolean }>;
+  appointmentsByDate: Record<string, { count: number }>;
   areasByDay: Record<number, Array<{ id: string; name: string; color: string }>>;
 }
 
@@ -187,11 +187,9 @@ export function AppointmentCalendar({
                 flex items-center justify-center text-[10px] font-bold
                 ${isSelected
                   ? "bg-white/90 text-[#A5744A]"
-                  : dateData.hasPending
-                    ? "bg-amber-100 text-amber-700 ring-1 ring-amber-300"
-                    : "bg-gray-100 text-gray-600 ring-1 ring-gray-300"
+                  : "bg-gray-100 text-gray-600 ring-1 ring-gray-300"
                 }
-              `} title={`${dateData.count} appointment${dateData.count > 1 ? "s" : ""}${dateData.hasPending ? " (some unconfirmed)" : ""}`}>
+              `} title={`${dateData.count} appointment${dateData.count > 1 ? "s" : ""}`}>
                 {dateData.count}
               </div>
             )}
@@ -236,12 +234,6 @@ export function AppointmentCalendar({
               2
             </div>
             <span>Appointments</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="min-w-[16px] h-[16px] px-1 rounded-full bg-amber-100 ring-1 ring-amber-300 flex items-center justify-center text-[10px] font-bold text-amber-700">
-              1
-            </div>
-            <span>Has unconfirmed</span>
           </div>
           {/* Service areas legend */}
           {uniqueAreas.length > 0 && (

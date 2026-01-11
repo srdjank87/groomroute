@@ -63,25 +63,18 @@ export async function GET(req: NextRequest) {
       select: {
         id: true,
         startAt: true,
-        status: true,
       },
     });
 
-    // Group appointments by date
-    const appointmentsByDate: Record<string, { count: number; hasConfirmed: boolean; hasPending: boolean }> = {};
+    // Group appointments by date - just count them
+    const appointmentsByDate: Record<string, { count: number }> = {};
 
     for (const apt of appointments) {
       const dateStr = apt.startAt.toISOString().split("T")[0];
       if (!appointmentsByDate[dateStr]) {
-        appointmentsByDate[dateStr] = { count: 0, hasConfirmed: false, hasPending: false };
+        appointmentsByDate[dateStr] = { count: 0 };
       }
       appointmentsByDate[dateStr].count++;
-      if (apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS" || apt.status === "COMPLETED") {
-        appointmentsByDate[dateStr].hasConfirmed = true;
-      }
-      if (apt.status === "BOOKED") {
-        appointmentsByDate[dateStr].hasPending = true;
-      }
     }
 
     // Get area day assignments for this groomer
