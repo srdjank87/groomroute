@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan, billing } = body as { plan: PlanType; billing: BillingType };
+    const { plan, billing, resubscribe } = body as { plan: PlanType; billing: BillingType; resubscribe?: boolean };
 
     // Get Stripe plans at runtime to ensure env vars are loaded
     const STRIPE_PLANS = getStripePlans();
@@ -64,6 +64,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Checkout Session
+    // For resubscriptions, skip trial and redirect to dashboard
+    const isResubscription = resubscribe || account.subscriptionStatus === "CANCELED" || account.subscriptionStatus === "PAST_DUE";
+
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
@@ -75,7 +78,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       subscription_data: {
-        trial_period_days: 14,
+        ...(isResubscription ? {} : { trial_period_days: 14 }),
         metadata: {
           accountId: account.id,
           plan: plan.toUpperCase(),
@@ -86,8 +89,12 @@ export async function POST(request: NextRequest) {
         accountId: account.id,
         userId: session.user.id,
       },
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/onboarding`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/auth/signup?payment=canceled`,
+      success_url: isResubscription
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?resubscribed=true`
+        : `${process.env.NEXT_PUBLIC_APP_URL}/onboarding`,
+      cancel_url: isResubscription
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/subscription/expired?payment=canceled`
+        : `${process.env.NEXT_PUBLIC_APP_URL}/auth/signup?payment=canceled`,
       allow_promotion_codes: true,
     });
 

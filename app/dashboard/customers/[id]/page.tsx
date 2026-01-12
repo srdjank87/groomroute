@@ -20,7 +20,9 @@ import {
   Clock,
   X,
   Check,
-  FileText
+  FileText,
+  AlertTriangle,
+  ShieldAlert
 } from "lucide-react";
 import toast from "react-hot-toast";
 import MapPreview from "@/components/MapPreview";
@@ -69,6 +71,10 @@ interface Customer {
   serviceArea?: ServiceArea | null;
   pets: Pet[];
   appointments: Appointment[];
+  cancellationCount?: number;
+  noShowCount?: number;
+  lastCancellationAt?: string | null;
+  lastNoShowAt?: string | null;
 }
 
 const formatAppointmentType = (type: string) => {
@@ -480,6 +486,83 @@ export default function CustomerEditPage() {
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* High-Risk Client Warning */}
+      {customer && ((customer.cancellationCount || 0) >= 3 || (customer.noShowCount || 0) >= 3) && (
+        <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <ShieldAlert className="h-6 w-6 text-amber-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-amber-800 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                High-Risk Client Alert
+              </h3>
+              <div className="mt-2 text-sm text-amber-700 space-y-1">
+                {(customer.noShowCount || 0) >= 3 && (
+                  <p>
+                    <span className="font-medium">{customer.noShowCount} no-shows</span> on record
+                    {customer.lastNoShowAt && (
+                      <span className="text-amber-600">
+                        {" "}(last: {new Date(customer.lastNoShowAt).toLocaleDateString()})
+                      </span>
+                    )}
+                  </p>
+                )}
+                {(customer.cancellationCount || 0) >= 3 && (
+                  <p>
+                    <span className="font-medium">{customer.cancellationCount} cancellations</span> on record
+                    {customer.lastCancellationAt && (
+                      <span className="text-amber-600">
+                        {" "}(last: {new Date(customer.lastCancellationAt).toLocaleDateString()})
+                      </span>
+                    )}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-3 p-3 bg-white/60 rounded-lg border border-amber-200">
+                <p className="text-xs font-semibold text-amber-800 mb-2">Recommended Actions:</p>
+                <ul className="text-xs text-amber-700 space-y-1.5">
+                  {(customer.noShowCount || 0) >= 3 && (
+                    <>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-500 mt-0.5">•</span>
+                        <span><strong>Require a deposit</strong> before confirming new appointments</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-500 mt-0.5">•</span>
+                        <span><strong>Send reminder texts</strong> 24 hours and 2 hours before the appointment</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-500 mt-0.5">•</span>
+                        <span><strong>Call to confirm</strong> the day before the appointment</span>
+                      </li>
+                    </>
+                  )}
+                  {(customer.cancellationCount || 0) >= 3 && (
+                    <>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-500 mt-0.5">•</span>
+                        <span><strong>Implement a cancellation policy</strong> (e.g., 24-hour notice required)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-500 mt-0.5">•</span>
+                        <span><strong>Charge a cancellation fee</strong> for late cancellations</span>
+                      </li>
+                    </>
+                  )}
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-500 mt-0.5">•</span>
+                    <span><strong>Consider booking during slower periods</strong> to minimize revenue impact</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

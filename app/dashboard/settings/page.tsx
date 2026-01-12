@@ -31,7 +31,6 @@ const settingsCategories = [
     icon: Bell,
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
-    disabled: true,
   },
   {
     name: "Billing",
@@ -40,7 +39,6 @@ const settingsCategories = [
     icon: CreditCard,
     iconBg: "bg-purple-100",
     iconColor: "text-purple-600",
-    disabled: true,
   },
 ];
 

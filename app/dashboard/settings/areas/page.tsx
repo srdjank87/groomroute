@@ -212,7 +212,7 @@ export default function SettingsAreasPage() {
   };
 
   const handleDeleteArea = async (area: ServiceArea) => {
-    if (!confirm(`Delete "${area.name}"? ${area.customerCount} customers will be unassigned.`)) {
+    if (!confirm(`Delete "${area.name}"? ${area.customerCount} clients will be unassigned.`)) {
       return;
     }
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon, MapPin, AlertTriangle, DollarSign } from "lucide-react";
+import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon, MapPin, AlertTriangle, DollarSign, ShieldAlert } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { AppointmentCalendar } from "@/components/ui/appointment-calendar";
@@ -29,6 +29,8 @@ interface Customer {
     appointments: number;
   };
   totalRevenue?: number;
+  cancellationCount?: number;
+  noShowCount?: number;
 }
 
 interface Pet {
@@ -568,6 +570,32 @@ function NewAppointmentContent() {
               <p className="text-sm font-medium text-blue-900">Selected Client</p>
               <p className="text-blue-700">{selectedCustomer.name}</p>
             </div>
+
+            {/* High-Risk Client Warning */}
+            {((selectedCustomer.cancellationCount || 0) >= 3 || (selectedCustomer.noShowCount || 0) >= 3) && (
+              <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <ShieldAlert className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-amber-800 text-sm flex items-center gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5" />
+                      High-Risk Client
+                    </p>
+                    <p className="text-xs text-amber-700 mt-1">
+                      {(selectedCustomer.noShowCount || 0) >= 3 && (
+                        <span className="block">{selectedCustomer.noShowCount} no-shows on record</span>
+                      )}
+                      {(selectedCustomer.cancellationCount || 0) >= 3 && (
+                        <span className="block">{selectedCustomer.cancellationCount} cancellations on record</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-amber-600 mt-2 font-medium">
+                      Consider requiring a deposit or confirming via phone before booking.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {selectedCustomer.pets.length > 0 ? (
               <>

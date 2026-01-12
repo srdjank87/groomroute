@@ -578,7 +578,7 @@ function DashboardContent() {
       .filter(Boolean) || [];
 
     if (phones.length === 0) {
-      toast.error("No upcoming customers to notify");
+      toast.error("No upcoming clients to notify");
       return;
     }
 
@@ -587,7 +587,7 @@ function DashboardContent() {
     );
     window.location.href = `sms:${phones.join(',')}?body=${message}`;
     setShowRunningLateModal(false);
-    toast.success(`Opening SMS to notify ${phones.length} customer${phones.length > 1 ? 's' : ''}`);
+    toast.success(`Opening SMS to notify ${phones.length} client${phones.length > 1 ? 's' : ''}`);
   }
 
   function openSkipModal(appointmentId: string) {

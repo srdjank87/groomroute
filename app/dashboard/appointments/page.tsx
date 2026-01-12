@@ -323,7 +323,7 @@ export default function AppointmentsPage() {
 
   const getServiceTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
-      FULL_GROOM: "Full Groom 💇",
+      FULL_GROOM: "Full Groom 🐕",
       BATH_ONLY: "Bath Only 🛁",
       BATH_BRUSH: "Bath & Brush 🛁",
       NAIL_TRIM: "Nail Trim ✂️",

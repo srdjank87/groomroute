@@ -17,12 +17,13 @@ export default function SubscriptionExpiredPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/stripe/checkout", {
+      const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           plan: selectedPlan,
           billing: selectedBilling,
+          resubscribe: true,
         }),
       });
 

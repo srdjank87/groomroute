@@ -32,8 +32,10 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `/dashboard/customers/[id]/pets/new` | Add pet to customer |
 | `/dashboard/customers/[id]/pets/[petId]` | Pet detail/edit page |
 | `/dashboard/settings` | Settings hub |
-| `/dashboard/settings/profile` | User profile settings |
+| `/dashboard/settings/profile` | User profile/workload settings |
 | `/dashboard/settings/areas` | Service area management (Area Days, Monthly Schedule) |
+| `/dashboard/settings/notifications` | Message templates and reminder settings |
+| `/dashboard/settings/billing` | Subscription and payment management |
 
 ---
 
@@ -120,11 +122,19 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `/api/dashboard/generate-sample` | POST | Generate sample data for demo |
 | `/api/dashboard/clear-sample` | DELETE | Clear sample data |
 
-### Payments
+### Payments & Subscription
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/create-checkout-session` | POST | Stripe checkout session |
+| `/api/subscription` | GET | Get current subscription info |
+| `/api/subscription/portal` | POST | Create Stripe billing portal session |
 | `/api/webhooks/stripe` | POST | Stripe webhook handler |
+
+### Message Templates
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/message-templates` | GET/POST | List/create message templates |
+| `/api/message-templates/[id]` | PATCH/DELETE | Update/delete message template |
 
 ---
 
@@ -276,6 +286,21 @@ This document provides a comprehensive inventory of all features, pages, routes,
   - Fixed new appointment notes textarea styling
   - Fixed settings/areas area name input styling
   - Fixed address icon on edit client page (added z-10 pointer-events-none)
+- Added high-risk client warning system:
+  - Shows alert on client profile page for 3+ no-shows or cancellations
+  - Shows warning when booking appointments for high-risk clients
+  - Includes actionable tips (require deposit, send reminders, confirm via phone)
+  - Displays last no-show/cancellation date for context
+- Fixed service type icons: Full Groom now uses 🐕 consistently (was 💇 on appointments list)
+- **Bug Fixes & New Features:**
+  - Fixed subscription reactivation: Page now calls correct API endpoint (`/api/create-checkout-session`)
+  - API now handles resubscription properly (skips trial, redirects to dashboard)
+  - Created Notifications settings page with message template management
+  - Created Billing settings page with Stripe portal integration
+  - Added subscription info API (`/api/subscription`)
+  - Added Stripe billing portal API (`/api/subscription/portal`)
+  - Added message templates API (`/api/message-templates`)
+  - Fixed geocoding during onboarding (was marked as TODO, now actually geocodes address)
 
 ---
 

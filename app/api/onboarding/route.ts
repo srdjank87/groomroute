@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { geocodeAddress } from "@/lib/geocoding";
 
 const onboardingSchema = z.object({
   groomer: z.object({
@@ -33,7 +34,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = onboardingSchema.parse(body);
 
-    // Create groomer profile
+    // Geocode the base address
+    const geocodeResult = await geocodeAddress(validatedData.address.baseAddress);
+
+    // Create groomer profile with geocoded coordinates
     const groomer = await prisma.groomer.create({
       data: {
         accountId: session.user.accountId,
@@ -41,18 +45,17 @@ export async function POST(request: NextRequest) {
         email: validatedData.groomer.email || null,
         phone: validatedData.groomer.phone || null,
         baseAddress: validatedData.address.baseAddress,
+        baseLat: geocodeResult.success ? geocodeResult.lat : null,
+        baseLng: geocodeResult.success ? geocodeResult.lng : null,
+        geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
         workingHoursStart: validatedData.hours.workingHoursStart,
         workingHoursEnd: validatedData.hours.workingHoursEnd,
         contactMethods: validatedData.contactMethods || ["call", "sms"],
         preferredMessaging: validatedData.preferredMessaging,
         preferredMaps: validatedData.preferredMaps,
         largeDogDailyLimit: validatedData.largeDogDailyLimit ?? null,
-        geocodeStatus: "PENDING",
       },
     });
-
-    // TODO: In a real app, we would geocode the address here
-    // For now, we'll leave it as PENDING and geocode it later
 
     return NextResponse.json(
       {

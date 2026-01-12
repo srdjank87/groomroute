@@ -509,7 +509,7 @@ function CalmCenterContent() {
     );
 
     if (toNotify.length === 0) {
-      toast.error("No customers to notify");
+      toast.error("No clients to notify");
       return;
     }
 
@@ -816,7 +816,7 @@ function CalmCenterContent() {
 
   function sendReplyMessage(method: "sms" | "whatsapp") {
     if (!selectedReplyCustomer || !customizedMessage) {
-      toast.error("Please select a customer and message");
+      toast.error("Please select a client and message");
       return;
     }
 
@@ -878,7 +878,7 @@ function CalmCenterContent() {
 
   function sendUpsetResponse(method: "sms" | "whatsapp") {
     if (!selectedUpsetCustomer || !selectedUpsetResponse) {
-      toast.error("Please select a customer and response");
+      toast.error("Please select a client and response");
       return;
     }
 
