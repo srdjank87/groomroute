@@ -12,7 +12,7 @@ interface AreaInfo {
 }
 
 interface CalendarData {
-  appointmentsByDate: Record<string, { count: number }>;
+  appointmentsByDate: Record<string, { count: number; scheduledCount: number; completedCount: number }>;
   areasByDate: Record<string, AreaInfo | null>;
   areasByDay: Record<number, Array<{ id: string; name: string; color: string }>>;
 }
@@ -206,18 +206,42 @@ export function AppointmentCalendar({
             )}
 
             {/* Appointment count badge */}
-            {isCurrentMonth && hasAppointments && (
-              <div className={`
-                absolute bottom-0.5 right-0.5 min-w-[16px] h-[16px] px-1 rounded-full
-                flex items-center justify-center text-[10px] font-bold
-                ${isSelected
-                  ? "bg-white/90 text-[#A5744A]"
-                  : "bg-gray-100 text-gray-600 ring-1 ring-gray-300"
-                }
-              `} title={`${dateData.count} appointment${dateData.count > 1 ? "s" : ""}`}>
-                {dateData.count}
-              </div>
-            )}
+            {isCurrentMonth && hasAppointments && (() => {
+              // Determine badge color based on appointment types
+              // - All completed: green
+              // - All scheduled (future): blue
+              // - Mixed: gray (shouldn't happen often but just in case)
+              const hasScheduled = dateData.scheduledCount > 0;
+              const hasCompleted = dateData.completedCount > 0;
+
+              let badgeClasses = "";
+              let titleText = "";
+
+              if (isSelected) {
+                badgeClasses = "bg-white/90 text-[#A5744A]";
+              } else if (hasScheduled && !hasCompleted) {
+                // All scheduled (future appointments)
+                badgeClasses = "bg-blue-100 text-blue-700 ring-1 ring-blue-300";
+                titleText = `${dateData.scheduledCount} scheduled`;
+              } else if (hasCompleted && !hasScheduled) {
+                // All completed (past appointments)
+                badgeClasses = "bg-green-100 text-green-700 ring-1 ring-green-300";
+                titleText = `${dateData.completedCount} completed`;
+              } else {
+                // Mixed
+                badgeClasses = "bg-gray-100 text-gray-600 ring-1 ring-gray-300";
+                titleText = `${dateData.scheduledCount} scheduled, ${dateData.completedCount} completed`;
+              }
+
+              return (
+                <div
+                  className={`absolute bottom-0.5 right-0.5 min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center text-[10px] font-bold ${badgeClasses}`}
+                  title={titleText || `${dateData.count} appointment${dateData.count > 1 ? "s" : ""}`}
+                >
+                  {dateData.count}
+                </div>
+              );
+            })()}
           </button>
         );
 
@@ -261,12 +285,19 @@ export function AppointmentCalendar({
     return (
       <div className="mt-4 pt-3 border-t border-gray-200">
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
-          {/* Appointments legend */}
+          {/* Scheduled appointments legend */}
           <div className="flex items-center gap-1.5">
-            <div className="min-w-[16px] h-[16px] px-1 rounded-full bg-gray-100 ring-1 ring-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-600">
+            <div className="min-w-[16px] h-[16px] px-1 rounded-full bg-blue-100 ring-1 ring-blue-300 flex items-center justify-center text-[10px] font-bold text-blue-700">
               2
             </div>
-            <span>Appointments</span>
+            <span>Scheduled</span>
+          </div>
+          {/* Completed appointments legend */}
+          <div className="flex items-center gap-1.5">
+            <div className="min-w-[16px] h-[16px] px-1 rounded-full bg-green-100 ring-1 ring-green-300 flex items-center justify-center text-[10px] font-bold text-green-700">
+              2
+            </div>
+            <span>Completed</span>
           </div>
           {/* Service areas legend */}
           {uniqueAreas.length > 0 && (

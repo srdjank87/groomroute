@@ -49,6 +49,7 @@ export async function GET(req: NextRequest) {
     const endOfMonth = new Date(year, monthNum, 0, 23, 59, 59, 999);
 
     // Get appointments for this month - group by date
+    // Exclude CANCELLED and NO_SHOW from counts
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
@@ -58,24 +59,32 @@ export async function GET(req: NextRequest) {
           lte: endOfMonth,
         },
         status: {
-          notIn: ["CANCELLED"],
+          notIn: ["CANCELLED", "NO_SHOW"],
         },
       },
       select: {
         id: true,
         startAt: true,
+        status: true,
       },
     });
 
-    // Group appointments by date - just count them
-    const appointmentsByDate: Record<string, { count: number }> = {};
+    // Group appointments by date - count scheduled vs completed
+    const appointmentsByDate: Record<string, { count: number; scheduledCount: number; completedCount: number }> = {};
 
     for (const apt of appointments) {
       const dateStr = apt.startAt.toISOString().split("T")[0];
       if (!appointmentsByDate[dateStr]) {
-        appointmentsByDate[dateStr] = { count: 0 };
+        appointmentsByDate[dateStr] = { count: 0, scheduledCount: 0, completedCount: 0 };
       }
       appointmentsByDate[dateStr].count++;
+
+      // Count by status - COMPLETED vs scheduled (CONFIRMED, IN_PROGRESS, etc.)
+      if (apt.status === "COMPLETED") {
+        appointmentsByDate[dateStr].completedCount++;
+      } else {
+        appointmentsByDate[dateStr].scheduledCount++;
+      }
     }
 
     // Get per-date area assignments (respects overrides)
