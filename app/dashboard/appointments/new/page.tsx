@@ -141,6 +141,11 @@ function NewAppointmentContent() {
   const [isCheckingConflict, setIsCheckingConflict] = useState(false);
   const [calendarAreaData, setCalendarAreaData] = useState<Record<string, AreaForDate>>({});
 
+  // Memoized callback for calendar area data changes to prevent infinite loop
+  const handleAreaDataChange = useCallback((areasByDate: Record<string, AreaForDate>) => {
+    setCalendarAreaData(areasByDate);
+  }, []);
+
   const dateInputRef = useRef<HTMLInputElement>(null);
   const timeInputRef = useRef<HTMLInputElement>(null);
 
@@ -725,7 +730,7 @@ function NewAppointmentContent() {
                 suggestedDays={areaSuggestion?.suggestedDays || []}
                 customerAreaColor={areaSuggestion?.customer?.serviceAreaColor || undefined}
                 minDate={today}
-                onAreaDataChange={(areasByDate) => setCalendarAreaData(areasByDate)}
+                onAreaDataChange={handleAreaDataChange}
               />
 
               {/* Selected date display with feedback */}
