@@ -17,6 +17,14 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `/onboarding` | Onboarding flow for new users |
 | `/subscription/expired` | Subscription expired page |
 
+### Admin Pages (Password Protected)
+| Path | Description |
+|------|-------------|
+| `/admin` | Admin overview dashboard with key metrics |
+| `/admin/login` | Admin login page |
+| `/admin/accounts` | Accounts list with filtering and search |
+| `/admin/events` | Events log (links to PostHog) |
+
 ### Dashboard Pages
 | Path | Description |
 |------|-------------|
@@ -136,6 +144,14 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `/api/message-templates` | GET/POST | List/create message templates |
 | `/api/message-templates/[id]` | PATCH/DELETE | Update/delete message template |
 
+### Admin APIs (Password Protected)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/login` | POST | Admin authentication |
+| `/api/admin/accounts` | GET | List all accounts with filtering |
+| `/api/admin/account/[id]` | GET | Get single account details |
+| `/api/admin/metrics` | GET | Get admin dashboard metrics |
+
 ---
 
 ## 3. COMPONENTS
@@ -154,6 +170,7 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `components/MapPreview.tsx` | Map display for addresses with verification |
 | `components/AddressAutocomplete.tsx` | Google Places autocomplete |
 | `components/TrialStatus.tsx` | Trial status/subscription banner |
+| `components/FacebookPixel.tsx` | Facebook Pixel client-side tracking |
 
 ### Route Management Components
 | Component | Description |
@@ -182,6 +199,10 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `lib/daily-quotes.ts` | Motivational quotes |
 | `lib/routing/` | Routing module (Google Maps, Mapbox providers) |
 | `lib/utils/` | Utility functions (date formatting, classnames) |
+| `lib/posthog.tsx` | PostHog client-side provider with user identification |
+| `lib/posthog-server.ts` | PostHog server-side client for API tracking |
+| `lib/facebook-capi.ts` | Facebook Conversion API client with data hashing |
+| `lib/admin-auth.ts` | Admin password authentication helper |
 
 ---
 
@@ -253,10 +274,19 @@ This document provides a comprehensive inventory of all features, pages, routes,
 - Running late bulk notifications
 - Customer contact history
 
-### Analytics
+### Analytics & Tracking
 - Daily performance metrics
 - Revenue statistics
 - Route efficiency analysis
+- PostHog product analytics (events, funnels, session replays)
+- Facebook Pixel for ad tracking
+- Facebook Conversion API for server-side conversion tracking
+
+### Admin Dashboard
+- Password-protected admin area
+- Account management and filtering
+- Key business metrics
+- Links to PostHog for detailed analytics
 
 ### Subscription Tiers
 - **TRIAL** - 14-day trial period
@@ -268,7 +298,32 @@ This document provides a comprehensive inventory of all features, pages, routes,
 
 ## 7. CHANGELOG
 
-### January 12, 2026
+### January 12, 2026 (Session 2)
+- **Analytics & Tracking Implementation:**
+  - Added PostHog analytics integration (`lib/posthog.tsx`, `lib/posthog-server.ts`)
+  - Added Facebook Pixel client-side tracking (`components/FacebookPixel.tsx`)
+  - Added Facebook Conversion API server-side tracking (`lib/facebook-capi.ts`)
+  - Updated Stripe webhook to track StartTrial and Subscribe events via PostHog and FB CAPI
+  - Added `lastActiveAt` field to Account model for user activity tracking
+- **Admin Dashboard:**
+  - Created password-protected admin area at `/admin`
+  - Admin authentication helper (`lib/admin-auth.ts`)
+  - Admin login page (`app/admin/login/page.tsx`)
+  - Admin overview dashboard (`app/admin/page.tsx`) with key metrics
+  - Accounts management page (`app/admin/accounts/page.tsx`) with filtering
+  - Events log page (`app/admin/events/page.tsx`) linking to PostHog
+  - Admin APIs: `/api/admin/login`, `/api/admin/accounts`, `/api/admin/metrics`, `/api/admin/account/[id]`
+- **Bug Fixes:**
+  - Fixed dashboard appointment count mismatch between "Ready when you are" and "Your Progress" sections
+  - Root cause 1: Performance API was using server local time while Today API used account timezone
+  - Root cause 2: Today API wasn't filtering by groomerId while Performance API was
+  - Updated `/api/dashboard/performance/route.ts` to use account timezone (date-fns-tz)
+  - Updated `/api/dashboard/today/route.ts` to filter by groomerId
+- **Sample Data Generation:**
+  - Changed from 5-8 total appointments per day to 4-6 appointments PER GROOMER per day
+  - Ensures each groomer has meaningful data for testing
+
+### January 12, 2026 (Session 1)
 - Fixed timezone inconsistency in area override detection
 - Removed misleading Client Situations section from Calm Center
 - Improved input field styling on new/edit client pages
@@ -313,3 +368,5 @@ This document provides a comprehensive inventory of all features, pages, routes,
 - **Maps:** Google Maps + Mapbox
 - **Styling:** Tailwind CSS + DaisyUI
 - **Drag & Drop:** React DnD Kit
+- **Analytics:** PostHog
+- **Ad Tracking:** Facebook Pixel + Conversion API
