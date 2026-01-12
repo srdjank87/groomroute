@@ -3,6 +3,8 @@ import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
+import { fbCapiStartTrial, fbCapiSubscribe } from "@/lib/facebook-capi";
+import { trackTrialConverted, trackServerEvent } from "@/lib/posthog-server";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -94,6 +96,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const trialEndsAt = new Date();
   trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
+  // Get account details for tracking
+  const account = await prisma.account.findUnique({
+    where: { id: accountId },
+    include: {
+      users: {
+        take: 1,
+        select: { email: true, name: true },
+      },
+    },
+  });
+
   await prisma.account.update({
     where: { id: accountId },
     data: {
@@ -103,6 +116,25 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       trialEndsAt: trialEndsAt,
     },
   });
+
+  // Track StartTrial event for Facebook CAPI
+  if (account) {
+    const user = account.users[0];
+    await fbCapiStartTrial(
+      {
+        email: user?.email,
+        firstName: user?.name?.split(" ")[0],
+        lastName: user?.name?.split(" ").slice(1).join(" "),
+      },
+      undefined,
+      process.env.NEXT_PUBLIC_APP_URL
+    );
+
+    // Track in PostHog
+    await trackServerEvent(accountId, "trial_started", {
+      plan: session.metadata?.plan || "unknown",
+    });
+  }
 
   console.log(`Checkout completed for account ${accountId}`);
 }
@@ -185,6 +217,19 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     return;
   }
 
+  // Get current account to check if this is first payment (trial conversion)
+  const account = await prisma.account.findUnique({
+    where: { id: accountId },
+    include: {
+      users: {
+        take: 1,
+        select: { email: true, name: true },
+      },
+    },
+  });
+
+  const wasInTrial = account?.subscriptionStatus === "TRIAL";
+
   // Extract the period end date with type assertion
   const currentPeriodEnd = (subscription as any).current_period_end;
   const periodEnd = currentPeriodEnd
@@ -199,6 +244,36 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       currentPeriodEnd: periodEnd,
     },
   });
+
+  // Track Subscribe event if this is first payment (trial conversion)
+  if (wasInTrial && account) {
+    const user = account.users[0];
+    const plan = subscription.metadata?.plan || account.subscriptionPlan;
+    const amount = invoice.amount_paid ? invoice.amount_paid / 100 : 0; // Convert from cents
+
+    // Facebook CAPI Subscribe event
+    await fbCapiSubscribe(
+      {
+        email: user?.email,
+        firstName: user?.name?.split(" ")[0],
+        lastName: user?.name?.split(" ").slice(1).join(" "),
+      },
+      amount,
+      plan || "subscription",
+      undefined,
+      process.env.NEXT_PUBLIC_APP_URL
+    );
+
+    // PostHog trial_converted event
+    const daysInTrial = account.trialEndsAt && account.createdAt
+      ? Math.floor((new Date().getTime() - account.createdAt.getTime()) / (1000 * 60 * 60 * 24))
+      : 14;
+
+    await trackTrialConverted(accountId, {
+      plan: plan || "unknown",
+      daysInTrial,
+    });
+  }
 
   console.log(`Invoice payment succeeded for account ${accountId}`);
 }

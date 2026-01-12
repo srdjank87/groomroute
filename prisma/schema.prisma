@@ -43,6 +43,7 @@ model Account {
   stripeCustomerId     String?          @unique
   stripeSubscriptionId String?          @unique
   currentPeriodEnd     DateTime?
+  lastActiveAt         DateTime?        // Track last user activity for analytics
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   users           User[]
