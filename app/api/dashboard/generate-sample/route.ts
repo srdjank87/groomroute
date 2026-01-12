@@ -736,6 +736,7 @@ export async function POST(req: NextRequest) {
     const customerLastNoShow: { [customerId: string]: Date } = {};
 
     // Create appointments for today and the last 30 days (31 days total)
+    // Generate appointments PER GROOMER to ensure each has a minimum of 4 per day
     for (let dayOffset = 30; dayOffset >= 0; dayOffset--) {
       const date = new Date(today);
       date.setDate(today.getDate() - dayOffset);
@@ -743,22 +744,20 @@ export async function POST(req: NextRequest) {
       // Skip Sundays
       if (date.getDay() === 0) continue;
 
-      // Random number of appointments between 5 and 8
-      const numAppointments = Math.floor(Math.random() * 4) + 5;
+      // For each groomer, generate 4-6 appointments per day
+      for (const assignedGroomer of allGroomers) {
+        // Random number of appointments between 4 and 6 per groomer
+        const numAppointmentsForGroomer = Math.floor(Math.random() * 3) + 4;
 
-      // Shuffle customers and pick random ones
-      const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
-      const selectedCustomers = shuffledCustomers.slice(0, numAppointments);
+        // Shuffle customers and pick random ones for this groomer
+        const shuffledCustomers = [...createdCustomers].sort(() => Math.random() - 0.5);
+        const selectedCustomers = shuffledCustomers.slice(0, numAppointmentsForGroomer);
 
-      // Distribute appointments across groomers
-      let currentMinutes = 9 * 60; // Start at 9:00 AM
+        // Each groomer starts at 9:00 AM
+        let currentMinutes = 9 * 60;
 
-      for (let i = 0; i < selectedCustomers.length; i++) {
-        const { customer, pets, sampleData } = selectedCustomers[i];
-
-        // Assign to a groomer (distribute among available groomers)
-        const groomerIndex = i % allGroomers.length;
-        const assignedGroomer = allGroomers[groomerIndex];
+        for (let i = 0; i < selectedCustomers.length; i++) {
+          const { customer, pets, sampleData } = selectedCustomers[i];
 
         // Pick a random pet from this customer for this appointment
         const randomPetIndex = Math.floor(Math.random() * pets.length);
@@ -840,6 +839,7 @@ export async function POST(req: NextRequest) {
         });
 
         totalAppointmentsCreated++;
+        }
       }
     }
 
