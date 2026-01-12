@@ -259,10 +259,12 @@ export default function SettingsAreasPage() {
 
       if (response.ok) {
         toast.success(areaId ? "Assignment updated" : "Assignment removed");
-        fetchAssignments();
-        fetchAreas();
+        // Wait for all data refreshes to complete before updating the calendar
+        await Promise.all([fetchAssignments(), fetchAreas()]);
+        // Small delay to ensure database transaction is fully committed
+        await new Promise(resolve => setTimeout(resolve, 100));
         // Refresh month data since default pattern changed
-        fetchMonthData(monthlyViewMonth);
+        await fetchMonthData(monthlyViewMonth);
       } else {
         const data = await response.json();
         toast.error(data.error || "Failed to update assignment");
