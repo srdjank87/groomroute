@@ -3,6 +3,9 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+// Maximum number of service areas allowed per account
+const MAX_SERVICE_AREAS = 6;
+
 // Validation schema for creating/updating service areas
 // Areas are just name + color - customers are assigned manually
 const serviceAreaSchema = z.object({
@@ -74,6 +77,20 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const validatedData = serviceAreaSchema.parse(body);
+
+    // Check if maximum areas limit reached
+    const areaCount = await prisma.serviceArea.count({
+      where: {
+        accountId: session.user.accountId,
+      },
+    });
+
+    if (areaCount >= MAX_SERVICE_AREAS) {
+      return NextResponse.json(
+        { error: `Maximum of ${MAX_SERVICE_AREAS} service areas allowed` },
+        { status: 400 }
+      );
+    }
 
     // Check for duplicate name within the account
     const existingArea = await prisma.serviceArea.findFirst({

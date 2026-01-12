@@ -62,6 +62,7 @@ interface MonthAreaData {
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const FULL_DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const MAX_SERVICE_AREAS = 6;
 const PRESET_COLORS = [
   "#EF4444", // Red
   "#F97316", // Orange
@@ -131,7 +132,10 @@ export default function SettingsAreasPage() {
     setIsLoadingMonthData(true);
     try {
       const monthStr = format(month, "yyyy-MM");
-      const response = await fetch(`/api/appointments/calendar?month=${monthStr}`);
+      // Add cache-busting timestamp to ensure fresh data after pattern changes
+      const response = await fetch(`/api/appointments/calendar?month=${monthStr}&_t=${Date.now()}`, {
+        cache: 'no-store'
+      });
       if (response.ok) {
         const data = await response.json();
         setMonthAreaData(data.areasByDate || {});
@@ -160,6 +164,10 @@ export default function SettingsAreasPage() {
   }, [monthlyViewMonth, areas.length, fetchMonthData]);
 
   const openCreateModal = () => {
+    if (areas.length >= MAX_SERVICE_AREAS) {
+      toast.error(`Maximum of ${MAX_SERVICE_AREAS} service areas allowed`);
+      return;
+    }
     setEditingArea(null);
     setFormData({ name: "", color: PRESET_COLORS[areas.length % PRESET_COLORS.length] });
     setShowModal(true);
@@ -334,13 +342,19 @@ export default function SettingsAreasPage() {
             them to days of the week to reduce drive time.
           </p>
         </div>
-        <button
-          onClick={openCreateModal}
-          className="btn bg-[#A5744A] hover:bg-[#8B5A2B] text-white border-none gap-2 px-4"
-        >
-          <Plus className="h-5 w-5" />
-          New Area
-        </button>
+        <div className="flex flex-col items-end gap-1">
+          <button
+            onClick={openCreateModal}
+            disabled={areas.length >= MAX_SERVICE_AREAS}
+            className="btn bg-[#A5744A] hover:bg-[#8B5A2B] text-white border-none gap-2 px-4 disabled:bg-gray-300 disabled:text-gray-500"
+          >
+            <Plus className="h-5 w-5" />
+            New Area
+          </button>
+          {areas.length >= MAX_SERVICE_AREAS && (
+            <span className="text-xs text-gray-500">Maximum {MAX_SERVICE_AREAS} areas</span>
+          )}
+        </div>
       </div>
 
       {/* Areas List */}
