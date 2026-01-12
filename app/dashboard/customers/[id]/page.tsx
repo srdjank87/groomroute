@@ -1147,7 +1147,7 @@ export default function CustomerEditPage() {
           ) : !showWaitlistForm ? (
             <button
               onClick={() => setShowWaitlistForm(true)}
-              className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+              className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 px-4"
             >
               <Plus className="h-4 w-4" />
               Add to Waitlist

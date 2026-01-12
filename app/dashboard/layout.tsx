@@ -16,6 +16,7 @@ import {
   Sparkles,
   BarChart3,
   UserPlus,
+  Crown,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -33,6 +34,7 @@ const mainNavigation = [
 const businessNavigation = [
   { name: "Appointments", href: "/dashboard/appointments", icon: Calendar },
   { name: "Clients", href: "/dashboard/customers", icon: Users },
+  { name: "Team Calendar", href: "/dashboard/team", icon: UserPlus, proBadge: true },
 ];
 
 const supportNavigation = [
@@ -197,7 +199,7 @@ export default function DashboardLayout({
                 <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Business</p>
                 <ul role="list" className="space-y-1">
                   {businessNavigation.map((item) => {
-                    const isActive = pathname === item.href;
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                     return (
                       <li key={item.name}>
                         <Link
@@ -211,6 +213,11 @@ export default function DashboardLayout({
                         >
                           <item.icon className="h-5 w-5" />
                           {item.name}
+                          {"proBadge" in item && item.proBadge && !isActive && (
+                            <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                              Pro
+                            </span>
+                          )}
                         </Link>
                       </li>
                     );
@@ -328,7 +335,7 @@ export default function DashboardLayout({
               <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Business</p>
               <ul role="list" className="space-y-1">
                 {businessNavigation.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                   return (
                     <li key={item.name}>
                       <Link
@@ -341,6 +348,11 @@ export default function DashboardLayout({
                       >
                         <item.icon className="h-5 w-5" />
                         {item.name}
+                        {"proBadge" in item && item.proBadge && !isActive && (
+                          <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                            Pro
+                          </span>
+                        )}
                       </Link>
                     </li>
                   );

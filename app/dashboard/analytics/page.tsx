@@ -11,7 +11,10 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
+  Crown,
+  Trophy,
 } from "lucide-react";
+import { useFeature } from "@/hooks/useFeatures";
 
 interface CalmImpact {
   weeklyTimeRecoveredMinutes: number;
@@ -81,11 +84,59 @@ interface PerformanceData {
   insights: IndustryInsights;
 }
 
+interface GroomerStat {
+  groomer: {
+    id: string;
+    name: string;
+    color: string | null;
+  };
+  stats: {
+    totalAppointments: number;
+    completedCount: number;
+    cancelledCount: number;
+    scheduledCount: number;
+    totalRevenue: number;
+    totalMinutes: number;
+    workingDays: number;
+    avgRevenuePerAppointment: number;
+    avgAppointmentsPerDay: number;
+    completionRate: number;
+    dogsBySize: {
+      small: number;
+      medium: number;
+      large: number;
+      giant: number;
+    };
+  };
+}
+
+interface TeamAnalytics {
+  period: string;
+  startDate: string;
+  endDate: string;
+  groomerStats: GroomerStat[];
+  teamTotals: {
+    totalAppointments: number;
+    completedCount: number;
+    totalRevenue: number;
+    avgCompletionRate: number;
+  };
+  topPerformer: {
+    name: string;
+    revenue: number;
+    appointments: number;
+  } | null;
+}
+
 export default function AnalyticsPage() {
   const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null);
+  const [teamAnalytics, setTeamAnalytics] = useState<TeamAnalytics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showPerformanceCharts, setShowPerformanceCharts] = useState(false);
+  const [teamPeriod, setTeamPeriod] = useState<"week" | "month" | "30days">("30days");
+
+  const { hasFeature: hasTeamAnalytics } = useFeature("groomer_performance_analytics");
 
   useEffect(() => {
     async function fetchData() {
@@ -114,6 +165,25 @@ export default function AnalyticsPage() {
 
     fetchData();
   }, []);
+
+  // Fetch team analytics when feature is available
+  useEffect(() => {
+    async function fetchTeamAnalytics() {
+      if (!hasTeamAnalytics) return;
+
+      try {
+        const response = await fetch(`/api/team/analytics?period=${teamPeriod}`);
+        if (response.ok) {
+          const data = await response.json();
+          setTeamAnalytics(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch team analytics:", error);
+      }
+    }
+
+    fetchTeamAnalytics();
+  }, [hasTeamAnalytics, teamPeriod]);
 
   if (isLoading) {
     return (
@@ -552,6 +622,148 @@ export default function AnalyticsPage() {
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <p className="text-2xl font-bold text-green-700">${performanceData.weekly.avgRevenuePerDay.toFixed(0)}</p>
               <p className="text-xs text-gray-600 mt-1">Avg Revenue/Day</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Team Performance - Pro Only */}
+      {hasTeamAnalytics && teamAnalytics && teamAnalytics.groomerStats.length > 1 && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-900">Team Performance</h3>
+              <span className="text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                Pro
+              </span>
+            </div>
+            <select
+              value={teamPeriod}
+              onChange={(e) => setTeamPeriod(e.target.value as "week" | "month" | "30days")}
+              className="select select-sm select-bordered"
+            >
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="30days">Last 30 Days</option>
+            </select>
+          </div>
+
+          {/* Top Performer Banner */}
+          {teamAnalytics.topPerformer && (
+            <div className="mb-4 p-3 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200">
+              <div className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-amber-500" />
+                <span className="font-medium text-gray-900">Top Performer:</span>
+                <span className="text-gray-700">{teamAnalytics.topPerformer.name}</span>
+                <span className="ml-auto text-sm text-amber-700 font-semibold">
+                  ${teamAnalytics.topPerformer.revenue} • {teamAnalytics.topPerformer.appointments} jobs
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Groomer Stats Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-2 px-2 font-medium text-gray-500">Groomer</th>
+                  <th className="text-center py-2 px-2 font-medium text-gray-500">Jobs</th>
+                  <th className="text-center py-2 px-2 font-medium text-gray-500">Revenue</th>
+                  <th className="text-center py-2 px-2 font-medium text-gray-500">Avg/Job</th>
+                  <th className="text-center py-2 px-2 font-medium text-gray-500">Rate</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {teamAnalytics.groomerStats.map((gs) => (
+                  <tr key={gs.groomer.id} className="hover:bg-gray-50">
+                    <td className="py-3 px-2">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                          style={{ backgroundColor: gs.groomer.color || "#6366f1" }}
+                        >
+                          {gs.groomer.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-medium text-gray-900">{gs.groomer.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      <span className="font-semibold text-gray-900">{gs.stats.completedCount}</span>
+                      {gs.stats.cancelledCount > 0 && (
+                        <span className="text-xs text-red-500 ml-1">
+                          (-{gs.stats.cancelledCount})
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      <span className="font-semibold text-green-600">
+                        ${gs.stats.totalRevenue}
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-center text-gray-700">
+                      ${gs.stats.avgRevenuePerAppointment}
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          gs.stats.completionRate >= 90
+                            ? "bg-green-100 text-green-700"
+                            : gs.stats.completionRate >= 75
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {gs.stats.completionRate}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot className="bg-gray-50">
+                <tr className="font-medium">
+                  <td className="py-3 px-2 text-gray-900">Team Total</td>
+                  <td className="py-3 px-2 text-center text-gray-900">
+                    {teamAnalytics.teamTotals.completedCount}
+                  </td>
+                  <td className="py-3 px-2 text-center text-green-600">
+                    ${teamAnalytics.teamTotals.totalRevenue}
+                  </td>
+                  <td className="py-3 px-2 text-center text-gray-500">-</td>
+                  <td className="py-3 px-2 text-center">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                      {Math.round(teamAnalytics.teamTotals.avgCompletionRate)}%
+                    </span>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Team Performance Upgrade Prompt - Show for non-Pro users */}
+      {!hasTeamAnalytics && (
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200 p-6 mt-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-purple-100 rounded-lg">
+              <Crown className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-gray-900 mb-1">
+                Team Performance Analytics
+              </h3>
+              <p className="text-sm text-gray-600 mb-3">
+                Track individual groomer performance, compare revenue, and identify top performers.
+                Available with the Pro plan.
+              </p>
+              <Link
+                href="/dashboard/settings/billing"
+                className="btn btn-sm bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+              >
+                <Crown className="h-4 w-4" />
+                Upgrade to Pro
+              </Link>
             </div>
           </div>
         </div>

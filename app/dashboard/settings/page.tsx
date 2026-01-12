@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Shield, Smartphone, CreditCard, ChevronRight, Settings as SettingsIcon } from "lucide-react";
+import { MapPin, Shield, Smartphone, CreditCard, ChevronRight, Settings as SettingsIcon, Users } from "lucide-react";
 
 const settingsCategories = [
   {
@@ -31,6 +31,16 @@ const settingsCategories = [
     icon: Smartphone,
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
+  },
+  {
+    name: "Team Management",
+    description: "Manage groomers and vans in your business",
+    href: "/dashboard/settings/team",
+    icon: Users,
+    iconBg: "bg-indigo-100",
+    iconColor: "text-indigo-600",
+    badge: "Pro",
+    badgeColor: "bg-purple-100 text-purple-700",
   },
   {
     name: "Billing",
