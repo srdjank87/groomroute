@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   Plus,
   MapPin,
@@ -102,6 +102,49 @@ export default function SettingsAreasPage() {
   const [activeDateCell, setActiveDateCell] = useState<string | null>(null); // YYYY-MM-DD
   const [isSavingOverride, setIsSavingOverride] = useState(false);
   const [assignmentsVersion, setAssignmentsVersion] = useState(0); // Track when assignments change
+
+  // Compute monthly area data from assignments (client-side, always fresh)
+  // This replaces the API-based monthAreaData for the default weekly pattern
+  const computedMonthAreaData = useMemo(() => {
+    if (assignments.length === 0) return {};
+
+    const groomerAssignment = assignments[0]; // Single groomer mode
+    if (!groomerAssignment) return {};
+
+    const result: MonthAreaData = {};
+    const monthStart = startOfMonth(monthlyViewMonth);
+    const monthEnd = endOfMonth(monthStart);
+
+    let day = monthStart;
+    while (day <= monthEnd) {
+      const dateStr = format(day, "yyyy-MM-dd");
+      const dayOfWeek = day.getDay();
+
+      // Check if there's an override in monthAreaData from API
+      const override = monthAreaData[dateStr];
+      if (override?.isOverride) {
+        // Keep the override from API
+        result[dateStr] = override;
+      } else {
+        // Use the current assignment from state (always fresh)
+        const dayData = groomerAssignment.days[dayOfWeek];
+        if (dayData) {
+          result[dateStr] = {
+            areaId: dayData.areaId,
+            areaName: dayData.areaName,
+            areaColor: dayData.areaColor,
+            isOverride: false,
+          };
+        } else {
+          result[dateStr] = null;
+        }
+      }
+
+      day = addDays(day, 1);
+    }
+
+    return result;
+  }, [assignments, monthlyViewMonth, monthAreaData]);
 
   const fetchAreas = useCallback(async () => {
     try {
@@ -566,7 +609,8 @@ export default function SettingsAreasPage() {
                       const currentDay = day;
                       const dateStr = format(currentDay, "yyyy-MM-dd");
                       const isCurrentMonth = isSameMonth(currentDay, monthStart);
-                      const areaData = monthAreaData[dateStr];
+                      // Use computed data which combines fresh assignments with API overrides
+                      const areaData = computedMonthAreaData[dateStr];
 
                       days.push(
                         <button
@@ -817,7 +861,7 @@ export default function SettingsAreasPage() {
                 {format(new Date(activeDateCell + "T12:00:00"), "EEEE, MMMM d")}
               </h3>
               <p className="text-sm text-gray-600">
-                {monthAreaData[activeDateCell]?.isOverride
+                {computedMonthAreaData[activeDateCell]?.isOverride
                   ? "This date has a custom schedule"
                   : "Using default weekly pattern"}
               </p>
@@ -825,7 +869,7 @@ export default function SettingsAreasPage() {
 
             <div className="p-2 max-h-80 overflow-y-auto">
               {/* Revert to default option (only show if there's an override) */}
-              {monthAreaData[activeDateCell]?.isOverride && (
+              {computedMonthAreaData[activeDateCell]?.isOverride && (
                 <button
                   onClick={() => handleRemoveOverride(activeDateCell)}
                   disabled={isSavingOverride}
@@ -860,7 +904,7 @@ export default function SettingsAreasPage() {
 
               {/* Area options */}
               {availableAreas.map((area) => {
-                const currentArea = monthAreaData[activeDateCell];
+                const currentArea = computedMonthAreaData[activeDateCell];
                 const isSelected = currentArea?.areaId === area.id;
                 return (
                   <button
