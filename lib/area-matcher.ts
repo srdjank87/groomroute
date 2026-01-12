@@ -233,6 +233,16 @@ export async function getGroomerAreasForDateRange(
 }
 
 /**
+ * Helper to format a local date as YYYY-MM-DD string (local timezone)
+ */
+function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
  * Find the next available date that matches a groomer's area day for a customer.
  * Respects date-specific overrides when searching.
  * @param groomerId The groomer to check
@@ -250,7 +260,7 @@ export async function findNextAreaDayDate(
   // Get all days when groomer is assigned to customer's area (default pattern)
   const defaultAreaDays = await getGroomerAreaDays(groomerId, customerAreaId);
 
-  // Normalize start date
+  // Normalize start date to local midnight
   const startDate = new Date(fromDate);
   startDate.setHours(0, 0, 0, 0);
 
@@ -274,6 +284,7 @@ export async function findNextAreaDayDate(
   });
 
   // Build a map of date string to override areaId (null means day off)
+  // Use the UTC date from the database but format it as YYYY-MM-DD
   const overrideMap = new Map<string, string | null>();
   for (const o of overrides) {
     const dateStr = o.date.toISOString().split("T")[0];
@@ -284,7 +295,8 @@ export async function findNextAreaDayDate(
   for (let i = 0; i < maxDaysAhead; i++) {
     const checkDate = new Date(startDate);
     checkDate.setDate(checkDate.getDate() + i);
-    const dateStr = checkDate.toISOString().split("T")[0];
+    // Format the local date as YYYY-MM-DD to compare with override map
+    const dateStr = formatLocalDate(checkDate);
     const dayOfWeek = checkDate.getDay();
 
     // Check for override first
@@ -356,7 +368,7 @@ export async function getUpcomingAreaDates(
   // Get default day-of-week assignments for this area
   const defaultAreaDays = await getGroomerAreaDays(groomerId, areaId);
 
-  // Normalize start date
+  // Normalize start date to local midnight
   const startDate = new Date(fromDate);
   startDate.setHours(0, 0, 0, 0);
 
@@ -392,7 +404,8 @@ export async function getUpcomingAreaDates(
   for (let i = 0; i < maxDaysAhead; i++) {
     const checkDate = new Date(startDate);
     checkDate.setDate(checkDate.getDate() + i);
-    const dateStr = checkDate.toISOString().split("T")[0];
+    // Format the local date as YYYY-MM-DD to compare with override map
+    const dateStr = formatLocalDate(checkDate);
     const dayOfWeek = checkDate.getDay();
 
     // Check for override first
