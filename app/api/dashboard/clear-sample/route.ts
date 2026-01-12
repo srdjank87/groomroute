@@ -62,6 +62,24 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Delete additional sample groomers (those with @groomroute.com email)
+    // These are the groomers created by the sample data generator for team features
+    const deletedGroomers = await prisma.groomer.deleteMany({
+      where: {
+        accountId,
+        email: {
+          endsWith: "@groomroute.com",
+        },
+      },
+    });
+
+    // Also delete area date overrides
+    const deletedDateOverrides = await prisma.areaDateOverride.deleteMany({
+      where: {
+        accountId,
+      },
+    });
+
     return NextResponse.json({
       success: true,
       deleted: {
@@ -69,6 +87,8 @@ export async function POST(req: NextRequest) {
         breaks: deletedBreaks.count,
         areaAssignments: deletedAssignments.count,
         serviceAreas: deletedAreas.count,
+        groomers: deletedGroomers.count,
+        dateOverrides: deletedDateOverrides.count,
       },
     });
   } catch (error) {
