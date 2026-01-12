@@ -23,6 +23,7 @@ interface AppointmentCalendarProps {
   suggestedDays?: number[]; // Days of week that are suggested (0=Sun, 1=Mon, etc.)
   customerAreaColor?: string; // Color of the customer's service area
   minDate?: Date;
+  onAreaDataChange?: (areasByDate: Record<string, AreaInfo | null>) => void; // Callback when area data is loaded
 }
 
 export function AppointmentCalendar({
@@ -31,6 +32,7 @@ export function AppointmentCalendar({
   suggestedDays = [],
   customerAreaColor,
   minDate,
+  onAreaDataChange,
 }: AppointmentCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(selectedDate || new Date());
   const [calendarData, setCalendarData] = useState<CalendarData | null>(null);
@@ -44,13 +46,17 @@ export function AppointmentCalendar({
       if (response.ok) {
         const data = await response.json();
         setCalendarData(data);
+        // Notify parent of area data changes
+        if (onAreaDataChange && data.areasByDate) {
+          onAreaDataChange(data.areasByDate);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch calendar data:", error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [onAreaDataChange]);
 
   useEffect(() => {
     fetchCalendarData(currentMonth);

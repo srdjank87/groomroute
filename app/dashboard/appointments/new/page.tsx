@@ -99,6 +99,13 @@ interface ConflictCheck {
   } | null;
 }
 
+type AreaForDate = {
+  areaId: string;
+  areaName: string;
+  areaColor: string;
+  isOverride: boolean;
+} | null;
+
 const LARGE_DOG_WEIGHT_THRESHOLD = 50;
 
 function NewAppointmentContent() {
@@ -132,6 +139,7 @@ function NewAppointmentContent() {
   const [workingHoursWarningDismissed, setWorkingHoursWarningDismissed] = useState(false);
   const [conflictCheck, setConflictCheck] = useState<ConflictCheck | null>(null);
   const [isCheckingConflict, setIsCheckingConflict] = useState(false);
+  const [calendarAreaData, setCalendarAreaData] = useState<Record<string, AreaForDate>>({});
 
   const dateInputRef = useRef<HTMLInputElement>(null);
   const timeInputRef = useRef<HTMLInputElement>(null);
@@ -384,18 +392,27 @@ function NewAppointmentContent() {
   const day = String(today.getDate()).padStart(2, '0');
   const todayStr = `${year}-${month}-${day}`;
 
-  // Check if selected date matches suggested area days
+  // Check if selected date matches the customer's area (respects date overrides)
   const getSelectedDateMatch = () => {
-    if (!appointmentData.date || !areaSuggestion?.suggestedDays?.length) {
+    if (!appointmentData.date || !areaSuggestion?.customer?.serviceAreaId) {
       return null;
     }
     const selectedDate = new Date(appointmentData.date + 'T00:00:00');
     const dayOfWeek = selectedDate.getDay();
-    const isMatch = areaSuggestion.suggestedDays.includes(dayOfWeek);
+    const dayName = DAY_NAMES[dayOfWeek];
+
+    // Check the actual area for this specific date (from calendar data)
+    const areaForDate = calendarAreaData[appointmentData.date];
+
+    // Check if the assigned area for this date matches the customer's area
+    const isMatch = areaForDate?.areaId === areaSuggestion.customer.serviceAreaId;
+
     return {
       isMatch,
       dayOfWeek,
-      dayName: DAY_NAMES[dayOfWeek],
+      dayName,
+      areaForDate,
+      isOverride: areaForDate?.isOverride || false,
     };
   };
 
@@ -708,6 +725,7 @@ function NewAppointmentContent() {
                 suggestedDays={areaSuggestion?.suggestedDays || []}
                 customerAreaColor={areaSuggestion?.customer?.serviceAreaColor || undefined}
                 minDate={today}
+                onAreaDataChange={(areasByDate) => setCalendarAreaData(areasByDate)}
               />
 
               {/* Selected date display with feedback */}
@@ -725,14 +743,22 @@ function NewAppointmentContent() {
                   {dateMatch?.isMatch && areaSuggestion?.customer?.serviceAreaName && (
                     <p className="text-xs mt-1 text-green-600 flex items-center gap-1">
                       <Check className="h-3 w-3" />
-                      Great choice! {dateMatch.dayName} is your {areaSuggestion.customer.serviceAreaName} day.
+                      {dateMatch.isOverride
+                        ? `Great choice! This ${dateMatch.dayName} is scheduled for ${areaSuggestion.customer.serviceAreaName}.`
+                        : `Great choice! ${dateMatch.dayName} is your ${areaSuggestion.customer.serviceAreaName} day.`
+                      }
                     </p>
                   )}
                   {dateMatch && !dateMatch.isMatch && areaSuggestion?.customer?.serviceAreaName && (
                     <p className="text-xs mt-1 text-amber-700 flex items-center gap-1">
                       <AlertTriangle className="h-3 w-3" />
-                      {dateMatch.dayName} is not your {areaSuggestion.customer.serviceAreaName} day.
-                      Consider {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" or ")}.
+                      {dateMatch.areaForDate
+                        ? `This ${dateMatch.dayName} is scheduled for ${dateMatch.areaForDate.areaName}, not ${areaSuggestion.customer.serviceAreaName}.`
+                        : `${dateMatch.dayName} is not your ${areaSuggestion.customer.serviceAreaName} day.`
+                      }
+                      {areaSuggestion.suggestedDays.length > 0 && (
+                        <> Consider {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" or ")}.</>
+                      )}
                     </p>
                   )}
                 </div>
