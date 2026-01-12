@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Calendar, MapPin, Clock, X, Filter, ChevronLeft, ChevronRight, Sparkles, Check, Phone, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
+import { AppointmentCalendar } from "@/components/ui/appointment-calendar";
 
 interface Appointment {
   id: string;
@@ -206,8 +207,6 @@ export default function AppointmentsPage() {
 
   // Preferences state
   const [preferredMessaging, setPreferredMessaging] = useState<"SMS" | "WHATSAPP">("SMS");
-
-  const dateInputRef = useRef<HTMLInputElement>(null);
 
   // Check if selected date is today
   const isToday = (() => {
@@ -438,52 +437,45 @@ export default function AppointmentsPage() {
         </Link>
       </div>
 
-      {/* Date Picker and Status Filter */}
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Date Picker */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Date
-            </label>
-            <div className="relative">
-              <div
-                className="cursor-pointer"
-                onClick={() => dateInputRef.current?.showPicker?.()}
-              >
-                <input
-                  ref={dateInputRef}
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="input input-bordered w-full h-12 cursor-pointer opacity-0 absolute inset-0"
-                />
-                <div className="input input-bordered w-full h-12 cursor-pointer flex items-center">
-                  {format(new Date(selectedDate + 'T00:00:00'), "EEEE, MMMM dd, yyyy")}
-                </div>
-              </div>
-            </div>
+      {/* Calendar and Status Filter */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Calendar */}
+        <div className="lg:col-span-2">
+          <AppointmentCalendar
+            selectedDate={new Date(selectedDate + 'T00:00:00')}
+            onDateSelect={(date) => {
+              const dateStr = format(date, 'yyyy-MM-dd');
+              setSelectedDate(dateStr);
+            }}
+          />
+        </div>
+
+        {/* Status Filter */}
+        <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm h-fit">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Filter by Status
+          </label>
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="select select-bordered w-full h-12 pl-10"
+            >
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* Status Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Filter by Status
-            </label>
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="select select-bordered w-full h-12 pl-10"
-              >
-                {STATUS_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Selected date display */}
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-500 mb-1">Selected Date</p>
+            <p className="font-semibold text-gray-900">
+              {format(new Date(selectedDate + 'T00:00:00'), "EEEE, MMMM d, yyyy")}
+            </p>
           </div>
         </div>
       </div>
