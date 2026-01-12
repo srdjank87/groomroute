@@ -151,7 +151,8 @@ export function AppointmentCalendar({
         const isCurrentMonth = isSameMonth(currentDay, monthStart);
         const isSelected = selectedDate && isSameDay(currentDay, selectedDate);
         const isToday = isSameDay(currentDay, new Date());
-        const isPast = minDate && currentDay < minDate;
+        // Compare dates only (not time) - allow same-day bookings
+        const isPast = minDate && !isSameDay(currentDay, minDate) && currentDay < minDate;
 
         // Get appointment data for this date
         const dateData = calendarData?.appointmentsByDate?.[dateStr];
