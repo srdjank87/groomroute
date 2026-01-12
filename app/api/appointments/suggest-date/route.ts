@@ -109,14 +109,11 @@ export async function GET(request: Request) {
     );
 
     // Find the next date that falls on one of those days
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-
+    // Start from today to allow same-day bookings (especially important for overrides)
     const nextAreaDayResult = await findNextAreaDayDate(
       groomerId,
       customer.serviceArea.id,
-      tomorrow
+      today
     );
 
     // Build reason text
