@@ -186,14 +186,14 @@ export default function SubscriptionExpiredPage() {
           <div className="flex gap-4">
             <button
               onClick={() => router.push("/dashboard")}
-              className="btn btn-ghost flex-1"
+              className="btn btn-outline border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 flex-1"
               disabled={isLoading}
             >
               Back to Dashboard
             </button>
             <button
               onClick={handleResubscribe}
-              className="btn btn-primary flex-1"
+              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 flex-1"
               disabled={isLoading}
             >
               {isLoading ? (
