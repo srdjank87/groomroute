@@ -10,8 +10,8 @@ export default function SubscriptionExpiredPage() {
   const { data: session } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"STARTER" | "GROWTH" | "PRO">("STARTER");
-  const [selectedBilling, setSelectedBilling] = useState<"MONTHLY" | "YEARLY">("MONTHLY");
+  const [selectedPlan, setSelectedPlan] = useState<"starter" | "growth" | "pro">("starter");
+  const [selectedBilling, setSelectedBilling] = useState<"monthly" | "yearly">("monthly");
 
   const handleResubscribe = async () => {
     setIsLoading(true);
@@ -65,16 +65,16 @@ export default function SubscriptionExpiredPage() {
 
             {/* Billing Toggle */}
             <div className="flex items-center justify-center gap-4 mb-6">
-              <span className={`text-sm font-medium ${selectedBilling === "MONTHLY" ? "text-gray-900" : "text-gray-500"}`}>
+              <span className={`text-sm font-medium ${selectedBilling === "monthly" ? "text-gray-900" : "text-gray-500"}`}>
                 Monthly
               </span>
               <input
                 type="checkbox"
                 className="toggle toggle-primary"
-                checked={selectedBilling === "YEARLY"}
-                onChange={(e) => setSelectedBilling(e.target.checked ? "YEARLY" : "MONTHLY")}
+                checked={selectedBilling === "yearly"}
+                onChange={(e) => setSelectedBilling(e.target.checked ? "yearly" : "monthly")}
               />
-              <span className={`text-sm font-medium ${selectedBilling === "YEARLY" ? "text-gray-900" : "text-gray-500"}`}>
+              <span className={`text-sm font-medium ${selectedBilling === "yearly" ? "text-gray-900" : "text-gray-500"}`}>
                 Yearly
                 <span className="ml-1 text-xs text-green-600">(Save 20%)</span>
               </span>
@@ -85,7 +85,7 @@ export default function SubscriptionExpiredPage() {
               {/* Starter Plan */}
               <label
                 className={`border-2 rounded-xl p-6 cursor-pointer transition-all ${
-                  selectedPlan === "STARTER"
+                  selectedPlan === "starter"
                     ? "border-primary bg-blue-50"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
@@ -93,21 +93,21 @@ export default function SubscriptionExpiredPage() {
                 <input
                   type="radio"
                   name="plan"
-                  value="STARTER"
-                  checked={selectedPlan === "STARTER"}
-                  onChange={(e) => setSelectedPlan(e.target.value as "STARTER" | "GROWTH" | "PRO")}
+                  value="starter"
+                  checked={selectedPlan === "starter"}
+                  onChange={(e) => setSelectedPlan(e.target.value as "starter" | "growth" | "pro")}
                   className="sr-only"
                 />
                 <div>
                   <h3 className="text-xl font-bold text-gray-900">Starter</h3>
                   <p className="text-sm text-gray-600 mt-1 mb-3">Perfect for solo groomers</p>
                   <div className="text-3xl font-bold text-gray-900">
-                    ${selectedBilling === "MONTHLY" ? "79" : "79"}
+                    ${selectedBilling === "monthly" ? "79" : "79"}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {selectedBilling === "MONTHLY" ? "/month" : "/month"}
+                    {selectedBilling === "monthly" ? "/month" : "/month"}
                   </div>
-                  {selectedBilling === "YEARLY" && (
+                  {selectedBilling === "yearly" && (
                     <div className="text-xs text-green-600 mt-1">
                       $950/year (save $200)
                     </div>
@@ -118,7 +118,7 @@ export default function SubscriptionExpiredPage() {
               {/* Growth Plan */}
               <label
                 className={`border-2 rounded-xl p-6 cursor-pointer transition-all ${
-                  selectedPlan === "GROWTH"
+                  selectedPlan === "growth"
                     ? "border-primary bg-blue-50"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
@@ -126,21 +126,21 @@ export default function SubscriptionExpiredPage() {
                 <input
                   type="radio"
                   name="plan"
-                  value="GROWTH"
-                  checked={selectedPlan === "GROWTH"}
-                  onChange={(e) => setSelectedPlan(e.target.value as "STARTER" | "GROWTH" | "PRO")}
+                  value="growth"
+                  checked={selectedPlan === "growth"}
+                  onChange={(e) => setSelectedPlan(e.target.value as "starter" | "growth" | "pro")}
                   className="sr-only"
                 />
                 <div>
                   <h3 className="text-xl font-bold text-gray-900">Growth</h3>
                   <p className="text-sm text-gray-600 mt-1 mb-3">For growing businesses</p>
                   <div className="text-3xl font-bold text-gray-900">
-                    ${selectedBilling === "MONTHLY" ? "179" : "142"}
+                    ${selectedBilling === "monthly" ? "179" : "142"}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {selectedBilling === "MONTHLY" ? "/month" : "/month"}
+                    {selectedBilling === "monthly" ? "/month" : "/month"}
                   </div>
-                  {selectedBilling === "YEARLY" && (
+                  {selectedBilling === "yearly" && (
                     <div className="text-xs text-green-600 mt-1">
                       $1,700/year (save $448)
                     </div>
@@ -151,7 +151,7 @@ export default function SubscriptionExpiredPage() {
               {/* Pro Plan */}
               <label
                 className={`border-2 rounded-xl p-6 cursor-pointer transition-all ${
-                  selectedPlan === "PRO"
+                  selectedPlan === "pro"
                     ? "border-primary bg-blue-50"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
@@ -159,21 +159,21 @@ export default function SubscriptionExpiredPage() {
                 <input
                   type="radio"
                   name="plan"
-                  value="PRO"
-                  checked={selectedPlan === "PRO"}
-                  onChange={(e) => setSelectedPlan(e.target.value as "STARTER" | "GROWTH" | "PRO")}
+                  value="pro"
+                  checked={selectedPlan === "pro"}
+                  onChange={(e) => setSelectedPlan(e.target.value as "starter" | "growth" | "pro")}
                   className="sr-only"
                 />
                 <div>
                   <h3 className="text-xl font-bold text-gray-900">Pro</h3>
                   <p className="text-sm text-gray-600 mt-1 mb-3">For established teams</p>
                   <div className="text-3xl font-bold text-gray-900">
-                    ${selectedBilling === "MONTHLY" ? "279" : "221"}
+                    ${selectedBilling === "monthly" ? "279" : "221"}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {selectedBilling === "MONTHLY" ? "/month" : "/month"}
+                    {selectedBilling === "monthly" ? "/month" : "/month"}
                   </div>
-                  {selectedBilling === "YEARLY" && (
+                  {selectedBilling === "yearly" && (
                     <div className="text-xs text-green-600 mt-1">
                       $2,650/year (save $698)
                     </div>
