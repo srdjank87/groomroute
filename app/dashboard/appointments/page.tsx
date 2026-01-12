@@ -7,6 +7,13 @@ import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { AppointmentCalendar } from "@/components/ui/appointment-calendar";
 
+// Day assignment type for calendar
+interface DayAssignment {
+  areaId: string;
+  areaName: string;
+  areaColor: string;
+}
+
 interface Appointment {
   id: string;
   startAt: string;
@@ -208,6 +215,9 @@ export default function AppointmentsPage() {
   // Preferences state
   const [preferredMessaging, setPreferredMessaging] = useState<"SMS" | "WHATSAPP">("SMS");
 
+  // Day assignments for calendar (to compute areas client-side)
+  const [dayAssignments, setDayAssignments] = useState<Record<number, DayAssignment | null>>({});
+
   // Check if selected date is today
   const isToday = (() => {
     const now = new Date();
@@ -290,6 +300,29 @@ export default function AppointmentsPage() {
     }
   }, []);
 
+  // Fetch day assignments for calendar area display
+  const fetchDayAssignments = useCallback(async () => {
+    try {
+      const response = await fetch("/api/area-assignments", {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Get the first groomer's assignments (single groomer mode)
+        const groomerAssignment = data.assignments?.[0];
+        if (groomerAssignment?.days) {
+          setDayAssignments(groomerAssignment.days);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch day assignments:", error);
+    }
+  }, []);
+
   const refreshAll = useCallback(() => {
     fetchAppointments();
     fetchAllAppointments();
@@ -302,6 +335,11 @@ export default function AppointmentsPage() {
   useEffect(() => {
     fetchAllAppointments();
   }, [fetchAllAppointments]);
+
+  // Fetch day assignments for calendar
+  useEffect(() => {
+    fetchDayAssignments();
+  }, [fetchDayAssignments]);
 
   // Fetch preferences
   useEffect(() => {
@@ -447,6 +485,7 @@ export default function AppointmentsPage() {
               const dateStr = format(date, 'yyyy-MM-dd');
               setSelectedDate(dateStr);
             }}
+            dayAssignments={dayAssignments}
           />
         </div>
 

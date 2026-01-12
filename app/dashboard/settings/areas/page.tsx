@@ -176,10 +176,7 @@ export default function SettingsAreasPage() {
     setIsLoadingMonthData(true);
     try {
       const monthStr = format(month, "yyyy-MM");
-      const url = `/api/appointments/calendar?month=${monthStr}&_t=${Date.now()}`;
-      console.log('[fetchMonthData] Fetching:', url);
-
-      const response = await fetch(url, {
+      const response = await fetch(`/api/appointments/calendar?month=${monthStr}&_t=${Date.now()}`, {
         method: 'GET',
         cache: 'no-store',
         headers: {
@@ -189,18 +186,10 @@ export default function SettingsAreasPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log('[fetchMonthData] Response areasByDate sample:',
-          Object.entries(data.areasByDate || {}).slice(0, 5).map(([date, area]) => ({
-            date,
-            area: (area as any)?.areaName || 'none'
-          }))
-        );
         setMonthAreaData(data.areasByDate || {});
-      } else {
-        console.error('[fetchMonthData] Response not OK:', response.status);
       }
     } catch (error) {
-      console.error("[fetchMonthData] Failed to fetch month data:", error);
+      console.error("Failed to fetch month data:", error);
     } finally {
       setIsLoadingMonthData(false);
     }
@@ -217,9 +206,7 @@ export default function SettingsAreasPage() {
 
   // Load month data when month changes or assignments are updated
   useEffect(() => {
-    console.log('[useEffect] Triggered - areas.length:', areas.length, 'assignmentsVersion:', assignmentsVersion);
     if (areas.length > 0) {
-      console.log('[useEffect] Calling fetchMonthData for', format(monthlyViewMonth, "yyyy-MM"));
       fetchMonthData(monthlyViewMonth);
     }
   }, [monthlyViewMonth, areas.length, fetchMonthData, assignmentsVersion]);
@@ -320,15 +307,10 @@ export default function SettingsAreasPage() {
 
       if (response.ok) {
         toast.success(areaId ? "Assignment updated" : "Assignment removed");
-        console.log('[handleSetAssignment] Assignment saved, fetching fresh data...');
         // Wait for assignment data refresh to complete
         await fetchAssignments();
-        console.log('[handleSetAssignment] Assignments fetched, incrementing version to trigger calendar refresh');
         // Increment version to trigger useEffect to re-fetch month data
-        setAssignmentsVersion(v => {
-          console.log('[handleSetAssignment] Version changing from', v, 'to', v + 1);
-          return v + 1;
-        });
+        setAssignmentsVersion(v => v + 1);
       } else {
         const data = await response.json();
         toast.error(data.error || "Failed to update assignment");

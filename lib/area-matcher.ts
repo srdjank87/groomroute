@@ -178,12 +178,6 @@ export async function getGroomerAreasForDateRange(
     },
   });
 
-  // DEBUG: Log what assignments we found
-  console.log(`[getGroomerAreasForDateRange] Found ${defaultAssignments.length} day assignments for groomer ${groomerId}`);
-  defaultAssignments.forEach(a => {
-    console.log(`  - Day ${a.dayOfWeek}: ${a.area.name} (${a.area.id})`);
-  });
-
   // Build a map of day-of-week to default area
   const defaultByDay = new Map<number, { areaId: string; areaName: string; areaColor: string }>();
   for (const assignment of defaultAssignments) {

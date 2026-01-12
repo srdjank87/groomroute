@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
 
@@ -17,6 +17,13 @@ interface CalendarData {
   areasByDay: Record<number, Array<{ id: string; name: string; color: string }>>;
 }
 
+// Day assignments from the area-assignments API
+interface DayAssignment {
+  areaId: string;
+  areaName: string;
+  areaColor: string;
+}
+
 interface AppointmentCalendarProps {
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
@@ -24,6 +31,9 @@ interface AppointmentCalendarProps {
   customerAreaColor?: string; // Color of the customer's service area
   minDate?: Date;
   onAreaDataChange?: (areasByDate: Record<string, AreaInfo | null>) => void; // Callback when area data is loaded
+  // Optional: pass fresh day assignments to compute areas client-side
+  dayAssignments?: Record<number, DayAssignment | null>;
+  refreshTrigger?: number; // Increment to force re-fetch
 }
 
 export function AppointmentCalendar({
@@ -33,6 +43,8 @@ export function AppointmentCalendar({
   customerAreaColor,
   minDate,
   onAreaDataChange,
+  dayAssignments,
+  refreshTrigger = 0,
 }: AppointmentCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(selectedDate || new Date());
   const [calendarData, setCalendarData] = useState<CalendarData | null>(null);
@@ -42,7 +54,14 @@ export function AppointmentCalendar({
     setIsLoading(true);
     try {
       const monthStr = format(month, "yyyy-MM");
-      const response = await fetch(`/api/appointments/calendar?month=${monthStr}`);
+      // Add cache-busting timestamp
+      const response = await fetch(`/api/appointments/calendar?month=${monthStr}&_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setCalendarData(data);
@@ -60,7 +79,50 @@ export function AppointmentCalendar({
 
   useEffect(() => {
     fetchCalendarData(currentMonth);
-  }, [currentMonth, fetchCalendarData]);
+  }, [currentMonth, fetchCalendarData, refreshTrigger]);
+
+  // Compute areasByDate from dayAssignments if provided (client-side, always fresh)
+  // This overrides the API-based areasByDate for the default weekly pattern
+  const computedAreasByDate = useMemo(() => {
+    if (!dayAssignments || !calendarData) return calendarData?.areasByDate || {};
+
+    const result: Record<string, AreaInfo | null> = {};
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(monthStart);
+
+    let day = monthStart;
+    while (day <= monthEnd) {
+      const dateStr = format(day, "yyyy-MM-dd");
+      const dayOfWeek = day.getDay();
+
+      // Check if there's an override from the API
+      const apiData = calendarData.areasByDate?.[dateStr];
+      if (apiData?.isOverride) {
+        // Keep the override from API
+        result[dateStr] = apiData;
+      } else {
+        // Use the passed-in dayAssignments (always fresh)
+        const assignment = dayAssignments[dayOfWeek];
+        if (assignment) {
+          result[dateStr] = {
+            areaId: assignment.areaId,
+            areaName: assignment.areaName,
+            areaColor: assignment.areaColor,
+            isOverride: false,
+          };
+        } else {
+          result[dateStr] = null;
+        }
+      }
+
+      day = addDays(day, 1);
+    }
+
+    return result;
+  }, [dayAssignments, calendarData, currentMonth]);
+
+  // Use computed areas if dayAssignments provided, otherwise fall back to API data
+  const effectiveAreasByDate = dayAssignments ? computedAreasByDate : (calendarData?.areasByDate || {});
 
   const handlePrevMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -158,8 +220,8 @@ export function AppointmentCalendar({
         const dateData = calendarData?.appointmentsByDate?.[dateStr];
         const hasAppointments = dateData && dateData.count > 0;
 
-        // Get area assignment for this specific date
-        const areaForDate = calendarData?.areasByDate?.[dateStr];
+        // Get area assignment for this specific date (use computed/effective data)
+        const areaForDate = effectiveAreasByDate[dateStr];
         const hasArea = !!areaForDate;
 
         // Check if this day is a suggested day for the customer
@@ -260,27 +322,23 @@ export function AppointmentCalendar({
   };
 
   const renderLegend = () => {
-    // Collect unique areas from areasByDate
+    // Collect unique areas from effectiveAreasByDate
     const uniqueAreas: Array<{ id: string; name: string; color: string }> = [];
     const seen = new Set<string>();
 
-    if (calendarData?.areasByDate) {
-      for (const areaInfo of Object.values(calendarData.areasByDate)) {
-        if (areaInfo && !seen.has(areaInfo.areaId)) {
-          seen.add(areaInfo.areaId);
-          uniqueAreas.push({
-            id: areaInfo.areaId,
-            name: areaInfo.areaName,
-            color: areaInfo.areaColor,
-          });
-        }
+    for (const areaInfo of Object.values(effectiveAreasByDate)) {
+      if (areaInfo && !seen.has(areaInfo.areaId)) {
+        seen.add(areaInfo.areaId);
+        uniqueAreas.push({
+          id: areaInfo.areaId,
+          name: areaInfo.areaName,
+          color: areaInfo.areaColor,
+        });
       }
     }
 
     // Check if there are any overrides in the current view
-    const hasOverrides = calendarData?.areasByDate
-      ? Object.values(calendarData.areasByDate).some(a => a?.isOverride)
-      : false;
+    const hasOverrides = Object.values(effectiveAreasByDate).some(a => a?.isOverride);
 
     return (
       <div className="mt-4 pt-3 border-t border-gray-200">
