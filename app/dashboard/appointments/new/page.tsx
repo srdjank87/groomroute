@@ -494,7 +494,7 @@ function NewAppointmentContent() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input input-bordered w-full h-12 pl-10"
+                  className="input w-full h-12 pl-10 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   placeholder="Search clients..."
                 />
               </div>
@@ -1103,7 +1103,7 @@ function NewAppointmentContent() {
                     type="text"
                     value={customServiceName}
                     onChange={(e) => setCustomServiceName(e.target.value)}
-                    className="input input-bordered w-full h-12 text-base"
+                    className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                     placeholder="e.g., Breed-specific cut, Show prep..."
                   />
                 </div>
@@ -1168,7 +1168,7 @@ function NewAppointmentContent() {
                   onChange={(e) =>
                     setAppointmentData({ ...appointmentData, notes: e.target.value })
                   }
-                  className="textarea textarea-bordered w-full text-base"
+                  className="textarea w-full text-base pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   rows={3}
                   placeholder="Special requests or notes..."
                 />

@@ -546,7 +546,7 @@ export default function CustomerEditPage() {
               <span className="label-text font-medium">Address *</span>
             </label>
             <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 z-10 pointer-events-none" />
               <input
                 type="text"
                 value={formData.address}

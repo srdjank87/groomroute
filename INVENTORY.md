@@ -266,6 +266,16 @@ This document provides a comprehensive inventory of all features, pages, routes,
 - Added top padding to textareas for better spacing
 - Added Internal Notes section to client profile page
 - Created this inventory file
+- **Design Consistency Pass:**
+  - Standardized input field styling across all pages (bg-gray-50, border-2, focus:border-[#A5744A])
+  - Added pl-4 padding to pet name/breed/age/weight fields on pet new/edit pages
+  - Added pl-4 pt-3 padding to all textareas on pet new/edit pages
+  - Fixed customer list search input to use consistent styling
+  - Fixed new appointment search input to use consistent styling
+  - Fixed new appointment custom service name input styling
+  - Fixed new appointment notes textarea styling
+  - Fixed settings/areas area name input styling
+  - Fixed address icon on edit client page (added z-10 pointer-events-none)
 
 ---
 

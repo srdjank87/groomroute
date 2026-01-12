@@ -148,7 +148,7 @@ export default function NewPetPage() {
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="input w-full h-12 text-base bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="Max, Bella, etc."
             />
           </div>
@@ -194,7 +194,7 @@ export default function NewPetPage() {
                 type="text"
                 value={formData.breed}
                 onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
-                className="input w-full h-12 text-base bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                 placeholder="Golden Retriever"
               />
             </div>
@@ -207,7 +207,7 @@ export default function NewPetPage() {
                 type="number"
                 value={formData.ageYears}
                 onChange={(e) => setFormData({ ...formData, ageYears: e.target.value })}
-                className="input w-full h-12 text-base bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                 placeholder="3"
                 min="0"
               />
@@ -222,7 +222,7 @@ export default function NewPetPage() {
               type="number"
               value={formData.weight}
               onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-              className="input w-full h-12 text-base bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="65"
               min="0"
               step="0.1"
@@ -264,7 +264,7 @@ export default function NewPetPage() {
             <textarea
               value={formData.behaviorNotes}
               onChange={(e) => setFormData({ ...formData, behaviorNotes: e.target.value })}
-              className="textarea w-full text-base bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="textarea w-full text-base pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               rows={3}
               placeholder="Any behavioral quirks or things to watch out for..."
             />
@@ -282,7 +282,7 @@ export default function NewPetPage() {
             <textarea
               value={formData.groomingNotes}
               onChange={(e) => setFormData({ ...formData, groomingNotes: e.target.value })}
-              className="textarea w-full text-base bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="textarea w-full text-base pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               rows={3}
               placeholder="Preferred styles, sensitivities, matting issues..."
             />
@@ -295,7 +295,7 @@ export default function NewPetPage() {
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="textarea w-full text-base bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="textarea w-full text-base pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               rows={2}
               placeholder="Any other notes about this pet..."
             />
@@ -347,7 +347,7 @@ export default function NewPetPage() {
                 <textarea
                   value={formData.specialHandling}
                   onChange={(e) => setFormData({ ...formData, specialHandling: e.target.value })}
-                  className="textarea w-full text-base bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                  className="textarea w-full text-base pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   rows={3}
                   placeholder="Detailed handling instructions for difficult pets..."
                 />

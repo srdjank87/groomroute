@@ -718,7 +718,7 @@ export default function SettingsAreasPage() {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder="e.g., North Side, Downtown, Westwood"
-                  className="input input-bordered w-full"
+                  className="input w-full h-12 pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Name your area based on neighborhoods or landmarks your customers know.
