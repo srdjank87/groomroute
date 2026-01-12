@@ -19,7 +19,8 @@ import {
   Sparkles,
   Clock,
   X,
-  Check
+  Check,
+  FileText
 } from "lucide-react";
 import toast from "react-hot-toast";
 import MapPreview from "@/components/MapPreview";
@@ -60,6 +61,7 @@ interface Customer {
   address: string;
   addressNotes?: string;
   accessInstructions?: string;
+  notes?: string;
   lat?: number | null;
   lng?: number | null;
   geocodeStatus?: string | null;
@@ -107,6 +109,7 @@ export default function CustomerEditPage() {
     address: "",
     addressNotes: "",
     accessInstructions: "",
+    notes: "",
   });
 
   const fetchCustomer = async () => {
@@ -122,6 +125,7 @@ export default function CustomerEditPage() {
           address: data.address || "",
           addressNotes: data.addressNotes || "",
           accessInstructions: data.accessInstructions || "",
+          notes: data.notes || "",
         });
       } else {
         toast.error("Client not found");
@@ -497,7 +501,7 @@ export default function CustomerEditPage() {
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="input w-full h-12 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="input w-full h-12 pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="Client name"
               required
             />
@@ -577,7 +581,7 @@ export default function CustomerEditPage() {
             <textarea
               value={formData.addressNotes}
               onChange={(e) => setFormData({ ...formData, addressNotes: e.target.value })}
-              className="textarea w-full bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="textarea w-full pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="e.g., Blue house on the corner"
               rows={2}
             />
@@ -590,10 +594,27 @@ export default function CustomerEditPage() {
             <textarea
               value={formData.accessInstructions}
               onChange={(e) => setFormData({ ...formData, accessInstructions: e.target.value })}
-              className="textarea w-full bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="textarea w-full pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="e.g., Gate code 1234, dog door in back"
               rows={2}
             />
+          </div>
+
+          <div>
+            <label className="label">
+              <span className="label-text font-medium flex items-center gap-2">
+                <FileText className="h-4 w-4 text-gray-500" />
+                Internal Notes
+              </span>
+            </label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              className="textarea w-full pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              placeholder="Billing preferences, special requests, or any other notes for your reference..."
+              rows={3}
+            />
+            <p className="text-xs text-gray-500 mt-1">For your reference only - not visible to the client</p>
           </div>
         </div>
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Check, ChevronDown, ChevronUp, MapPin, Sparkles } from "lucide-react";
+import { ChevronLeft, Check, ChevronDown, ChevronUp, MapPin, Sparkles, Phone, Mail } from "lucide-react";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import MapPreview from "@/components/MapPreview";
 import toast from "react-hot-toast";
@@ -246,35 +246,43 @@ export default function NewCustomerPage() {
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="input input-bordered w-full h-12 text-base"
+              className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="Client name"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Phone
-            </label>
-            <input
-              type="tel"
-              value={formData.phone}
-              onChange={handlePhoneChange}
-              className="input input-bordered w-full h-12 text-base"
-              placeholder="(555) 123-4567"
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handlePhoneChange}
+                  className="input w-full h-12 text-base pl-10 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="input input-bordered w-full h-12 text-base"
-              placeholder="client@example.com"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="input w-full h-12 text-base pl-10 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                  placeholder="client@example.com"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -286,37 +294,40 @@ export default function NewCustomerPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Street Address <span className="text-red-500">*</span>
             </label>
-            <AddressAutocomplete
-              value={formData.address}
-              onChange={(address) => {
-                setFormData({ ...formData, address });
-                setGeocodedLocation(null); // Reset preview when address changes manually
-              }}
-              onPlaceSelected={async (place) => {
-                // Auto-geocode when address is selected from autocomplete
-                if (place.geometry?.location && place.formatted_address) {
-                  const lat = place.geometry.location.lat();
-                  const lng = place.geometry.location.lng();
+            <div className="relative">
+              <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400 z-10" />
+              <AddressAutocomplete
+                value={formData.address}
+                onChange={(address) => {
+                  setFormData({ ...formData, address });
+                  setGeocodedLocation(null); // Reset preview when address changes manually
+                }}
+                onPlaceSelected={async (place) => {
+                  // Auto-geocode when address is selected from autocomplete
+                  if (place.geometry?.location && place.formatted_address) {
+                    const lat = place.geometry.location.lat();
+                    const lng = place.geometry.location.lng();
 
-                  setFormData((prev) => ({ ...prev, address: place.formatted_address || "" }));
-                  setGeocodedLocation({
-                    lat,
-                    lng,
-                    status: "OK",
-                  });
-                  toast.success("Location found!");
+                    setFormData((prev) => ({ ...prev, address: place.formatted_address || "" }));
+                    setGeocodedLocation({
+                      lat,
+                      lng,
+                      status: "OK",
+                    });
+                    toast.success("Location found!");
 
-                  // Try to get area suggestion based on zip code
-                  const zipCode = extractZipCode(place.formatted_address || "");
-                  if (zipCode) {
-                    fetchAreaSuggestion(zipCode);
+                    // Try to get area suggestion based on zip code
+                    const zipCode = extractZipCode(place.formatted_address || "");
+                    if (zipCode) {
+                      fetchAreaSuggestion(zipCode);
+                    }
                   }
-                }
-              }}
-              placeholder="Start typing address..."
-              required
-              className="input input-bordered w-full h-12 text-base"
-            />
+                }}
+                placeholder="Start typing address..."
+                required
+                className="input w-full h-12 text-base pl-10 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              />
+            </div>
             <p className="text-xs text-gray-500 mt-1">
               Select an address from the dropdown to see it on the map
             </p>
@@ -471,7 +482,7 @@ export default function NewCustomerPage() {
                 <textarea
                   value={formData.addressNotes}
                   onChange={(e) => setFormData({ ...formData, addressNotes: e.target.value })}
-                  className="textarea textarea-bordered w-full text-base"
+                  className="textarea w-full text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   rows={2}
                   placeholder="Gate code, parking spot, etc."
                 />
@@ -484,7 +495,7 @@ export default function NewCustomerPage() {
                 <textarea
                   value={formData.accessInstructions}
                   onChange={(e) => setFormData({ ...formData, accessInstructions: e.target.value })}
-                  className="textarea textarea-bordered w-full text-base"
+                  className="textarea w-full text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   rows={2}
                   placeholder="Side gate, backyard access, etc."
                 />
@@ -517,7 +528,7 @@ export default function NewCustomerPage() {
                   type="text"
                   value={formData.petName}
                   onChange={(e) => setFormData({ ...formData, petName: e.target.value })}
-                  className="input input-bordered w-full h-12 text-base"
+                  className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   placeholder="Max, Bella, etc."
                 />
               </div>
@@ -563,7 +574,7 @@ export default function NewCustomerPage() {
                     type="text"
                     value={formData.breed}
                     onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
-                    className="input input-bordered w-full h-12 text-base"
+                    className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                     placeholder="Golden Retriever"
                   />
                 </div>
@@ -576,7 +587,7 @@ export default function NewCustomerPage() {
                     type="number"
                     value={formData.weight}
                     onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                    className="input input-bordered w-full h-12 text-base"
+                    className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                     placeholder="65"
                   />
                 </div>
@@ -612,7 +623,7 @@ export default function NewCustomerPage() {
                 <textarea
                   value={formData.specialHandling}
                   onChange={(e) => setFormData({ ...formData, specialHandling: e.target.value })}
-                  className="textarea textarea-bordered w-full text-base"
+                  className="textarea w-full text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   rows={3}
                   placeholder="Any special handling requirements..."
                 />
@@ -640,7 +651,7 @@ export default function NewCustomerPage() {
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="textarea textarea-bordered w-full text-base"
+                className="textarea w-full text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                 rows={4}
                 placeholder="Billing preferences, special requests, etc."
               />
