@@ -160,8 +160,14 @@ export function AppointmentCalendar({
       <div className="grid grid-cols-7 mb-2">
         {days.map((day, index) => {
           // Check if this day has an area assignment
+          // Use fresh dayAssignments if provided, otherwise fall back to cached API data
+          const freshAssignment = dayAssignments?.[index];
           const areasForDay = calendarData?.areasByDay?.[index] || [];
-          const hasAreaAssignment = areasForDay.length > 0;
+
+          // Determine if there's an assignment and what color to show
+          const hasAreaAssignment = freshAssignment ? true : areasForDay.length > 0;
+          const areaColor = freshAssignment?.areaColor || areasForDay[0]?.color;
+          const areaName = freshAssignment?.areaName || areasForDay[0]?.name;
           const isSuggestedDay = suggestedDays.includes(index);
 
           return (
@@ -176,16 +182,13 @@ export function AppointmentCalendar({
                 {day}
               </span>
               {/* Area color indicator under day name */}
-              {hasAreaAssignment && (
+              {hasAreaAssignment && areaColor && (
                 <div className="flex justify-center gap-0.5 mt-1">
-                  {areasForDay.map((area, i) => (
-                    <div
-                      key={area.id}
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: area.color }}
-                      title={area.name}
-                    />
-                  ))}
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: areaColor }}
+                    title={areaName}
+                  />
                 </div>
               )}
             </div>
