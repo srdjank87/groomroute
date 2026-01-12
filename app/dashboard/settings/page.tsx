@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Shield, Bell, CreditCard, ChevronRight, Settings as SettingsIcon } from "lucide-react";
+import { MapPin, Shield, Smartphone, CreditCard, ChevronRight, Settings as SettingsIcon } from "lucide-react";
 
 const settingsCategories = [
   {
@@ -25,10 +25,10 @@ const settingsCategories = [
     badgeColor: "",
   },
   {
-    name: "Notifications",
-    description: "Configure reminders and message templates",
+    name: "App Preferences",
+    description: "Choose your preferred messaging and navigation apps",
     href: "/dashboard/settings/notifications",
-    icon: Bell,
+    icon: Smartphone,
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
   },
