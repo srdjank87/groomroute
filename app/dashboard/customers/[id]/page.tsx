@@ -513,7 +513,7 @@ export default function CustomerEditPage() {
                 <span className="label-text font-medium">Phone</span>
               </label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 z-10 pointer-events-none" />
                 <input
                   type="tel"
                   value={formData.phone}
@@ -529,7 +529,7 @@ export default function CustomerEditPage() {
                 <span className="label-text font-medium">Email</span>
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 z-10 pointer-events-none" />
                 <input
                   type="email"
                   value={formData.email}
@@ -581,7 +581,7 @@ export default function CustomerEditPage() {
             <textarea
               value={formData.addressNotes}
               onChange={(e) => setFormData({ ...formData, addressNotes: e.target.value })}
-              className="textarea w-full pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="textarea w-full pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="e.g., Blue house on the corner"
               rows={2}
             />
@@ -594,7 +594,7 @@ export default function CustomerEditPage() {
             <textarea
               value={formData.accessInstructions}
               onChange={(e) => setFormData({ ...formData, accessInstructions: e.target.value })}
-              className="textarea w-full pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="textarea w-full pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="e.g., Gate code 1234, dog door in back"
               rows={2}
             />
@@ -610,7 +610,7 @@ export default function CustomerEditPage() {
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="textarea w-full pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+              className="textarea w-full pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="Billing preferences, special requests, or any other notes for your reference..."
               rows={3}
             />

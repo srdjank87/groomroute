@@ -257,7 +257,7 @@ export default function NewCustomerPage() {
                 Phone
               </label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 z-10 pointer-events-none" />
                 <input
                   type="tel"
                   value={formData.phone}
@@ -273,7 +273,7 @@ export default function NewCustomerPage() {
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 z-10 pointer-events-none" />
                 <input
                   type="email"
                   value={formData.email}
@@ -482,7 +482,7 @@ export default function NewCustomerPage() {
                 <textarea
                   value={formData.addressNotes}
                   onChange={(e) => setFormData({ ...formData, addressNotes: e.target.value })}
-                  className="textarea w-full text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                  className="textarea w-full text-base pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   rows={2}
                   placeholder="Gate code, parking spot, etc."
                 />
@@ -495,7 +495,7 @@ export default function NewCustomerPage() {
                 <textarea
                   value={formData.accessInstructions}
                   onChange={(e) => setFormData({ ...formData, accessInstructions: e.target.value })}
-                  className="textarea w-full text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                  className="textarea w-full text-base pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   rows={2}
                   placeholder="Side gate, backyard access, etc."
                 />
@@ -623,7 +623,7 @@ export default function NewCustomerPage() {
                 <textarea
                   value={formData.specialHandling}
                   onChange={(e) => setFormData({ ...formData, specialHandling: e.target.value })}
-                  className="textarea w-full text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                  className="textarea w-full text-base pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   rows={3}
                   placeholder="Any special handling requirements..."
                 />
@@ -651,7 +651,7 @@ export default function NewCustomerPage() {
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="textarea w-full text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                className="textarea w-full text-base pl-4 pt-3 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                 rows={4}
                 placeholder="Billing preferences, special requests, etc."
               />
