@@ -94,6 +94,10 @@ export async function GET(req: NextRequest) {
     // Get per-date area assignments (respects overrides)
     const startDateUTC = new Date(Date.UTC(year, monthNum - 1, 1));
     const endDateUTC = new Date(Date.UTC(year, monthNum, 0)); // Last day of month
+
+    // DEBUG: Log which groomer we're querying for
+    console.log(`[Calendar API] Fetching areas for groomer ${groomer.id} for month ${month}`);
+
     const areasMap = await getGroomerAreasForDateRange(groomer.id, startDateUTC, endDateUTC);
 
     // Convert Map to object for JSON response
@@ -101,6 +105,10 @@ export async function GET(req: NextRequest) {
     for (const [dateStr, areaInfo] of areasMap.entries()) {
       areasByDate[dateStr] = areaInfo;
     }
+
+    // DEBUG: Log sample of areasByDate to verify data
+    const sampleDates = Object.keys(areasByDate).slice(0, 3);
+    console.log(`[Calendar API] Sample areasByDate:`, sampleDates.map(d => ({ date: d, area: areasByDate[d]?.areaName })));
 
     // Also return default day-of-week assignments for the week header display
     const areaDayAssignments = await prisma.areaDayAssignment.findMany({
