@@ -268,7 +268,7 @@ export default function BillingSettingsPage() {
           <button
             onClick={handleManageBilling}
             disabled={isPortalLoading}
-            className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white gap-2"
+            className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
           >
             {isPortalLoading ? (
               <span className="loading loading-spinner loading-sm"></span>
@@ -284,7 +284,7 @@ export default function BillingSettingsPage() {
             </p>
             <Link
               href="/subscription/expired"
-              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white gap-2"
+              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
             >
               <CreditCard className="h-4 w-4" />
               Subscribe Now
