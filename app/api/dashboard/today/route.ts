@@ -63,9 +63,11 @@ export async function GET(req: NextRequest) {
     const tomorrow = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate() + 1, 0, 0, 0, 0));
 
     // Fetch ALL today's appointments (including completed, cancelled, no-show) for status tracking
+    // Filter by groomerId to only show appointments for the current groomer
     const allTodayAppointments = await prisma.appointment.findMany({
       where: {
         accountId,
+        ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: today,
           lt: tomorrow,
