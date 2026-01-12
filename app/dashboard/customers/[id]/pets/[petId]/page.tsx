@@ -18,7 +18,6 @@ interface Pet {
   behaviorFlags: string[];
   equipmentRequired: string[];
   specialHandling?: string;
-  canBookSolo: boolean;
 }
 
 const behaviorOptions = [
@@ -27,7 +26,6 @@ const behaviorOptions = [
   { value: "AGGRESSIVE", label: "Aggressive", emoji: "⚠️" },
   { value: "BITE_RISK", label: "Bite Risk", emoji: "🦷" },
   { value: "MUZZLE_REQUIRED", label: "Muzzle Required", emoji: "🏥" },
-  { value: "TWO_PERSON_REQUIRED", label: "2-Person Required", emoji: "👥" },
 ];
 
 const equipmentOptions = [
@@ -62,7 +60,6 @@ export default function EditPetPage() {
     behaviorFlags: [] as string[],
     equipmentRequired: [] as string[],
     specialHandling: "",
-    canBookSolo: true,
   });
 
   useEffect(() => {
@@ -84,10 +81,9 @@ export default function EditPetPage() {
             behaviorFlags: data.behaviorFlags || [],
             equipmentRequired: data.equipmentRequired || [],
             specialHandling: data.specialHandling || "",
-            canBookSolo: data.canBookSolo ?? true,
           });
           // Show advanced section if there's data in it
-          if (data.equipmentRequired?.length > 0 || data.specialHandling || !data.canBookSolo) {
+          if (data.equipmentRequired?.length > 0 || data.specialHandling) {
             setShowAdvanced(true);
           }
         } else {
@@ -147,7 +143,6 @@ export default function EditPetPage() {
           behaviorFlags: formData.behaviorFlags,
           equipmentRequired: formData.equipmentRequired,
           specialHandling: formData.specialHandling || null,
-          canBookSolo: formData.canBookSolo,
         }),
       });
 
@@ -441,22 +436,6 @@ export default function EditPetPage() {
                   rows={3}
                   placeholder="Detailed handling instructions for difficult pets..."
                 />
-              </div>
-
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                <input
-                  type="checkbox"
-                  id="canBookSolo"
-                  checked={formData.canBookSolo}
-                  onChange={(e) => setFormData({ ...formData, canBookSolo: e.target.checked })}
-                  className="checkbox checkbox-primary"
-                />
-                <label htmlFor="canBookSolo" className="text-sm">
-                  <span className="font-medium">Can be booked solo</span>
-                  <p className="text-gray-500 text-xs mt-0.5">
-                    Uncheck if this pet requires 2-person handling
-                  </p>
-                </label>
               </div>
             </div>
           )}

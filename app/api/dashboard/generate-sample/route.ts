@@ -47,7 +47,6 @@ interface SamplePet {
   equipmentRequired?: EquipmentRequired[];
   behaviorNotes?: string;
   groomingNotes?: string;
-  canBookSolo?: boolean;
 }
 
 // Customer type definition
@@ -212,7 +211,6 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         behaviorFlags: [BehaviorFlag.AGGRESSIVE, BehaviorFlag.MUZZLE_REQUIRED],
         equipmentRequired: [EquipmentRequired.MUZZLE, EquipmentRequired.HEAVY_DUTY_DRYER],
         behaviorNotes: "Protective, needs slow introduction. ALWAYS use muzzle.",
-        canBookSolo: false,
       },
     ],
     duration: 120,
@@ -293,10 +291,9 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         species: "dog",
         weight: 95,
         ageYears: 4,
-        behaviorFlags: [BehaviorFlag.FRIENDLY, BehaviorFlag.TWO_PERSON_REQUIRED],
+        behaviorFlags: [BehaviorFlag.FRIENDLY],
         equipmentRequired: [EquipmentRequired.HEAVY_DUTY_DRYER, EquipmentRequired.EXTRA_TOWELS, EquipmentRequired.TABLE_EXTENDER],
-        groomingNotes: "Gentle giant, needs two people due to size",
-        canBookSolo: false,
+        groomingNotes: "Gentle giant, large breed needs extra time",
       },
     ],
     duration: 120,
@@ -491,10 +488,9 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         species: "dog",
         weight: 100,
         ageYears: 5,
-        behaviorFlags: [BehaviorFlag.FRIENDLY, BehaviorFlag.TWO_PERSON_REQUIRED],
+        behaviorFlags: [BehaviorFlag.FRIENDLY],
         equipmentRequired: [EquipmentRequired.HEAVY_DUTY_DRYER, EquipmentRequired.EXTRA_TOWELS, EquipmentRequired.TABLE_EXTENDER],
         groomingNotes: "Massive fluffball, needs full deshed every visit",
-        canBookSolo: false,
       },
       {
         name: "Moose",
@@ -502,10 +498,9 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         species: "dog",
         weight: 130,
         ageYears: 4,
-        behaviorFlags: [BehaviorFlag.FRIENDLY, BehaviorFlag.TWO_PERSON_REQUIRED],
+        behaviorFlags: [BehaviorFlag.FRIENDLY],
         equipmentRequired: [EquipmentRequired.HEAVY_DUTY_DRYER, EquipmentRequired.EXTRA_TOWELS, EquipmentRequired.TABLE_EXTENDER],
         groomingNotes: "Even bigger than Bear, drools a lot",
-        canBookSolo: false,
       },
     ],
     duration: 180,
@@ -719,7 +714,6 @@ export async function POST(req: NextRequest) {
             equipmentRequired: petData.equipmentRequired || [],
             behaviorNotes: petData.behaviorNotes || null,
             groomingNotes: petData.groomingNotes || null,
-            canBookSolo: petData.canBookSolo !== false,
           },
         });
         createdPets.push(pet);

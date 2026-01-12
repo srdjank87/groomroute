@@ -17,8 +17,7 @@ const createPetSchema = z.object({
     "ANXIOUS",
     "AGGRESSIVE",
     "BITE_RISK",
-    "MUZZLE_REQUIRED",
-    "TWO_PERSON_REQUIRED"
+    "MUZZLE_REQUIRED"
   ])).optional(),
   equipmentRequired: z.array(z.enum([
     "MUZZLE",
@@ -28,7 +27,6 @@ const createPetSchema = z.object({
     "SENSITIVE_SKIN_PRODUCTS"
   ])).optional(),
   specialHandling: z.string().optional(),
-  canBookSolo: z.boolean().optional(),
 });
 
 // GET all pets for a customer
@@ -119,7 +117,6 @@ export async function POST(
         behaviorFlags: validatedData.behaviorFlags || [],
         equipmentRequired: validatedData.equipmentRequired || [],
         specialHandling: validatedData.specialHandling || null,
-        canBookSolo: validatedData.canBookSolo ?? true,
       },
     });
 

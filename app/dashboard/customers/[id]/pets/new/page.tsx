@@ -11,7 +11,6 @@ const behaviorOptions = [
   { value: "AGGRESSIVE", label: "Aggressive", emoji: "⚠️" },
   { value: "BITE_RISK", label: "Bite Risk", emoji: "🦷" },
   { value: "MUZZLE_REQUIRED", label: "Muzzle Required", emoji: "🏥" },
-  { value: "TWO_PERSON_REQUIRED", label: "2-Person Required", emoji: "👥" },
 ];
 
 const equipmentOptions = [
@@ -50,7 +49,6 @@ export default function NewPetPage() {
     behaviorFlags: [] as string[],
     equipmentRequired: [] as string[],
     specialHandling: "",
-    canBookSolo: true,
   });
 
   const toggleBehaviorFlag = (flag: string) => {
@@ -97,7 +95,6 @@ export default function NewPetPage() {
           behaviorFlags: formData.behaviorFlags.length > 0 ? formData.behaviorFlags : undefined,
           equipmentRequired: formData.equipmentRequired.length > 0 ? formData.equipmentRequired : undefined,
           specialHandling: formData.specialHandling || undefined,
-          canBookSolo: formData.canBookSolo,
         }),
       });
 
@@ -351,22 +348,6 @@ export default function NewPetPage() {
                   rows={3}
                   placeholder="Detailed handling instructions for difficult pets..."
                 />
-              </div>
-
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                <input
-                  type="checkbox"
-                  id="canBookSolo"
-                  checked={formData.canBookSolo}
-                  onChange={(e) => setFormData({ ...formData, canBookSolo: e.target.checked })}
-                  className="checkbox checkbox-primary"
-                />
-                <label htmlFor="canBookSolo" className="text-sm">
-                  <span className="font-medium">Can be booked solo</span>
-                  <p className="text-gray-500 text-xs mt-0.5">
-                    Uncheck if this pet requires 2-person handling
-                  </p>
-                </label>
               </div>
             </div>
           )}

@@ -187,7 +187,6 @@ model Pet {
   behaviorFlags     BehaviorFlag[]
   equipmentRequired EquipmentRequired[]
   specialHandling   String?            @db.Text
-  canBookSolo       Boolean            @default(true) // False if requires 2-person handling
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   appointments      Appointment[]
@@ -201,7 +200,6 @@ enum BehaviorFlag {
   AGGRESSIVE
   BITE_RISK
   MUZZLE_REQUIRED
-  TWO_PERSON_REQUIRED
 }
 
 enum EquipmentRequired {

@@ -17,8 +17,7 @@ const updatePetSchema = z.object({
     "ANXIOUS",
     "AGGRESSIVE",
     "BITE_RISK",
-    "MUZZLE_REQUIRED",
-    "TWO_PERSON_REQUIRED"
+    "MUZZLE_REQUIRED"
   ])).optional(),
   equipmentRequired: z.array(z.enum([
     "MUZZLE",
@@ -28,7 +27,6 @@ const updatePetSchema = z.object({
     "SENSITIVE_SKIN_PRODUCTS"
   ])).optional(),
   specialHandling: z.string().optional().nullable(),
-  canBookSolo: z.boolean().optional(),
 });
 
 // GET single pet
@@ -135,7 +133,6 @@ export async function PATCH(
         ...(validatedData.behaviorFlags !== undefined && { behaviorFlags: validatedData.behaviorFlags }),
         ...(validatedData.equipmentRequired !== undefined && { equipmentRequired: validatedData.equipmentRequired }),
         ...(validatedData.specialHandling !== undefined && { specialHandling: validatedData.specialHandling }),
-        ...(validatedData.canBookSolo !== undefined && { canBookSolo: validatedData.canBookSolo }),
       },
     });
 
