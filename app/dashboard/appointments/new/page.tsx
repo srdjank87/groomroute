@@ -40,6 +40,12 @@ interface Pet {
   behaviorFlags?: string[];
 }
 
+interface UpcomingAreaDate {
+  date: string;
+  dayOfWeek: number;
+  isOverride: boolean;
+}
+
 interface AreaDaySuggestion {
   customer: {
     serviceAreaId: string | null;
@@ -47,6 +53,7 @@ interface AreaDaySuggestion {
     serviceAreaColor: string | null;
   };
   suggestedDays: number[];
+  upcomingAreaDates: UpcomingAreaDate[];
   nextSuggestedDate: string | null;
   suggestedTime: {
     time: string;
@@ -656,7 +663,7 @@ function NewAppointmentContent() {
             </div>
 
             {/* Area Day Suggestion */}
-            {areaSuggestion?.customer?.serviceAreaName && areaSuggestion.suggestedDays.length > 0 && (
+            {areaSuggestion?.customer?.serviceAreaName && (areaSuggestion.suggestedDays.length > 0 || (areaSuggestion.upcomingAreaDates && areaSuggestion.upcomingAreaDates.length > 0)) && (
               <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <div
@@ -668,9 +675,40 @@ function NewAppointmentContent() {
                       <MapPin className="h-4 w-4 inline mr-1" />
                       {areaSuggestion.customer.serviceAreaName} Client
                     </p>
-                    <p className="text-sm text-emerald-700 mt-1">
-                      <span className="font-medium">Best days:</span> {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(", ")}
-                    </p>
+
+                    {/* Show default weekly pattern if available */}
+                    {areaSuggestion.suggestedDays.length > 0 && (
+                      <p className="text-sm text-emerald-700 mt-1">
+                        <span className="font-medium">Regular days:</span> {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(", ")}
+                      </p>
+                    )}
+
+                    {/* Show upcoming override dates */}
+                    {areaSuggestion.upcomingAreaDates && (() => {
+                      const overrideDates = areaSuggestion.upcomingAreaDates.filter(d => d.isOverride);
+                      if (overrideDates.length === 0) return null;
+                      return (
+                        <p className="text-sm text-emerald-700 mt-1">
+                          <span className="font-medium">Special dates:</span>{' '}
+                          {overrideDates.slice(0, 4).map((d, i) => {
+                            const date = new Date(d.date + 'T00:00:00');
+                            return (
+                              <span key={d.date}>
+                                {i > 0 && ', '}
+                                <button
+                                  type="button"
+                                  onClick={() => setAppointmentData({ ...appointmentData, date: d.date })}
+                                  className="underline hover:text-emerald-900"
+                                >
+                                  {format(date, "MMM d")}
+                                </button>
+                              </span>
+                            );
+                          })}
+                          {overrideDates.length > 4 && ` +${overrideDates.length - 4} more`}
+                        </p>
+                      );
+                    })()}
 
                     {/* Quick-apply suggested date and time button */}
                     {areaSuggestion.nextSuggestedDate && (
@@ -707,8 +745,12 @@ function NewAppointmentContent() {
 
                     <div className="mt-2 p-2 bg-emerald-100/50 rounded-lg">
                       <p className="text-xs text-emerald-800">
-                        <span className="font-semibold">Why these days?</span> You work in {areaSuggestion.customer.serviceAreaName} on {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" and ")}.
-                        Booking on these days means shorter routes and less driving.
+                        <span className="font-semibold">Why these days?</span>{' '}
+                        {areaSuggestion.suggestedDays.length > 0
+                          ? `You normally work in ${areaSuggestion.customer.serviceAreaName} on ${areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" and ")}.`
+                          : `You have scheduled dates for ${areaSuggestion.customer.serviceAreaName}.`
+                        }
+                        {' '}Booking on these days means shorter routes and less driving.
                       </p>
                     </div>
                   </div>
@@ -764,6 +806,13 @@ function NewAppointmentContent() {
                       {areaSuggestion.suggestedDays.length > 0 && (
                         <> Consider {areaSuggestion.suggestedDays.map(d => DAY_NAMES[d]).join(" or ")}.</>
                       )}
+                      {areaSuggestion.upcomingAreaDates && (() => {
+                        const overrideDates = areaSuggestion.upcomingAreaDates.filter(d => d.isOverride);
+                        if (overrideDates.length === 0) return null;
+                        const nextOverride = overrideDates[0];
+                        const date = new Date(nextOverride.date + 'T00:00:00');
+                        return <> Or try {format(date, "MMM d")}.</>;
+                      })()}
                     </p>
                   )}
                 </div>

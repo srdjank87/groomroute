@@ -337,3 +337,80 @@ export function formatDayNames(dayNumbers: number[]): string {
 export function formatDayNamesShort(dayNumbers: number[]): string {
   return dayNumbers.map((d) => DAY_NAMES_SHORT[d]).join(", ");
 }
+
+/**
+ * Get upcoming dates when a groomer will be in a specific area (including overrides).
+ * Returns dates for the next N days where the groomer's assigned area matches.
+ * @param groomerId The groomer to check
+ * @param areaId The target service area
+ * @param fromDate Starting date to search from
+ * @param maxDaysAhead Maximum days to search (default 30)
+ * @returns Array of dates with override flag
+ */
+export async function getUpcomingAreaDates(
+  groomerId: string,
+  areaId: string,
+  fromDate: Date = new Date(),
+  maxDaysAhead: number = 30
+): Promise<Array<{ date: string; dayOfWeek: number; isOverride: boolean }>> {
+  // Get default day-of-week assignments for this area
+  const defaultAreaDays = await getGroomerAreaDays(groomerId, areaId);
+
+  // Normalize start date
+  const startDate = new Date(fromDate);
+  startDate.setHours(0, 0, 0, 0);
+
+  // Calculate end date for range query
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + maxDaysAhead);
+
+  // Get all overrides in the date range
+  const overrides = await prisma.areaDateOverride.findMany({
+    where: {
+      groomerId,
+      date: {
+        gte: new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())),
+        lte: new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())),
+      },
+    },
+    select: {
+      date: true,
+      areaId: true,
+    },
+  });
+
+  // Build a map of date string to override areaId (null means day off)
+  const overrideMap = new Map<string, string | null>();
+  for (const o of overrides) {
+    const dateStr = o.date.toISOString().split("T")[0];
+    overrideMap.set(dateStr, o.areaId);
+  }
+
+  const result: Array<{ date: string; dayOfWeek: number; isOverride: boolean }> = [];
+
+  // Search through each day in the range
+  for (let i = 0; i < maxDaysAhead; i++) {
+    const checkDate = new Date(startDate);
+    checkDate.setDate(checkDate.getDate() + i);
+    const dateStr = checkDate.toISOString().split("T")[0];
+    const dayOfWeek = checkDate.getDay();
+
+    // Check for override first
+    if (overrideMap.has(dateStr)) {
+      const overrideAreaId = overrideMap.get(dateStr);
+      if (overrideAreaId === areaId) {
+        // Override matches target area
+        result.push({ date: dateStr, dayOfWeek, isOverride: true });
+      }
+      // Override exists but for different area (or day off) - skip this date
+      continue;
+    }
+
+    // No override - check default pattern
+    if (defaultAreaDays.includes(dayOfWeek)) {
+      result.push({ date: dateStr, dayOfWeek, isOverride: false });
+    }
+  }
+
+  return result;
+}

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import {
   getGroomerAreaDays,
   findNextAreaDayDate,
+  getUpcomingAreaDates,
   DAY_NAMES,
 } from "@/lib/area-matcher";
 
@@ -90,10 +91,21 @@ export async function GET(request: Request) {
       });
     }
 
-    // Get the days this groomer works in this customer's area
+    // Get the default days this groomer works in this customer's area (weekly pattern)
     const suggestedDays = await getGroomerAreaDays(
       groomerId,
       customer.serviceArea.id
+    );
+
+    // Get upcoming dates including overrides (next 30 days)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const upcomingAreaDates = await getUpcomingAreaDates(
+      groomerId,
+      customer.serviceArea.id,
+      today,
+      30
     );
 
     // Find the next date that falls on one of those days
@@ -109,14 +121,32 @@ export async function GET(request: Request) {
 
     // Build reason text
     let reason: string | null = null;
-    if (suggestedDays.length > 0) {
-      const dayNames = suggestedDays.map((d) => DAY_NAMES[d]).join(", ");
-      reason = `${groomer.name} works in ${customer.serviceArea.name} on ${dayNames}`;
 
-      // Add note if the suggested date is from an override
-      if (nextAreaDayResult?.isOverride) {
-        reason += " (schedule adjusted for this date)";
+    // Check if there are any override dates in upcoming dates
+    const overrideDates = upcomingAreaDates.filter(d => d.isOverride);
+    const hasOverrides = overrideDates.length > 0;
+
+    if (suggestedDays.length > 0 || hasOverrides) {
+      const parts: string[] = [];
+
+      if (suggestedDays.length > 0) {
+        const dayNames = suggestedDays.map((d) => DAY_NAMES[d]).join(", ");
+        parts.push(`${groomer.name} works in ${customer.serviceArea.name} on ${dayNames}`);
       }
+
+      // Add note about override dates if any
+      if (hasOverrides) {
+        const overrideDateStrs = overrideDates.slice(0, 3).map(d => {
+          const date = new Date(d.date + 'T00:00:00');
+          return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        if (overrideDates.length > 3) {
+          overrideDateStrs.push(`+${overrideDates.length - 3} more`);
+        }
+        parts.push(`Special dates: ${overrideDateStrs.join(', ')}`);
+      }
+
+      reason = parts.join('. ');
     }
 
     // Find first available time slot on the suggested date
@@ -222,6 +252,7 @@ export async function GET(request: Request) {
         serviceAreaColor: customer.serviceArea.color,
       },
       suggestedDays,
+      upcomingAreaDates, // All dates (including overrides) in the next 30 days
       nextSuggestedDate: nextSuggestedDate?.toISOString().split("T")[0] || null,
       suggestedTime,
       reason,
