@@ -101,6 +101,7 @@ export default function SettingsAreasPage() {
   const [isLoadingMonthData, setIsLoadingMonthData] = useState(false);
   const [activeDateCell, setActiveDateCell] = useState<string | null>(null); // YYYY-MM-DD
   const [isSavingOverride, setIsSavingOverride] = useState(false);
+  const [assignmentsVersion, setAssignmentsVersion] = useState(0); // Track when assignments change
 
   const fetchAreas = useCallback(async () => {
     try {
@@ -132,9 +133,14 @@ export default function SettingsAreasPage() {
     setIsLoadingMonthData(true);
     try {
       const monthStr = format(month, "yyyy-MM");
-      // Add cache-busting timestamp to ensure fresh data after pattern changes
+      // Add cache-busting timestamp and explicit no-cache headers
       const response = await fetch(`/api/appointments/calendar?month=${monthStr}&_t=${Date.now()}`, {
-        cache: 'no-store'
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       });
       if (response.ok) {
         const data = await response.json();
@@ -156,12 +162,12 @@ export default function SettingsAreasPage() {
     loadData();
   }, [fetchAreas, fetchAssignments]);
 
-  // Load month data when month changes
+  // Load month data when month changes or assignments are updated
   useEffect(() => {
     if (areas.length > 0) {
       fetchMonthData(monthlyViewMonth);
     }
-  }, [monthlyViewMonth, areas.length, fetchMonthData]);
+  }, [monthlyViewMonth, areas.length, fetchMonthData, assignmentsVersion]);
 
   const openCreateModal = () => {
     if (areas.length >= MAX_SERVICE_AREAS) {
@@ -259,12 +265,10 @@ export default function SettingsAreasPage() {
 
       if (response.ok) {
         toast.success(areaId ? "Assignment updated" : "Assignment removed");
-        // Wait for all data refreshes to complete before updating the calendar
-        await Promise.all([fetchAssignments(), fetchAreas()]);
-        // Small delay to ensure database transaction is fully committed
-        await new Promise(resolve => setTimeout(resolve, 100));
-        // Refresh month data since default pattern changed
-        await fetchMonthData(monthlyViewMonth);
+        // Wait for assignment data refresh to complete
+        await fetchAssignments();
+        // Increment version to trigger useEffect to re-fetch month data
+        setAssignmentsVersion(v => v + 1);
       } else {
         const data = await response.json();
         toast.error(data.error || "Failed to update assignment");

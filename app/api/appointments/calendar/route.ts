@@ -3,6 +3,10 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getGroomerAreasForDateRange } from "@/lib/area-matcher";
 
+// Disable Next.js caching for this route - data changes frequently
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * GET /api/appointments/calendar
  * Get calendar data for a month including:
@@ -127,12 +131,19 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       month,
       appointmentsByDate,
       areasByDate,
       areasByDay, // Still include for week header
     });
+
+    // Prevent all caching
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
   } catch (error) {
     console.error("Get calendar data error:", error);
     return NextResponse.json(
