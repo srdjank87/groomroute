@@ -241,7 +241,7 @@ export default function ProfileSettingsPage() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white gap-2"
+          className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white gap-2 px-4"
         >
           {isSaving ? (
             <span className="loading loading-spinner loading-sm"></span>

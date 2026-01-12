@@ -22,7 +22,9 @@ import {
   Check,
   FileText,
   AlertTriangle,
-  ShieldAlert
+  ShieldAlert,
+  Bell,
+  BellOff
 } from "lucide-react";
 import toast from "react-hot-toast";
 import MapPreview from "@/components/MapPreview";
@@ -77,6 +79,14 @@ interface Customer {
   lastNoShowAt?: string | null;
 }
 
+interface WaitlistEntry {
+  id: string;
+  preferredDays: string[];
+  preferredTimes: string[];
+  flexibleTiming: boolean;
+  isActive: boolean;
+}
+
 const formatAppointmentType = (type: string) => {
   return type
     .split('_')
@@ -106,6 +116,14 @@ export default function CustomerEditPage() {
   const [editingTime, setEditingTime] = useState("");
   const [isSavingAppointment, setIsSavingAppointment] = useState(false);
   const [cancellingAppointmentId, setCancellingAppointmentId] = useState<string | null>(null);
+
+  // Waitlist state
+  const [waitlistEntry, setWaitlistEntry] = useState<WaitlistEntry | null>(null);
+  const [showWaitlistForm, setShowWaitlistForm] = useState(false);
+  const [waitlistDays, setWaitlistDays] = useState<string[]>([]);
+  const [waitlistTimes, setWaitlistTimes] = useState<string[]>([]);
+  const [waitlistFlexible, setWaitlistFlexible] = useState(true);
+  const [isSavingWaitlist, setIsSavingWaitlist] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -148,6 +166,7 @@ export default function CustomerEditPage() {
   useEffect(() => {
     fetchCustomer();
     fetchAvailableAreas();
+    fetchWaitlistEntry();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId]);
 
@@ -161,6 +180,104 @@ export default function CustomerEditPage() {
     } catch (error) {
       console.error("Failed to fetch areas:", error);
     }
+  };
+
+  const fetchWaitlistEntry = async () => {
+    try {
+      const response = await fetch(`/api/waitlist?customerId=${customerId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.waitlist && data.waitlist.length > 0) {
+          const entry = data.waitlist[0];
+          setWaitlistEntry(entry);
+          setWaitlistDays(entry.preferredDays || []);
+          setWaitlistTimes(entry.preferredTimes || []);
+          setWaitlistFlexible(entry.flexibleTiming);
+        } else {
+          setWaitlistEntry(null);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch waitlist:", error);
+    }
+  };
+
+  const handleSaveWaitlist = async () => {
+    if (waitlistDays.length === 0 && waitlistTimes.length === 0 && !waitlistFlexible) {
+      toast.error("Please select at least one preference or enable flexible timing");
+      return;
+    }
+
+    setIsSavingWaitlist(true);
+    try {
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId,
+          preferredDays: waitlistDays,
+          preferredTimes: waitlistTimes,
+          flexibleTiming: waitlistFlexible,
+          notifyViaSMS: true,
+          notifyViaEmail: true,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Added to waitlist");
+        setShowWaitlistForm(false);
+        fetchWaitlistEntry();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to add to waitlist");
+      }
+    } catch (error) {
+      console.error("Failed to save waitlist:", error);
+      toast.error("Failed to add to waitlist");
+    } finally {
+      setIsSavingWaitlist(false);
+    }
+  };
+
+  const handleRemoveFromWaitlist = async () => {
+    if (!confirm("Remove from waitlist? They won't receive gap-fill offers anymore.")) {
+      return;
+    }
+
+    setIsSavingWaitlist(true);
+    try {
+      const response = await fetch(`/api/waitlist?customerId=${customerId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Removed from waitlist");
+        setWaitlistEntry(null);
+        setWaitlistDays([]);
+        setWaitlistTimes([]);
+        setWaitlistFlexible(true);
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to remove from waitlist");
+      }
+    } catch (error) {
+      console.error("Failed to remove from waitlist:", error);
+      toast.error("Failed to remove from waitlist");
+    } finally {
+      setIsSavingWaitlist(false);
+    }
+  };
+
+  const toggleDay = (day: string) => {
+    setWaitlistDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
+
+  const toggleTime = (time: string) => {
+    setWaitlistTimes((prev) =>
+      prev.includes(time) ? prev.filter((t) => t !== time) : [...prev, time]
+    );
   };
 
   const handleAssignArea = async (areaId: string | null) => {
@@ -1003,6 +1120,214 @@ export default function CustomerEditPage() {
             >
               View all {customer.appointments.length} appointments
             </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Waitlist Section */}
+      <div className="bg-white rounded-lg shadow p-6 mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Bell className="h-5 w-5 text-purple-500" />
+            <h2 className="text-lg font-semibold text-gray-900">Gap-Fill Waitlist</h2>
+          </div>
+          {waitlistEntry ? (
+            <button
+              onClick={handleRemoveFromWaitlist}
+              disabled={isSavingWaitlist}
+              className="btn btn-sm btn-ghost gap-2 text-red-600 hover:bg-red-50"
+            >
+              {isSavingWaitlist ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : (
+                <BellOff className="h-4 w-4" />
+              )}
+              Remove
+            </button>
+          ) : !showWaitlistForm ? (
+            <button
+              onClick={() => setShowWaitlistForm(true)}
+              className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add to Waitlist
+            </button>
+          ) : null}
+        </div>
+
+        {waitlistEntry && !showWaitlistForm ? (
+          <div className="bg-purple-50 rounded-xl p-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Bell className="h-5 w-5 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900 mb-2">
+                  {customer.name} is on the waitlist
+                </p>
+                <div className="space-y-2 text-sm text-gray-600">
+                  {waitlistEntry.preferredDays.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">Preferred days:</span>
+                      <div className="flex flex-wrap gap-1">
+                        {waitlistEntry.preferredDays.map((day) => (
+                          <span
+                            key={day}
+                            className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium"
+                          >
+                            {day.charAt(0) + day.slice(1).toLowerCase()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {waitlistEntry.preferredTimes.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">Preferred times:</span>
+                      <div className="flex flex-wrap gap-1">
+                        {waitlistEntry.preferredTimes.map((time) => (
+                          <span
+                            key={time}
+                            className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium"
+                          >
+                            {time.charAt(0) + time.slice(1).toLowerCase()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {waitlistEntry.flexibleTiming && (
+                    <p className="text-purple-600 text-xs">
+                      Flexible timing enabled - can fill any gap
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowWaitlistForm(true)}
+                  className="mt-3 text-sm text-[#A5744A] hover:underline font-medium"
+                >
+                  Edit preferences
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : showWaitlistForm ? (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              When you have a schedule gap, we&apos;ll suggest {customer.name} as a potential fill-in based on their preferences.
+            </p>
+
+            {/* Day preferences */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Preferred Days
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"].map(
+                  (day) => (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => toggleDay(day)}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                        waitlistDays.includes(day)
+                          ? "bg-purple-500 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {day.charAt(0) + day.slice(1, 3).toLowerCase()}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Time preferences */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Preferred Times
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: "MORNING", label: "Morning (8am-12pm)" },
+                  { value: "AFTERNOON", label: "Afternoon (12pm-5pm)" },
+                  { value: "EVENING", label: "Evening (5pm+)" },
+                ].map((time) => (
+                  <button
+                    key={time.value}
+                    type="button"
+                    onClick={() => toggleTime(time.value)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      waitlistTimes.includes(time.value)
+                        ? "bg-purple-500 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {time.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Flexible timing */}
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="flexibleTiming"
+                checked={waitlistFlexible}
+                onChange={(e) => setWaitlistFlexible(e.target.checked)}
+                className="checkbox checkbox-sm checkbox-primary"
+              />
+              <label htmlFor="flexibleTiming" className="text-sm text-gray-700">
+                Flexible timing - can fill any gap, even outside preferences
+              </label>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={handleSaveWaitlist}
+                disabled={isSavingWaitlist}
+                className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 px-4"
+              >
+                {isSavingWaitlist ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
+                {waitlistEntry ? "Update" : "Add to Waitlist"}
+              </button>
+              <button
+                onClick={() => {
+                  setShowWaitlistForm(false);
+                  if (waitlistEntry) {
+                    setWaitlistDays(waitlistEntry.preferredDays);
+                    setWaitlistTimes(waitlistEntry.preferredTimes);
+                    setWaitlistFlexible(waitlistEntry.flexibleTiming);
+                  }
+                }}
+                className="btn btn-ghost"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl">
+            <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Bell className="h-7 w-7 text-purple-500" />
+            </div>
+            <h3 className="text-base font-medium text-gray-900 mb-1">Fill your gaps faster</h3>
+            <p className="text-gray-600 text-sm mb-4 max-w-xs mx-auto">
+              Add {customer.name} to your waitlist to be suggested when you have schedule openings
+            </p>
+            <button
+              onClick={() => setShowWaitlistForm(true)}
+              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 px-4"
+            >
+              <Plus className="h-4 w-4" />
+              Add to Waitlist
+            </button>
           </div>
         )}
       </div>

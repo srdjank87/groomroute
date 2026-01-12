@@ -21,6 +21,7 @@ import {
 } from "@dnd-kit/sortable";
 import SortableAppointment from "@/components/routes/SortableAppointment";
 import ReorderConfirmModal from "@/components/routes/ReorderConfirmModal";
+import GapFillSuggestions from "@/components/GapFillSuggestions";
 
 interface Appointment {
   id: string;
@@ -698,6 +699,11 @@ export default function TodaysRoutePage() {
             <div className="text-xs text-gray-600">Revenue</div>
           </div>
         </div>
+      </div>
+
+      {/* Gap-Fill Suggestions */}
+      <div className="mt-6">
+        <GapFillSuggestions preferredMessaging={preferredMessaging} />
       </div>
 
       {/* Reorder Confirmation Modal */}
