@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
   DollarSign,
   Users,
   Shield,
@@ -127,21 +126,13 @@ export default function AnalyticsPage() {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link href="/dashboard" className="btn btn-ghost btn-sm gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Link>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <BarChart3 className="h-6 w-6 text-blue-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-              <p className="text-gray-500 text-sm">Your business at a glance</p>
-            </div>
-          </div>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-blue-100 rounded-lg">
+          <BarChart3 className="h-6 w-6 text-blue-600" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+          <p className="text-gray-500 text-sm">Your business at a glance</p>
         </div>
       </div>
 

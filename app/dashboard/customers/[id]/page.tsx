@@ -16,7 +16,10 @@ import {
   PawPrint,
   CheckCircle,
   Heart,
-  Sparkles
+  Sparkles,
+  Clock,
+  X,
+  Check
 } from "lucide-react";
 import toast from "react-hot-toast";
 import MapPreview from "@/components/MapPreview";
@@ -88,6 +91,13 @@ export default function CustomerEditPage() {
   const [availableAreas, setAvailableAreas] = useState<ServiceArea[]>([]);
   const [showAreaDropdown, setShowAreaDropdown] = useState(false);
   const [isAssigningArea, setIsAssigningArea] = useState(false);
+
+  // Appointment editing state
+  const [editingAppointmentId, setEditingAppointmentId] = useState<string | null>(null);
+  const [editingDate, setEditingDate] = useState("");
+  const [editingTime, setEditingTime] = useState("");
+  const [isSavingAppointment, setIsSavingAppointment] = useState(false);
+  const [cancellingAppointmentId, setCancellingAppointmentId] = useState<string | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -281,6 +291,88 @@ export default function CustomerEditPage() {
     }
   };
 
+  const startEditingAppointment = (appointment: Appointment) => {
+    const date = new Date(appointment.startAt);
+    // Format date as YYYY-MM-DD
+    const dateStr = date.toISOString().split('T')[0];
+    // Format time as HH:MM using UTC hours/minutes
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+
+    setEditingAppointmentId(appointment.id);
+    setEditingDate(dateStr);
+    setEditingTime(`${hours}:${minutes}`);
+  };
+
+  const cancelEditingAppointment = () => {
+    setEditingAppointmentId(null);
+    setEditingDate("");
+    setEditingTime("");
+  };
+
+  const saveAppointmentChanges = async (appointmentId: string) => {
+    if (!editingDate || !editingTime) {
+      toast.error("Please select a date and time");
+      return;
+    }
+
+    setIsSavingAppointment(true);
+    try {
+      // Combine date and time into ISO string
+      const [hours, minutes] = editingTime.split(':').map(Number);
+      const newDate = new Date(editingDate + 'T00:00:00Z');
+      newDate.setUTCHours(hours, minutes, 0, 0);
+
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ startAt: newDate.toISOString() }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment updated");
+        setEditingAppointmentId(null);
+        fetchCustomer();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to update appointment");
+      }
+    } catch (error) {
+      console.error("Failed to update appointment:", error);
+      toast.error("Failed to update appointment");
+    } finally {
+      setIsSavingAppointment(false);
+    }
+  };
+
+  const cancelAppointment = async (appointmentId: string) => {
+    if (!confirm("Cancel this appointment? This cannot be undone.")) {
+      return;
+    }
+
+    setCancellingAppointmentId(appointmentId);
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "CANCELLED" }),
+      });
+
+      if (response.ok) {
+        toast.success("Appointment cancelled");
+        fetchCustomer();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to cancel appointment");
+      }
+    } catch (error) {
+      console.error("Failed to cancel appointment:", error);
+      toast.error("Failed to cancel appointment");
+    } finally {
+      setCancellingAppointmentId(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -405,7 +497,7 @@ export default function CustomerEditPage() {
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="input input-bordered w-full h-12"
+              className="input w-full h-12 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="Client name"
               required
             />
@@ -422,7 +514,7 @@ export default function CustomerEditPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="input input-bordered w-full h-12 pl-10"
+                  className="input w-full h-12 pl-10 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   placeholder="555-123-4567"
                 />
               </div>
@@ -438,7 +530,7 @@ export default function CustomerEditPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="input input-bordered w-full h-12 pl-10"
+                  className="input w-full h-12 pl-10 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                   placeholder="client@email.com"
                 />
               </div>
@@ -455,7 +547,7 @@ export default function CustomerEditPage() {
                 type="text"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="input input-bordered w-full h-12 pl-10"
+                className="input w-full h-12 pl-10 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
                 placeholder="123 Main St, City, State ZIP"
                 required
               />
@@ -485,7 +577,7 @@ export default function CustomerEditPage() {
             <textarea
               value={formData.addressNotes}
               onChange={(e) => setFormData({ ...formData, addressNotes: e.target.value })}
-              className="textarea textarea-bordered w-full"
+              className="textarea w-full bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="e.g., Blue house on the corner"
               rows={2}
             />
@@ -498,7 +590,7 @@ export default function CustomerEditPage() {
             <textarea
               value={formData.accessInstructions}
               onChange={(e) => setFormData({ ...formData, accessInstructions: e.target.value })}
-              className="textarea textarea-bordered w-full"
+              className="textarea w-full bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
               placeholder="e.g., Gate code 1234, dog door in back"
               rows={2}
             />
@@ -611,7 +703,8 @@ export default function CustomerEditPage() {
             className="btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
           >
             <Plus className="h-4 w-4" />
-            Book Appointment
+            <span className="hidden sm:inline">Book Appointment</span>
+            <span className="sm:hidden">Book</span>
           </Link>
         </div>
 
@@ -638,48 +731,160 @@ export default function CustomerEditPage() {
               .map((appointment) => {
                 const date = new Date(appointment.startAt);
                 const isUpcoming = date > new Date();
+                const isScheduled = ["BOOKED", "CONFIRMED"].includes(appointment.status);
+                const isEditing = editingAppointmentId === appointment.id;
+                const isCancelling = cancellingAppointmentId === appointment.id;
+
+                // Status badge styling
+                const getStatusBadge = (status: string) => {
+                  switch (status) {
+                    case "BOOKED":
+                    case "CONFIRMED":
+                      return "bg-blue-100 text-blue-700";
+                    case "IN_PROGRESS":
+                      return "bg-amber-100 text-amber-700";
+                    case "COMPLETED":
+                      return "bg-green-100 text-green-700";
+                    case "CANCELLED":
+                      return "bg-red-100 text-red-700";
+                    case "NO_SHOW":
+                      return "bg-gray-100 text-gray-600";
+                    default:
+                      return "bg-gray-100 text-gray-600";
+                  }
+                };
 
                 return (
                   <div
                     key={appointment.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      isScheduled && isUpcoming
+                        ? "border-blue-200 bg-blue-50/50"
+                        : "border-gray-100 bg-gray-50"
+                    }`}
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Calendar className="h-4 w-4 text-[#A5744A]" />
-                        <h3 className="font-medium text-gray-900">
-                          {date.toLocaleDateString("en-US", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </h3>
-                        <span className={`badge badge-sm ${isUpcoming ? 'badge-success' : 'badge-ghost'}`}>
-                          {appointment.status}
-                        </span>
+                    {/* Main appointment info */}
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                      {/* Date/Time column */}
+                      <div className="flex-1 min-w-0">
+                        {isEditing ? (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">Date</label>
+                                <input
+                                  type="date"
+                                  value={editingDate}
+                                  onChange={(e) => setEditingDate(e.target.value)}
+                                  className="input input-sm w-full bg-white border-2 border-gray-200 focus:border-[#A5744A]"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">Time</label>
+                                <input
+                                  type="time"
+                                  value={editingTime}
+                                  onChange={(e) => setEditingTime(e.target.value)}
+                                  className="input input-sm w-full bg-white border-2 border-gray-200 focus:border-[#A5744A]"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => saveAppointmentChanges(appointment.id)}
+                                disabled={isSavingAppointment}
+                                className="btn btn-sm bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1"
+                              >
+                                {isSavingAppointment ? (
+                                  <span className="loading loading-spinner loading-xs"></span>
+                                ) : (
+                                  <Check className="h-3 w-3" />
+                                )}
+                                Save
+                              </button>
+                              <button
+                                onClick={cancelEditingAppointment}
+                                className="btn btn-sm btn-ghost gap-1"
+                              >
+                                <X className="h-3 w-3" />
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-semibold text-gray-900">
+                                {date.toLocaleDateString("en-US", {
+                                  weekday: "short",
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </span>
+                              <span className="text-gray-500">at</span>
+                              <span className="font-medium text-gray-700">
+                                {(() => {
+                                  const hours = date.getUTCHours();
+                                  const minutes = date.getUTCMinutes();
+                                  const period = hours >= 12 ? 'PM' : 'AM';
+                                  const hour12 = hours % 12 || 12;
+                                  return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`;
+                                })()}
+                              </span>
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusBadge(appointment.status)}`}>
+                                {appointment.status}
+                              </span>
+                            </div>
+
+                            <div className="mt-2 flex flex-wrap gap-2 text-sm text-gray-600">
+                              <span className="inline-flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {appointment.serviceMinutes} min
+                              </span>
+                              <span>•</span>
+                              <span>{formatAppointmentType(appointment.appointmentType)}</span>
+                              {appointment.pet && (
+                                <>
+                                  <span>•</span>
+                                  <span className="inline-flex items-center gap-1">
+                                    <PawPrint className="h-3 w-3" />
+                                    {appointment.pet.name}
+                                  </span>
+                                </>
+                              )}
+                              <span>•</span>
+                              <span className="font-medium text-gray-900">${appointment.price}</span>
+                            </div>
+                          </>
+                        )}
                       </div>
-                      <div className="flex gap-3 text-sm text-gray-600">
-                        <span>
-                          {(() => {
-                            const hours = date.getUTCHours();
-                            const minutes = date.getUTCMinutes();
-                            const period = hours >= 12 ? 'PM' : 'AM';
-                            const hour12 = hours % 12 || 12;
-                            return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`;
-                          })()}
-                        </span>
-                        <span>• {formatAppointmentType(appointment.appointmentType)}</span>
-                        {appointment.pet && <span>• {appointment.pet.name}</span>}
-                        <span>• ${appointment.price}</span>
-                      </div>
+
+                      {/* Actions for scheduled appointments */}
+                      {isScheduled && isUpcoming && !isEditing && (
+                        <div className="flex gap-2 sm:flex-col">
+                          <button
+                            onClick={() => startEditingAppointment(appointment)}
+                            className="btn btn-sm btn-ghost gap-1 text-[#A5744A] hover:bg-orange-50"
+                          >
+                            <Edit2 className="h-3 w-3" />
+                            <span className="hidden sm:inline">Edit Time</span>
+                            <span className="sm:hidden">Edit</span>
+                          </button>
+                          <button
+                            onClick={() => cancelAppointment(appointment.id)}
+                            disabled={isCancelling}
+                            className="btn btn-sm btn-ghost gap-1 text-red-600 hover:bg-red-50"
+                          >
+                            {isCancelling ? (
+                              <span className="loading loading-spinner loading-xs"></span>
+                            ) : (
+                              <X className="h-3 w-3" />
+                            )}
+                            Cancel
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    <Link
-                      href={`/dashboard/appointments/${appointment.id}`}
-                      className="btn btn-ghost btn-sm gap-2"
-                    >
-                      View
-                    </Link>
                   </div>
                 );
               })}
