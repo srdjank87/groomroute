@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { toZonedTime } from "date-fns-tz";
 import {
   calculateTodayPerformance,
   calculateWeeklyPerformance,
@@ -25,9 +26,16 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get groomer for this account
+    // Get groomer for this account with timezone
     const groomer = await prisma.groomer.findFirst({
       where: { accountId },
+      include: {
+        account: {
+          select: {
+            timezone: true,
+          },
+        },
+      },
     });
 
     if (!groomer) {
@@ -37,15 +45,18 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get today's date range
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Get the account's timezone (default to America/New_York)
+    const timezone = groomer.account?.timezone || "America/New_York";
 
-    // Get start of week (Sunday)
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay());
+    // Get today's date range based on the ACCOUNT'S LOCAL timezone
+    // (same approach as /api/dashboard/today for consistency)
+    const now = new Date();
+    const localNow = toZonedTime(now, timezone);
+    const today = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate(), 0, 0, 0, 0));
+    const tomorrow = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate() + 1, 0, 0, 0, 0));
+
+    // Get start of week (Sunday) in account's timezone
+    const startOfWeek = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate() - localNow.getDay(), 0, 0, 0, 0));
 
     // Fetch today's appointments with pet data
     const todayAppointments = await prisma.appointment.findMany({
@@ -182,8 +193,7 @@ export async function GET(req: NextRequest) {
     );
 
     // Calculate 30-day stats for industry insights
-    const thirtyDaysAgo = new Date(today);
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const thirtyDaysAgo = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate() - 30, 0, 0, 0, 0));
 
     const last30DaysAppointments = await prisma.appointment.findMany({
       where: {
