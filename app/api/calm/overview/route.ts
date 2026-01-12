@@ -222,29 +222,6 @@ export async function GET(req: NextRequest) {
     // Sort by urgency (higher = more urgent)
     quickRescues.sort((a, b) => b.urgency - a.urgency);
 
-    // Customer Situations (mock data for now - would come from messaging system)
-    const customerSituations: Array<{
-      id: string;
-      customerName: string;
-      type: string;
-      message?: string;
-      needsAction: boolean;
-    }> = [];
-
-    // Check for unconfirmed appointments today
-    const unconfirmedToday = appointments.filter(
-      (apt) => !apt.customerConfirmed
-    );
-
-    unconfirmedToday.forEach((apt) => {
-      customerSituations.push({
-        id: `unconfirmed-${apt.id}`,
-        customerName: apt.customer.name,
-        type: "reschedule",
-        needsAction: true,
-      });
-    });
-
     // Wellness Alerts
     const wellnessAlerts: Array<{
       id: string;
@@ -312,7 +289,7 @@ export async function GET(req: NextRequest) {
         totalMinutes,
       },
       quickRescues: quickRescues.slice(0, 5), // Max 5
-      customerSituations: customerSituations.slice(0, 10), // Max 10
+      customerSituations: [], // Removed - was showing misleading info for unconfirmed appointments
       wellnessAlerts: wellnessAlerts.slice(0, 3), // Max 3
     };
 
