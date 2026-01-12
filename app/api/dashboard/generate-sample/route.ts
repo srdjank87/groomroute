@@ -841,7 +841,7 @@ export async function POST(req: NextRequest) {
             status,
             appointmentType: appointmentType as any,
             price: price,
-            customerConfirmed: status !== AppointmentStatus.BOOKED,
+            customerConfirmed: true, // All sample appointments are confirmed
           },
         });
 
