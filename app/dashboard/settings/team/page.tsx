@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   ArrowLeft,
   Plus,
+  Minus,
   Users,
   Edit2,
   Trash2,
@@ -20,6 +21,7 @@ import {
   Check,
   X,
   RefreshCw,
+  Loader2,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useFeature } from "@/hooks/useFeatures";
@@ -80,6 +82,14 @@ export default function TeamSettingsPage() {
   const [groomerSeats, setGroomerSeats] = useState<SeatInfo>({ total: 0, used: 0, pending: 0, available: 0 });
   const [isLoadingTeam, setIsLoadingTeam] = useState(true);
 
+  // Seat management
+  const [seatPricing, setSeatPricing] = useState<{
+    additionalAdminAmount: number;
+    groomerAmount: number;
+    billing: "monthly" | "yearly";
+  } | null>(null);
+  const [isUpdatingSeats, setIsUpdatingSeats] = useState(false);
+
   // Invite modal
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -125,9 +135,10 @@ export default function TeamSettingsPage() {
   const fetchTeamData = async () => {
     setIsLoadingTeam(true);
     try {
-      const [membersRes, invitationsRes] = await Promise.all([
+      const [membersRes, invitationsRes, seatsRes] = await Promise.all([
         fetch("/api/team/members"),
         fetch("/api/team/invitations"),
+        fetch("/api/subscription/seats"),
       ]);
 
       if (membersRes.ok) {
@@ -141,10 +152,60 @@ export default function TeamSettingsPage() {
         const data = await invitationsRes.json();
         setInvitations(data.invitations || []);
       }
+
+      if (seatsRes.ok) {
+        const data = await seatsRes.json();
+        setSeatPricing(data.pricing);
+      }
     } catch (error) {
       console.error("Failed to fetch team data:", error);
     } finally {
       setIsLoadingTeam(false);
+    }
+  };
+
+  const handleUpdateSeats = async (type: "admin" | "groomer", delta: number) => {
+    const currentTotal = type === "admin" ? adminSeats.total : groomerSeats.total;
+    const newTotal = Math.max(type === "admin" ? 1 : 0, currentTotal + delta);
+
+    // Check if decreasing below used count
+    const usedCount = type === "admin" ? adminSeats.used + adminSeats.pending : groomerSeats.used + groomerSeats.pending;
+    if (newTotal < usedCount) {
+      toast.error(`Cannot reduce below ${usedCount} - remove team members first`);
+      return;
+    }
+
+    if (newTotal === currentTotal) return;
+
+    setIsUpdatingSeats(true);
+    try {
+      const response = await fetch("/api/subscription/seats", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          type === "admin"
+            ? { adminSeats: newTotal }
+            : { groomerSeats: newTotal }
+        ),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (type === "admin") {
+          setAdminSeats((prev) => ({ ...prev, total: data.adminSeats, available: data.adminSeats - prev.used - prev.pending }));
+        } else {
+          setGroomerSeats((prev) => ({ ...prev, total: data.groomerSeats, available: data.groomerSeats - prev.used - prev.pending }));
+        }
+        toast.success(`${type === "admin" ? "Admin" : "Groomer"} seats updated`);
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to update seats");
+      }
+    } catch (error) {
+      console.error("Failed to update seats:", error);
+      toast.error("Failed to update seats");
+    } finally {
+      setIsUpdatingSeats(false);
     }
   };
 
@@ -503,42 +564,128 @@ export default function TeamSettingsPage() {
       {/* Seat Overview */}
       <div className="bg-white rounded-xl shadow p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Seat Usage</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Seat Management</h2>
           <Link
             href="/dashboard/settings/billing"
             className="text-sm text-[#A5744A] hover:underline"
           >
-            Manage subscription →
+            View billing →
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Admin Seats */}
           <div className="p-4 bg-purple-50 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Shield className="h-5 w-5 text-purple-600" />
-              <span className="font-medium text-gray-900">Admin Seats</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-purple-600" />
+                <span className="font-medium text-gray-900">Admin Seats</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handleUpdateSeats("admin", -1)}
+                  disabled={isUpdatingSeats || adminSeats.total <= 1}
+                  className="btn btn-xs btn-circle btn-ghost text-purple-600 hover:bg-purple-100 disabled:opacity-50"
+                  title="Remove seat"
+                >
+                  {isUpdatingSeats ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Minus className="h-4 w-4" />
+                  )}
+                </button>
+                <span className="w-8 text-center font-bold text-purple-600">
+                  {adminSeats.total}
+                </span>
+                <button
+                  onClick={() => handleUpdateSeats("admin", 1)}
+                  disabled={isUpdatingSeats}
+                  className="btn btn-xs btn-circle btn-ghost text-purple-600 hover:bg-purple-100 disabled:opacity-50"
+                  title="Add seat"
+                >
+                  {isUpdatingSeats ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-purple-600">
-              {adminSeats.used} / {adminSeats.total}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">
+                  {adminSeats.used} used
+                  {adminSeats.pending > 0 && ` • ${adminSeats.pending} pending`}
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {adminSeats.available} available
+                </p>
+              </div>
+              {seatPricing && (
+                <p className="text-xs text-purple-600 font-medium">
+                  ${seatPricing.additionalAdminAmount}/{seatPricing.billing === "yearly" ? "yr" : "mo"} each
+                </p>
+              )}
             </div>
-            <p className="text-sm text-gray-500 mt-1">
-              {adminSeats.pending > 0 && `${adminSeats.pending} pending • `}
-              {adminSeats.available} available
-            </p>
           </div>
+
+          {/* Groomer Seats */}
           <div className="p-4 bg-emerald-50 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Scissors className="h-5 w-5 text-emerald-600" />
-              <span className="font-medium text-gray-900">Groomer Seats</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Scissors className="h-5 w-5 text-emerald-600" />
+                <span className="font-medium text-gray-900">Groomer Seats</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handleUpdateSeats("groomer", -1)}
+                  disabled={isUpdatingSeats || groomerSeats.total <= 0}
+                  className="btn btn-xs btn-circle btn-ghost text-emerald-600 hover:bg-emerald-100 disabled:opacity-50"
+                  title="Remove seat"
+                >
+                  {isUpdatingSeats ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Minus className="h-4 w-4" />
+                  )}
+                </button>
+                <span className="w-8 text-center font-bold text-emerald-600">
+                  {groomerSeats.total}
+                </span>
+                <button
+                  onClick={() => handleUpdateSeats("groomer", 1)}
+                  disabled={isUpdatingSeats}
+                  className="btn btn-xs btn-circle btn-ghost text-emerald-600 hover:bg-emerald-100 disabled:opacity-50"
+                  title="Add seat"
+                >
+                  {isUpdatingSeats ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-emerald-600">
-              {groomerSeats.used} / {groomerSeats.total}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">
+                  {groomerSeats.used} used
+                  {groomerSeats.pending > 0 && ` • ${groomerSeats.pending} pending`}
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {groomerSeats.available} available
+                </p>
+              </div>
+              {seatPricing && (
+                <p className="text-xs text-emerald-600 font-medium">
+                  ${seatPricing.groomerAmount}/{seatPricing.billing === "yearly" ? "yr" : "mo"} each
+                </p>
+              )}
             </div>
-            <p className="text-sm text-gray-500 mt-1">
-              {groomerSeats.pending > 0 && `${groomerSeats.pending} pending • `}
-              {groomerSeats.available} available
-            </p>
           </div>
         </div>
+        <p className="text-xs text-gray-500 mt-3 text-center">
+          Changes are prorated and applied immediately to your subscription
+        </p>
       </div>
 
       {/* Team Members Section */}
