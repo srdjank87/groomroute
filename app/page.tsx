@@ -197,52 +197,91 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1: Area Days */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-emerald-100">
-              <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center mb-6">
-                <MapPin className="h-7 w-7 text-emerald-600" />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">Area Days</h3>
-              <p className="text-gray-600 mb-4">
-                Assign neighborhoods to specific days. Monday is North Side. Thursday is Downtown.
-                Stop zigzagging across town.
-              </p>
-              <div className="bg-emerald-50 rounded-lg p-3">
-                <p className="text-sm text-emerald-800">
-                  <span className="font-semibold">The result:</span> Appointments 5-15 minutes apart instead of 30+
+            <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 overflow-hidden flex flex-col">
+              <div className="p-6 pb-4">
+                <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center mb-4">
+                  <MapPin className="h-7 w-7 text-emerald-600" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Area Days</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Assign neighborhoods to specific days. Monday is North Side. Thursday is Downtown.
+                  Stop zigzagging across town.
                 </p>
+                <div className="bg-emerald-50 rounded-lg p-2.5">
+                  <p className="text-xs text-emerald-800">
+                    <span className="font-semibold">The result:</span> Appointments 5-15 minutes apart instead of 30+
+                  </p>
+                </div>
+              </div>
+              <div className="mt-auto px-4 pb-4">
+                <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
+                  <Image
+                    src="/images/area_days.png"
+                    alt="Area Days feature - assign neighborhoods to specific days"
+                    width={400}
+                    height={300}
+                    className="rounded-lg w-full shadow-md"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Step 2: Workload Protection */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-emerald-100">
-              <div className="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center mb-6">
-                <Shield className="h-7 w-7 text-amber-600" />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">Workload Protection</h3>
-              <p className="text-gray-600 mb-4">
-                Set your limits. Max 3 large dogs today. No appointments after 5pm.
-                The system warns you before you overcommit.
-              </p>
-              <div className="bg-amber-50 rounded-lg p-3">
-                <p className="text-sm text-amber-800">
-                  <span className="font-semibold">The result:</span> Days that don&apos;t wreck your body or your sanity
+            <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 overflow-hidden flex flex-col">
+              <div className="p-6 pb-4">
+                <div className="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
+                  <Shield className="h-7 w-7 text-amber-600" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Workload Protection</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Set your limits. Max 3 large dogs today. No appointments after 5pm.
+                  The system warns you before you overcommit.
                 </p>
+                <div className="bg-amber-50 rounded-lg p-2.5">
+                  <p className="text-xs text-amber-800">
+                    <span className="font-semibold">The result:</span> Days that don&apos;t wreck your body or your sanity
+                  </p>
+                </div>
+              </div>
+              <div className="mt-auto px-4 pb-4">
+                <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
+                  <Image
+                    src="/images/workload_protection.png"
+                    alt="Workload Protection feature - set daily limits and get warnings"
+                    width={400}
+                    height={300}
+                    className="rounded-lg w-full shadow-md"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Step 3: Day-of Rescue */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-emerald-100">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                <Heart className="h-7 w-7 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">Day-of Rescue</h3>
-              <p className="text-gray-600 mb-4">
-                When things go sideways - cancellations, running late, traffic - GroomRoute has your back with one-tap solutions.
-              </p>
-              <div className="bg-blue-50 rounded-lg p-3">
-                <p className="text-sm text-blue-800">
-                  <span className="font-semibold">The result:</span> Problems handled without stress spirals
+            <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 overflow-hidden flex flex-col">
+              <div className="p-6 pb-4">
+                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                  <Heart className="h-7 w-7 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Day-of Rescue</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  When things go sideways - cancellations, running late, traffic - GroomRoute has your back with one-tap solutions.
                 </p>
+                <div className="bg-blue-50 rounded-lg p-2.5">
+                  <p className="text-xs text-blue-800">
+                    <span className="font-semibold">The result:</span> Problems handled without stress spirals
+                  </p>
+                </div>
+              </div>
+              <div className="mt-auto px-4 pb-4">
+                <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
+                  <Image
+                    src="/images/day_rescue.png"
+                    alt="Day-of Rescue feature - one-tap solutions for problems"
+                    width={400}
+                    height={300}
+                    className="rounded-lg w-full shadow-md"
+                  />
+                </div>
               </div>
             </div>
           </div>
