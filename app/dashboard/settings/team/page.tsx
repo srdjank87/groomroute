@@ -29,6 +29,15 @@ import {
 import toast from "react-hot-toast";
 import { useFeature } from "@/hooks/useFeatures";
 
+// Helper to format 24-hour time to 12-hour format
+function formatTime12Hour(time: string | null): string {
+  if (!time) return "";
+  const [hours, minutes] = time.split(":").map(Number);
+  const period = hours >= 12 ? "PM" : "AM";
+  const displayHours = hours % 12 || 12;
+  return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+}
+
 interface Groomer {
   id: string;
   name: string;
@@ -927,7 +936,7 @@ export default function TeamSettingsPage() {
                         {groomer.workingHoursStart && (
                           <span className="flex items-center gap-1">
                             <Clock className="h-3.5 w-3.5" />
-                            {groomer.workingHoursStart} - {groomer.workingHoursEnd}
+                            {formatTime12Hour(groomer.workingHoursStart)} - {formatTime12Hour(groomer.workingHoursEnd)}
                           </span>
                         )}
                       </div>
@@ -1228,8 +1237,7 @@ export default function TeamSettingsPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Start Time
                   </label>
-                  <input
-                    type="time"
+                  <select
                     value={groomerFormData.workingHoursStart}
                     onChange={(e) =>
                       setGroomerFormData({
@@ -1237,15 +1245,31 @@ export default function TeamSettingsPage() {
                         workingHoursStart: e.target.value,
                       })
                     }
-                    className="input input-bordered w-full"
-                  />
+                    className="select select-bordered w-full"
+                  >
+                    <option value="">Select time</option>
+                    <option value="05:00">5:00 AM</option>
+                    <option value="05:30">5:30 AM</option>
+                    <option value="06:00">6:00 AM</option>
+                    <option value="06:30">6:30 AM</option>
+                    <option value="07:00">7:00 AM</option>
+                    <option value="07:30">7:30 AM</option>
+                    <option value="08:00">8:00 AM</option>
+                    <option value="08:30">8:30 AM</option>
+                    <option value="09:00">9:00 AM</option>
+                    <option value="09:30">9:30 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="10:30">10:30 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="11:30">11:30 AM</option>
+                    <option value="12:00">12:00 PM</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     End Time
                   </label>
-                  <input
-                    type="time"
+                  <select
                     value={groomerFormData.workingHoursEnd}
                     onChange={(e) =>
                       setGroomerFormData({
@@ -1253,8 +1277,27 @@ export default function TeamSettingsPage() {
                         workingHoursEnd: e.target.value,
                       })
                     }
-                    className="input input-bordered w-full"
-                  />
+                    className="select select-bordered w-full"
+                  >
+                    <option value="">Select time</option>
+                    <option value="12:00">12:00 PM</option>
+                    <option value="12:30">12:30 PM</option>
+                    <option value="13:00">1:00 PM</option>
+                    <option value="13:30">1:30 PM</option>
+                    <option value="14:00">2:00 PM</option>
+                    <option value="14:30">2:30 PM</option>
+                    <option value="15:00">3:00 PM</option>
+                    <option value="15:30">3:30 PM</option>
+                    <option value="16:00">4:00 PM</option>
+                    <option value="16:30">4:30 PM</option>
+                    <option value="17:00">5:00 PM</option>
+                    <option value="17:30">5:30 PM</option>
+                    <option value="18:00">6:00 PM</option>
+                    <option value="18:30">6:30 PM</option>
+                    <option value="19:00">7:00 PM</option>
+                    <option value="19:30">7:30 PM</option>
+                    <option value="20:00">8:00 PM</option>
+                  </select>
                 </div>
               </div>
 
