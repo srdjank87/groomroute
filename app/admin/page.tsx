@@ -10,6 +10,7 @@ import {
   Activity,
   LogOut,
   ChevronRight,
+  Mail,
 } from "lucide-react";
 
 async function getMetrics() {
@@ -253,6 +254,13 @@ export default async function AdminDashboard() {
             >
               <Users className="w-5 h-5 text-gray-600" />
               <span className="font-medium text-gray-900">All Accounts</span>
+            </Link>
+            <Link
+              href="/admin/emails"
+              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              <Mail className="w-5 h-5 text-gray-600" />
+              <span className="font-medium text-gray-900">Email Templates</span>
             </Link>
             <Link
               href="/admin/events"
