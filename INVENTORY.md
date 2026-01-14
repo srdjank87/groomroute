@@ -307,9 +307,15 @@ This document provides a comprehensive inventory of all features, pages, routes,
 ## 7. CHANGELOG
 
 ### January 13, 2026
+- **Bug Fix: Calm Center showing wrong appointment count (16 instead of 6)**
+  - Same timezone bug as dashboard - was using server local time instead of account timezone
+  - Same groomerId bug - was showing all account appointments instead of current groomer's
+  - Updated `/api/calm/overview/route.ts` to use account timezone and filter by groomerId
+
 - **Bug Fix: Pre-fill suggested time on new appointment page**
   - Fixed URL parameters `suggestedDate` and `suggestedTime` not being used to pre-fill the date/time fields
   - When clicking "Book any client for this slot" from Routes page gap-fill section, time is now pre-filled
+  - Fixed time format from 12-hour (8:00 AM) to 24-hour (08:00) for HTML time input compatibility
 
 - **Smart Watchlist Suggest Feature:**
   - Created intelligent suggestion engine (`lib/watchlist-suggest.ts`) that scores waitlist customers based on:

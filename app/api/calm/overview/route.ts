@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { toZonedTime } from "date-fns-tz";
 import { canAccessCalmControl } from "@/lib/feature-helpers";
 import { assessWorkload, WorkloadAssessment } from "@/lib/workload-assessment";
 
@@ -39,17 +40,26 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get groomer for assistant preference
+    // Get groomer for assistant preference and account timezone
     const groomer = await prisma.groomer.findFirst({
       where: { accountId, isActive: true },
-      select: { id: true, defaultHasAssistant: true },
+      select: {
+        id: true,
+        defaultHasAssistant: true,
+        account: {
+          select: { timezone: true },
+        },
+      },
     });
 
-    // Get today's date range
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Get the account's timezone (default to America/New_York)
+    const timezone = groomer?.account?.timezone || "America/New_York";
+
+    // Get today's date range based on the ACCOUNT'S LOCAL timezone
+    const now = new Date();
+    const localNow = toZonedTime(now, timezone);
+    const today = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate(), 0, 0, 0, 0));
+    const tomorrow = new Date(Date.UTC(localNow.getFullYear(), localNow.getMonth(), localNow.getDate() + 1, 0, 0, 0, 0));
 
     // Get today's route for assistant status
     const route = await prisma.route.findFirst({
@@ -63,10 +73,11 @@ export async function GET(req: NextRequest) {
     // Use route's hasAssistant if set, otherwise fall back to groomer's default
     const hasAssistant = route?.hasAssistant ?? groomer?.defaultHasAssistant ?? false;
 
-    // Fetch today's appointments
+    // Fetch today's appointments for the current groomer
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
+        ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: today,
           lt: tomorrow,
