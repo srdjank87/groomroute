@@ -61,6 +61,7 @@ interface MonthAreaData {
 }
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAY_NAMES_SHORT = ["S", "M", "T", "W", "T", "F", "S"];
 const FULL_DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MAX_SERVICE_AREAS = 6;
 const PRESET_COLORS = [
@@ -462,10 +463,11 @@ export default function SettingsAreasPage() {
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
-                    {area.customerCount} customer{area.customerCount !== 1 ? "s" : ""}
+                    <span>{area.customerCount} customer{area.customerCount !== 1 ? "s" : ""}</span>
                   </div>
+                  {/* Hide assigned days on mobile to prevent cutoff */}
                   {area.assignedDays.length > 0 && (
-                    <div className="text-gray-400">
+                    <div className="text-gray-400 hidden sm:block">
                       {area.assignedDays
                         .map((d) => DAY_NAMES[d.dayOfWeek])
                         .join(", ")}
@@ -491,7 +493,38 @@ export default function SettingsAreasPage() {
           {/* Simple 7-day grid for the single groomer */}
           {assignments.slice(0, 1).map((assignment) => (
             <div key={assignment.groomerId} className="bg-white rounded-xl border p-4">
-              <div className="grid grid-cols-7 gap-2">
+              {/* Mobile: Vertical list layout */}
+              <div className="flex flex-col gap-2 sm:hidden">
+                {[0, 1, 2, 3, 4, 5, 6].map((dayOfWeek) => {
+                  const dayData = assignment.days[dayOfWeek];
+                  return (
+                    <button
+                      key={dayOfWeek}
+                      onClick={() =>
+                        setActiveAssignmentCell({
+                          groomerId: assignment.groomerId,
+                          dayOfWeek,
+                        })
+                      }
+                      className={`flex items-center justify-between p-3 rounded-xl transition-all ${
+                        dayData
+                          ? "text-white hover:opacity-90"
+                          : "bg-gray-50 border-2 border-dashed border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
+                      }`}
+                      style={dayData ? { backgroundColor: dayData.areaColor } : undefined}
+                    >
+                      <span className={`text-sm font-medium ${dayData ? "text-white/80" : "text-gray-500"}`}>
+                        {FULL_DAY_NAMES[dayOfWeek]}
+                      </span>
+                      <span className={`text-sm font-semibold ${dayData ? "" : ""}`}>
+                        {dayData ? dayData.areaName : "Not assigned"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Desktop: 7-column grid */}
+              <div className="hidden sm:grid grid-cols-7 gap-2">
                 {[0, 1, 2, 3, 4, 5, 6].map((dayOfWeek) => {
                   const dayData = assignment.days[dayOfWeek];
                   return (
@@ -562,9 +595,10 @@ export default function SettingsAreasPage() {
 
             {/* Day of Week Headers */}
             <div className="grid grid-cols-7 mb-2">
-              {DAY_NAMES.map((day) => (
+              {DAY_NAMES.map((day, index) => (
                 <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
-                  {day}
+                  <span className="hidden sm:inline">{day}</span>
+                  <span className="sm:hidden">{DAY_NAMES_SHORT[index]}</span>
                 </div>
               ))}
             </div>
@@ -601,24 +635,24 @@ export default function SettingsAreasPage() {
                           disabled={!isCurrentMonth}
                           onClick={() => isCurrentMonth && setActiveDateCell(dateStr)}
                           className={`
-                            relative p-2 min-h-[48px] rounded-lg transition-all text-left
+                            relative p-1 sm:p-2 min-h-[40px] sm:min-h-[48px] rounded-lg transition-all text-left
                             ${!isCurrentMonth ? "text-gray-300 cursor-default" : "hover:ring-2 hover:ring-gray-300"}
                             ${areaData ? "" : isCurrentMonth ? "bg-gray-50 border border-dashed border-gray-200" : ""}
                           `}
                           style={isCurrentMonth && areaData ? { backgroundColor: areaData.areaColor + "20" } : undefined}
                         >
-                          <span className={`text-sm font-medium ${isCurrentMonth ? "text-gray-900" : ""}`}>
+                          <span className={`text-xs sm:text-sm font-medium ${isCurrentMonth ? "text-gray-900" : ""}`}>
                             {format(currentDay, "d")}
                           </span>
 
-                          {/* Area indicator */}
+                          {/* Area indicator - Mobile: just dot, Desktop: dot + name */}
                           {isCurrentMonth && areaData && (
-                            <div className="flex items-center gap-1 mt-1">
+                            <div className="flex items-center gap-1 mt-0.5 sm:mt-1">
                               <div
-                                className={`w-2 h-2 rounded-full ${areaData.isOverride ? "ring-1 ring-offset-1 ring-gray-400" : ""}`}
+                                className={`w-3 h-3 sm:w-2 sm:h-2 rounded-full flex-shrink-0 ${areaData.isOverride ? "ring-1 ring-offset-1 ring-gray-400" : ""}`}
                                 style={{ backgroundColor: areaData.areaColor }}
                               />
-                              <span className="text-[10px] text-gray-600 truncate max-w-[60px]">
+                              <span className="hidden sm:inline text-[10px] text-gray-600 truncate max-w-[60px]">
                                 {areaData.areaName}
                               </span>
                             </div>
@@ -626,7 +660,7 @@ export default function SettingsAreasPage() {
 
                           {/* Day off indicator */}
                           {isCurrentMonth && !areaData && (
-                            <span className="text-[10px] text-gray-400 block mt-1">—</span>
+                            <span className="text-[10px] text-gray-400 block mt-0.5 sm:mt-1">—</span>
                           )}
                         </button>
                       );
@@ -648,20 +682,21 @@ export default function SettingsAreasPage() {
             )}
 
             {/* Legend */}
-            <div className="mt-4 pt-3 border-t border-gray-200 flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
+            <div className="mt-4 pt-3 border-t border-gray-200 flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-2 text-xs text-gray-500">
               {availableAreas.map(area => (
                 <div key={area.id} className="flex items-center gap-1.5">
                   <div
-                    className="w-2 h-2 rounded-full"
+                    className="w-3 h-3 sm:w-2 sm:h-2 rounded-full flex-shrink-0"
                     style={{ backgroundColor: area.color }}
                   />
                   <span>{area.name}</span>
                 </div>
               ))}
-              <div className="w-px h-4 bg-gray-300 mx-1" />
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-gray-400 ring-1 ring-offset-1 ring-gray-400" />
-                <span>Override (differs from default)</span>
+              <div className="w-px h-4 bg-gray-300 mx-1 hidden sm:block" />
+              <div className="w-full sm:w-auto flex items-center gap-1.5 pt-2 sm:pt-0 border-t sm:border-0 border-gray-200 mt-1 sm:mt-0">
+                <div className="w-3 h-3 sm:w-2 sm:h-2 rounded-full bg-gray-400 ring-1 ring-offset-1 ring-gray-400 flex-shrink-0" />
+                <span className="hidden sm:inline">Override (differs from default)</span>
+                <span className="sm:hidden">Override</span>
               </div>
             </div>
           </div>

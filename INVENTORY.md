@@ -307,6 +307,18 @@ This document provides a comprehensive inventory of all features, pages, routes,
 ## 7. CHANGELOG
 
 ### January 13, 2026
+- **Service Areas Settings - Mobile Optimization:**
+  - **Your Areas cards:** Hide assigned days list on mobile to prevent text cutoff
+  - **Default Weekly Pattern:** Changed from cramped 7-column grid to vertical list on mobile
+    - Shows full day names (Sunday, Monday, etc.) instead of abbreviations
+    - Each day is a full-width row with day name and area name clearly visible
+  - **Monthly Schedule Calendar:**
+    - Smaller day headers on mobile (single letters: S, M, T, W, T, F, S)
+    - Reduced cell padding and minimum height for better fit
+    - Area indicator shows larger colored dot on mobile (no truncated text)
+    - Smaller date number font on mobile
+  - **Legend:** More compact on mobile, "Override" label shortened
+
 - **Landing Page - Calm Center Emphasis:**
   - Added dedicated "Calm Control Center" highlight section before pricing
     - Eye-catching badge "Only on Growth & Pro Plans"
