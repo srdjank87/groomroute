@@ -12,18 +12,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan, billing, resubscribe, adminSeats, groomerSeats } = body as {
+    const { plan, billing, resubscribe, additionalAdminSeats, groomerSeats } = body as {
       plan: PlanType;
       billing: BillingType;
       resubscribe?: boolean;
-      adminSeats?: number;
+      additionalAdminSeats?: number;
       groomerSeats?: number;
     };
 
-    // For Pro plan, validate seat counts (minimum 1 admin, 1 groomer)
+    // For Pro plan, validate seat counts
     const isPro = plan.toLowerCase() === "pro";
-    const adminSeatCount = isPro ? Math.max(adminSeats || 1, 1) : 0;
-    const groomerSeatCount = isPro ? Math.max(groomerSeats || 1, 1) : 0;
+    const additionalAdminSeatCount = isPro ? Math.max(additionalAdminSeats || 0, 0) : 0;
+    const groomerSeatCount = isPro ? Math.max(groomerSeats || 0, 0) : 0;
 
     // Get Stripe plans at runtime to ensure env vars are loaded
     const STRIPE_PLANS = getStripePlans();
@@ -70,28 +70,34 @@ export async function POST(request: NextRequest) {
     const lineItems: LineItem[] = [];
 
     if (isPro) {
-      // Pro plan: separate admin and groomer seat prices
+      // Pro plan: base price + optional additional seats
       const proPricing = STRIPE_PLANS.pro[billing];
-      const adminPriceId = proPricing.adminPriceId || proPricing.priceId;
-      const groomerPriceId = proPricing.groomerPriceId || proPricing.priceId;
 
-      if (!adminPriceId) {
+      if (!proPricing.priceId) {
         return NextResponse.json(
-          { error: "Stripe admin price ID not configured for Pro plan" },
+          { error: "Stripe base price ID not configured for Pro plan" },
           { status: 500 }
         );
       }
 
-      // Add admin seat(s)
+      // Add Pro base price (includes 1 admin seat)
       lineItems.push({
-        price: adminPriceId,
-        quantity: adminSeatCount,
+        price: proPricing.priceId,
+        quantity: 1,
       });
 
-      // Add groomer seat(s) if groomer price is configured
-      if (groomerPriceId && groomerSeatCount > 0) {
+      // Add additional admin seats if any
+      if (additionalAdminSeatCount > 0 && proPricing.additionalAdminPriceId) {
         lineItems.push({
-          price: groomerPriceId,
+          price: proPricing.additionalAdminPriceId,
+          quantity: additionalAdminSeatCount,
+        });
+      }
+
+      // Add groomer seats if any
+      if (groomerSeatCount > 0 && proPricing.groomerPriceId) {
+        lineItems.push({
+          price: proPricing.groomerPriceId,
           quantity: groomerSeatCount,
         });
       }
@@ -128,8 +134,9 @@ export async function POST(request: NextRequest) {
           plan: plan.toUpperCase(),
           billing: billing.toUpperCase(),
           ...(isPro && {
-            adminSeats: adminSeatCount.toString(),
+            additionalAdminSeats: additionalAdminSeatCount.toString(),
             groomerSeats: groomerSeatCount.toString(),
+            totalSeats: (1 + additionalAdminSeatCount + groomerSeatCount).toString(),
           }),
         },
       },

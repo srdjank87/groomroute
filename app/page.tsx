@@ -768,54 +768,40 @@ export default function Home() {
             <div className="card bg-base-100 shadow-xl border-2 border-base-200 h-full">
               <div className="card-body">
                 <div className="badge badge-ghost mb-2">PRO</div>
-
-                {/* Two-tier pricing */}
-                <div className="mb-4 space-y-2">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold">${isYearly ? '41' : '49'}</span>
-                    <span className="text-sm opacity-70">/admin seat</span>
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-gray-600">${isYearly ? '25' : '29'}</span>
-                    <span className="text-sm opacity-70">/groomer seat</span>
-                  </div>
+                <div className="mb-4">
+                  <span className="text-4xl font-bold">${isYearly ? '124' : '149'}</span>
+                  <span className="text-sm opacity-70">/month</span>
                 </div>
-                {isYearly && <div className="text-xs text-emerald-600 -mt-2 mb-4">Save 17% with yearly billing</div>}
-                <p className="text-xs text-gray-500 -mt-2 mb-4">1 admin seat required, add groomer seats as needed</p>
+                {isYearly && <div className="text-xs text-emerald-600 -mt-3 mb-4">Billed annually ($1,490/year)</div>}
 
                 <p className="text-sm text-gray-600 mb-6">
                   For multi-van operations
                 </p>
 
                 <ul className="space-y-3 mb-6 flex-grow">
-                  <li className="flex gap-2 items-start">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm"><strong>Admin seat:</strong> Full access to everything</span>
-                  </li>
-                  <li className="flex gap-2 items-start">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm"><strong>Groomer seats:</strong> Daily schedule, route & Calm Center</span>
-                  </li>
-                  <li className="flex gap-2 items-start pt-2 border-t border-gray-100">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Unlimited groomers/vans</span>
-                  </li>
-                  <li className="flex gap-2 items-start">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Team calendar view</span>
-                  </li>
-                  <li className="flex gap-2 items-start">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Per-groomer analytics</span>
-                  </li>
-                  <li className="flex gap-2 items-start">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Phone support</span>
-                  </li>
+                  {[
+                    "Everything in Growth, plus:",
+                    "Unlimited groomers/vans",
+                    "Team calendar view",
+                    "Per-groomer analytics",
+                    "Phone support",
+                  ].map((item) => (
+                    <li className="flex gap-2 items-start" key={item}>
+                      <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm">{item}</span>
+                    </li>
+                  ))}
                   {/* Calm Center included */}
                   <li className="flex gap-2 items-start">
                     <Shield className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Calm Control Center</span>
+                  </li>
+                  {/* Additional seats info */}
+                  <li className="flex gap-2 items-start pt-2 border-t border-gray-100 mt-2">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-600">
+                      Add team members: +${isYearly ? '25' : '29'}/groomer
+                    </span>
                   </li>
                 </ul>
 

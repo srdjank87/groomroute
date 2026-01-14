@@ -33,23 +33,22 @@ export function getStripePlans() {
     },
     pro: {
       monthly: {
-        // For Pro, we use separate admin and groomer seat prices
-        adminPriceId: process.env.STRIPE_PRO_ADMIN_MONTHLY_PRICE_ID || "",
-        groomerPriceId: process.env.STRIPE_PRO_GROOMER_MONTHLY_PRICE_ID || "",
-        adminAmount: 4900, // $49.00 per admin seat
-        groomerAmount: 2900, // $29.00 per groomer seat
-        // Legacy single price for backwards compatibility
+        // Pro base price (includes 1 admin seat)
         priceId: process.env.STRIPE_PRO_MONTHLY_PRICE_ID || "",
-        amount: 4900,
+        amount: 14900, // $149.00 base price
+        // Additional seat prices
+        additionalAdminPriceId: process.env.STRIPE_PRO_ADMIN_MONTHLY_PRICE_ID || "",
+        groomerPriceId: process.env.STRIPE_PRO_GROOMER_MONTHLY_PRICE_ID || "",
+        additionalAdminAmount: 4900, // $49.00 per extra admin seat
+        groomerAmount: 2900, // $29.00 per groomer seat
       },
       yearly: {
-        adminPriceId: process.env.STRIPE_PRO_ADMIN_YEARLY_PRICE_ID || "",
-        groomerPriceId: process.env.STRIPE_PRO_GROOMER_YEARLY_PRICE_ID || "",
-        adminAmount: 49200, // $492.00/year ($41/mo) per admin seat
-        groomerAmount: 30000, // $300.00/year ($25/mo) per groomer seat
-        // Legacy single price for backwards compatibility
         priceId: process.env.STRIPE_PRO_YEARLY_PRICE_ID || "",
-        amount: 49200,
+        amount: 148800, // $1,488.00/year ($124/mo)
+        additionalAdminPriceId: process.env.STRIPE_PRO_ADMIN_YEARLY_PRICE_ID || "",
+        groomerPriceId: process.env.STRIPE_PRO_GROOMER_YEARLY_PRICE_ID || "",
+        additionalAdminAmount: 49200, // $492.00/year ($41/mo) per extra admin
+        groomerAmount: 30000, // $300.00/year ($25/mo) per groomer seat
       },
     },
   } as const;

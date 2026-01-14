@@ -6,11 +6,13 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-const MAX_GROOMER_SEATS = 19; // Max 19 groomer seats + 1 admin = 20 total
+const MAX_GROOMER_SEATS = 19; // Max 19 additional groomer seats
 
-// Pricing constants
-const ADMIN_SEAT_PRICE_MONTHLY = 49;
-const ADMIN_SEAT_PRICE_YEARLY = 41;
+// Pricing constants for Pro plan
+const PRO_BASE_PRICE_MONTHLY = 149;
+const PRO_BASE_PRICE_YEARLY = 124;
+const ADDITIONAL_ADMIN_SEAT_MONTHLY = 49;
+const ADDITIONAL_ADMIN_SEAT_YEARLY = 41;
 const GROOMER_SEAT_PRICE_MONTHLY = 29;
 const GROOMER_SEAT_PRICE_YEARLY = 25;
 
@@ -23,15 +25,17 @@ function SignUpForm() {
   const selectedPlan = searchParams.get("plan") || "growth";
   const selectedBilling = searchParams.get("billing") || "monthly";
 
-  // Seat counts for Pro plan (1 admin included, groomer seats start at 1)
-  const [groomerSeats, setGroomerSeats] = useState(1);
+  // Seat counts for Pro plan (base includes 1 admin, can add more)
+  const [additionalAdminSeats, setAdditionalAdminSeats] = useState(0);
+  const [groomerSeats, setGroomerSeats] = useState(0);
   const isProPlan = selectedPlan.toLowerCase() === "pro";
 
-  // Calculate total monthly cost
-  const adminPrice = selectedBilling === "yearly" ? ADMIN_SEAT_PRICE_YEARLY : ADMIN_SEAT_PRICE_MONTHLY;
+  // Calculate total monthly cost for Pro plan
+  const basePrice = selectedBilling === "yearly" ? PRO_BASE_PRICE_YEARLY : PRO_BASE_PRICE_MONTHLY;
+  const additionalAdminPrice = selectedBilling === "yearly" ? ADDITIONAL_ADMIN_SEAT_YEARLY : ADDITIONAL_ADMIN_SEAT_MONTHLY;
   const groomerPrice = selectedBilling === "yearly" ? GROOMER_SEAT_PRICE_YEARLY : GROOMER_SEAT_PRICE_MONTHLY;
-  const monthlyTotal = adminPrice + (groomerSeats * groomerPrice);
-  const yearlyTotal = (ADMIN_SEAT_PRICE_YEARLY * 12) + (groomerSeats * GROOMER_SEAT_PRICE_YEARLY * 12);
+  const monthlyTotal = basePrice + (additionalAdminSeats * additionalAdminPrice) + (groomerSeats * groomerPrice);
+  const yearlyTotal = (PRO_BASE_PRICE_YEARLY * 12) + (additionalAdminSeats * ADDITIONAL_ADMIN_SEAT_YEARLY * 12) + (groomerSeats * GROOMER_SEAT_PRICE_YEARLY * 12);
 
   // Show error message if redirected from dashboard
   useEffect(() => {
@@ -90,7 +94,7 @@ function SignUpForm() {
           plan: formData.plan.toLowerCase(),
           billing: formData.billing.toLowerCase(),
           ...(isProPlan && {
-            adminSeats: 1,
+            additionalAdminSeats: additionalAdminSeats,
             groomerSeats: groomerSeats,
           }),
         }),
@@ -141,32 +145,59 @@ function SignUpForm() {
               </div>
             </div>
 
-            {/* Seat Selector for Pro Plan */}
+            {/* Team Size Selector for Pro Plan */}
             {isProPlan && (
               <div className="mt-4 pt-4 border-t border-[#A5744A]/20 space-y-4">
-                {/* Admin Seat - Fixed at 1 */}
+                {/* Base Plan Info */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Admin Seat</p>
-                    <p className="text-xs text-gray-500">Full access (scheduling, analytics, billing)</p>
+                    <p className="text-sm font-medium text-gray-700">Pro Base</p>
+                    <p className="text-xs text-gray-500">Includes 1 admin seat with full access</p>
                   </div>
                   <div className="text-right">
-                    <span className="font-bold text-lg">1</span>
-                    <span className="text-xs text-gray-500 ml-1">× ${adminPrice}</span>
+                    <span className="font-bold text-[#A5744A]">${basePrice}/mo</span>
                   </div>
                 </div>
 
-                {/* Groomer Seats - Adjustable */}
+                {/* Additional Admin Seats - Optional */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Groomer Seats</p>
-                    <p className="text-xs text-gray-500">Daily schedule, route & Calm Center only</p>
+                    <p className="text-sm font-medium text-gray-700">Extra Admin Seats</p>
+                    <p className="text-xs text-gray-500">Full access (optional)</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setGroomerSeats(Math.max(1, groomerSeats - 1))}
-                      disabled={groomerSeats <= 1 || isLoading}
+                      onClick={() => setAdditionalAdminSeats(Math.max(0, additionalAdminSeats - 1))}
+                      disabled={additionalAdminSeats <= 0 || isLoading}
+                      className="btn btn-sm btn-circle btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:border-[#A5744A] disabled:opacity-40"
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center font-bold text-lg">{additionalAdminSeats}</span>
+                    <button
+                      type="button"
+                      onClick={() => setAdditionalAdminSeats(Math.min(5, additionalAdminSeats + 1))}
+                      disabled={additionalAdminSeats >= 5 || isLoading}
+                      className="btn btn-sm btn-circle btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:border-[#A5744A] disabled:opacity-40"
+                    >
+                      +
+                    </button>
+                    <span className="text-xs text-gray-500 ml-1">× ${additionalAdminPrice}</span>
+                  </div>
+                </div>
+
+                {/* Groomer Seats - Optional */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Groomer Seats</p>
+                    <p className="text-xs text-gray-500">Schedule & route access only</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setGroomerSeats(Math.max(0, groomerSeats - 1))}
+                      disabled={groomerSeats <= 0 || isLoading}
                       className="btn btn-sm btn-circle btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:border-[#A5744A] disabled:opacity-40"
                     >
                       -
@@ -187,7 +218,9 @@ function SignUpForm() {
                 {/* Total */}
                 <div className="pt-3 border-t border-[#A5744A]/20">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Total ({1 + groomerSeats} seats)</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Total ({1 + additionalAdminSeats + groomerSeats} {1 + additionalAdminSeats + groomerSeats === 1 ? 'seat' : 'seats'})
+                    </span>
                     <div className="text-right">
                       <span className="text-lg font-bold text-[#A5744A]">${monthlyTotal}/month</span>
                       {selectedBilling === "yearly" && (

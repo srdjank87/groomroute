@@ -300,31 +300,35 @@ This document provides a comprehensive inventory of all features, pages, routes,
 - **TRIAL** - 14-day free trial (all plans)
 - **STARTER** - $39/mo ($32/mo yearly) - 50 clients, route optimization, area scheduling
 - **GROWTH** - $79/mo ($66/mo yearly) - Unlimited clients, Calm Center, wellness features
-- **PRO** - Two-tier seat pricing, multi-groomer, team features:
-  - **Admin Seat:** $49/mo ($41/mo yearly) - Full access to all features
-  - **Groomer Seat:** $29/mo ($25/mo yearly) - Daily schedule, route, Calm Center only
+- **PRO** - $149/mo ($124/mo yearly) - Multi-groomer, team features:
+  - Base price includes 1 admin seat with full access
+  - Additional admin seats: +$49/mo ($41/mo yearly)
+  - Groomer seats: +$29/mo ($25/mo yearly) - Daily schedule, route, Calm Center only
 
 ---
 
 ## 7. CHANGELOG
 
 ### January 13, 2026
-- **Pro Plan Two-Tier Seat Pricing Model:**
-  - Implemented tiered seat pricing to better match grooming business needs:
-    - **Admin Seat:** $49/mo ($41/mo yearly) - Full access to scheduling, analytics, billing, team management
-    - **Groomer Seat:** $29/mo ($25/mo yearly) - Limited to daily schedule, route, and Calm Center
-  - Updated landing page Pro pricing card to show both seat types with descriptions
-  - Updated signup page seat selector:
-    - Admin seat count fixed at 1 (required)
-    - Groomer seat count adjustable (min: 1, max: 19)
-    - Dynamic total calculation showing breakdown
+- **Pro Plan Pricing Model Update:**
+  - Changed Pro plan to base price + optional seats model:
+    - **Base:** $149/mo ($124/mo yearly) - Includes 1 admin seat with full access
+    - **Additional Admin Seats:** +$49/mo ($41/mo yearly) each
+    - **Groomer Seats:** +$29/mo ($25/mo yearly) each - Limited access
+  - Updated landing page Pro pricing card to show $149 base with add-on info
+  - Updated signup page team size selector:
+    - Shows base Pro price with included admin seat
+    - Optional additional admin seats (0-5)
+    - Optional groomer seats (0-19)
+    - Dynamic total calculation
   - Updated checkout session API (`app/api/create-checkout-session/route.ts`):
-    - Accepts `adminSeats` and `groomerSeats` parameters
-    - Creates separate Stripe line items for each seat type
+    - Accepts `additionalAdminSeats` and `groomerSeats` parameters
+    - Creates Stripe line items: base price + optional seat add-ons
     - Stores seat counts in subscription metadata
   - Updated Stripe configuration (`lib/stripe.ts`):
-    - Added separate price IDs for admin and groomer seats
-    - Environment variables: `STRIPE_PRO_ADMIN_MONTHLY_PRICE_ID`, `STRIPE_PRO_GROOMER_MONTHLY_PRICE_ID`, etc.
+    - Pro base price ID: `STRIPE_PRO_MONTHLY_PRICE_ID` ($149/mo)
+    - Additional admin: `STRIPE_PRO_ADMIN_MONTHLY_PRICE_ID` ($49/mo)
+    - Groomer seat: `STRIPE_PRO_GROOMER_MONTHLY_PRICE_ID` ($29/mo)
   - Added role-based feature gating (`lib/feature-helpers.ts`):
     - `canAccessByRole()` - Check if user's role allows feature access
     - `canAccessAnalytics()`, `canManageCustomers()`, `canScheduleAppointments()`, etc.
