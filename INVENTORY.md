@@ -99,6 +99,13 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `/api/breaks/take` | POST | Mark break as taken |
 | `/api/breaks/suggest` | GET | Smart break suggestions |
 
+### Waitlist & Gap-Fill
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/waitlist` | GET/POST/DELETE | List/add/remove waitlist entries |
+| `/api/waitlist/suggest` | GET | Smart suggestions based on proximity, value, reliability |
+| `/api/gaps` | GET | Find schedule gaps and suggest waitlist clients |
+
 ### Calm Control Center
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -203,6 +210,7 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `lib/posthog-server.ts` | PostHog server-side client for API tracking |
 | `lib/facebook-capi.ts` | Facebook Conversion API client with data hashing |
 | `lib/admin-auth.ts` | Admin password authentication helper |
+| `lib/watchlist-suggest.ts` | Smart watchlist suggestion engine with multi-factor scoring |
 
 ---
 
@@ -297,6 +305,28 @@ This document provides a comprehensive inventory of all features, pages, routes,
 ---
 
 ## 7. CHANGELOG
+
+### January 13, 2026
+- **Smart Watchlist Suggest Feature:**
+  - Created intelligent suggestion engine (`lib/watchlist-suggest.ts`) that scores waitlist customers based on:
+    - Day/time preference matching (30 pts)
+    - Service area alignment with groomer's schedule (25 pts)
+    - Proximity to scheduled appointments using Haversine formula (20 pts)
+    - Customer lifetime value and spending tier (15 pts)
+    - Reliability score based on cancellation/no-show history (10 pts)
+    - Recency bonus for customers due for appointments (10 pts)
+  - Created `/api/waitlist/suggest` endpoint with filters:
+    - `date`: Target date (defaults to today)
+    - `limit`: Max suggestions (default 10)
+    - `minReliability`: Filter by tier (excellent/good/fair/poor)
+    - `valueTier`: Filter by value (high/medium/low)
+    - `maxDistance`: Maximum miles from route
+  - Returns rich customer data including:
+    - Total revenue, average appointment value, appointment count
+    - Last appointment date and days since
+    - Completion rate and reliability tier
+    - Distance to today's route
+    - Value tier (high/medium/low based on revenue quartiles)
 
 ### January 12, 2026 (Session 2)
 - **Analytics & Tracking Implementation:**
