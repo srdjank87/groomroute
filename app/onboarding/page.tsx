@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 
-type OnboardingStep = "address" | "hours" | "contact" | "preferences" | "workload" | "complete";
+type OnboardingStep = "address" | "hours" | "preferences" | "workload" | "complete";
 
 export default function OnboardingPage() {
   const { data: session, status } = useSession();
@@ -40,7 +40,7 @@ export default function OnboardingPage() {
     workingHoursEnd: "17:00",
   });
 
-  const [contactMethods, setContactMethods] = useState<string[]>(["call", "sms"]);
+  const [contactMethods] = useState<string[]>(["call", "sms"]);
   const [preferredMessaging, setPreferredMessaging] = useState<"SMS" | "WHATSAPP">("SMS");
   const [preferredMaps, setPreferredMaps] = useState<"GOOGLE" | "APPLE">("GOOGLE");
   const [largeDogLimit, setLargeDogLimit] = useState<string>("");
@@ -65,19 +65,6 @@ export default function OnboardingPage() {
   };
 
   const handleHoursSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentStep("contact");
-  };
-
-  const toggleContactMethod = (method: string) => {
-    setContactMethods((prev) =>
-      prev.includes(method)
-        ? prev.filter((m) => m !== method)
-        : [...prev, method]
-    );
-  };
-
-  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentStep("preferences");
   };
@@ -120,6 +107,16 @@ export default function OnboardingPage() {
     }
   };
 
+  // Step configuration for progress bar
+  const steps = [
+    { id: "address", label: "Address" },
+    { id: "hours", label: "Hours" },
+    { id: "preferences", label: "Apps" },
+    { id: "workload", label: "Workload" },
+  ];
+
+  const currentStepIndex = steps.findIndex(s => s.id === currentStep);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 py-12 px-4">
       <div className="max-w-2xl mx-auto">
@@ -132,25 +129,49 @@ export default function OnboardingPage() {
           </p>
         </div>
 
-        {/* Progress Steps */}
+        {/* Progress Steps - Custom styled for brand */}
         <div className="mb-8">
-          <ul className="steps steps-horizontal w-full">
-            <li className={`step ${currentStep !== "address" ? "step-primary" : ""} text-gray-700 font-medium`}>
-              Address
-            </li>
-            <li className={`step ${["hours", "contact", "preferences", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
-              Hours
-            </li>
-            <li className={`step ${["contact", "preferences", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
-              Contact
-            </li>
-            <li className={`step ${["preferences", "workload"].includes(currentStep) ? "step-primary" : ""} text-gray-700 font-medium`}>
-              Apps
-            </li>
-            <li className={`step ${currentStep === "workload" ? "step-primary" : ""} text-gray-700 font-medium`}>
-              Workload
-            </li>
-          </ul>
+          <div className="flex justify-between items-center relative">
+            {/* Progress line background */}
+            <div className="absolute top-5 left-0 right-0 h-1 bg-gray-300 rounded-full mx-8" />
+            {/* Progress line filled */}
+            <div
+              className="absolute top-5 left-0 h-1 bg-[#A5744A] rounded-full mx-8 transition-all duration-300"
+              style={{ width: `calc(${(currentStepIndex / (steps.length - 1)) * 100}% - 4rem)` }}
+            />
+
+            {steps.map((step, index) => {
+              const isCompleted = index < currentStepIndex;
+              const isCurrent = index === currentStepIndex;
+
+              return (
+                <div key={step.id} className="flex flex-col items-center z-10">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                      isCompleted
+                        ? "bg-[#A5744A] text-white"
+                        : isCurrent
+                          ? "bg-[#A5744A] text-white ring-4 ring-[#A5744A]/30"
+                          : "bg-gray-300 text-gray-600"
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      index + 1
+                    )}
+                  </div>
+                  <span className={`mt-2 text-sm font-medium ${
+                    isCompleted || isCurrent ? "text-[#A5744A]" : "text-gray-500"
+                  }`}>
+                    {step.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -234,60 +255,6 @@ export default function OnboardingPage() {
                   type="submit"
                   className="btn btn-primary flex-1 text-white bg-[#A5744A] hover:bg-[#8B6239] border-0"
                   disabled={isLoading}
-                >
-                  Continue
-                </button>
-              </div>
-            </form>
-          )}
-
-          {currentStep === "contact" && (
-            <form onSubmit={handleContactSubmit} className="space-y-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Contact Methods
-              </h2>
-              <p className="text-gray-600 mb-4">
-                How do you prefer to contact your customers? Select all that apply.
-              </p>
-
-              <div className="space-y-3">
-                {[
-                  { value: "call", label: "Phone Call", icon: "📞" },
-                  { value: "sms", label: "SMS / Text", icon: "💬" },
-                  { value: "whatsapp", label: "WhatsApp", icon: "💚" },
-                  { value: "signal", label: "Signal", icon: "🔵" },
-                  { value: "telegram", label: "Telegram", icon: "✈️" },
-                ].map((method) => (
-                  <button
-                    key={method.value}
-                    type="button"
-                    onClick={() => toggleContactMethod(method.value)}
-                    className={`w-full p-4 rounded-lg border-2 transition-colors text-left flex items-center gap-3 ${
-                      contactMethods.includes(method.value)
-                        ? "border-[#A5744A] bg-orange-50"
-                        : "border-gray-200 hover:border-gray-300 bg-white"
-                    }`}
-                  >
-                    <span className="text-2xl">{method.icon}</span>
-                    <span className="font-medium text-gray-900">{method.label}</span>
-                    {contactMethods.includes(method.value) && (
-                      <span className="ml-auto text-[#A5744A]">✓</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex gap-2 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep("hours")}
-                  className="btn btn-ghost flex-1 border-2 border-gray-300"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary flex-1 text-white bg-[#A5744A] hover:bg-[#8B6239] border-0"
                 >
                   Continue
                 </button>
@@ -407,7 +374,7 @@ export default function OnboardingPage() {
               <div className="flex gap-2 mt-6">
                 <button
                   type="button"
-                  onClick={() => setCurrentStep("contact")}
+                  onClick={() => setCurrentStep("hours")}
                   className="btn btn-ghost flex-1 border-2 border-gray-300"
                 >
                   Back
