@@ -44,6 +44,8 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `/dashboard/settings/areas` | Service area management (Area Days, Monthly Schedule) |
 | `/dashboard/settings/notifications` | Message templates and reminder settings |
 | `/dashboard/settings/billing` | Subscription and payment management |
+| `/dashboard/settings/team` | Team member management (Pro plan) |
+| `/invite/[token]` | Team invitation acceptance page |
 
 ---
 
@@ -159,6 +161,17 @@ This document provides a comprehensive inventory of all features, pages, routes,
 | `/api/admin/account/[id]` | GET | Get single account details |
 | `/api/admin/metrics` | GET | Get admin dashboard metrics |
 
+### Team Management (Pro Plan)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/team/invite` | POST | Send team invitation |
+| `/api/team/invitations` | GET | List all invitations |
+| `/api/team/invitations/[id]` | DELETE | Revoke pending invitation |
+| `/api/team/members` | GET | List team members with seat info |
+| `/api/team/members/[id]` | DELETE | Remove team member |
+| `/api/invite/[token]` | GET | Validate invitation token |
+| `/api/invite/[token]/accept` | POST | Accept invitation and create account |
+
 ---
 
 ## 3. COMPONENTS
@@ -244,6 +257,9 @@ This document provides a comprehensive inventory of all features, pages, routes,
 - **CustomerWaitlist** - Gap-fill appointment waitlist
 - **GapFillNotification** - Gap-fill notification tracking
 
+### Team Management
+- **TeamInvitation** - Team invitations with tokens, expiry, status (PENDING/ACCEPTED/EXPIRED/REVOKED)
+
 ---
 
 ## 6. KEY FEATURES
@@ -310,6 +326,31 @@ This document provides a comprehensive inventory of all features, pages, routes,
 ## 7. CHANGELOG
 
 ### January 13, 2026
+- **Team Management for Pro Plan:**
+  - Added team invitation system for Pro plan seat management
+  - New database model `TeamInvitation` with token-based invites, expiry dates, and status tracking
+  - Added seat tracking fields to Account model: `adminSeats`, `groomerSeats`
+  - Created `/dashboard/settings/team` page with:
+    - Seat usage overview (admin vs groomer seats)
+    - Team member list with role badges
+    - Invite modal with role selection
+    - Pending invitation management
+    - Groomer profile management (separate from user accounts)
+  - Created invitation flow:
+    - Admin sends invite via email address and role selection
+    - System generates unique token link (7-day expiry)
+    - Invitee visits `/invite/[token]` to accept and create account
+    - Seat availability checked before invite and acceptance
+  - New API endpoints:
+    - `POST /api/team/invite` - Send invitation
+    - `GET /api/team/invitations` - List invitations
+    - `DELETE /api/team/invitations/[id]` - Revoke invitation
+    - `GET /api/team/members` - List members with seat info
+    - `DELETE /api/team/members/[id]` - Remove member
+    - `GET /api/invite/[token]` - Validate token
+    - `POST /api/invite/[token]/accept` - Accept and create account
+  - Updated Stripe webhook to sync seat counts from subscription metadata
+
 - **Pro Plan Pricing Model Update:**
   - Changed Pro plan to base price + optional seats model:
     - **Base:** $149/mo ($124/mo yearly) - Includes 1 admin seat with full access

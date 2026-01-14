@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { BehaviorFlag } from "@prisma/client";
-import { canAddCustomer } from "@/lib/feature-helpers";
+import { canAddCustomer, requireAdminRole } from "@/lib/feature-helpers";
 import { geocodeAddress } from "@/lib/geocoding";
 
 const customerSchema = z.object({
@@ -31,6 +31,12 @@ export async function POST(req: NextRequest) {
 
     if (!session?.user?.accountId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Groomer role cannot create customers
+    const roleError = requireAdminRole(session.user.role);
+    if (roleError) {
+      return NextResponse.json({ error: roleError.error }, { status: roleError.status });
     }
 
     const accountId = session.user.accountId;

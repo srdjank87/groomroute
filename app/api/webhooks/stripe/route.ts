@@ -96,6 +96,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const trialEndsAt = new Date();
   trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
+  // Extract seat counts from subscription metadata (for Pro plan)
+  const additionalAdminSeats = parseInt(subscription.metadata?.additionalAdminSeats || "0", 10);
+  const groomerSeats = parseInt(subscription.metadata?.groomerSeats || "0", 10);
+  // Pro plan includes 1 admin seat in base price
+  const totalAdminSeats = subscription.metadata?.plan === "PRO" ? 1 + additionalAdminSeats : 1;
+
   // Get account details for tracking
   const account = await prisma.account.findUnique({
     where: { id: accountId },
@@ -114,6 +120,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       subscriptionStatus: "TRIAL",
       currentPeriodEnd: periodEnd,
       trialEndsAt: trialEndsAt,
+      // Update seat counts for Pro plan
+      adminSeats: totalAdminSeats,
+      groomerSeats: groomerSeats,
     },
   });
 
@@ -171,6 +180,12 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     ? new Date(currentPeriodEnd * 1000)
     : null;
 
+  // Extract seat counts from subscription metadata (for Pro plan)
+  const additionalAdminSeats = parseInt(subscription.metadata?.additionalAdminSeats || "0", 10);
+  const groomerSeats = parseInt(subscription.metadata?.groomerSeats || "0", 10);
+  // Pro plan includes 1 admin seat in base price
+  const totalAdminSeats = plan === "PRO" ? 1 + additionalAdminSeats : 1;
+
   await prisma.account.update({
     where: { id: accountId },
     data: {
@@ -179,6 +194,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       subscriptionPlan: plan,
       billingCycle: billing,
       currentPeriodEnd: periodEnd,
+      // Sync seat counts for Pro plan
+      adminSeats: totalAdminSeats,
+      groomerSeats: groomerSeats,
     },
   });
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -14,7 +13,13 @@ import {
   Phone,
   Mail,
   Crown,
-  Lock,
+  Shield,
+  Scissors,
+  UserPlus,
+  Copy,
+  Check,
+  X,
+  RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useFeature } from "@/hooks/useFeatures";
@@ -32,18 +37,59 @@ interface Groomer {
   largeDogDailyLimit: number | null;
 }
 
+interface TeamMember {
+  id: string;
+  name: string | null;
+  email: string;
+  role: "ADMIN" | "GROOMER" | "VIEWER";
+  createdAt: string;
+  isCurrentUser: boolean;
+}
+
+interface Invitation {
+  id: string;
+  email: string;
+  role: "ADMIN" | "GROOMER";
+  status: "PENDING" | "ACCEPTED" | "EXPIRED" | "REVOKED";
+  expiresAt: string;
+  createdAt: string;
+  isExpired: boolean;
+}
+
+interface SeatInfo {
+  total: number;
+  used: number;
+  pending: number;
+  available: number;
+}
+
 export default function TeamSettingsPage() {
-  const router = useRouter();
   const { hasAccess: hasMultiGroomer, isLoading: isCheckingAccess, plan } = useFeature("multi_groomer");
 
+  // Groomer profiles (van/service units)
   const [groomers, setGroomers] = useState<Groomer[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [isLoadingGroomers, setIsLoadingGroomers] = useState(true);
+  const [showGroomerModal, setShowGroomerModal] = useState(false);
   const [editingGroomer, setEditingGroomer] = useState<Groomer | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSavingGroomer, setIsSavingGroomer] = useState(false);
 
-  // Form state
-  const [formData, setFormData] = useState({
+  // Team members (user accounts)
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [adminSeats, setAdminSeats] = useState<SeatInfo>({ total: 1, used: 1, pending: 0, available: 0 });
+  const [groomerSeats, setGroomerSeats] = useState<SeatInfo>({ total: 0, used: 0, pending: 0, available: 0 });
+  const [isLoadingTeam, setIsLoadingTeam] = useState(true);
+
+  // Invite modal
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"ADMIN" | "GROOMER">("GROOMER");
+  const [isSendingInvite, setIsSendingInvite] = useState(false);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  // Groomer form state
+  const [groomerFormData, setGroomerFormData] = useState({
     name: "",
     email: "",
     phone: "",
@@ -56,7 +102,10 @@ export default function TeamSettingsPage() {
 
   useEffect(() => {
     fetchGroomers();
-  }, []);
+    if (hasMultiGroomer) {
+      fetchTeamData();
+    }
+  }, [hasMultiGroomer]);
 
   const fetchGroomers = async () => {
     try {
@@ -69,12 +118,38 @@ export default function TeamSettingsPage() {
       console.error("Failed to fetch groomers:", error);
       toast.error("Failed to load team members");
     } finally {
-      setIsLoading(false);
+      setIsLoadingGroomers(false);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
+  const fetchTeamData = async () => {
+    setIsLoadingTeam(true);
+    try {
+      const [membersRes, invitationsRes] = await Promise.all([
+        fetch("/api/team/members"),
+        fetch("/api/team/invitations"),
+      ]);
+
+      if (membersRes.ok) {
+        const data = await membersRes.json();
+        setMembers(data.members || []);
+        setAdminSeats(data.seats?.admin || { total: 1, used: 1, pending: 0, available: 0 });
+        setGroomerSeats(data.seats?.groomer || { total: 0, used: 0, pending: 0, available: 0 });
+      }
+
+      if (invitationsRes.ok) {
+        const data = await invitationsRes.json();
+        setInvitations(data.invitations || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch team data:", error);
+    } finally {
+      setIsLoadingTeam(false);
+    }
+  };
+
+  const resetGroomerForm = () => {
+    setGroomerFormData({
       name: "",
       email: "",
       phone: "",
@@ -86,49 +161,48 @@ export default function TeamSettingsPage() {
     });
   };
 
-  const openAddModal = () => {
-    resetForm();
-    setEditingGroomer(null);
-    setShowAddModal(true);
+  const openGroomerModal = (groomer?: Groomer) => {
+    if (groomer) {
+      setGroomerFormData({
+        name: groomer.name,
+        email: groomer.email || "",
+        phone: groomer.phone || "",
+        baseAddress: groomer.baseAddress,
+        workingHoursStart: groomer.workingHoursStart || "08:00",
+        workingHoursEnd: groomer.workingHoursEnd || "17:00",
+        defaultHasAssistant: groomer.defaultHasAssistant,
+        largeDogDailyLimit: groomer.largeDogDailyLimit?.toString() || "",
+      });
+      setEditingGroomer(groomer);
+    } else {
+      resetGroomerForm();
+      setEditingGroomer(null);
+    }
+    setShowGroomerModal(true);
   };
 
-  const openEditModal = (groomer: Groomer) => {
-    setFormData({
-      name: groomer.name,
-      email: groomer.email || "",
-      phone: groomer.phone || "",
-      baseAddress: groomer.baseAddress,
-      workingHoursStart: groomer.workingHoursStart || "08:00",
-      workingHoursEnd: groomer.workingHoursEnd || "17:00",
-      defaultHasAssistant: groomer.defaultHasAssistant,
-      largeDogDailyLimit: groomer.largeDogDailyLimit?.toString() || "",
-    });
-    setEditingGroomer(groomer);
-    setShowAddModal(true);
-  };
-
-  const handleSave = async () => {
-    if (!formData.name.trim()) {
+  const handleSaveGroomer = async () => {
+    if (!groomerFormData.name.trim()) {
       toast.error("Name is required");
       return;
     }
-    if (!formData.baseAddress.trim()) {
+    if (!groomerFormData.baseAddress.trim()) {
       toast.error("Base address is required");
       return;
     }
 
-    setIsSaving(true);
+    setIsSavingGroomer(true);
     try {
       const payload = {
-        name: formData.name.trim(),
-        email: formData.email.trim() || null,
-        phone: formData.phone.trim() || null,
-        baseAddress: formData.baseAddress.trim(),
-        workingHoursStart: formData.workingHoursStart,
-        workingHoursEnd: formData.workingHoursEnd,
-        defaultHasAssistant: formData.defaultHasAssistant,
-        largeDogDailyLimit: formData.largeDogDailyLimit
-          ? parseInt(formData.largeDogDailyLimit)
+        name: groomerFormData.name.trim(),
+        email: groomerFormData.email.trim() || null,
+        phone: groomerFormData.phone.trim() || null,
+        baseAddress: groomerFormData.baseAddress.trim(),
+        workingHoursStart: groomerFormData.workingHoursStart,
+        workingHoursEnd: groomerFormData.workingHoursEnd,
+        defaultHasAssistant: groomerFormData.defaultHasAssistant,
+        largeDogDailyLimit: groomerFormData.largeDogDailyLimit
+          ? parseInt(groomerFormData.largeDogDailyLimit)
           : null,
       };
 
@@ -147,31 +221,23 @@ export default function TeamSettingsPage() {
 
       if (response.ok) {
         toast.success(
-          editingGroomer ? "Team member updated" : "Team member added"
+          editingGroomer ? "Groomer updated" : "Groomer added"
         );
-        setShowAddModal(false);
+        setShowGroomerModal(false);
         fetchGroomers();
       } else {
-        if (data.upgradeRequired) {
-          toast.error(data.error);
-        } else {
-          toast.error(data.error || "Failed to save");
-        }
+        toast.error(data.error || "Failed to save");
       }
     } catch (error) {
       console.error("Save error:", error);
-      toast.error("Failed to save team member");
+      toast.error("Failed to save groomer");
     } finally {
-      setIsSaving(false);
+      setIsSavingGroomer(false);
     }
   };
 
-  const handleDeactivate = async (groomer: Groomer) => {
-    if (
-      !confirm(
-        `Deactivate ${groomer.name}? They will no longer appear in scheduling.`
-      )
-    ) {
+  const handleDeactivateGroomer = async (groomer: Groomer) => {
+    if (!confirm(`Deactivate ${groomer.name}? They will no longer appear in scheduling.`)) {
       return;
     }
 
@@ -181,7 +247,7 @@ export default function TeamSettingsPage() {
       });
 
       if (response.ok) {
-        toast.success("Team member deactivated");
+        toast.success("Groomer deactivated");
         fetchGroomers();
       } else {
         const data = await response.json();
@@ -189,11 +255,11 @@ export default function TeamSettingsPage() {
       }
     } catch (error) {
       console.error("Deactivate error:", error);
-      toast.error("Failed to deactivate team member");
+      toast.error("Failed to deactivate groomer");
     }
   };
 
-  const handleReactivate = async (groomer: Groomer) => {
+  const handleReactivateGroomer = async (groomer: Groomer) => {
     try {
       const response = await fetch(`/api/groomers/${groomer.id}`, {
         method: "PATCH",
@@ -202,7 +268,7 @@ export default function TeamSettingsPage() {
       });
 
       if (response.ok) {
-        toast.success("Team member reactivated");
+        toast.success("Groomer reactivated");
         fetchGroomers();
       } else {
         const data = await response.json();
@@ -210,12 +276,108 @@ export default function TeamSettingsPage() {
       }
     } catch (error) {
       console.error("Reactivate error:", error);
-      toast.error("Failed to reactivate team member");
+      toast.error("Failed to reactivate groomer");
     }
   };
 
+  const handleSendInvite = async () => {
+    if (!inviteEmail.trim() || !inviteEmail.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    setIsSendingInvite(true);
+    try {
+      const response = await fetch("/api/team/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: inviteEmail.trim(),
+          role: inviteRole,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Invitation sent!");
+        setInviteLink(data.inviteLink);
+        fetchTeamData();
+      } else {
+        toast.error(data.error || "Failed to send invitation");
+      }
+    } catch (error) {
+      console.error("Invite error:", error);
+      toast.error("Failed to send invitation");
+    } finally {
+      setIsSendingInvite(false);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (inviteLink) {
+      await navigator.clipboard.writeText(inviteLink);
+      setCopiedLink(true);
+      toast.success("Link copied to clipboard!");
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
+  const handleRevokeInvitation = async (id: string) => {
+    if (!confirm("Revoke this invitation?")) return;
+
+    try {
+      const response = await fetch(`/api/team/invitations/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Invitation revoked");
+        fetchTeamData();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to revoke invitation");
+      }
+    } catch (error) {
+      console.error("Revoke error:", error);
+      toast.error("Failed to revoke invitation");
+    }
+  };
+
+  const handleRemoveMember = async (member: TeamMember) => {
+    if (!confirm(`Remove ${member.name || member.email} from the team? They will lose access to the account.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/team/members/${member.id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Team member removed");
+        fetchTeamData();
+      } else {
+        toast.error(data.error || "Failed to remove member");
+      }
+    } catch (error) {
+      console.error("Remove error:", error);
+      toast.error("Failed to remove team member");
+    }
+  };
+
+  const closeInviteModal = () => {
+    setShowInviteModal(false);
+    setInviteEmail("");
+    setInviteRole("GROOMER");
+    setInviteLink(null);
+    setCopiedLink(false);
+  };
+
   // Show loading state
-  if (isCheckingAccess || isLoading) {
+  if (isCheckingAccess || isLoadingGroomers) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <span className="loading loading-spinner loading-lg text-primary"></span>
@@ -319,45 +481,208 @@ export default function TeamSettingsPage() {
   // Pro users - show full team management
   const activeGroomers = groomers.filter((g) => g.isActive);
   const inactiveGroomers = groomers.filter((g) => !g.isActive);
+  const pendingInvitations = invitations.filter((i) => i.status === "PENDING" && !i.isExpired);
 
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <Link
-            href="/dashboard/settings"
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Settings
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Team Management</h1>
-          <p className="text-gray-600 mt-1">
-            Manage groomers and vans in your business
-          </p>
-        </div>
-        <button
-          onClick={openAddModal}
-          className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 px-4"
+      <div className="mb-6">
+        <Link
+          href="/dashboard/settings"
+          className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
         >
-          <Plus className="h-5 w-5" />
-          Add Groomer
-        </button>
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Back to Settings
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-900">Team Management</h1>
+        <p className="text-gray-600 mt-1">
+          Manage team members and groomer profiles
+        </p>
       </div>
 
-      {/* Active Groomers */}
-      <div className="bg-white rounded-xl shadow mb-6">
-        <div className="p-4 border-b flex items-center gap-2">
-          <Users className="h-5 w-5 text-emerald-500" />
-          <h2 className="text-lg font-semibold text-gray-900">
-            Active Team Members ({activeGroomers.length})
-          </h2>
+      {/* Seat Overview */}
+      <div className="bg-white rounded-xl shadow p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">Seat Usage</h2>
+          <Link
+            href="/dashboard/settings/billing"
+            className="text-sm text-[#A5744A] hover:underline"
+          >
+            Manage subscription →
+          </Link>
         </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 bg-purple-50 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="h-5 w-5 text-purple-600" />
+              <span className="font-medium text-gray-900">Admin Seats</span>
+            </div>
+            <div className="text-2xl font-bold text-purple-600">
+              {adminSeats.used} / {adminSeats.total}
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              {adminSeats.pending > 0 && `${adminSeats.pending} pending • `}
+              {adminSeats.available} available
+            </p>
+          </div>
+          <div className="p-4 bg-emerald-50 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Scissors className="h-5 w-5 text-emerald-600" />
+              <span className="font-medium text-gray-900">Groomer Seats</span>
+            </div>
+            <div className="text-2xl font-bold text-emerald-600">
+              {groomerSeats.used} / {groomerSeats.total}
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              {groomerSeats.pending > 0 && `${groomerSeats.pending} pending • `}
+              {groomerSeats.available} available
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Team Members Section */}
+      <div className="bg-white rounded-xl shadow mb-6">
+        <div className="p-4 border-b flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-indigo-500" />
+            <h2 className="text-lg font-semibold text-gray-900">
+              Team Members ({members.length})
+            </h2>
+          </div>
+          <button
+            onClick={() => setShowInviteModal(true)}
+            className="btn btn-sm bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1"
+          >
+            <UserPlus className="h-4 w-4" />
+            Invite
+          </button>
+        </div>
+
+        {isLoadingTeam ? (
+          <div className="p-8 text-center">
+            <span className="loading loading-spinner loading-md"></span>
+          </div>
+        ) : (
+          <div className="divide-y">
+            {members.map((member) => (
+              <div
+                key={member.id}
+                className="p-4 flex items-center justify-between hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`p-2 rounded-lg ${
+                      member.role === "ADMIN" ? "bg-purple-100" : "bg-emerald-100"
+                    }`}
+                  >
+                    {member.role === "ADMIN" ? (
+                      <Shield className="h-4 w-4 text-purple-600" />
+                    ) : (
+                      <Scissors className="h-4 w-4 text-emerald-600" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-gray-900">
+                        {member.name || "Unnamed"}
+                      </p>
+                      {member.isCurrentUser && (
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                          You
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500">{member.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-xs px-2 py-1 rounded ${
+                      member.role === "ADMIN"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-emerald-100 text-emerald-700"
+                    }`}
+                  >
+                    {member.role}
+                  </span>
+                  {!member.isCurrentUser && (
+                    <button
+                      onClick={() => handleRemoveMember(member)}
+                      className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Pending Invitations */}
+        {pendingInvitations.length > 0 && (
+          <>
+            <div className="p-3 bg-gray-50 border-t border-b">
+              <p className="text-sm font-medium text-gray-600">
+                Pending Invitations ({pendingInvitations.length})
+              </p>
+            </div>
+            <div className="divide-y">
+              {pendingInvitations.map((inv) => (
+                <div
+                  key={inv.id}
+                  className="p-4 flex items-center justify-between bg-amber-50/50"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-amber-100 rounded-lg">
+                      <Mail className="h-4 w-4 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{inv.email}</p>
+                      <p className="text-sm text-gray-500">
+                        Invited as {inv.role} • Expires{" "}
+                        {new Date(inv.expiresAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleRevokeInvitation(inv.id)}
+                    className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Groomer Profiles Section */}
+      <div className="bg-white rounded-xl shadow mb-6">
+        <div className="p-4 border-b flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Scissors className="h-5 w-5 text-emerald-500" />
+            <h2 className="text-lg font-semibold text-gray-900">
+              Groomer Profiles ({activeGroomers.length})
+            </h2>
+          </div>
+          <button
+            onClick={() => openGroomerModal()}
+            className="btn btn-sm bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            Add Groomer
+          </button>
+        </div>
+        <p className="px-4 py-2 text-sm text-gray-500 bg-gray-50 border-b">
+          Groomer profiles represent vans/service units for scheduling and routing.
+        </p>
         <div className="divide-y">
           {activeGroomers.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              No active team members. Add your first groomer to get started.
+              No groomer profiles. Add your first groomer to get started.
             </div>
           ) : (
             activeGroomers.map((groomer) => (
@@ -378,34 +703,21 @@ export default function TeamSettingsPage() {
                         {groomer.workingHoursStart} - {groomer.workingHoursEnd}
                       </span>
                     )}
-                    {groomer.email && (
-                      <span className="flex items-center gap-1">
-                        <Mail className="h-3.5 w-3.5" />
-                        {groomer.email}
-                      </span>
-                    )}
-                    {groomer.phone && (
-                      <span className="flex items-center gap-1">
-                        <Phone className="h-3.5 w-3.5" />
-                        {groomer.phone}
-                      </span>
-                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <button
-                    onClick={() => openEditModal(groomer)}
+                    onClick={() => openGroomerModal(groomer)}
                     className="btn btn-ghost btn-sm gap-1"
                   >
                     <Edit2 className="h-4 w-4" />
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDeactivate(groomer)}
+                    onClick={() => handleDeactivateGroomer(groomer)}
                     className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50 gap-1"
                   >
                     <Trash2 className="h-4 w-4" />
-                    Deactivate
                   </button>
                 </div>
               </div>
@@ -420,7 +732,7 @@ export default function TeamSettingsPage() {
           <div className="p-4 border-b flex items-center gap-2">
             <Users className="h-5 w-5 text-gray-400" />
             <h2 className="text-lg font-semibold text-gray-500">
-              Inactive Team Members ({inactiveGroomers.length})
+              Inactive Groomer Profiles ({inactiveGroomers.length})
             </h2>
           </div>
           <div className="divide-y opacity-60">
@@ -434,9 +746,10 @@ export default function TeamSettingsPage() {
                   <p className="text-sm text-gray-500">{groomer.baseAddress}</p>
                 </div>
                 <button
-                  onClick={() => handleReactivate(groomer)}
+                  onClick={() => handleReactivateGroomer(groomer)}
                   className="btn btn-ghost btn-sm text-emerald-600 hover:bg-emerald-50"
                 >
+                  <RefreshCw className="h-4 w-4 mr-1" />
                   Reactivate
                 </button>
               </div>
@@ -445,16 +758,156 @@ export default function TeamSettingsPage() {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
-      {showAddModal && (
+      {/* Invite Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-4 border-b flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {inviteLink ? "Invitation Sent!" : "Invite Team Member"}
+              </h3>
+              <button
+                onClick={closeInviteModal}
+                className="btn btn-ghost btn-sm btn-circle"
+              >
+                ×
+              </button>
+            </div>
+
+            {inviteLink ? (
+              <div className="p-6">
+                <div className="text-center mb-4">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Check className="h-6 w-6 text-emerald-600" />
+                  </div>
+                  <p className="text-gray-600">
+                    Share this link with <strong>{inviteEmail}</strong> to join your team.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={inviteLink}
+                    readOnly
+                    className="input input-bordered flex-1 text-sm bg-gray-50"
+                  />
+                  <button
+                    onClick={handleCopyLink}
+                    className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
+                  >
+                    {copiedLink ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  This link expires in 7 days
+                </p>
+                <button
+                  onClick={closeInviteModal}
+                  className="btn btn-ghost w-full mt-4"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="teammate@example.com"
+                    className="input input-bordered w-full"
+                    disabled={isSendingInvite}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Role
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setInviteRole("GROOMER")}
+                      disabled={groomerSeats.available <= 0}
+                      className={`p-3 rounded-lg border-2 text-left transition-all ${
+                        inviteRole === "GROOMER"
+                          ? "border-emerald-500 bg-emerald-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      } ${groomerSeats.available <= 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <Scissors className="h-4 w-4 text-emerald-600" />
+                        <span className="font-medium">Groomer</span>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Schedule & route access
+                      </p>
+                      {groomerSeats.available <= 0 && (
+                        <p className="text-xs text-red-500 mt-1">No seats available</p>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInviteRole("ADMIN")}
+                      disabled={adminSeats.available <= 0}
+                      className={`p-3 rounded-lg border-2 text-left transition-all ${
+                        inviteRole === "ADMIN"
+                          ? "border-purple-500 bg-purple-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      } ${adminSeats.available <= 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <Shield className="h-4 w-4 text-purple-600" />
+                        <span className="font-medium">Admin</span>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Full access to all features
+                      </p>
+                      {adminSeats.available <= 0 && (
+                        <p className="text-xs text-red-500 mt-1">No seats available</p>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    onClick={handleSendInvite}
+                    disabled={isSendingInvite || (inviteRole === "ADMIN" ? adminSeats.available <= 0 : groomerSeats.available <= 0)}
+                    className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 w-full gap-2"
+                  >
+                    {isSendingInvite ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      <UserPlus className="h-4 w-4" />
+                    )}
+                    Send Invitation
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Groomer Modal */}
+      {showGroomerModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-4 border-b flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">
-                {editingGroomer ? "Edit Team Member" : "Add Team Member"}
+                {editingGroomer ? "Edit Groomer Profile" : "Add Groomer Profile"}
               </h3>
               <button
-                onClick={() => setShowAddModal(false)}
+                onClick={() => setShowGroomerModal(false)}
                 className="btn btn-ghost btn-sm btn-circle"
               >
                 ×
@@ -462,64 +915,60 @@ export default function TeamSettingsPage() {
             </div>
 
             <div className="p-4 space-y-4">
-              {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Name *
                 </label>
                 <input
                   type="text"
-                  value={formData.name}
+                  value={groomerFormData.name}
                   onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
+                    setGroomerFormData({ ...groomerFormData, name: e.target.value })
                   }
                   placeholder="John Smith"
                   className="input input-bordered w-full"
                 />
               </div>
 
-              {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email
                 </label>
                 <input
                   type="email"
-                  value={formData.email}
+                  value={groomerFormData.email}
                   onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
+                    setGroomerFormData({ ...groomerFormData, email: e.target.value })
                   }
                   placeholder="john@example.com"
                   className="input input-bordered w-full"
                 />
               </div>
 
-              {/* Phone */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Phone
                 </label>
                 <input
                   type="tel"
-                  value={formData.phone}
+                  value={groomerFormData.phone}
                   onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
+                    setGroomerFormData({ ...groomerFormData, phone: e.target.value })
                   }
                   placeholder="(555) 123-4567"
                   className="input input-bordered w-full"
                 />
               </div>
 
-              {/* Base Address */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Base Address (Start/End Location) *
                 </label>
                 <input
                   type="text"
-                  value={formData.baseAddress}
+                  value={groomerFormData.baseAddress}
                   onChange={(e) =>
-                    setFormData({ ...formData, baseAddress: e.target.value })
+                    setGroomerFormData({ ...groomerFormData, baseAddress: e.target.value })
                   }
                   placeholder="123 Main St, City, State ZIP"
                   className="input input-bordered w-full"
@@ -529,7 +978,6 @@ export default function TeamSettingsPage() {
                 </p>
               </div>
 
-              {/* Working Hours */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -537,10 +985,10 @@ export default function TeamSettingsPage() {
                   </label>
                   <input
                     type="time"
-                    value={formData.workingHoursStart}
+                    value={groomerFormData.workingHoursStart}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
+                      setGroomerFormData({
+                        ...groomerFormData,
                         workingHoursStart: e.target.value,
                       })
                     }
@@ -553,10 +1001,10 @@ export default function TeamSettingsPage() {
                   </label>
                   <input
                     type="time"
-                    value={formData.workingHoursEnd}
+                    value={groomerFormData.workingHoursEnd}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
+                      setGroomerFormData({
+                        ...groomerFormData,
                         workingHoursEnd: e.target.value,
                       })
                     }
@@ -565,17 +1013,16 @@ export default function TeamSettingsPage() {
                 </div>
               </div>
 
-              {/* Large Dog Limit */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Daily Large Dog Limit
                 </label>
                 <input
                   type="number"
-                  value={formData.largeDogDailyLimit}
+                  value={groomerFormData.largeDogDailyLimit}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
+                    setGroomerFormData({
+                      ...groomerFormData,
                       largeDogDailyLimit: e.target.value,
                     })
                   }
@@ -583,20 +1030,17 @@ export default function TeamSettingsPage() {
                   min="0"
                   className="input input-bordered w-full"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Leave empty for no limit
-                </p>
+                <p className="text-xs text-gray-500 mt-1">Leave empty for no limit</p>
               </div>
 
-              {/* Has Assistant */}
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
                   id="hasAssistant"
-                  checked={formData.defaultHasAssistant}
+                  checked={groomerFormData.defaultHasAssistant}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
+                    setGroomerFormData({
+                      ...groomerFormData,
                       defaultHasAssistant: e.target.checked,
                     })
                   }
@@ -610,19 +1054,19 @@ export default function TeamSettingsPage() {
 
             <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
               <button
-                onClick={() => setShowAddModal(false)}
+                onClick={() => setShowGroomerModal(false)}
                 className="btn btn-ghost"
               >
                 Cancel
               </button>
               <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 px-4"
+                onClick={handleSaveGroomer}
+                disabled={isSavingGroomer}
+                className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
               >
-                {isSaving ? (
+                {isSavingGroomer && (
                   <span className="loading loading-spinner loading-sm"></span>
-                ) : null}
+                )}
                 {editingGroomer ? "Save Changes" : "Add Groomer"}
               </button>
             </div>

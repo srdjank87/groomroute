@@ -17,32 +17,43 @@ import {
   BarChart3,
   UserPlus,
   Crown,
+  Scissors,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 const GroomRouteLogo = () => (
   <span>Groom<span style={{ color: '#A5744A' }}>Route</span></span>
 );
 
-// Navigation grouped by purpose
-const mainNavigation = [
+// Navigation items with role restrictions
+// adminOnly: true means only ADMIN role can see this item
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  adminOnly?: boolean;
+  proBadge?: boolean;
+  special?: boolean;
+}
+
+const allMainNavigation: NavItem[] = [
   { name: "Today", href: "/dashboard", icon: Sun },
   { name: "Routes", href: "/dashboard/routes", icon: RouteIcon },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3, adminOnly: true },
 ];
 
-const businessNavigation = [
-  { name: "Appointments", href: "/dashboard/appointments", icon: Calendar },
-  { name: "Clients", href: "/dashboard/customers", icon: Users },
-  { name: "Team Calendar", href: "/dashboard/team", icon: UserPlus, proBadge: true },
+const allBusinessNavigation: NavItem[] = [
+  { name: "Appointments", href: "/dashboard/appointments", icon: Calendar, adminOnly: true },
+  { name: "Clients", href: "/dashboard/customers", icon: Users, adminOnly: true },
+  { name: "Team Calendar", href: "/dashboard/team", icon: UserPlus, proBadge: true, adminOnly: true },
 ];
 
-const supportNavigation = [
+const allSupportNavigation: NavItem[] = [
   { name: "Calm Center", href: "/dashboard/calm", icon: Heart, special: true },
 ];
 
-const settingsNavigation = [
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+const allSettingsNavigation: NavItem[] = [
+  { name: "Settings", href: "/dashboard/settings", icon: Settings, adminOnly: true },
 ];
 
 export default function DashboardLayout({
@@ -56,6 +67,31 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [hasAssistant, setHasAssistant] = useState(false);
+
+  // Get user role from session
+  const userRole = session?.user?.role || "ADMIN";
+  const isGroomerRole = userRole === "GROOMER";
+
+  // Filter navigation based on role
+  const mainNavigation = useMemo(() =>
+    allMainNavigation.filter(item => !item.adminOnly || !isGroomerRole),
+    [isGroomerRole]
+  );
+
+  const businessNavigation = useMemo(() =>
+    allBusinessNavigation.filter(item => !item.adminOnly || !isGroomerRole),
+    [isGroomerRole]
+  );
+
+  const supportNavigation = useMemo(() =>
+    allSupportNavigation.filter(item => !item.adminOnly || !isGroomerRole),
+    [isGroomerRole]
+  );
+
+  const settingsNavigation = useMemo(() =>
+    allSettingsNavigation.filter(item => !item.adminOnly || !isGroomerRole),
+    [isGroomerRole]
+  );
 
   // Fetch assistant status for the day
   useEffect(() => {
@@ -104,6 +140,27 @@ export default function DashboardLayout({
       }
     }
   }, [status, session]);
+
+  // Redirect groomer users away from restricted pages
+  useEffect(() => {
+    if (status === "authenticated" && isGroomerRole) {
+      const restrictedPaths = [
+        "/dashboard/analytics",
+        "/dashboard/appointments",
+        "/dashboard/customers",
+        "/dashboard/team",
+        "/dashboard/settings",
+      ];
+
+      const isRestrictedPath = restrictedPaths.some(path =>
+        pathname === path || pathname.startsWith(path + "/")
+      );
+
+      if (isRestrictedPath) {
+        router.push("/dashboard");
+      }
+    }
+  }, [status, isGroomerRole, pathname, router]);
 
   if (status === "loading") {
     return (
@@ -168,6 +225,14 @@ export default function DashboardLayout({
               )}
             </div>
             <nav className="flex flex-1 flex-col p-4">
+              {/* Role Badge for Groomer users */}
+              {isGroomerRole && (
+                <div className="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
+                  <Scissors className="h-4 w-4 text-emerald-600" />
+                  <span className="text-sm font-medium text-emerald-700">Groomer View</span>
+                </div>
+              )}
+
               {/* Main Navigation - Your Day */}
               <div className="mb-4">
                 <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Your Day</p>
@@ -194,36 +259,38 @@ export default function DashboardLayout({
                 </ul>
               </div>
 
-              {/* Business Navigation */}
-              <div className="mb-4">
-                <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Business</p>
-                <ul role="list" className="space-y-1">
-                  {businessNavigation.map((item) => {
-                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-                    return (
-                      <li key={item.name}>
-                        <Link
-                          href={item.href}
-                          onClick={() => setSidebarOpen(false)}
-                          className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                            isActive
-                              ? "bg-[#A5744A] text-white"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
-                        >
-                          <item.icon className="h-5 w-5" />
-                          {item.name}
-                          {"proBadge" in item && item.proBadge && !isActive && (
-                            <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
-                              Pro
-                            </span>
-                          )}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+              {/* Business Navigation - only show if there are items */}
+              {businessNavigation.length > 0 && (
+                <div className="mb-4">
+                  <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Business</p>
+                  <ul role="list" className="space-y-1">
+                    {businessNavigation.map((item) => {
+                      const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                      return (
+                        <li key={item.name}>
+                          <Link
+                            href={item.href}
+                            onClick={() => setSidebarOpen(false)}
+                            className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                              isActive
+                                ? "bg-[#A5744A] text-white"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                          >
+                            <item.icon className="h-5 w-5" />
+                            {item.name}
+                            {item.proBadge && !isActive && (
+                              <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                                Pro
+                              </span>
+                            )}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
 
               {/* Support Navigation - Calm Center */}
               <div className="mb-4">
@@ -251,30 +318,32 @@ export default function DashboardLayout({
                 </ul>
               </div>
 
-              {/* Settings at bottom */}
-              <div className="mt-auto pt-4 border-t border-gray-200">
-                <ul role="list" className="space-y-1">
-                  {settingsNavigation.map((item) => {
-                    const isActive = pathname === item.href;
-                    return (
-                      <li key={item.name}>
-                        <Link
-                          href={item.href}
-                          onClick={() => setSidebarOpen(false)}
-                          className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                            isActive
-                              ? "bg-[#A5744A] text-white"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
-                        >
-                          <item.icon className="h-5 w-5" />
-                          {item.name}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+              {/* Settings at bottom - only show if there are items */}
+              {settingsNavigation.length > 0 && (
+                <div className="mt-auto pt-4 border-t border-gray-200">
+                  <ul role="list" className="space-y-1">
+                    {settingsNavigation.map((item) => {
+                      const isActive = pathname === item.href;
+                      return (
+                        <li key={item.name}>
+                          <Link
+                            href={item.href}
+                            onClick={() => setSidebarOpen(false)}
+                            className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                              isActive
+                                ? "bg-[#A5744A] text-white"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                          >
+                            <item.icon className="h-5 w-5" />
+                            {item.name}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
             </nav>
           </div>
         </div>
@@ -305,6 +374,14 @@ export default function DashboardLayout({
             </div>
           )}
           <nav className="flex flex-1 flex-col p-4">
+            {/* Role Badge for Groomer users */}
+            {isGroomerRole && (
+              <div className="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
+                <Scissors className="h-4 w-4 text-emerald-600" />
+                <span className="text-sm font-medium text-emerald-700">Groomer View</span>
+              </div>
+            )}
+
             {/* Main Navigation - Your Day */}
             <div className="mb-4">
               <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Your Day</p>
@@ -330,35 +407,37 @@ export default function DashboardLayout({
               </ul>
             </div>
 
-            {/* Business Navigation */}
-            <div className="mb-4">
-              <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Business</p>
-              <ul role="list" className="space-y-1">
-                {businessNavigation.map((item) => {
-                  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-                  return (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                          isActive
-                            ? "bg-[#A5744A] text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        <item.icon className="h-5 w-5" />
-                        {item.name}
-                        {"proBadge" in item && item.proBadge && !isActive && (
-                          <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
-                            Pro
-                          </span>
-                        )}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            {/* Business Navigation - only show if there are items */}
+            {businessNavigation.length > 0 && (
+              <div className="mb-4">
+                <p className="px-3 mb-2 text-xs font-medium text-gray-400 uppercase tracking-wider">Business</p>
+                <ul role="list" className="space-y-1">
+                  {businessNavigation.map((item) => {
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                            isActive
+                              ? "bg-[#A5744A] text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {item.name}
+                          {item.proBadge && !isActive && (
+                            <span className="ml-auto text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                              Pro
+                            </span>
+                          )}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
 
             {/* Support Navigation - Calm Center */}
             <div className="mb-4">
@@ -385,29 +464,31 @@ export default function DashboardLayout({
               </ul>
             </div>
 
-            {/* Settings at bottom */}
-            <div className="mt-auto pt-4 border-t border-gray-200">
-              <ul role="list" className="space-y-1">
-                {settingsNavigation.map((item) => {
-                  const isActive = pathname === item.href;
-                  return (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                          isActive
-                            ? "bg-[#A5744A] text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        <item.icon className="h-5 w-5" />
-                        {item.name}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            {/* Settings at bottom - only show if there are items */}
+            {settingsNavigation.length > 0 && (
+              <div className="mt-auto pt-4 border-t border-gray-200">
+                <ul role="list" className="space-y-1">
+                  {settingsNavigation.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          className={`flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                            isActive
+                              ? "bg-[#A5744A] text-white"
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {item.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
           </nav>
         </div>
       </div>
@@ -439,6 +520,11 @@ export default function DashboardLayout({
           {/* Desktop - right aligned user info */}
           <div className="hidden lg:flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end items-center">
             <div className="flex items-center gap-x-4">
+              {isGroomerRole && (
+                <span className="text-xs px-2 py-1 rounded bg-emerald-100 text-emerald-700 font-medium">
+                  Groomer
+                </span>
+              )}
               <span className="text-sm text-gray-700">
                 {session?.user?.name || session?.user?.email}
               </span>

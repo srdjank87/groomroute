@@ -153,6 +153,28 @@ export function getRoleBasedFeatures(user: { role: UserRole }): {
 }
 
 /**
+ * Check if user role is allowed to perform admin-only actions
+ * Use this in API routes to enforce role-based access
+ */
+export function isAdminRole(role: UserRole | undefined): boolean {
+  return role === "ADMIN";
+}
+
+/**
+ * Returns an error response if user is not an admin
+ * Use this in API routes for quick role enforcement
+ */
+export function requireAdminRole(role: UserRole | undefined): { error: string; status: 403 } | null {
+  if (role !== "ADMIN") {
+    return {
+      error: "This action requires admin access",
+      status: 403,
+    };
+  }
+  return null;
+}
+
+/**
  * Example usage in API routes or server components
  */
 

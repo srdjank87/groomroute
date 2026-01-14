@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { AppointmentType, AppointmentStatus } from "@prisma/client";
-import { canAddAppointment } from "@/lib/feature-helpers";
+import { canAddAppointment, requireAdminRole } from "@/lib/feature-helpers";
 
 const appointmentSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
@@ -22,6 +22,12 @@ export async function POST(req: NextRequest) {
 
     if (!session?.user?.accountId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Groomer role cannot create appointments
+    const roleError = requireAdminRole(session.user.role);
+    if (roleError) {
+      return NextResponse.json({ error: roleError.error }, { status: roleError.status });
     }
 
     const accountId = session.user.accountId;

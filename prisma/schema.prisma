@@ -55,6 +55,11 @@ model Account {
   serviceAreas     ServiceArea[]
   areaDayAssignments AreaDayAssignment[]
   areaDateOverrides  AreaDateOverride[]
+  teamInvitations    TeamInvitation[]
+
+  // Pro plan seat tracking (populated from Stripe subscription metadata)
+  adminSeats         Int              @default(1)  // Total admin seats purchased (min 1)
+  groomerSeats       Int              @default(0)  // Total groomer seats purchased
 
   @@index([createdAt])
   @@index([subscriptionStatus])
@@ -523,4 +528,37 @@ model AreaDateOverride {
   @@index([accountId])
   @@index([groomerId, date])
   @@index([areaId])
+}
+
+// Team Invitation for Pro plan seat management
+model TeamInvitation {
+  id          String           @id @default(cuid())
+  accountId   String
+  account     Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  email       String           // Email address to invite
+  role        UserRole         @default(GROOMER) // Role to assign when accepted
+  invitedBy   String           // User ID who sent the invitation
+
+  token       String           @unique // Unique token for invitation link
+  expiresAt   DateTime         // When the invitation expires
+  status      InvitationStatus @default(PENDING)
+
+  acceptedAt  DateTime?        // When the invitation was accepted
+  acceptedBy  String?          // User ID who accepted (after they create account)
+
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([accountId])
+  @@index([token])
+  @@index([email])
+  @@index([status])
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
 }
