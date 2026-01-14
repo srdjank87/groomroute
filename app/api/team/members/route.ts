@@ -32,6 +32,13 @@ export async function GET() {
             email: true,
             role: true,
             createdAt: true,
+            groomerId: true,
+            groomer: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
           orderBy: { createdAt: "asc" },
         },

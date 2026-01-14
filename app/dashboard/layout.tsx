@@ -18,6 +18,7 @@ import {
   UserPlus,
   Crown,
   Scissors,
+  Smartphone,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 
@@ -39,6 +40,7 @@ interface NavItem {
 const allMainNavigation: NavItem[] = [
   { name: "Today", href: "/dashboard", icon: Sun },
   { name: "Routes", href: "/dashboard/routes", icon: RouteIcon },
+  { name: "My Clients", href: "/dashboard/my-clients", icon: Users },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3, adminOnly: true },
 ];
 
@@ -54,6 +56,7 @@ const allSupportNavigation: NavItem[] = [
 
 const allSettingsNavigation: NavItem[] = [
   { name: "Settings", href: "/dashboard/settings", icon: Settings, adminOnly: true },
+  { name: "My Preferences", href: "/dashboard/preferences", icon: Smartphone },
 ];
 
 export default function DashboardLayout({

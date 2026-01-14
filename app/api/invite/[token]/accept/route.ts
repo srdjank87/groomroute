@@ -119,6 +119,21 @@ export async function POST(
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // For groomer role, try to find a matching groomer profile by email
+    let matchingGroomerId: string | null = null;
+    if (invitation.role === "GROOMER") {
+      const matchingGroomer = await prisma.groomer.findFirst({
+        where: {
+          accountId: invitation.accountId,
+          email: invitation.email,
+          isActive: true,
+        },
+      });
+      if (matchingGroomer) {
+        matchingGroomerId = matchingGroomer.id;
+      }
+    }
+
     // Create user and update invitation in a transaction
     const result = await prisma.$transaction(async (tx) => {
       // Create the user
@@ -129,6 +144,7 @@ export async function POST(
           password: hashedPassword,
           accountId: invitation.accountId,
           role: invitation.role,
+          groomerId: matchingGroomerId, // Auto-link to groomer profile if found
         },
       });
 

@@ -22,6 +22,9 @@ import {
   X,
   RefreshCw,
   Loader2,
+  Link2,
+  Unlink,
+  AlertCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useFeature } from "@/hooks/useFeatures";
@@ -46,6 +49,8 @@ interface TeamMember {
   role: "ADMIN" | "GROOMER" | "VIEWER";
   createdAt: string;
   isCurrentUser: boolean;
+  groomerId: string | null;
+  groomer: { id: string; name: string } | null;
 }
 
 interface Invitation {
@@ -437,6 +442,27 @@ export default function TeamSettingsPage() {
     setCopiedLink(false);
   };
 
+  const handleLinkGroomer = async (memberId: string, groomerId: string | null) => {
+    try {
+      const response = await fetch(`/api/team/members/${memberId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groomerId }),
+      });
+
+      if (response.ok) {
+        toast.success(groomerId ? "Linked to groomer profile" : "Unlinked from groomer profile");
+        fetchTeamData();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to update");
+      }
+    } catch (error) {
+      console.error("Link error:", error);
+      toast.error("Failed to link to groomer profile");
+    }
+  };
+
   // Show loading state
   if (isCheckingAccess || isLoadingGroomers) {
     return (
@@ -712,58 +738,107 @@ export default function TeamSettingsPage() {
           </div>
         ) : (
           <div className="divide-y">
-            {members.map((member) => (
-              <div
-                key={member.id}
-                className="p-4 flex items-center justify-between hover:bg-gray-50"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`p-2 rounded-lg ${
-                      member.role === "ADMIN" ? "bg-purple-100" : "bg-emerald-100"
-                    }`}
-                  >
-                    {member.role === "ADMIN" ? (
-                      <Shield className="h-4 w-4 text-purple-600" />
-                    ) : (
-                      <Scissors className="h-4 w-4 text-emerald-600" />
-                    )}
-                  </div>
-                  <div>
+            {members.map((member) => {
+              const activeGroomersList = groomers.filter((g) => g.isActive);
+              const needsLinking = member.role === "GROOMER" && !member.groomerId;
+
+              return (
+                <div
+                  key={member.id}
+                  className={`p-4 hover:bg-gray-50 ${needsLinking ? "bg-amber-50/50" : ""}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`p-2 rounded-lg ${
+                          member.role === "ADMIN" ? "bg-purple-100" : "bg-emerald-100"
+                        }`}
+                      >
+                        {member.role === "ADMIN" ? (
+                          <Shield className="h-4 w-4 text-purple-600" />
+                        ) : (
+                          <Scissors className="h-4 w-4 text-emerald-600" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-gray-900">
+                            {member.name || "Unnamed"}
+                          </p>
+                          {member.isCurrentUser && (
+                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                              You
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500">{member.email}</p>
+                      </div>
+                    </div>
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900">
-                        {member.name || "Unnamed"}
-                      </p>
-                      {member.isCurrentUser && (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                          You
-                        </span>
+                      <span
+                        className={`text-xs px-2 py-1 rounded ${
+                          member.role === "ADMIN"
+                            ? "bg-purple-100 text-purple-700"
+                            : "bg-emerald-100 text-emerald-700"
+                        }`}
+                      >
+                        {member.role}
+                      </span>
+                      {!member.isCurrentUser && (
+                        <button
+                          onClick={() => handleRemoveMember(member)}
+                          className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500">{member.email}</p>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-xs px-2 py-1 rounded ${
-                      member.role === "ADMIN"
-                        ? "bg-purple-100 text-purple-700"
-                        : "bg-emerald-100 text-emerald-700"
-                    }`}
-                  >
-                    {member.role}
-                  </span>
-                  {!member.isCurrentUser && (
-                    <button
-                      onClick={() => handleRemoveMember(member)}
-                      className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+
+                  {/* Groomer Profile Linking */}
+                  {member.role === "GROOMER" && (
+                    <div className="mt-3 ml-11">
+                      {member.groomer ? (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Link2 className="h-3.5 w-3.5 text-emerald-500" />
+                          <span className="text-gray-600">
+                            Linked to: <span className="font-medium text-gray-900">{member.groomer.name}</span>
+                          </span>
+                          <button
+                            onClick={() => handleLinkGroomer(member.id, null)}
+                            className="text-xs text-red-600 hover:underline flex items-center gap-1"
+                          >
+                            <Unlink className="h-3 w-3" />
+                            Unlink
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
+                          <span className="text-sm text-amber-700">Not linked to a groomer profile</span>
+                          {activeGroomersList.length > 0 && (
+                            <select
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  handleLinkGroomer(member.id, e.target.value);
+                                }
+                              }}
+                              className="select select-xs select-bordered ml-2"
+                              defaultValue=""
+                            >
+                              <option value="" disabled>Link to...</option>
+                              {activeGroomersList.map((g) => (
+                                <option key={g.id} value={g.id}>{g.name}</option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
@@ -936,16 +1011,16 @@ export default function TeamSettingsPage() {
                     type="text"
                     value={inviteLink}
                     readOnly
-                    className="input input-bordered flex-1 text-sm bg-gray-50"
+                    className="input input-bordered flex-1 text-sm bg-gray-50 min-w-0"
                   />
                   <button
                     onClick={handleCopyLink}
-                    className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
+                    className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 px-4 min-w-[52px] flex-shrink-0"
                   >
                     {copiedLink ? (
-                      <Check className="h-4 w-4" />
+                      <Check className="h-5 w-5" />
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <Copy className="h-5 w-5" />
                     )}
                   </button>
                 </div>
