@@ -216,9 +216,9 @@ export default function Home() {
               <div className="mt-auto px-4 pb-4">
                 <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
                   <Image
-                    src="/images/area_days.png"
+                    src="/images/area_days.svg"
                     alt="Area Days feature - assign neighborhoods to specific days"
-                    width={400}
+                    width={300}
                     height={300}
                     className="rounded-lg w-full shadow-md"
                   />
@@ -248,7 +248,7 @@ export default function Home() {
                   <Image
                     src="/images/workload_protection.png"
                     alt="Workload Protection feature - set daily limits and get warnings"
-                    width={400}
+                    width={300}
                     height={300}
                     className="rounded-lg w-full shadow-md"
                   />
@@ -277,7 +277,7 @@ export default function Home() {
                   <Image
                     src="/images/day_rescue.png"
                     alt="Day-of Rescue feature - one-tap solutions for problems"
-                    width={400}
+                    width={300}
                     height={300}
                     className="rounded-lg w-full shadow-md"
                   />
