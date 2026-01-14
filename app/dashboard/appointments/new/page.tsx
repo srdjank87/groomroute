@@ -121,6 +121,8 @@ function NewAppointmentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preSelectedCustomerId = searchParams.get("customerId");
+  const preSelectedDate = searchParams.get("suggestedDate");
+  const preSelectedTime = searchParams.get("suggestedTime");
 
   const [currentStep, setCurrentStep] = useState<Step>("customer");
   const [isLoading, setIsLoading] = useState(false);
@@ -130,8 +132,8 @@ function NewAppointmentContent() {
   const [appointmentData, setAppointmentData] = useState({
     customerId: preSelectedCustomerId || "",
     petId: "",
-    date: "",
-    time: "",
+    date: preSelectedDate || "",
+    time: preSelectedTime || "",
     serviceType: "FULL_GROOM",
     serviceMinutes: 90,
     price: 85,

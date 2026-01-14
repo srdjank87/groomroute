@@ -307,6 +307,10 @@ This document provides a comprehensive inventory of all features, pages, routes,
 ## 7. CHANGELOG
 
 ### January 13, 2026
+- **Bug Fix: Pre-fill suggested time on new appointment page**
+  - Fixed URL parameters `suggestedDate` and `suggestedTime` not being used to pre-fill the date/time fields
+  - When clicking "Book any client for this slot" from Routes page gap-fill section, time is now pre-filled
+
 - **Smart Watchlist Suggest Feature:**
   - Created intelligent suggestion engine (`lib/watchlist-suggest.ts`) that scores waitlist customers based on:
     - Day/time preference matching (30 pts)
