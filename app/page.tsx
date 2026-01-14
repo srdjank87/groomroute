@@ -216,7 +216,7 @@ export default function Home() {
               <div className="mt-auto px-4 pb-4">
                 <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
                   <Image
-                    src="/images/area_days.png"
+                    src="/images/area_days.jpg"
                     alt="Area Days feature - assign neighborhoods to specific days"
                     width={300}
                     height={400}
