@@ -307,6 +307,12 @@ This document provides a comprehensive inventory of all features, pages, routes,
 ## 7. CHANGELOG
 
 ### January 13, 2026
+- **Bug Fix: Analytics earnings showing inflated numbers**
+  - Revenue stats API was not filtering by groomerId
+  - For multi-groomer accounts, was showing combined revenue from ALL groomers
+  - Fixed `/api/dashboard/revenue-stats/route.ts` to filter appointments by current groomer's ID
+  - Affected metrics: weekly earnings, monthly earnings, lost revenue, completion rate
+
 - **Service Areas Settings - Mobile Optimization:**
   - **Your Areas cards:** Hide assigned days list on mobile to prevent text cutoff
   - **Default Weekly Pattern:** Changed from cramped 7-column grid to vertical list on mobile

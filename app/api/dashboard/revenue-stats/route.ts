@@ -13,6 +13,12 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
+    // Get the current user's groomer to filter by groomerId
+    const groomer = await prisma.groomer.findFirst({
+      where: { accountId, isActive: true },
+      select: { id: true },
+    });
+
     // Get date ranges
     const now = new Date();
     const today = new Date(now);
@@ -27,9 +33,11 @@ export async function GET(req: NextRequest) {
     thirtyDaysAgo.setDate(today.getDate() - 29); // Including today = 30 days
 
     // Fetch ONLY completed appointments for the last 30 days (actual revenue)
+    // Filter by groomerId to show only current groomer's appointments
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
+        ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: thirtyDaysAgo,
         },
@@ -51,6 +59,7 @@ export async function GET(req: NextRequest) {
     const lostAppointments = await prisma.appointment.findMany({
       where: {
         accountId,
+        ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: thirtyDaysAgo,
         },
@@ -131,6 +140,7 @@ export async function GET(req: NextRequest) {
     const allAppointments = await prisma.appointment.count({
       where: {
         accountId,
+        ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: thirtyDaysAgo,
         },
