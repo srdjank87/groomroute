@@ -19,10 +19,10 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get account to check subscription plan
+    // Get account to check subscription plan and business name
     const account = await prisma.account.findUnique({
       where: { id: accountId },
-      select: { subscriptionPlan: true, timezone: true },
+      select: { subscriptionPlan: true, timezone: true, name: true },
     });
 
     if (!account) {
@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const businessName = account.name || "Your Groomer";
     const timezone = account.timezone || "America/New_York";
 
     // Get today's date based on account's timezone
@@ -198,7 +199,7 @@ export async function GET(req: NextRequest) {
 
     // Generate reschedule message template
     const rescheduleMessage = (customerName: string, petName?: string) =>
-      `Hi ${customerName}! I'm having a packed day and want to give ${petName || "your pet"} my full attention. Would you be open to rescheduling to tomorrow or later this week? I'll prioritize you!`;
+      `Hi ${customerName}! This is ${businessName}. I'm having a packed day and want to give ${petName || "your pet"} my full attention. Would you be open to rescheduling to tomorrow or later this week? I'll prioritize you!`;
 
     return NextResponse.json({
       totalAppointments,

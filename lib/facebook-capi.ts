@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
-const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
-const FB_ACCESS_TOKEN = process.env.FB_CONVERSION_API_TOKEN;
+const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
+const FB_ACCESS_TOKEN = process.env.FACEBOOK_CAPI_ACCESS_TOKEN;
 const FB_TEST_EVENT_CODE = process.env.FB_TEST_EVENT_CODE; // For testing
 
 const FB_API_VERSION = "v18.0";

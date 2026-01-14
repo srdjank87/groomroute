@@ -153,10 +153,10 @@ export async function POST(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get account to check subscription plan
+    // Get account to check subscription plan and business name
     const account = await prisma.account.findUnique({
       where: { id: accountId },
-      select: { subscriptionPlan: true },
+      select: { subscriptionPlan: true, name: true },
     });
 
     if (!account) {
@@ -175,6 +175,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const businessName = account.name || "Your Groomer";
     const body = await req.json();
     const { appointmentId, notes } = body;
 
@@ -236,7 +237,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Generate a message for the customer
-    const message = `Hi ${appointment.customer.name}, we missed you at your ${appointment.pet?.name ? appointment.pet.name + "'s " : ""}grooming appointment today. Please reach out when you'd like to reschedule. We hope everything is okay!`;
+    const message = `Hi ${appointment.customer.name}, this is ${businessName}. We missed you at your ${appointment.pet?.name ? appointment.pet.name + "'s " : ""}grooming appointment today. Please reach out when you'd like to reschedule. We hope everything is okay!`;
 
     return NextResponse.json({
       success: true,

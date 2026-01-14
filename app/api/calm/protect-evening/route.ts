@@ -19,10 +19,10 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get account to check subscription plan
+    // Get account to check subscription plan and business name
     const account = await prisma.account.findUnique({
       where: { id: accountId },
-      select: { subscriptionPlan: true, timezone: true },
+      select: { subscriptionPlan: true, timezone: true, name: true },
     });
 
     if (!account) {
@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const businessName = account.name || "Your Groomer";
     const timezone = account.timezone || "America/New_York";
 
     // Get today's date based on account's timezone
@@ -185,7 +186,7 @@ export async function GET(req: NextRequest) {
 
     // Generate reschedule message
     const rescheduleMessage = (customerName: string, petName?: string) =>
-      `Hi ${customerName}! I'm trying to protect my evening hours for some personal time. Would you be open to rescheduling ${petName || "your pet"}'s appointment to earlier in the day or another day this week? I really appreciate your understanding!`;
+      `Hi ${customerName}! This is ${businessName}. I'm trying to protect my evening hours for some personal time. Would you be open to rescheduling ${petName || "your pet"}'s appointment to earlier in the day or another day this week? I really appreciate your understanding!`;
 
     return NextResponse.json({
       estimatedEndTime: estimatedEndTime?.toISOString(),

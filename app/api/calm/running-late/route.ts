@@ -19,10 +19,10 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get account to check subscription plan
+    // Get account to check subscription plan and business name
     const account = await prisma.account.findUnique({
       where: { id: accountId },
-      select: { subscriptionPlan: true, timezone: true },
+      select: { subscriptionPlan: true, timezone: true, name: true },
     });
 
     if (!account) {
@@ -145,10 +145,10 @@ export async function POST(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get account to check subscription plan
+    // Get account to check subscription plan and business name
     const account = await prisma.account.findUnique({
       where: { id: accountId },
-      select: { subscriptionPlan: true, timezone: true },
+      select: { subscriptionPlan: true, timezone: true, name: true },
     });
 
     if (!account) {
@@ -167,6 +167,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const businessName = account.name || "Your Groomer";
     const body = await req.json();
     const { delayMinutes } = body;
 
@@ -259,7 +260,7 @@ export async function POST(req: NextRequest) {
         newTime: newTime.toISOString(),
         formattedNewTime: format(newTime, "h:mm a"),
         // Pre-generate message for each customer
-        message: `Hi ${apt.customer.name}! I'm running about ${delayMinutes} minutes behind schedule today. Your new estimated arrival time for ${apt.pet?.name ? apt.pet.name + "'s" : "your"} appointment is around ${format(newTime, "h:mm a")}. I apologize for any inconvenience!`,
+        message: `Hi ${apt.customer.name}! This is ${businessName}. I'm running about ${delayMinutes} minutes behind schedule today. Your new estimated arrival time for ${apt.pet?.name ? apt.pet.name + "'s" : "your"} appointment is around ${format(newTime, "h:mm a")}. I apologize for any inconvenience!`,
       };
     });
 
