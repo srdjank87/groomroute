@@ -164,7 +164,7 @@ export default function ProfileSettingsPage() {
                 className="checkbox checkbox-primary"
               />
               <div>
-                <span className="font-medium text-gray-900">Default to working with a bather</span>
+                <span className="font-medium text-gray-900">Default to working with a assistant</span>
                 <p className="text-xs text-gray-500">
                   When enabled, new routes will assume you have an assistant
                 </p>
