@@ -69,19 +69,22 @@ export async function GET(req: NextRequest) {
       )
     );
 
-    // Get groomer settings
+    // Get groomer settings and ID for filtering
     const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
+      where: { accountId, isActive: true },
       select: {
+        id: true,
         contactMethods: true,
         workingHoursEnd: true,
       },
     });
 
     // Get today's active appointments
+    // Filter by groomerId to only show this groomer's appointments
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
+        ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: today,
           lt: tomorrow,

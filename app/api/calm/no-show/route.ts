@@ -69,16 +69,18 @@ export async function GET(req: NextRequest) {
       )
     );
 
-    // Get groomer for contact methods
+    // Get groomer for contact methods and ID for filtering
     const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-      select: { contactMethods: true },
+      where: { accountId, isActive: true },
+      select: { id: true, contactMethods: true },
     });
 
     // Get today's active appointments (not completed, cancelled, or already no-show)
+    // Filter by groomerId to only show this groomer's appointments
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
+        ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: today,
           lt: tomorrow,
