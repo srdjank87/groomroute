@@ -248,7 +248,7 @@ export default function CustomersPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input w-full h-12 pl-10 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
-            placeholder="Search by name, phone, or address..."
+            placeholder="Search clients or pets..."
           />
         </div>
       </div>

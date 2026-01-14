@@ -167,6 +167,7 @@ export async function GET(req: NextRequest) {
             { name: { contains: search, mode: "insensitive" } },
             { phone: { contains: search } },
             { address: { contains: search, mode: "insensitive" } },
+            { pets: { some: { name: { contains: search, mode: "insensitive" } } } },
           ],
         }),
       },
