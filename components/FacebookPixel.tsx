@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
+const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
 
 // PageView tracker component (needs to be wrapped in Suspense)
 function PageViewTracker() {
