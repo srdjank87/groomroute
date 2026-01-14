@@ -57,17 +57,14 @@ export async function GET(req: NextRequest) {
 
     switch (period) {
       case "week":
-        // Rolling 7 days (matching revenue-stats: last 7 days excluding today)
+        // Rolling 7 days excluding today (days -7 to -1)
         startDate = subDays(today, 7);
-        endDate = today;
+        endDate = today; // Exclusive upper bound
         break;
       case "month":
-        // Rolling 30 days (matching revenue-stats)
-        startDate = subDays(today, 29);
-        endDate = now;
-        break;
-      default: // 30days
-        startDate = subDays(now, 30);
+      default: // 30days - Rolling 30 days excluding today
+        startDate = subDays(today, 30);
+        endDate = today; // Exclusive upper bound
         break;
     }
 
@@ -86,13 +83,14 @@ export async function GET(req: NextRequest) {
     });
 
     // Get appointments for all groomers in the period
+    // Use lt: endDate for exclusive upper bound (excludes today)
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
         groomerId: { in: groomers.map((g) => g.id) },
         startAt: {
           gte: startDate,
-          lte: endDate,
+          lt: endDate, // Exclusive - excludes today
         },
       },
       select: {

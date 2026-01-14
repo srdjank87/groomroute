@@ -28,18 +28,20 @@ export async function GET(req: NextRequest) {
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 7); // Previous 7 days, not including today
 
-    // Last 30 days for monthly stats
+    // Last 30 days for monthly stats (excluding today = days -30 to -1)
     const thirtyDaysAgo = new Date(today);
-    thirtyDaysAgo.setDate(today.getDate() - 29); // Including today = 30 days
+    thirtyDaysAgo.setDate(today.getDate() - 30);
 
     // Fetch ONLY completed appointments for the last 30 days (actual revenue)
     // Filter by groomerId to show only current groomer's appointments
+    // Use lt: today to exclude today (matching weekly calculation and team analytics)
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
         ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: thirtyDaysAgo,
+          lt: today, // Exclude today to match weekly calculation
         },
         status: "COMPLETED",
       },
@@ -62,6 +64,7 @@ export async function GET(req: NextRequest) {
         ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: thirtyDaysAgo,
+          lt: today, // Exclude today to match weekly calculation
         },
         status: {
           in: ["CANCELLED", "NO_SHOW"],
@@ -143,6 +146,7 @@ export async function GET(req: NextRequest) {
         ...(groomer?.id ? { groomerId: groomer.id } : {}),
         startAt: {
           gte: thirtyDaysAgo,
+          lt: today, // Exclude today to match other calculations
         },
         status: {
           in: ["COMPLETED", "CANCELLED", "NO_SHOW"],
