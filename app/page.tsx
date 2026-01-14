@@ -922,6 +922,10 @@ export default function Home() {
           </div>
           <p className="max-w-md">The scheduling system built only for mobile groomers.</p>
           <p className="max-w-md">Finally, a calm day.</p>
+          <div className="flex gap-4 mt-4">
+            <Link href="/privacy" className="link link-hover text-sm">Privacy Policy</Link>
+            <Link href="/terms" className="link link-hover text-sm">Terms of Service</Link>
+          </div>
           <p className="text-sm opacity-70 mt-4">&copy; 2025 GroomRoute. All rights reserved.</p>
         </aside>
       </footer>
