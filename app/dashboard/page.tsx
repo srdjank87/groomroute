@@ -1107,28 +1107,65 @@ function DashboardContent() {
 
       {/* Day Status Card - Calm & Control messaging (hide at end of day to avoid repetition) */}
       {stats?.hasData && !isFullscreen && stats.dayStatus !== "completed" && (
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl shadow-sm border border-emerald-100 p-6 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-emerald-100 rounded-full">
-              <Smile className="h-7 w-7 text-emerald-600" />
+        (() => {
+          // Determine card styling based on workload level
+          const workloadLevel = stats.workload?.level || 'moderate';
+          const isHeavyOrOverloaded = workloadLevel === 'heavy' || workloadLevel === 'overloaded';
+          const isBusy = workloadLevel === 'busy';
+
+          // Color schemes based on workload
+          const cardColors = isHeavyOrOverloaded
+            ? 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200'
+            : isBusy
+            ? 'bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200'
+            : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-100';
+
+          const iconBg = isHeavyOrOverloaded
+            ? 'bg-orange-100'
+            : isBusy
+            ? 'bg-amber-100'
+            : 'bg-emerald-100';
+
+          const iconColor = isHeavyOrOverloaded
+            ? 'text-orange-600'
+            : isBusy
+            ? 'text-amber-600'
+            : 'text-emerald-600';
+
+          const messageColor = isHeavyOrOverloaded
+            ? 'text-orange-700'
+            : isBusy
+            ? 'text-amber-700'
+            : 'text-emerald-700';
+
+          // Use workload emoji or default
+          const emoji = stats.workload?.emoji || '😊';
+
+          return (
+            <div className={`${cardColors} rounded-xl shadow-sm border p-6 mb-6`}>
+              <div className="flex items-center gap-4">
+                <div className={`p-3 ${iconBg} rounded-full`}>
+                  <span className="text-2xl">{emoji}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {stats.dayStatus === "in-progress"
+                      ? "Day in Progress"
+                      : stats.workload?.label || "Your Day is Ready"}
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-0.5">
+                    {stats.totalAppointments} appointment{stats.totalAppointments !== 1 ? "s" : ""}
+                    {stats.completedCount > 0 && ` · ${stats.completedCount} completed`}
+                    {stats.confirmedCount > 0 && stats.completedCount === 0 && ` · All confirmed`}
+                  </p>
+                  <p className={`${messageColor} font-medium mt-2 text-sm italic`}>
+                    &ldquo;{stats.workload?.message || stats.calmMessage}&rdquo;
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {stats.dayStatus === "in-progress"
-                  ? "Day in Progress"
-                  : "Your Day is Ready"}
-              </h3>
-              <p className="text-gray-600 text-sm mt-0.5">
-                {stats.totalAppointments} appointment{stats.totalAppointments !== 1 ? "s" : ""}
-                {stats.completedCount > 0 && ` · ${stats.completedCount} completed`}
-                {stats.confirmedCount > 0 && stats.completedCount === 0 && ` · All confirmed`}
-              </p>
-              <p className="text-emerald-700 font-medium mt-2 text-sm italic">
-                &ldquo;{stats.calmMessage}&rdquo;
-              </p>
-            </div>
-          </div>
-        </div>
+          );
+        })()
       )}
 
       {/* Today's Progress - Simplified & Calm */}
