@@ -899,7 +899,7 @@ export default function TeamSettingsPage() {
           </button>
         </div>
         <p className="px-4 py-2 text-sm text-gray-500 bg-gray-50 border-b">
-          Groomer profiles represent vans/service units for scheduling and routing.
+          Each groomer profile has their own schedule, routes, and base location. Link team members to give them access to their schedule.
         </p>
         <div className="divide-y">
           {activeGroomers.length === 0 ? (
@@ -907,43 +907,66 @@ export default function TeamSettingsPage() {
               No groomer profiles. Add your first groomer to get started.
             </div>
           ) : (
-            activeGroomers.map((groomer) => (
-              <div
-                key={groomer.id}
-                className="p-4 flex items-center justify-between hover:bg-gray-50"
-              >
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">{groomer.name}</p>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {groomer.baseAddress}
-                    </span>
-                    {groomer.workingHoursStart && (
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" />
-                        {groomer.workingHoursStart} - {groomer.workingHoursEnd}
-                      </span>
+            activeGroomers.map((groomer) => {
+              // Find linked team member for this groomer
+              const linkedMember = members.find(m => m.groomerId === groomer.id);
+
+              return (
+                <div
+                  key={groomer.id}
+                  className="p-4 hover:bg-gray-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">{groomer.name}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3.5 w-3.5" />
+                          {groomer.baseAddress}
+                        </span>
+                        {groomer.workingHoursStart && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5" />
+                            {groomer.workingHoursStart} - {groomer.workingHoursEnd}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 ml-4">
+                      <button
+                        onClick={() => openGroomerModal(groomer)}
+                        className="btn btn-ghost btn-sm gap-1"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeactivateGroomer(groomer)}
+                        className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50 gap-1"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                  {/* Show linked user or prompt to link */}
+                  <div className="mt-2 ml-0">
+                    {linkedMember ? (
+                      <div className="flex items-center gap-2 text-sm text-emerald-600">
+                        <Link2 className="h-3.5 w-3.5" />
+                        <span>
+                          Linked to <span className="font-medium">{linkedMember.name || linkedMember.email}</span>
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <Unlink className="h-3.5 w-3.5" />
+                        <span>No team member linked</span>
+                      </div>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 ml-4">
-                  <button
-                    onClick={() => openGroomerModal(groomer)}
-                    className="btn btn-ghost btn-sm gap-1"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeactivateGroomer(groomer)}
-                    className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50 gap-1"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

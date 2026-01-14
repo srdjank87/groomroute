@@ -29,8 +29,7 @@ async function getAccounts(searchParams: { status?: string; search?: string }) {
     orderBy: { createdAt: "desc" },
     include: {
       users: {
-        take: 1,
-        select: { email: true, name: true },
+        select: { email: true, name: true, role: true },
       },
       _count: {
         select: {
@@ -131,6 +130,9 @@ export default async function AdminAccountsPage({
                     Plan
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Team
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -162,6 +164,23 @@ export default async function AdminAccountsPage({
                       <span className="text-sm text-gray-900">
                         {account.subscriptionPlan}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-xs space-y-1">
+                        {account.users.filter(u => u.role === "ADMIN").length > 0 && (
+                          <span className="inline-block px-2 py-0.5 rounded bg-purple-100 text-purple-700">
+                            {account.users.filter(u => u.role === "ADMIN").length} Admin
+                          </span>
+                        )}
+                        {account.users.filter(u => u.role === "GROOMER").length > 0 && (
+                          <span className="inline-block ml-1 px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+                            {account.users.filter(u => u.role === "GROOMER").length} Groomer
+                          </span>
+                        )}
+                        {account.users.length === 0 && (
+                          <span className="text-gray-400">No users</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span
