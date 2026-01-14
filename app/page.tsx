@@ -576,8 +576,7 @@ export default function Home() {
             <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
               Introducing the Calm Control Center
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The feature your competitors don&apos;t have. Because grooming software should care about <em>you</em>, not just your schedule.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">Because grooming software should care about <em>you</em>, not just your schedule.
             </p>
           </div>
 
@@ -770,10 +769,11 @@ export default function Home() {
               <div className="card-body">
                 <div className="badge badge-ghost mb-2">PRO</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '124' : '149'}</span>
-                  <span className="text-sm opacity-70">/month</span>
+                  <span className="text-4xl font-bold">${isYearly ? '41' : '49'}</span>
+                  <span className="text-sm opacity-70">/seat/month</span>
                 </div>
-                {isYearly && <div className="text-xs text-emerald-600 -mt-3 mb-4">Billed annually ($1,490/year)</div>}
+                {isYearly && <div className="text-xs text-emerald-600 -mt-3 mb-4">Billed annually ($490/seat/year)</div>}
+                <p className="text-xs text-gray-500 -mt-2 mb-4">Minimum 2 seats</p>
 
                 <p className="text-sm text-gray-600 mb-6">
                   For multi-van operations
@@ -782,7 +782,7 @@ export default function Home() {
                 <ul className="space-y-3 mb-6 flex-grow">
                   {[
                     "Everything in Growth, plus:",
-                    "Multiple groomers/vans",
+                    "Unlimited groomers/vans",
                     "Team calendar view",
                     "Per-groomer analytics",
                     "Phone support",

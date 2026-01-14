@@ -12,7 +12,15 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan, billing, resubscribe } = body as { plan: PlanType; billing: BillingType; resubscribe?: boolean };
+    const { plan, billing, resubscribe, quantity } = body as {
+      plan: PlanType;
+      billing: BillingType;
+      resubscribe?: boolean;
+      quantity?: number;
+    };
+
+    // For Pro plan, validate quantity (minimum 2 seats)
+    const seatCount = plan.toLowerCase() === "pro" ? Math.max(quantity || 2, 2) : 1;
 
     // Get Stripe plans at runtime to ensure env vars are loaded
     const STRIPE_PLANS = getStripePlans();
@@ -74,7 +82,7 @@ export async function POST(request: NextRequest) {
       line_items: [
         {
           price: priceId,
-          quantity: 1,
+          quantity: seatCount,
         },
       ],
       subscription_data: {
@@ -83,6 +91,7 @@ export async function POST(request: NextRequest) {
           accountId: account.id,
           plan: plan.toUpperCase(),
           billing: billing.toUpperCase(),
+          seatCount: seatCount.toString(),
         },
       },
       metadata: {

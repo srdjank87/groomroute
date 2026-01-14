@@ -6,6 +6,9 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
+const MIN_PRO_SEATS = 2;
+const MAX_PRO_SEATS = 20;
+
 function SignUpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -14,6 +17,10 @@ function SignUpForm() {
   // Get plan and billing from URL params (default to Growth Monthly)
   const selectedPlan = searchParams.get("plan") || "growth";
   const selectedBilling = searchParams.get("billing") || "monthly";
+
+  // Seat count for Pro plan (minimum 2)
+  const [seatCount, setSeatCount] = useState(MIN_PRO_SEATS);
+  const isProPlan = selectedPlan.toLowerCase() === "pro";
 
   // Show error message if redirected from dashboard
   useEffect(() => {
@@ -71,6 +78,7 @@ function SignUpForm() {
         body: JSON.stringify({
           plan: formData.plan.toLowerCase(),
           billing: formData.billing.toLowerCase(),
+          ...(isProPlan && { quantity: seatCount }),
         }),
       });
 
@@ -118,6 +126,41 @@ function SignUpForm() {
                 </Link>
               </div>
             </div>
+
+            {/* Seat Selector for Pro Plan */}
+            {isProPlan && (
+              <div className="mt-4 pt-4 border-t border-[#A5744A]/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Number of Seats</p>
+                    <p className="text-xs text-gray-500">One seat per groomer/van</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSeatCount(Math.max(MIN_PRO_SEATS, seatCount - 1))}
+                      disabled={seatCount <= MIN_PRO_SEATS || isLoading}
+                      className="btn btn-sm btn-circle btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:border-[#A5744A] disabled:opacity-40"
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center font-bold text-lg">{seatCount}</span>
+                    <button
+                      type="button"
+                      onClick={() => setSeatCount(Math.min(MAX_PRO_SEATS, seatCount + 1))}
+                      disabled={seatCount >= MAX_PRO_SEATS || isLoading}
+                      className="btn btn-sm btn-circle btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:border-[#A5744A] disabled:opacity-40"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-[#A5744A] mt-2 text-right">
+                  ${selectedBilling === "yearly" ? 41 * seatCount : 49 * seatCount}/month
+                  {selectedBilling === "yearly" && ` (billed $${490 * seatCount}/year)`}
+                </p>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

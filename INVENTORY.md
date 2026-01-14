@@ -300,13 +300,25 @@ This document provides a comprehensive inventory of all features, pages, routes,
 - **TRIAL** - 14-day free trial (all plans)
 - **STARTER** - $39/mo ($32/mo yearly) - 50 clients, route optimization, area scheduling
 - **GROWTH** - $79/mo ($66/mo yearly) - Unlimited clients, Calm Center, wellness features
-- **PRO** - $149/mo ($124/mo yearly) - Multi-groomer, team features
+- **PRO** - $49/seat/mo ($41/seat/mo yearly) - Per-seat pricing, minimum 2 seats, multi-groomer, team features
 
 ---
 
 ## 7. CHANGELOG
 
 ### January 13, 2026
+- **Pro Plan Per-Seat Pricing Model:**
+  - Changed Pro plan from flat rate ($149/mo) to per-seat pricing ($49/seat/mo, yearly: $41/seat/mo)
+  - Updated landing page pricing card to show "/seat/month" with "Minimum 2 seats" notice
+  - Added seat selector UI to signup page for Pro plan:
+    - +/- buttons to adjust seat count (min: 2, max: 20)
+    - Dynamic price calculation based on selected seats
+    - Shows both monthly rate and yearly total when applicable
+  - Updated checkout session API to:
+    - Accept `quantity` parameter for Pro plan signups
+    - Pass seat count to Stripe as subscription quantity
+    - Store seat count in subscription metadata
+
 - **Bug Fix: Sample data generator creating multiple groomers on non-Pro plans**
   - Generate-sample route was creating additional groomers regardless of subscription plan
   - This caused inflated analytics numbers since appointments were distributed across all groomers
