@@ -6,8 +6,13 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-const MIN_PRO_SEATS = 2;
-const MAX_PRO_SEATS = 20;
+const MAX_GROOMER_SEATS = 19; // Max 19 groomer seats + 1 admin = 20 total
+
+// Pricing constants
+const ADMIN_SEAT_PRICE_MONTHLY = 49;
+const ADMIN_SEAT_PRICE_YEARLY = 41;
+const GROOMER_SEAT_PRICE_MONTHLY = 29;
+const GROOMER_SEAT_PRICE_YEARLY = 25;
 
 function SignUpForm() {
   const router = useRouter();
@@ -18,9 +23,15 @@ function SignUpForm() {
   const selectedPlan = searchParams.get("plan") || "growth";
   const selectedBilling = searchParams.get("billing") || "monthly";
 
-  // Seat count for Pro plan (minimum 2)
-  const [seatCount, setSeatCount] = useState(MIN_PRO_SEATS);
+  // Seat counts for Pro plan (1 admin included, groomer seats start at 1)
+  const [groomerSeats, setGroomerSeats] = useState(1);
   const isProPlan = selectedPlan.toLowerCase() === "pro";
+
+  // Calculate total monthly cost
+  const adminPrice = selectedBilling === "yearly" ? ADMIN_SEAT_PRICE_YEARLY : ADMIN_SEAT_PRICE_MONTHLY;
+  const groomerPrice = selectedBilling === "yearly" ? GROOMER_SEAT_PRICE_YEARLY : GROOMER_SEAT_PRICE_MONTHLY;
+  const monthlyTotal = adminPrice + (groomerSeats * groomerPrice);
+  const yearlyTotal = (ADMIN_SEAT_PRICE_YEARLY * 12) + (groomerSeats * GROOMER_SEAT_PRICE_YEARLY * 12);
 
   // Show error message if redirected from dashboard
   useEffect(() => {
@@ -78,7 +89,10 @@ function SignUpForm() {
         body: JSON.stringify({
           plan: formData.plan.toLowerCase(),
           billing: formData.billing.toLowerCase(),
-          ...(isProPlan && { quantity: seatCount }),
+          ...(isProPlan && {
+            adminSeats: 1,
+            groomerSeats: groomerSeats,
+          }),
         }),
       });
 
@@ -129,36 +143,59 @@ function SignUpForm() {
 
             {/* Seat Selector for Pro Plan */}
             {isProPlan && (
-              <div className="mt-4 pt-4 border-t border-[#A5744A]/20">
+              <div className="mt-4 pt-4 border-t border-[#A5744A]/20 space-y-4">
+                {/* Admin Seat - Fixed at 1 */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Number of Seats</p>
-                    <p className="text-xs text-gray-500">One seat per groomer/van</p>
+                    <p className="text-sm font-medium text-gray-700">Admin Seat</p>
+                    <p className="text-xs text-gray-500">Full access (scheduling, analytics, billing)</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-bold text-lg">1</span>
+                    <span className="text-xs text-gray-500 ml-1">× ${adminPrice}</span>
+                  </div>
+                </div>
+
+                {/* Groomer Seats - Adjustable */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Groomer Seats</p>
+                    <p className="text-xs text-gray-500">Daily schedule, route & Calm Center only</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setSeatCount(Math.max(MIN_PRO_SEATS, seatCount - 1))}
-                      disabled={seatCount <= MIN_PRO_SEATS || isLoading}
+                      onClick={() => setGroomerSeats(Math.max(1, groomerSeats - 1))}
+                      disabled={groomerSeats <= 1 || isLoading}
                       className="btn btn-sm btn-circle btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:border-[#A5744A] disabled:opacity-40"
                     >
                       -
                     </button>
-                    <span className="w-8 text-center font-bold text-lg">{seatCount}</span>
+                    <span className="w-8 text-center font-bold text-lg">{groomerSeats}</span>
                     <button
                       type="button"
-                      onClick={() => setSeatCount(Math.min(MAX_PRO_SEATS, seatCount + 1))}
-                      disabled={seatCount >= MAX_PRO_SEATS || isLoading}
+                      onClick={() => setGroomerSeats(Math.min(MAX_GROOMER_SEATS, groomerSeats + 1))}
+                      disabled={groomerSeats >= MAX_GROOMER_SEATS || isLoading}
                       className="btn btn-sm btn-circle btn-outline border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:border-[#A5744A] disabled:opacity-40"
                     >
                       +
                     </button>
+                    <span className="text-xs text-gray-500 ml-1">× ${groomerPrice}</span>
                   </div>
                 </div>
-                <p className="text-xs text-[#A5744A] mt-2 text-right">
-                  ${selectedBilling === "yearly" ? 41 * seatCount : 49 * seatCount}/month
-                  {selectedBilling === "yearly" && ` (billed $${490 * seatCount}/year)`}
-                </p>
+
+                {/* Total */}
+                <div className="pt-3 border-t border-[#A5744A]/20">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Total ({1 + groomerSeats} seats)</span>
+                    <div className="text-right">
+                      <span className="text-lg font-bold text-[#A5744A]">${monthlyTotal}/month</span>
+                      {selectedBilling === "yearly" && (
+                        <p className="text-xs text-gray-500">(billed ${yearlyTotal}/year)</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

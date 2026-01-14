@@ -300,24 +300,42 @@ This document provides a comprehensive inventory of all features, pages, routes,
 - **TRIAL** - 14-day free trial (all plans)
 - **STARTER** - $39/mo ($32/mo yearly) - 50 clients, route optimization, area scheduling
 - **GROWTH** - $79/mo ($66/mo yearly) - Unlimited clients, Calm Center, wellness features
-- **PRO** - $49/seat/mo ($41/seat/mo yearly) - Per-seat pricing, minimum 2 seats, multi-groomer, team features
+- **PRO** - Two-tier seat pricing, multi-groomer, team features:
+  - **Admin Seat:** $49/mo ($41/mo yearly) - Full access to all features
+  - **Groomer Seat:** $29/mo ($25/mo yearly) - Daily schedule, route, Calm Center only
 
 ---
 
 ## 7. CHANGELOG
 
 ### January 13, 2026
-- **Pro Plan Per-Seat Pricing Model:**
-  - Changed Pro plan from flat rate ($149/mo) to per-seat pricing ($49/seat/mo, yearly: $41/seat/mo)
-  - Updated landing page pricing card to show "/seat/month" with "Minimum 2 seats" notice
-  - Added seat selector UI to signup page for Pro plan:
-    - +/- buttons to adjust seat count (min: 2, max: 20)
-    - Dynamic price calculation based on selected seats
-    - Shows both monthly rate and yearly total when applicable
-  - Updated checkout session API to:
-    - Accept `quantity` parameter for Pro plan signups
-    - Pass seat count to Stripe as subscription quantity
-    - Store seat count in subscription metadata
+- **Pro Plan Two-Tier Seat Pricing Model:**
+  - Implemented tiered seat pricing to better match grooming business needs:
+    - **Admin Seat:** $49/mo ($41/mo yearly) - Full access to scheduling, analytics, billing, team management
+    - **Groomer Seat:** $29/mo ($25/mo yearly) - Limited to daily schedule, route, and Calm Center
+  - Updated landing page Pro pricing card to show both seat types with descriptions
+  - Updated signup page seat selector:
+    - Admin seat count fixed at 1 (required)
+    - Groomer seat count adjustable (min: 1, max: 19)
+    - Dynamic total calculation showing breakdown
+  - Updated checkout session API (`app/api/create-checkout-session/route.ts`):
+    - Accepts `adminSeats` and `groomerSeats` parameters
+    - Creates separate Stripe line items for each seat type
+    - Stores seat counts in subscription metadata
+  - Updated Stripe configuration (`lib/stripe.ts`):
+    - Added separate price IDs for admin and groomer seats
+    - Environment variables: `STRIPE_PRO_ADMIN_MONTHLY_PRICE_ID`, `STRIPE_PRO_GROOMER_MONTHLY_PRICE_ID`, etc.
+  - Added role-based feature gating (`lib/feature-helpers.ts`):
+    - `canAccessByRole()` - Check if user's role allows feature access
+    - `canAccessAnalytics()`, `canManageCustomers()`, `canScheduleAppointments()`, etc.
+    - `getRoleBasedFeatures()` - Get full list of user's permissions
+  - Groomer seat users (UserRole.GROOMER) are restricted from:
+    - Analytics/revenue reports
+    - Team management
+    - Billing/subscription management
+    - Customer management (create, edit, delete)
+    - Appointment scheduling (create, edit appointments)
+    - Settings pages (except own profile)
 
 - **Bug Fix: Sample data generator creating multiple groomers on non-Pro plans**
   - Generate-sample route was creating additional groomers regardless of subscription plan

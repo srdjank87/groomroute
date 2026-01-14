@@ -12,15 +12,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan, billing, resubscribe, quantity } = body as {
+    const { plan, billing, resubscribe, adminSeats, groomerSeats } = body as {
       plan: PlanType;
       billing: BillingType;
       resubscribe?: boolean;
-      quantity?: number;
+      adminSeats?: number;
+      groomerSeats?: number;
     };
 
-    // For Pro plan, validate quantity (minimum 2 seats)
-    const seatCount = plan.toLowerCase() === "pro" ? Math.max(quantity || 2, 2) : 1;
+    // For Pro plan, validate seat counts (minimum 1 admin, 1 groomer)
+    const isPro = plan.toLowerCase() === "pro";
+    const adminSeatCount = isPro ? Math.max(adminSeats || 1, 1) : 0;
+    const groomerSeatCount = isPro ? Math.max(groomerSeats || 1, 1) : 0;
 
     // Get Stripe plans at runtime to ensure env vars are loaded
     const STRIPE_PLANS = getStripePlans();
@@ -62,13 +65,51 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const priceId = STRIPE_PLANS[plan][billing].priceId;
+    // Build line items based on plan type
+    type LineItem = { price: string; quantity: number };
+    const lineItems: LineItem[] = [];
 
-    if (!priceId) {
-      return NextResponse.json(
-        { error: "Stripe price ID not configured for this plan" },
-        { status: 500 }
-      );
+    if (isPro) {
+      // Pro plan: separate admin and groomer seat prices
+      const proPricing = STRIPE_PLANS.pro[billing];
+      const adminPriceId = proPricing.adminPriceId || proPricing.priceId;
+      const groomerPriceId = proPricing.groomerPriceId || proPricing.priceId;
+
+      if (!adminPriceId) {
+        return NextResponse.json(
+          { error: "Stripe admin price ID not configured for Pro plan" },
+          { status: 500 }
+        );
+      }
+
+      // Add admin seat(s)
+      lineItems.push({
+        price: adminPriceId,
+        quantity: adminSeatCount,
+      });
+
+      // Add groomer seat(s) if groomer price is configured
+      if (groomerPriceId && groomerSeatCount > 0) {
+        lineItems.push({
+          price: groomerPriceId,
+          quantity: groomerSeatCount,
+        });
+      }
+    } else {
+      // Non-Pro plans: single price
+      const priceId = STRIPE_PLANS[plan][billing].priceId;
+
+      if (!priceId) {
+        return NextResponse.json(
+          { error: "Stripe price ID not configured for this plan" },
+          { status: 500 }
+        );
+      }
+
+      lineItems.push({
+        price: priceId,
+        quantity: 1,
+      });
     }
 
     // Create Checkout Session
@@ -79,19 +120,17 @@ export async function POST(request: NextRequest) {
       customer: customerId,
       mode: "subscription",
       payment_method_types: ["card"],
-      line_items: [
-        {
-          price: priceId,
-          quantity: seatCount,
-        },
-      ],
+      line_items: lineItems,
       subscription_data: {
         ...(isResubscription ? {} : { trial_period_days: 14 }),
         metadata: {
           accountId: account.id,
           plan: plan.toUpperCase(),
           billing: billing.toUpperCase(),
-          seatCount: seatCount.toString(),
+          ...(isPro && {
+            adminSeats: adminSeatCount.toString(),
+            groomerSeats: groomerSeatCount.toString(),
+          }),
         },
       },
       metadata: {

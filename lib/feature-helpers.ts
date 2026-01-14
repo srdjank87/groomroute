@@ -5,8 +5,152 @@
  * based on the user's subscription plan.
  */
 
-import { SubscriptionPlan } from "@prisma/client";
+import { SubscriptionPlan, UserRole } from "@prisma/client";
 import { hasFeature, hasReachedLimit, getPlanLimits, getMessagingTier } from "./features";
+
+/**
+ * Role-Based Access Control for Pro Plan Seat Types
+ *
+ * Admin seats have full access to all features.
+ * Groomer seats have limited access to:
+ * - Their own daily schedule and route
+ * - Calm Control Center
+ * - Customer/pet details for their appointments
+ * - Basic appointment actions (complete, skip, running late)
+ *
+ * Groomer seats do NOT have access to:
+ * - Analytics/revenue reports
+ * - Team management
+ * - Billing/subscription management
+ * - Creating/editing other groomers
+ * - All customer management (create, edit, delete)
+ * - All appointment scheduling (create, edit appointments)
+ * - Settings pages (except their own profile)
+ */
+
+// Features restricted to Admin role only
+const ADMIN_ONLY_FEATURES = [
+  "analytics",
+  "revenue_reports",
+  "team_management",
+  "billing",
+  "subscription",
+  "groomer_management",
+  "customer_management",
+  "appointment_scheduling",
+  "service_areas",
+  "message_templates",
+  "settings",
+] as const;
+
+type AdminOnlyFeature = typeof ADMIN_ONLY_FEATURES[number];
+
+/**
+ * Check if user's role allows access to a specific feature
+ */
+export function canAccessByRole(
+  user: { role: UserRole },
+  feature: AdminOnlyFeature
+): boolean {
+  // Admin role has full access
+  if (user.role === "ADMIN") {
+    return true;
+  }
+
+  // Groomer role is restricted from admin-only features
+  if (user.role === "GROOMER") {
+    return !ADMIN_ONLY_FEATURES.includes(feature);
+  }
+
+  // Viewer role (if used) would have even more restrictions
+  return false;
+}
+
+/**
+ * Check if user can access analytics pages
+ */
+export function canAccessAnalytics(user: { role: UserRole }): boolean {
+  return canAccessByRole(user, "analytics");
+}
+
+/**
+ * Check if user can manage customers (create, edit, delete)
+ */
+export function canManageCustomers(user: { role: UserRole }): boolean {
+  return canAccessByRole(user, "customer_management");
+}
+
+/**
+ * Check if user can schedule appointments (create, edit, delete)
+ */
+export function canScheduleAppointments(user: { role: UserRole }): boolean {
+  return canAccessByRole(user, "appointment_scheduling");
+}
+
+/**
+ * Check if user can access billing/subscription management
+ */
+export function canAccessBilling(user: { role: UserRole }): boolean {
+  return canAccessByRole(user, "billing");
+}
+
+/**
+ * Check if user can manage groomers (add, edit, remove team members)
+ */
+export function canManageGroomers(user: { role: UserRole }): boolean {
+  return canAccessByRole(user, "groomer_management");
+}
+
+/**
+ * Check if user can access settings (except own profile)
+ */
+export function canAccessSettings(user: { role: UserRole }): boolean {
+  return canAccessByRole(user, "settings");
+}
+
+/**
+ * Get list of features available to a user based on their role
+ */
+export function getRoleBasedFeatures(user: { role: UserRole }): {
+  canViewOwnSchedule: boolean;
+  canViewOwnRoute: boolean;
+  canAccessCalmCenter: boolean;
+  canCompleteAppointments: boolean;
+  canSkipAppointments: boolean;
+  canSendRunningLate: boolean;
+  canViewCustomerDetails: boolean;
+  canCreateCustomers: boolean;
+  canEditCustomers: boolean;
+  canCreateAppointments: boolean;
+  canEditAppointments: boolean;
+  canViewAnalytics: boolean;
+  canManageTeam: boolean;
+  canAccessBilling: boolean;
+  canAccessSettings: boolean;
+} {
+  const isAdmin = user.role === "ADMIN";
+
+  return {
+    // Everyone can do these
+    canViewOwnSchedule: true,
+    canViewOwnRoute: true,
+    canAccessCalmCenter: true,
+    canCompleteAppointments: true,
+    canSkipAppointments: true,
+    canSendRunningLate: true,
+    canViewCustomerDetails: true,
+
+    // Admin only
+    canCreateCustomers: isAdmin,
+    canEditCustomers: isAdmin,
+    canCreateAppointments: isAdmin,
+    canEditAppointments: isAdmin,
+    canViewAnalytics: isAdmin,
+    canManageTeam: isAdmin,
+    canAccessBilling: isAdmin,
+    canAccessSettings: isAdmin,
+  };
+}
 
 /**
  * Example usage in API routes or server components
