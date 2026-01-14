@@ -2,7 +2,7 @@
 
 This document provides a comprehensive inventory of all features, pages, routes, components, and database models in the GroomRoute application.
 
-**Last Updated:** January 12, 2026
+**Last Updated:** January 13, 2026
 
 ---
 
@@ -307,6 +307,17 @@ This document provides a comprehensive inventory of all features, pages, routes,
 ## 7. CHANGELOG
 
 ### January 13, 2026
+- **Landing Page - Calm Center Emphasis:**
+  - Added dedicated "Calm Control Center" highlight section before pricing
+    - Eye-catching badge "Only on Growth & Pro Plans"
+    - Three feature cards: Workload Protection, Stress Detection, Quick Rescues
+    - Visual mockup showing day status indicator
+  - Updated pricing cards to emphasize Calm Center availability:
+    - Starter: Shows "Calm Control Center" as NOT included (grayed out with X icon)
+    - Growth: Calm Center highlighted with green background and Shield icon
+    - Pro: Shows Calm Center included with Shield icon
+  - Goal: Push users from Starter to Growth plan by highlighting exclusive features
+
 - **Pricing Update:**
   - Lowered pricing to be more accessible for solo groomers
   - Starter: $89/mo → $39/mo (yearly: $74 → $32/mo)

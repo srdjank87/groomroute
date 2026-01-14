@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Shield, Clock, Heart, CheckCircle2, XCircle, ChevronRight, Zap, MessageSquare } from "lucide-react";
+import { MapPin, Shield, Clock, Heart, CheckCircle2, XCircle, X, ChevronRight, Zap, MessageSquare } from "lucide-react";
 import { useState } from "react";
 
 const GroomRouteLogo = () => (
@@ -565,6 +565,94 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CALM CENTER HIGHLIGHT - Unique Feature */}
+      <section className="py-12 lg:py-16 px-6 bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50" id="calm-center">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <span className="text-lg">🧘</span>
+              Only on Growth & Pro Plans
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
+              Introducing the Calm Control Center
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              The feature your competitors don&apos;t have. Because grooming software should care about <em>you</em>, not just your schedule.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Left: Feature highlights */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-purple-500">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">🛡️</span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Workload Protection</h3>
+                    <p className="text-gray-600 text-sm">Set daily limits on large dogs, total appointments, and working hours. We&apos;ll warn you before you overbook yourself.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-indigo-500">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">😤</span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Stress Detection</h3>
+                    <p className="text-gray-600 text-sm">AI monitors your schedule for red flags: tight travel times, heavy days, back-to-back difficult dogs. Get alerts before burnout hits.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-blue-500">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">🌬️</span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Quick Rescues</h3>
+                    <p className="text-gray-600 text-sm">Running late? Difficult customer? One tap to send delay notifications, reschedule, or get breathing exercises to reset.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Visual mockup / testimonial */}
+            <div className="flex flex-col justify-center">
+              <div className="bg-white rounded-2xl shadow-2xl p-8 border-2 border-purple-200">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    Your day looks smooth
+                  </div>
+                </div>
+                <div className="space-y-4 mb-6">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-600">Today&apos;s Appointments</span>
+                    <span className="font-bold text-gray-900">5 dogs</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-600">Large Dogs</span>
+                    <span className="font-bold text-green-600">2 of 3 limit</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-600">Finish Time</span>
+                    <span className="font-bold text-green-600">5:30 PM ✓</span>
+                  </div>
+                </div>
+                <p className="text-center text-gray-500 text-sm italic">
+                  &quot;It&apos;s like having a friend who actually gets what this job does to your body.&quot;
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* PRICING */}
       <section className="py-12 lg:py-16 px-6 bg-white" id="pricing">
         <div className="max-w-6xl mx-auto">
@@ -620,6 +708,11 @@ export default function Home() {
                       <span className="text-sm">{item}</span>
                     </li>
                   ))}
+                  {/* Calm Center not included indicator */}
+                  <li className="flex gap-2 items-start opacity-50">
+                    <X className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-500">Calm Control Center</span>
+                  </li>
                 </ul>
 
                 <Link href={`/auth/signup?plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
@@ -650,7 +743,6 @@ export default function Home() {
                     "Workload protection limits",
                     "Working hours warnings",
                     "Running late notifications",
-                    "Calm Center (stress relief tools)",
                     "Pet behavior flags",
                     "Client cancellation history",
                     "Priority support",
@@ -660,6 +752,11 @@ export default function Home() {
                       <span className="text-sm">{item}</span>
                     </li>
                   ))}
+                  {/* Calm Center highlighted */}
+                  <li className="flex gap-2 items-start bg-emerald-50 -mx-2 px-2 py-1.5 rounded-lg border border-emerald-200">
+                    <Shield className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm font-medium text-emerald-800">Calm Control Center</span>
+                  </li>
                 </ul>
 
                 <Link href={`/auth/signup?plan=growth&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-block bg-[#A5744A] hover:bg-[#8B6239] text-white border-0">
@@ -696,6 +793,11 @@ export default function Home() {
                       <span className="text-sm">{item}</span>
                     </li>
                   ))}
+                  {/* Calm Center included */}
+                  <li className="flex gap-2 items-start">
+                    <Shield className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Calm Control Center</span>
+                  </li>
                 </ul>
 
                 <Link href={`/auth/signup?plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
