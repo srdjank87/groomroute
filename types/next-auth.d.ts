@@ -7,6 +7,7 @@ declare module "next-auth" {
       id: string;
       accountId: string;
       role: UserRole;
+      groomerId?: string | null;
       subscriptionStatus?: SubscriptionStatus;
       subscriptionPlan?: SubscriptionPlan;
       currentPeriodEnd?: string;
@@ -17,6 +18,7 @@ declare module "next-auth" {
   interface User {
     accountId: string;
     role: UserRole;
+    groomerId?: string | null;
   }
 }
 
@@ -24,6 +26,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     accountId: string;
     role: UserRole;
+    groomerId?: string | null;
     subscriptionStatus?: SubscriptionStatus;
     subscriptionPlan?: SubscriptionPlan;
     currentPeriodEnd?: string;

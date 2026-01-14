@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
 
 /**
  * GET /api/groomer/settings
@@ -14,10 +15,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const accountId = session.user.accountId;
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
 
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
+    if (!groomerId) {
+      return NextResponse.json(
+        { error: "No groomer found" },
+        { status: 404 }
+      );
+    }
+
+    const groomer = await prisma.groomer.findUnique({
+      where: { id: groomerId },
       select: {
         id: true,
         name: true,
@@ -59,14 +68,12 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const accountId = session.user.accountId;
     const body = await req.json();
 
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-    });
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
 
-    if (!groomer) {
+    if (!groomerId) {
       return NextResponse.json(
         { error: "No groomer found" },
         { status: 404 }
@@ -139,7 +146,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const updatedGroomer = await prisma.groomer.update({
-      where: { id: groomer.id },
+      where: { id: groomerId },
       data: updateData,
       select: {
         id: true,

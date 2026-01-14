@@ -1,4 +1,5 @@
 import { PostHog } from "posthog-node";
+import { prisma } from "@/lib/prisma";
 
 // Server-side PostHog client
 // Use this in API routes and server components
@@ -90,6 +91,44 @@ export async function trackFirstAction(
   });
 }
 
+// Helper to check and track first action if not already tracked
+// Returns true if this was the first action
+export async function checkAndTrackFirstAction(
+  accountId: string,
+  actionType: "appointment_created" | "customer_created" | "route_optimized"
+): Promise<boolean> {
+  // Check if first action already tracked
+  const account = await prisma.account.findUnique({
+    where: { id: accountId },
+    select: { firstActionAt: true, createdAt: true },
+  });
+
+  if (!account || account.firstActionAt) {
+    // Already tracked or account not found
+    return false;
+  }
+
+  // Calculate minutes since signup
+  const now = new Date();
+  const minutesSinceSignup = Math.round(
+    (now.getTime() - account.createdAt.getTime()) / (1000 * 60)
+  );
+
+  // Update account with first action info
+  await prisma.account.update({
+    where: { id: accountId },
+    data: {
+      firstActionAt: now,
+      firstActionType: actionType,
+    },
+  });
+
+  // Track in PostHog
+  await trackFirstAction(accountId, actionType, minutesSinceSignup);
+
+  return true;
+}
+
 // Track route optimization
 export async function trackRouteOptimized(
   accountId: string,
@@ -156,6 +195,23 @@ export async function trackTrialConverted(
     days_in_trial: properties.daysInTrial,
     total_routes_optimized: properties.totalRoutesOptimized || 0,
     days_active: properties.daysActive || 0,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+// Track day viewed (dashboard load)
+export async function trackDayViewed(
+  accountId: string,
+  properties: {
+    appointmentsToday: number;
+    hasRoute: boolean;
+    dayOfWeek: number;
+  }
+) {
+  await trackServerEvent(accountId, "day_viewed", {
+    appointments_today: properties.appointmentsToday,
+    has_route: properties.hasRoute,
+    day_of_week: properties.dayOfWeek,
     timestamp: new Date().toISOString(),
   });
 }

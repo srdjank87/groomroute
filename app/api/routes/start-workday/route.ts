@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { toZonedTime } from "date-fns-tz";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
 
 /**
  * POST /api/routes/start-workday
@@ -17,10 +18,21 @@ export async function POST(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get groomer for this account with account timezone
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-      include: {
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
+
+    if (!groomerId) {
+      return NextResponse.json(
+        { error: "No groomer found" },
+        { status: 400 }
+      );
+    }
+
+    // Get groomer details including account timezone and defaults
+    const groomer = await prisma.groomer.findUnique({
+      where: { id: groomerId },
+      select: {
+        defaultHasAssistant: true,
         account: {
           select: {
             timezone: true,
@@ -29,15 +41,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (!groomer) {
-      return NextResponse.json(
-        { error: "No groomer found" },
-        { status: 400 }
-      );
-    }
-
     // Get the account's timezone (default to America/New_York)
-    const timezone = groomer.account?.timezone || "America/New_York";
+    const timezone = groomer?.account?.timezone || "America/New_York";
 
     // Get today's date based on ACCOUNT'S LOCAL timezone
     // Routes use the same date convention as appointments
@@ -49,7 +54,7 @@ export async function POST(req: NextRequest) {
     const route = await prisma.route.upsert({
       where: {
         groomerId_routeDate: {
-          groomerId: groomer.id,
+          groomerId,
           routeDate: today,
         },
       },
@@ -58,10 +63,10 @@ export async function POST(req: NextRequest) {
       },
       create: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         routeDate: today,
         workdayStarted: true,
-        hasAssistant: groomer.defaultHasAssistant,
+        hasAssistant: groomer?.defaultHasAssistant ?? false,
         status: "DRAFT",
         provider: "LOCAL",
       },

@@ -18,10 +18,14 @@ model User {
   accountId String
   account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   role      UserRole @default(ADMIN)
+  // Link to groomer profile (for users with GROOMER role or solo groomers)
+  groomerId String?
+  groomer   Groomer? @relation(fields: [groomerId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([accountId])
+  @@index([groomerId])
 }
 
 enum UserRole {
@@ -44,6 +48,8 @@ model Account {
   stripeSubscriptionId String?          @unique
   currentPeriodEnd     DateTime?
   lastActiveAt         DateTime?        // Track last user activity for analytics
+  firstActionAt        DateTime?        // Track when first meaningful action occurred (for analytics)
+  firstActionType      String?          // Type of first action: appointment_created, customer_created, route_optimized
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   users           User[]
@@ -117,6 +123,7 @@ model Groomer {
   breaks              Break[]
   areaDayAssignments  AreaDayAssignment[]
   areaDateOverrides   AreaDateOverride[]
+  users               User[]        // Users linked to this groomer profile
 
   @@index([accountId])
   @@index([accountId, isActive])

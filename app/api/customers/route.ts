@@ -5,6 +5,7 @@ import { z } from "zod";
 import { BehaviorFlag } from "@prisma/client";
 import { canAddCustomer, requireAdminRole } from "@/lib/feature-helpers";
 import { geocodeAddress } from "@/lib/geocoding";
+import { trackCustomerCreated, checkAndTrackFirstAction } from "@/lib/posthog-server";
 
 const customerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -113,6 +114,15 @@ export async function POST(req: NextRequest) {
 
       return { customer, pet };
     });
+
+    // Track customer creation in PostHog
+    await trackCustomerCreated(accountId, {
+      hasArea: !!validatedData.serviceAreaId,
+      hasPets: !!result.pet,
+    });
+
+    // Check if this is the first meaningful action
+    await checkAndTrackFirstAction(accountId, "customer_created");
 
     return NextResponse.json({
       success: true,

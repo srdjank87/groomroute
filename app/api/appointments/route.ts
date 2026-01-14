@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { AppointmentType, AppointmentStatus } from "@prisma/client";
 import { canAddAppointment, requireAdminRole } from "@/lib/feature-helpers";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
+import { trackAppointmentCreated, checkAndTrackFirstAction } from "@/lib/posthog-server";
 
 const appointmentSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
@@ -73,12 +75,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get the groomer for this account
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-    });
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
 
-    if (!groomer) {
+    if (!groomerId) {
       return NextResponse.json(
         { error: "No groomer found. Please complete onboarding first." },
         { status: 400 }
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
     // Get all appointments for this groomer on the same day
     const existingAppointments = await prisma.appointment.findMany({
       where: {
-        groomerId: groomer.id,
+        groomerId,
         status: {
           notIn: ["CANCELLED", "NO_SHOW"],
         },
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
       data: {
         customerId: validatedData.customerId,
         petId: validatedData.petId || null,
-        groomerId: groomer.id,
+        groomerId,
         startAt,
         appointmentType: validatedData.serviceType as AppointmentType,
         serviceMinutes: validatedData.serviceMinutes,
@@ -178,6 +178,16 @@ export async function POST(req: NextRequest) {
         pet: true,
       },
     });
+
+    // Track appointment creation in PostHog
+    await trackAppointmentCreated(accountId, {
+      appointmentType: validatedData.serviceType,
+      serviceMinutes: validatedData.serviceMinutes,
+      hasCustomer: true,
+    });
+
+    // Check if this is the first meaningful action
+    await checkAndTrackFirstAction(accountId, "appointment_created");
 
     return NextResponse.json({
       success: true,
@@ -214,12 +224,10 @@ export async function GET(req: NextRequest) {
     const customerId = searchParams.get("customerId");
     const all = searchParams.get("all") === "true";
 
-    // Get groomer for this account
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-    });
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
 
-    if (!groomer) {
+    if (!groomerId) {
       return NextResponse.json(
         { error: "No groomer found" },
         { status: 400 }
@@ -228,7 +236,7 @@ export async function GET(req: NextRequest) {
 
     // Build where clause
     const where: any = {
-      groomerId: groomer.id,
+      groomerId,
     };
 
     // If 'all' is not set, apply date/customer filters

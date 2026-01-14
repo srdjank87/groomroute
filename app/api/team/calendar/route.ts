@@ -53,24 +53,22 @@ export async function GET(req: NextRequest) {
 
     if (weekStr) {
       // Week view - start from the provided date
+      // Use UTC to match how appointments are stored (timestamps represent local times as UTC)
       viewMode = "week";
-      startDate = new Date(weekStr);
-      startDate.setHours(0, 0, 0, 0);
+      startDate = new Date(weekStr + "T00:00:00.000Z");
       endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + 6);
-      endDate.setHours(23, 59, 59, 999);
+      endDate.setUTCDate(endDate.getUTCDate() + 6);
+      endDate.setUTCHours(23, 59, 59, 999);
     } else if (dateStr) {
-      // Day view
-      startDate = new Date(dateStr);
-      startDate.setHours(0, 0, 0, 0);
-      endDate = new Date(dateStr);
-      endDate.setHours(23, 59, 59, 999);
+      // Day view - use UTC to match how appointments are stored
+      startDate = new Date(dateStr + "T00:00:00.000Z");
+      endDate = new Date(dateStr + "T23:59:59.999Z");
     } else {
-      // Default to today
-      startDate = new Date();
-      startDate.setHours(0, 0, 0, 0);
-      endDate = new Date();
-      endDate.setHours(23, 59, 59, 999);
+      // Default to today in UTC
+      const now = new Date();
+      const todayStr = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-${String(now.getUTCDate()).padStart(2, '0')}`;
+      startDate = new Date(todayStr + "T00:00:00.000Z");
+      endDate = new Date(todayStr + "T23:59:59.999Z");
     }
 
     // Get all active groomers for this account

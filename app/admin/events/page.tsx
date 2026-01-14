@@ -60,12 +60,12 @@ export default async function AdminEventsPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-gray-600">
               <div className="p-3 bg-gray-50 rounded-lg">account_created</div>
               <div className="p-3 bg-gray-50 rounded-lg">first_action_completed</div>
-              <div className="p-3 bg-gray-50 rounded-lg">route_optimized</div>
-              <div className="p-3 bg-gray-50 rounded-lg">day_viewed</div>
               <div className="p-3 bg-gray-50 rounded-lg">appointment_created</div>
               <div className="p-3 bg-gray-50 rounded-lg">customer_created</div>
+              <div className="p-3 bg-gray-50 rounded-lg">route_optimized</div>
+              <div className="p-3 bg-gray-50 rounded-lg">day_viewed</div>
+              <div className="p-3 bg-gray-50 rounded-lg">trial_started</div>
               <div className="p-3 bg-gray-50 rounded-lg">trial_converted</div>
-              <div className="p-3 bg-gray-50 rounded-lg">trial_expired</div>
               <div className="p-3 bg-gray-50 rounded-lg">$pageview (auto)</div>
             </div>
           </div>

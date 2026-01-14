@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { toZonedTime } from "date-fns-tz";
 import { assessWorkload, WorkloadAssessment } from "@/lib/workload-assessment";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
+import { trackDayViewed } from "@/lib/posthog-server";
 
 const LARGE_DOG_THRESHOLD = 50; // lbs
 
@@ -28,25 +30,27 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
+    // Get the current user's groomer ID (respects user-groomer link)
+    const groomerId = await getUserGroomerId();
+
     // Get groomer profile for contact methods, assistant preference, and account timezone
-    const groomer = await prisma.groomer.findFirst({
-      where: {
-        accountId,
-        isActive: true,
-      },
-      select: {
-        id: true,
-        contactMethods: true,
-        preferredMessaging: true,
-        preferredMaps: true,
-        defaultHasAssistant: true,
-        account: {
+    const groomer = groomerId
+      ? await prisma.groomer.findUnique({
+          where: { id: groomerId },
           select: {
-            timezone: true,
+            id: true,
+            contactMethods: true,
+            preferredMessaging: true,
+            preferredMaps: true,
+            defaultHasAssistant: true,
+            account: {
+              select: {
+                timezone: true,
+              },
+            },
           },
-        },
-      },
-    });
+        })
+      : null;
 
     // Get the account's timezone (default to America/New_York)
     const timezone = groomer?.account?.timezone || "America/New_York";
@@ -230,6 +234,13 @@ export async function GET(req: NextRequest) {
       largeDogCount,
       totalMinutes,
     };
+
+    // Track day view in PostHog (async, don't await)
+    trackDayViewed(accountId, {
+      appointmentsToday: totalAppointments,
+      hasRoute,
+      dayOfWeek: new Date().getDay(),
+    }).catch(() => {}); // Silently fail if tracking fails
 
     return NextResponse.json(response);
   } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
 
 /**
  * POST /api/routes/reorder
@@ -25,12 +26,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get groomer for this account
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-    });
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
 
-    if (!groomer) {
+    if (!groomerId) {
       return NextResponse.json(
         { error: "No groomer found" },
         { status: 400 }
@@ -52,7 +51,7 @@ export async function POST(req: NextRequest) {
       where: {
         accountId,
         id: { in: appointmentIds },
-        groomerId: groomer.id,
+        groomerId,
         status: {
           notIn: ["CANCELLED", "NO_SHOW", "COMPLETED"],
         },

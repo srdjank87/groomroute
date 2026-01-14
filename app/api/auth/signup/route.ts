@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { trackAccountCreated } from "@/lib/posthog-server";
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -71,6 +72,12 @@ export async function POST(request: NextRequest) {
       });
 
       return { account, user };
+    });
+
+    // Track account creation in PostHog
+    await trackAccountCreated(result.account.id, validatedData.email, {
+      signupSource: "direct",
+      planSelected: validatedData.plan,
     });
 
     return NextResponse.json(

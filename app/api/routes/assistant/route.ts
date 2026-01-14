@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
 
 /**
  * GET /api/routes/assistant
@@ -16,17 +17,21 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get groomer for this account
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-    });
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
 
-    if (!groomer) {
+    if (!groomerId) {
       return NextResponse.json(
         { error: "No groomer found" },
         { status: 400 }
       );
     }
+
+    // Get groomer defaults
+    const groomer = await prisma.groomer.findUnique({
+      where: { id: groomerId },
+      select: { defaultHasAssistant: true },
+    });
 
     // Get today's route (use UTC date to match how routes are stored)
     const now = new Date();
@@ -35,17 +40,17 @@ export async function GET(req: NextRequest) {
     const route = await prisma.route.findFirst({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         routeDate: today,
       },
     });
 
     // If route exists, use its setting; otherwise use groomer default
-    const hasAssistant = route?.hasAssistant ?? groomer.defaultHasAssistant;
+    const hasAssistant = route?.hasAssistant ?? groomer?.defaultHasAssistant ?? false;
 
     return NextResponse.json({
       hasAssistant,
-      defaultHasAssistant: groomer.defaultHasAssistant,
+      defaultHasAssistant: groomer?.defaultHasAssistant ?? false,
       hasRouteForToday: !!route,
     });
   } catch (error) {
@@ -80,12 +85,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get groomer for this account
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-    });
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
 
-    if (!groomer) {
+    if (!groomerId) {
       return NextResponse.json(
         { error: "No groomer found" },
         { status: 400 }
@@ -100,7 +103,7 @@ export async function POST(req: NextRequest) {
     const route = await prisma.route.upsert({
       where: {
         groomerId_routeDate: {
-          groomerId: groomer.id,
+          groomerId,
           routeDate: today,
         },
       },
@@ -109,7 +112,7 @@ export async function POST(req: NextRequest) {
       },
       create: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         routeDate: today,
         hasAssistant,
         status: "DRAFT",
@@ -120,7 +123,7 @@ export async function POST(req: NextRequest) {
     // Optionally update the groomer's default setting
     if (setAsDefault === true) {
       await prisma.groomer.update({
-        where: { id: groomer.id },
+        where: { id: groomerId },
         data: { defaultHasAssistant: hasAssistant },
       });
     }

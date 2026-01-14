@@ -7,6 +7,8 @@ import {
   getAdjustedServiceMinutes,
   getBufferMinutes,
 } from "@/lib/benchmarks";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
+import { trackRouteOptimized, checkAndTrackFirstAction } from "@/lib/posthog-server";
 
 interface Location {
   id: string;
@@ -86,17 +88,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get groomer for this account
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-    });
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
 
-    if (!groomer) {
+    if (!groomerId) {
       return NextResponse.json(
         { error: "No groomer found" },
         { status: 400 }
       );
     }
+
+    // Get groomer defaults
+    const groomer = await prisma.groomer.findUnique({
+      where: { id: groomerId },
+      select: { defaultHasAssistant: true },
+    });
 
     // Ensure we're only optimizing today's route
     const today = new Date().toISOString().split('T')[0];
@@ -112,12 +118,12 @@ export async function POST(req: NextRequest) {
     const existingRoute = await prisma.route.findFirst({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         routeDate,
       },
       select: { id: true, hasAssistant: true },
     });
-    const hasAssistant = existingRoute?.hasAssistant ?? groomer.defaultHasAssistant;
+    const hasAssistant = existingRoute?.hasAssistant ?? groomer?.defaultHasAssistant ?? false;
 
     // Fetch all incomplete appointments for today only
     const startOfDay = new Date(date + 'T00:00:00.000Z');
@@ -126,7 +132,7 @@ export async function POST(req: NextRequest) {
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         startAt: {
           gte: startOfDay,
           lte: endOfDay,
@@ -248,7 +254,7 @@ export async function POST(req: NextRequest) {
       await prisma.route.create({
         data: {
           accountId,
-          groomerId: groomer.id,
+          groomerId,
           routeDate,
           totalDistanceMeters,
           totalDriveMinutes,
@@ -306,6 +312,16 @@ export async function POST(req: NextRequest) {
     const formattedDriveTime = driveHours > 0
       ? `${driveHours}h ${driveMinutesRemainder}m`
       : `${totalDriveMinutes}m`;
+
+    // Track route optimization in PostHog
+    await trackRouteOptimized(accountId, {
+      numberOfStops: stops,
+      estimatedTimeSaved: totalDriveMinutes,
+      dayOfWeek: new Date().getDay(),
+    });
+
+    // Check if this is the first meaningful action
+    await checkAndTrackFirstAction(accountId, "route_optimized");
 
     return NextResponse.json({
       success: true,

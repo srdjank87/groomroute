@@ -11,6 +11,7 @@ import {
 } from "@/lib/performance-calculator";
 import { calculateBreakStats } from "@/lib/break-calculator";
 import { getAdditionalCapacity } from "@/lib/benchmarks";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
 
 /**
  * GET /api/dashboard/performance
@@ -26,9 +27,19 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
+
+    if (!groomerId) {
+      return NextResponse.json(
+        { error: "No groomer found" },
+        { status: 400 }
+      );
+    }
+
     // Get groomer for this account with timezone
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
+    const groomer = await prisma.groomer.findUnique({
+      where: { id: groomerId },
       include: {
         account: {
           select: {
@@ -62,7 +73,7 @@ export async function GET(req: NextRequest) {
     const todayAppointments = await prisma.appointment.findMany({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         startAt: {
           gte: today,
           lt: tomorrow,
@@ -87,7 +98,7 @@ export async function GET(req: NextRequest) {
     const todayRoute = await prisma.route.findFirst({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         routeDate: today,
       },
     });
@@ -96,7 +107,7 @@ export async function GET(req: NextRequest) {
     const todayBreaks = await prisma.break.findMany({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         breakDate: today,
       },
     });
@@ -105,7 +116,7 @@ export async function GET(req: NextRequest) {
     const weeklyAppointments = await prisma.appointment.findMany({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         startAt: {
           gte: startOfWeek,
           lt: tomorrow,
@@ -125,7 +136,7 @@ export async function GET(req: NextRequest) {
     const weeklyRoutes = await prisma.route.findMany({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         routeDate: {
           gte: startOfWeek,
           lt: tomorrow,
@@ -198,7 +209,7 @@ export async function GET(req: NextRequest) {
     const last30DaysAppointments = await prisma.appointment.findMany({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         startAt: {
           gte: thirtyDaysAgo,
           lt: tomorrow,
@@ -217,7 +228,7 @@ export async function GET(req: NextRequest) {
     const last30DaysRoutes = await prisma.route.findMany({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         routeDate: {
           gte: thirtyDaysAgo,
           lt: tomorrow,
@@ -277,7 +288,7 @@ export async function GET(req: NextRequest) {
     const last30DaysCancelled = await prisma.appointment.count({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         startAt: {
           gte: thirtyDaysAgo,
           lt: tomorrow,

@@ -45,6 +45,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           accountId: user.accountId,
           role: user.role,
+          groomerId: user.groomerId,
         };
       },
     }),
@@ -54,26 +55,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.accountId = user.accountId;
         token.role = user.role;
+        token.groomerId = user.groomerId;
       }
 
-      // Always fetch fresh subscription data when user logs in or token is updated
-      // This ensures we always have the latest subscription status
-      if (token.accountId) {
-        const account = await prisma.account.findUnique({
-          where: { id: token.accountId as string },
-          select: {
-            subscriptionStatus: true,
-            subscriptionPlan: true,
-            currentPeriodEnd: true,
-            trialEndsAt: true,
-          },
-        });
+      // Always fetch fresh subscription and user data when user logs in or token is updated
+      // This ensures we always have the latest subscription status and groomerId
+      if (token.accountId && token.sub) {
+        const [account, dbUser] = await Promise.all([
+          prisma.account.findUnique({
+            where: { id: token.accountId as string },
+            select: {
+              subscriptionStatus: true,
+              subscriptionPlan: true,
+              currentPeriodEnd: true,
+              trialEndsAt: true,
+            },
+          }),
+          prisma.user.findUnique({
+            where: { id: token.sub as string },
+            select: { groomerId: true },
+          }),
+        ]);
 
         if (account) {
           token.subscriptionStatus = account.subscriptionStatus;
           token.subscriptionPlan = account.subscriptionPlan;
           token.currentPeriodEnd = account.currentPeriodEnd?.toISOString();
           token.trialEndsAt = account.trialEndsAt?.toISOString();
+        }
+
+        if (dbUser) {
+          token.groomerId = dbUser.groomerId;
         }
       }
 
@@ -84,6 +96,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub as string;
         session.user.accountId = token.accountId as string;
         session.user.role = token.role as UserRole;
+        session.user.groomerId = token.groomerId as string | null | undefined;
         session.user.subscriptionStatus = token.subscriptionStatus as SubscriptionStatus | undefined;
         session.user.subscriptionPlan = token.subscriptionPlan as SubscriptionPlan | undefined;
         session.user.currentPeriodEnd = token.currentPeriodEnd as string | undefined;

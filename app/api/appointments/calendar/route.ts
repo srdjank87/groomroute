@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getGroomerAreasForDateRange } from "@/lib/area-matcher";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
 
 // Disable Next.js caching for this route - data changes frequently
 export const dynamic = 'force-dynamic';
@@ -35,12 +36,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get groomer for this account
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId },
-    });
+    // Get the current user's groomer ID
+    const groomerId = await getUserGroomerId();
 
-    if (!groomer) {
+    if (!groomerId) {
       return NextResponse.json(
         { error: "No groomer found" },
         { status: 400 }
@@ -57,7 +56,7 @@ export async function GET(req: NextRequest) {
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
         startAt: {
           gte: startOfMonth,
           lte: endOfMonth,
@@ -95,7 +94,7 @@ export async function GET(req: NextRequest) {
     const startDateUTC = new Date(Date.UTC(year, monthNum - 1, 1));
     const endDateUTC = new Date(Date.UTC(year, monthNum, 0)); // Last day of month
 
-    const areasMap = await getGroomerAreasForDateRange(groomer.id, startDateUTC, endDateUTC);
+    const areasMap = await getGroomerAreasForDateRange(groomerId, startDateUTC, endDateUTC);
 
     // Convert Map to object for JSON response
     const areasByDate: Record<string, { areaId: string; areaName: string; areaColor: string; isOverride: boolean } | null> = {};
@@ -107,7 +106,7 @@ export async function GET(req: NextRequest) {
     const areaDayAssignments = await prisma.areaDayAssignment.findMany({
       where: {
         accountId,
-        groomerId: groomer.id,
+        groomerId,
       },
       include: {
         area: {

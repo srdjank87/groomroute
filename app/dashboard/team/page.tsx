@@ -120,11 +120,15 @@ export default function TeamCalendarPage() {
   };
 
   const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
+    // Appointments are stored with UTC timestamps that represent local display times
+    // (e.g., 9 AM local is stored as T09:00:00.000Z)
+    // So we need to extract the time portion without timezone conversion
+    const date = new Date(dateStr);
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const period = hours >= 12 ? "PM" : "AM";
+    const hour12 = hours % 12 || 12;
+    return `${hour12}:${minutes.toString().padStart(2, "0")} ${period}`;
   };
 
   const getStatusBadge = (status: string) => {

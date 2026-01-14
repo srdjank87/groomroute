@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getDailyQuote } from "@/lib/daily-quotes";
+import { getUserGroomerId } from "@/lib/get-user-groomer";
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,11 +14,8 @@ export async function GET(req: NextRequest) {
 
     const accountId = session.user.accountId;
 
-    // Get the current user's groomer to filter by groomerId
-    const groomer = await prisma.groomer.findFirst({
-      where: { accountId, isActive: true },
-      select: { id: true },
-    });
+    // Get the current user's groomer ID (respects user-groomer link)
+    const groomerId = await getUserGroomerId();
 
     // Get date ranges
     const now = new Date();
@@ -38,7 +36,7 @@ export async function GET(req: NextRequest) {
     const appointments = await prisma.appointment.findMany({
       where: {
         accountId,
-        ...(groomer?.id ? { groomerId: groomer.id } : {}),
+        ...(groomerId ? { groomerId } : {}),
         startAt: {
           gte: thirtyDaysAgo,
           lt: today, // Exclude today to match weekly calculation
@@ -61,7 +59,7 @@ export async function GET(req: NextRequest) {
     const lostAppointments = await prisma.appointment.findMany({
       where: {
         accountId,
-        ...(groomer?.id ? { groomerId: groomer.id } : {}),
+        ...(groomerId ? { groomerId } : {}),
         startAt: {
           gte: thirtyDaysAgo,
           lt: today, // Exclude today to match weekly calculation
@@ -143,7 +141,7 @@ export async function GET(req: NextRequest) {
     const allAppointments = await prisma.appointment.count({
       where: {
         accountId,
-        ...(groomer?.id ? { groomerId: groomer.id } : {}),
+        ...(groomerId ? { groomerId } : {}),
         startAt: {
           gte: thirtyDaysAgo,
           lt: today, // Exclude today to match other calculations
