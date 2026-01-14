@@ -204,7 +204,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-gray-900">Area Days</h3>
                 <p className="text-gray-600 text-sm mb-3">
-                  Assign neighborhoods to specific days. Monday is North Side. Thursday is Downtown.
+                  Assign neighborhoods to specific days. Monday is North Side. Tuesday and Friday are Downtown.
                   Stop zigzagging across town.
                 </p>
                 <div className="bg-emerald-50 rounded-lg p-2.5">
