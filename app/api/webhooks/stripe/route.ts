@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { fbCapiStartTrial, fbCapiSubscribe } from "@/lib/facebook-capi";
 import { trackTrialConverted, trackServerEvent } from "@/lib/posthog-server";
+import { onboardNewUser } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -143,6 +144,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     await trackServerEvent(accountId, "trial_started", {
       plan: session.metadata?.plan || "unknown",
     });
+
+    // Send welcome email and add to marketing list
+    if (user?.email) {
+      const planName = session.metadata?.plan || account.subscriptionPlan || "Growth";
+      const planDisplayName = planName.charAt(0).toUpperCase() + planName.slice(1).toLowerCase();
+      await onboardNewUser(user.email, user.name || "there", planDisplayName, 14);
+    }
   }
 
   console.log(`Checkout completed for account ${accountId}`);

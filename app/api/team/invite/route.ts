@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { randomBytes } from "crypto";
+import { sendTeamInviteEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
@@ -143,9 +144,22 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // TODO: Send invitation email with link
-    // For now, return the invitation link that can be shared manually
+    // Send invitation email
     const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/invite/${token}`;
+
+    // Get inviter's name
+    const inviter = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true },
+    });
+
+    await sendTeamInviteEmail(
+      email.toLowerCase(),
+      inviter?.name || "Your team",
+      account.name,
+      role,
+      token
+    );
 
     return NextResponse.json({
       success: true,
