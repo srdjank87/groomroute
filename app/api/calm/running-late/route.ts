@@ -249,6 +249,8 @@ export async function POST(req: NextRequest) {
     const appointmentsWithNewETA = appointments.map((apt) => {
       const originalTime = apt.startAt;
       const newTime = addMinutes(originalTime, delayMinutes);
+      // Use first name only for personalized messages
+      const firstName = apt.customer.name.split(" ")[0];
 
       return {
         id: apt.id,
@@ -259,14 +261,18 @@ export async function POST(req: NextRequest) {
         formattedOriginalTime: format(originalTime, "h:mm a"),
         newTime: newTime.toISOString(),
         formattedNewTime: format(newTime, "h:mm a"),
-        // Pre-generate message for each customer
-        message: `Hi ${apt.customer.name}! This is ${businessName}. I'm running about ${delayMinutes} minutes behind schedule today. Your new estimated arrival time for ${apt.pet?.name ? apt.pet.name + "'s" : "your"} appointment is around ${format(newTime, "h:mm a")}. I apologize for any inconvenience!`,
+        // Pre-generate personalized message for individual SMS (uses first name)
+        message: `Hi ${firstName}! This is ${businessName}. I'm running about ${delayMinutes} minutes behind schedule today. Your new estimated arrival time is around ${format(newTime, "h:mm a")}. I apologize for any inconvenience!`,
       };
     });
+
+    // Generic message for group SMS (no personalization)
+    const groupMessage = `Hi! This is ${businessName}. I'm running about ${delayMinutes} minutes behind schedule today. I'll be there as soon as I can. I apologize for any inconvenience!`;
 
     return NextResponse.json({
       appointments: appointmentsWithNewETA,
       delayMinutes,
+      groupMessage,
       contactMethods: groomer?.contactMethods || ["sms"],
     });
   } catch (error) {

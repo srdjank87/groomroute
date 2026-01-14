@@ -184,9 +184,11 @@ export async function GET(req: NextRequest) {
       },
     ];
 
-    // Generate reschedule message
-    const rescheduleMessage = (customerName: string, petName?: string) =>
-      `Hi ${customerName}! This is ${businessName}. I'm trying to protect my evening hours for some personal time. Would you be open to rescheduling ${petName || "your pet"}'s appointment to earlier in the day or another day this week? I really appreciate your understanding!`;
+    // Generate reschedule message (uses first name only)
+    const rescheduleMessage = (customerName: string, petName?: string) => {
+      const firstName = customerName.split(" ")[0];
+      return `Hi ${firstName}! This is ${businessName}. I'm trying to protect my evening hours for some personal time. Would you be open to rescheduling ${petName || "your pet"}'s appointment to earlier in the day or another day this week? I really appreciate your understanding!`;
+    };
 
     return NextResponse.json({
       estimatedEndTime: estimatedEndTime?.toISOString(),

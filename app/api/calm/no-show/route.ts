@@ -236,8 +236,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Generate a message for the customer
-    const message = `Hi ${appointment.customer.name}, this is ${businessName}. We missed you at your ${appointment.pet?.name ? appointment.pet.name + "'s " : ""}grooming appointment today. Please reach out when you'd like to reschedule. We hope everything is okay!`;
+    // Generate a message for the customer (use first name only)
+    const firstName = appointment.customer.name.split(" ")[0];
+    const message = `Hi ${firstName}, this is ${businessName}. We missed you at your ${appointment.pet?.name ? appointment.pet.name + "'s " : ""}grooming appointment today. Please reach out when you'd like to reschedule. We hope everything is okay!`;
 
     return NextResponse.json({
       success: true,

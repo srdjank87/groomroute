@@ -197,9 +197,11 @@ export async function GET(req: NextRequest) {
       canReschedule: apt.status === "BOOKED",
     }));
 
-    // Generate reschedule message template
-    const rescheduleMessage = (customerName: string, petName?: string) =>
-      `Hi ${customerName}! This is ${businessName}. I'm having a packed day and want to give ${petName || "your pet"} my full attention. Would you be open to rescheduling to tomorrow or later this week? I'll prioritize you!`;
+    // Generate reschedule message template (uses first name only)
+    const rescheduleMessage = (customerName: string, petName?: string) => {
+      const firstName = customerName.split(" ")[0];
+      return `Hi ${firstName}! This is ${businessName}. I'm having a packed day and want to give ${petName || "your pet"} my full attention. Would you be open to rescheduling to tomorrow or later this week? I'll prioritize you!`;
+    };
 
     return NextResponse.json({
       totalAppointments,

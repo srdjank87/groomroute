@@ -38,11 +38,18 @@ function generateNotificationMessage(
   oldTime: string,
   newTime: string
 ): string {
-  return `Hi ${customerName}, your grooming appointment for ${petName} has been rescheduled from ${oldTime} to ${newTime} today. Let me know if this works for you!`;
+  const firstName = customerName.split(" ")[0];
+  return `Hi ${firstName}, your grooming appointment for ${petName} has been rescheduled from ${oldTime} to ${newTime} today. Let me know if this works for you!`;
 }
 
 function generateETAMessage(customerName: string, petName: string, newTime: string): string {
-  return `Hi ${customerName}! I'll be arriving for ${petName}'s grooming around ${newTime} today. See you soon!`;
+  const firstName = customerName.split(" ")[0];
+  return `Hi ${firstName}! I'll be arriving for ${petName}'s grooming around ${newTime} today. See you soon!`;
+}
+
+// Generic message for group notifications (no personalization)
+function generateGroupMessage(): string {
+  return `Hi! Your grooming appointment time has been adjusted for today. Please check your updated time. Let me know if you have any questions!`;
 }
 
 export default function ReorderConfirmModal({
@@ -84,25 +91,20 @@ export default function ReorderConfirmModal({
 
     if (customersToNotify.length === 0) return;
 
-    // For "Notify All", use ETA message instead of reschedule message
-    customersToNotify.forEach((change, index) => {
-      const message = generateETAMessage(
-        change.customerName,
-        change.petName,
-        formatTime(change.newStartAt)
-      );
-      const encodedMessage = encodeURIComponent(message);
+    // Use generic message for group notifications
+    const message = generateGroupMessage();
+    const encodedMessage = encodeURIComponent(message);
 
-      // Use setTimeout to stagger the opening of windows
-      setTimeout(() => {
-        if (useWhatsApp) {
-          const cleanPhone = change.customerPhone!.replace(/\D/g, "");
-          window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
-        } else {
-          window.location.href = `sms:${change.customerPhone}?body=${encodedMessage}`;
-        }
-      }, index * 500); // 500ms delay between each
-    });
+    if (useWhatsApp) {
+      // WhatsApp doesn't support group compose, notify first customer
+      const firstCustomer = customersToNotify[0];
+      const cleanPhone = firstCustomer.customerPhone!.replace(/\D/g, "");
+      window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
+    } else {
+      // Combine all phone numbers for group SMS
+      const phoneNumbers = customersToNotify.map((c) => c.customerPhone).join(",");
+      window.location.href = `sms:${phoneNumbers}?body=${encodedMessage}`;
+    }
   }
 
   return (

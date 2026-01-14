@@ -219,6 +219,7 @@ function CalmCenterContent() {
   const [showRunningLateModal, setShowRunningLateModal] = useState(false);
   const [delayMinutes, setDelayMinutes] = useState(15);
   const [runningLateAppointments, setRunningLateAppointments] = useState<RunningLateAppointment[]>([]);
+  const [runningLateGroupMessage, setRunningLateGroupMessage] = useState("");
   const [isCalculating, setIsCalculating] = useState(false);
   const [contactMethods, setContactMethods] = useState<string[]>(["sms"]);
   const [notifiedCustomers, setNotifiedCustomers] = useState<Set<string>>(new Set());
@@ -446,6 +447,7 @@ function CalmCenterContent() {
       if (response.ok) {
         const result = await response.json();
         setRunningLateAppointments(result.appointments);
+        setRunningLateGroupMessage(result.groupMessage || "");
         setContactMethods(result.contactMethods || ["sms"]);
       } else {
         toast.error("Failed to calculate new times");
@@ -473,6 +475,7 @@ function CalmCenterContent() {
       if (response.ok) {
         const result = await response.json();
         setRunningLateAppointments(result.appointments);
+        setRunningLateGroupMessage(result.groupMessage || "");
       }
     } catch (error) {
       console.error("Recalculation error:", error);
@@ -502,7 +505,7 @@ function CalmCenterContent() {
     setNotifiedCustomers((prev) => new Set(prev).add(appointment.id));
   }
 
-  // Notify all customers sequentially
+  // Notify all customers at once with a group SMS
   function notifyAllCustomers(method: "sms" | "whatsapp") {
     const toNotify = runningLateAppointments.filter(
       (apt) => apt.customerPhone && !notifiedCustomers.has(apt.id)
@@ -513,24 +516,33 @@ function CalmCenterContent() {
       return;
     }
 
-    // For SMS, we can create a single message to multiple recipients isn't reliable
-    // So we'll notify the first one and let them click through
+    // Use generic group message (not personalized)
+    const encodedMessage = encodeURIComponent(runningLateGroupMessage);
+
     if (method === "sms") {
-      // Build a combined message with all customers
-      const firstApt = toNotify[0];
-      notifyCustomer(firstApt, "sms");
-      toast.success(`Opened SMS for ${firstApt.customerName}. Continue notifying others individually.`);
+      // Combine all phone numbers for group SMS
+      const phoneNumbers = toNotify.map((apt) => apt.customerPhone).join(",");
+      window.location.href = `sms:${phoneNumbers}?body=${encodedMessage}`;
+      // Mark all as notified
+      setNotifiedCustomers((prev) => {
+        const newSet = new Set(prev);
+        toNotify.forEach((apt) => newSet.add(apt.id));
+        return newSet;
+      });
     } else {
-      // For WhatsApp, open first one
+      // For WhatsApp, open first one (WhatsApp doesn't support group compose)
       const firstApt = toNotify[0];
-      notifyCustomer(firstApt, "whatsapp");
-      toast.success(`Opened WhatsApp for ${firstApt.customerName}. Continue notifying others individually.`);
+      const cleanPhone = firstApt.customerPhone.replace(/\D/g, "");
+      window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
+      setNotifiedCustomers((prev) => new Set(prev).add(firstApt.id));
+      toast.success(`Opened WhatsApp for ${firstApt.customerName.split(" ")[0]}. Continue notifying others individually.`);
     }
   }
 
   function closeRunningLateModal() {
     setShowRunningLateModal(false);
     setRunningLateAppointments([]);
+    setRunningLateGroupMessage("");
     setNotifiedCustomers(new Set());
   }
 
@@ -656,7 +668,8 @@ function CalmCenterContent() {
       toast.error("No phone number available");
       return;
     }
-    const message = `Hi ${customerName}! Just checking in about ${petName ? petName + "'s " : "your "}appointment today.`;
+    const firstName = customerName.split(" ")[0];
+    const message = `Hi ${firstName}! Just checking in about ${petName ? petName + "'s " : "your "}appointment today.`;
     const encodedMessage = encodeURIComponent(message);
     window.location.href = `sms:${phone}?body=${encodedMessage}`;
   }
@@ -666,7 +679,8 @@ function CalmCenterContent() {
       toast.error("No phone number available");
       return;
     }
-    const message = `Hi ${customerName}! Just checking in about ${petName ? petName + "'s " : "your "}appointment today.`;
+    const firstName = customerName.split(" ")[0];
+    const message = `Hi ${firstName}! Just checking in about ${petName ? petName + "'s " : "your "}appointment today.`;
     const encodedMessage = encodeURIComponent(message);
     const cleanPhone = phone.replace(/\D/g, "");
     window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
