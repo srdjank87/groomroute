@@ -297,16 +297,23 @@ This document provides a comprehensive inventory of all features, pages, routes,
 - Links to PostHog for detailed analytics
 
 ### Subscription Tiers
-- **TRIAL** - 14-day trial period
-- **STARTER** - Basic features
-- **GROWTH** - Extended features
-- **PRO** - All features
+- **TRIAL** - 14-day free trial (all plans)
+- **STARTER** - $39/mo ($32/mo yearly) - 50 clients, route optimization, area scheduling
+- **GROWTH** - $79/mo ($66/mo yearly) - Unlimited clients, Calm Center, wellness features
+- **PRO** - $149/mo ($124/mo yearly) - Multi-groomer, team features
 
 ---
 
 ## 7. CHANGELOG
 
 ### January 13, 2026
+- **Pricing Update:**
+  - Lowered pricing to be more accessible for solo groomers
+  - Starter: $89/mo → $39/mo (yearly: $74 → $32/mo)
+  - Growth: $179/mo → $79/mo (yearly: $149 → $66/mo)
+  - Pro: $329/mo → $149/mo (yearly: $274 → $124/mo)
+  - Kept 14-day free trial on all plans
+
 - **Bug Fix: Calm Center showing wrong appointment count (16 instead of 6)**
   - Same timezone bug as dashboard - was using server local time instead of account timezone
   - Same groomerId bug - was showing all account appointments instead of current groomer's

@@ -597,10 +597,10 @@ export default function Home() {
               <div className="card-body">
                 <div className="badge badge-ghost mb-2">STARTER</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '74' : '89'}</span>
+                  <span className="text-4xl font-bold">${isYearly ? '32' : '39'}</span>
                   <span className="text-sm opacity-70">/month</span>
                 </div>
-                {isYearly && <div className="text-xs text-emerald-600 -mt-3 mb-4">Billed annually ($890/year)</div>}
+                {isYearly && <div className="text-xs text-emerald-600 -mt-3 mb-4">Billed annually ($390/year)</div>}
 
                 <p className="text-sm text-gray-600 mb-6">
                   For solo groomers getting organized
@@ -634,10 +634,10 @@ export default function Home() {
                 <div className="badge badge-primary mb-2 bg-[#A5744A] border-[#A5744A]">MOST POPULAR</div>
                 <div className="badge badge-ghost mb-2">GROWTH</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '149' : '179'}</span>
+                  <span className="text-4xl font-bold">${isYearly ? '66' : '79'}</span>
                   <span className="text-sm opacity-70">/month</span>
                 </div>
-                {isYearly && <div className="text-xs text-emerald-600 -mt-3 mb-4">Billed annually ($1,790/year)</div>}
+                {isYearly && <div className="text-xs text-emerald-600 -mt-3 mb-4">Billed annually ($790/year)</div>}
 
                 <p className="text-sm text-gray-600 mb-6">
                   For groomers who want full protection
@@ -673,10 +673,10 @@ export default function Home() {
               <div className="card-body">
                 <div className="badge badge-ghost mb-2">PRO</div>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold">${isYearly ? '274' : '329'}</span>
+                  <span className="text-4xl font-bold">${isYearly ? '124' : '149'}</span>
                   <span className="text-sm opacity-70">/month</span>
                 </div>
-                {isYearly && <div className="text-xs text-emerald-600 -mt-3 mb-4">Billed annually ($3,290/year)</div>}
+                {isYearly && <div className="text-xs text-emerald-600 -mt-3 mb-4">Billed annually ($1,490/year)</div>}
 
                 <p className="text-sm text-gray-600 mb-6">
                   For multi-van operations
