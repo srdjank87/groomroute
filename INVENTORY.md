@@ -307,6 +307,12 @@ This document provides a comprehensive inventory of all features, pages, routes,
 ## 7. CHANGELOG
 
 ### January 13, 2026
+- **Bug Fix: Sample data generator creating multiple groomers on non-Pro plans**
+  - Generate-sample route was creating additional groomers regardless of subscription plan
+  - This caused inflated analytics numbers since appointments were distributed across all groomers
+  - Fixed to only create additional groomers for Pro plan accounts
+  - Non-Pro accounts now only use their primary groomer for sample data
+
 - **Bug Fix: Analytics earnings showing inflated numbers**
   - Revenue stats API was not filtering by groomerId
   - For multi-groomer accounts, was showing combined revenue from ALL groomers

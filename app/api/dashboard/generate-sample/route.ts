@@ -557,37 +557,48 @@ export async function POST(req: NextRequest) {
 
     console.log("Found primary groomer:", primaryGroomer.id, "for account:", accountId);
 
-    // Create additional groomers for team features
-    const allGroomers = [primaryGroomer];
-    for (const groomerData of ADDITIONAL_GROOMERS) {
-      // Check if groomer with this email already exists
-      const existingGroomer = await prisma.groomer.findFirst({
-        where: {
-          accountId,
-          email: groomerData.email,
-        },
-      });
+    // Check if account is on Pro plan for multi-groomer support
+    const account = await prisma.account.findUnique({
+      where: { id: accountId },
+      select: { subscriptionPlan: true },
+    });
+    const isProPlan = account?.subscriptionPlan === "PRO";
 
-      if (!existingGroomer) {
-        const geocodeResult = await geocodeAddress(groomerData.baseAddress);
-        const newGroomer = await prisma.groomer.create({
-          data: {
+    // Create additional groomers for team features (Pro plan only)
+    const allGroomers = [primaryGroomer];
+    if (isProPlan) {
+      for (const groomerData of ADDITIONAL_GROOMERS) {
+        // Check if groomer with this email already exists
+        const existingGroomer = await prisma.groomer.findFirst({
+          where: {
             accountId,
-            name: groomerData.name,
             email: groomerData.email,
-            phone: groomerData.phone,
-            baseAddress: groomerData.baseAddress,
-            baseLat: geocodeResult.success ? geocodeResult.lat : null,
-            baseLng: geocodeResult.success ? geocodeResult.lng : null,
-            geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
-            isActive: true,
           },
         });
-        allGroomers.push(newGroomer);
-        console.log("Created additional groomer:", newGroomer.name);
-      } else {
-        allGroomers.push(existingGroomer);
+
+        if (!existingGroomer) {
+          const geocodeResult = await geocodeAddress(groomerData.baseAddress);
+          const newGroomer = await prisma.groomer.create({
+            data: {
+              accountId,
+              name: groomerData.name,
+              email: groomerData.email,
+              phone: groomerData.phone,
+              baseAddress: groomerData.baseAddress,
+              baseLat: geocodeResult.success ? geocodeResult.lat : null,
+              baseLng: geocodeResult.success ? geocodeResult.lng : null,
+              geocodeStatus: geocodeResult.success ? "OK" : "FAILED",
+              isActive: true,
+            },
+          });
+          allGroomers.push(newGroomer);
+          console.log("Created additional groomer:", newGroomer.name);
+        } else {
+          allGroomers.push(existingGroomer);
+        }
       }
+    } else {
+      console.log("Skipping additional groomers - not on Pro plan");
     }
 
     // Generate appointments for the last 30 days (more data for analytics)
