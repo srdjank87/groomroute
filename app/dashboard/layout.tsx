@@ -33,6 +33,7 @@ interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   adminOnly?: boolean;
+  groomerOnly?: boolean;
   proBadge?: boolean;
   special?: boolean;
 }
@@ -40,7 +41,7 @@ interface NavItem {
 const allMainNavigation: NavItem[] = [
   { name: "Today", href: "/dashboard", icon: Sun },
   { name: "Routes", href: "/dashboard/routes", icon: RouteIcon },
-  { name: "My Clients", href: "/dashboard/my-clients", icon: Users },
+  { name: "My Clients", href: "/dashboard/my-clients", icon: Users, groomerOnly: true },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3, adminOnly: true },
 ];
 
@@ -76,23 +77,32 @@ export default function DashboardLayout({
   const isGroomerRole = userRole === "GROOMER";
 
   // Filter navigation based on role
+  // adminOnly: only show to admins (hide from groomers)
+  // groomerOnly: only show to groomers (hide from admins)
+  const filterNavItems = (items: NavItem[]) =>
+    items.filter(item => {
+      if (item.adminOnly && isGroomerRole) return false;
+      if (item.groomerOnly && !isGroomerRole) return false;
+      return true;
+    });
+
   const mainNavigation = useMemo(() =>
-    allMainNavigation.filter(item => !item.adminOnly || !isGroomerRole),
+    filterNavItems(allMainNavigation),
     [isGroomerRole]
   );
 
   const businessNavigation = useMemo(() =>
-    allBusinessNavigation.filter(item => !item.adminOnly || !isGroomerRole),
+    filterNavItems(allBusinessNavigation),
     [isGroomerRole]
   );
 
   const supportNavigation = useMemo(() =>
-    allSupportNavigation.filter(item => !item.adminOnly || !isGroomerRole),
+    filterNavItems(allSupportNavigation),
     [isGroomerRole]
   );
 
   const settingsNavigation = useMemo(() =>
-    allSettingsNavigation.filter(item => !item.adminOnly || !isGroomerRole),
+    filterNavItems(allSettingsNavigation),
     [isGroomerRole]
   );
 
