@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { sendWelcomeEmail, sendTeamInviteEmail } from "@/lib/email";
+import { sendWelcomeEmail, sendTeamInviteEmail, sendPasswordResetEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -48,6 +48,14 @@ export async function POST(req: NextRequest) {
           "Pawsome Groomers",   // Sample business
           "GROOMER",            // Sample role
           "test-token-preview"  // Sample token (won't work for actual signup)
+        );
+        break;
+
+      case "password-reset":
+        result = await sendPasswordResetEmail(
+          email,
+          "John Smith",           // Sample name
+          "test-reset-token-123"  // Sample token (won't work for actual reset)
         );
         break;
 

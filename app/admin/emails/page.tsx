@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Mail, Send, Eye, CheckCircle, AlertCircle } from "lucide-react";
 
-type EmailTemplate = "welcome" | "team-invite";
+type EmailTemplate = "welcome" | "team-invite" | "password-reset";
 
 interface EmailPreviewProps {
   template: EmailTemplate;
@@ -22,6 +22,10 @@ const sampleData = {
     businessName: "Pawsome Groomers",
     role: "GROOMER" as "ADMIN" | "GROOMER",
     inviteToken: "sample-token-123",
+  },
+  "password-reset": {
+    userName: "John Smith",
+    resetToken: "sample-reset-token-abc123",
   },
 };
 
@@ -123,6 +127,19 @@ export default function AdminEmailsPage() {
                     Sent when inviting team members
                   </p>
                 </button>
+                <button
+                  onClick={() => setSelectedTemplate("password-reset")}
+                  className={`w-full p-4 text-left transition-colors ${
+                    selectedTemplate === "password-reset"
+                      ? "bg-amber-50 border-l-4 border-[#A5744A]"
+                      : "hover:bg-gray-50"
+                  }`}
+                >
+                  <p className="font-medium text-gray-900">Password Reset</p>
+                  <p className="text-sm text-gray-500">
+                    Sent for forgot password requests
+                  </p>
+                </button>
               </div>
             </div>
 
@@ -201,6 +218,13 @@ export default function AdminEmailsPage() {
                     <p><strong>Variables:</strong> inviterName, businessName, role, inviteToken</p>
                   </>
                 )}
+                {selectedTemplate === "password-reset" && (
+                  <>
+                    <p><strong>Subject:</strong> Reset your GroomRoute password</p>
+                    <p><strong>Trigger:</strong> Forgot password request</p>
+                    <p><strong>Variables:</strong> userName, resetToken</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -214,7 +238,9 @@ export default function AdminEmailsPage() {
                   Preview
                 </h2>
                 <span className="text-sm text-gray-500">
-                  {selectedTemplate === "welcome" ? "Welcome Email" : "Team Invitation"}
+                  {selectedTemplate === "welcome" && "Welcome Email"}
+                  {selectedTemplate === "team-invite" && "Team Invitation"}
+                  {selectedTemplate === "password-reset" && "Password Reset"}
                 </span>
               </div>
               <div className="p-4 bg-gray-50">
@@ -386,6 +412,77 @@ function EmailPreview({ template }: EmailPreviewProps) {
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
               Questions? Reply to this email and we'll help you get started.
+            </p>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '24px 0 0' }}>
+              The GroomRoute Team
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div style={{ padding: '32px 48px 0', textAlign: 'center' }}>
+            <p style={{ color: '#8898aa', fontSize: '12px', lineHeight: '16px', margin: '8px 0' }}>
+              GroomRoute - Route planning for mobile pet groomers
+            </p>
+            <p style={{ color: '#8898aa', fontSize: '12px', lineHeight: '16px', margin: '8px 0' }}>
+              <span style={{ color: '#8898aa', textDecoration: 'underline' }}>Privacy Policy</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (template === "password-reset") {
+    const { userName } = sampleData["password-reset"];
+    const firstName = userName.split(" ")[0];
+
+    return (
+      <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', backgroundColor: '#f6f9fc', padding: '20px' }}>
+        <div style={{ backgroundColor: '#ffffff', maxWidth: '600px', margin: '0 auto', padding: '20px 0 48px' }}>
+          {/* Logo */}
+          <div style={{ textAlign: 'center', padding: '32px 20px 0' }}>
+            <span style={{ color: '#A5744A', fontSize: '28px', fontWeight: 'bold' }}>GroomRoute</span>
+          </div>
+
+          {/* Content */}
+          <div style={{ padding: '0 48px' }}>
+            <h1 style={{ color: '#1a1a1a', fontSize: '28px', fontWeight: 'bold', textAlign: 'center', margin: '32px 0 24px' }}>
+              Reset Your Password
+            </h1>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              Hi {firstName},
+            </p>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              We received a request to reset your password for your GroomRoute account. Click the button below to create a new password.
+            </p>
+
+            <div style={{ textAlign: 'center', margin: '32px 0' }}>
+              <span style={{ backgroundColor: '#A5744A', borderRadius: '8px', color: '#ffffff', fontSize: '16px', fontWeight: 'bold', padding: '14px 32px', display: 'inline-block' }}>
+                Reset Password
+              </span>
+            </div>
+
+            <p style={{ color: '#8898aa', fontSize: '13px', lineHeight: '20px', textAlign: 'center', margin: '16px 0' }}>
+              This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email - your password won't be changed.
+            </p>
+
+            <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              If the button doesn't work, copy and paste this link into your browser:
+            </p>
+
+            <p style={{ color: '#525f7f', fontSize: '14px', lineHeight: '20px', wordBreak: 'break-all' }}>
+              <span style={{ color: '#A5744A', textDecoration: 'underline' }}>https://groomroute.com/auth/reset-password?token=sample-token</span>
+            </p>
+
+            <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              Need help? Reply to this email and we'll assist you.
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '24px 0 0' }}>

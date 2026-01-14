@@ -1,6 +1,7 @@
 import { resend, addToMarketingList } from "./resend";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 import TeamInviteEmail from "@/emails/TeamInviteEmail";
+import PasswordResetEmail from "@/emails/PasswordResetEmail";
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "GroomRoute <hello@groomroute.com>";
 
@@ -53,6 +54,31 @@ export async function sendTeamInviteEmail(
     return result;
   } catch (error) {
     console.error("Failed to send team invite email:", error);
+    return null;
+  }
+}
+
+/**
+ * Send password reset email
+ */
+export async function sendPasswordResetEmail(
+  email: string,
+  userName: string,
+  resetToken: string
+) {
+  try {
+    const client = resend();
+    const result = await client.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: "Reset your GroomRoute password",
+      react: PasswordResetEmail({ userName, resetToken }),
+    });
+
+    console.log("Password reset email sent:", email);
+    return result;
+  } catch (error) {
+    console.error("Failed to send password reset email:", error);
     return null;
   }
 }

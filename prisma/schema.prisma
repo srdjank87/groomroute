@@ -21,6 +21,9 @@ model User {
   // Link to groomer profile (for users with GROOMER role or solo groomers)
   groomerId String?
   groomer   Groomer? @relation(fields: [groomerId], references: [id], onDelete: SetNull)
+  // Password reset
+  passwordResetToken     String?   @unique
+  passwordResetExpiresAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
