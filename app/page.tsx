@@ -247,7 +247,7 @@ export default function Home() {
               <div className="mt-auto px-4 pb-4">
                 <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
                   <Image
-                    src="/images/workload_protection.png"
+                    src="/images/workload_protection.jpg"
                     alt="Workload Protection feature - set daily limits and get warnings"
                     width={300}
                     height={400}
@@ -277,7 +277,7 @@ export default function Home() {
               <div className="mt-auto px-4 pb-4">
                 <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
                   <Image
-                    src="/images/day_rescue.png"
+                    src="/images/day_rescue.jpg"
                     alt="Day-of Rescue feature - one-tap solutions for problems"
                     width={300}
                     height={400}
