@@ -12,13 +12,22 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan, billing, resubscribe, additionalAdminSeats, groomerSeats } = body as {
+    const { plan, billing, resubscribe, additionalAdminSeats, groomerSeats, fbBrowserData } = body as {
       plan: PlanType;
       billing: BillingType;
       resubscribe?: boolean;
       additionalAdminSeats?: number;
       groomerSeats?: number;
+      fbBrowserData?: {
+        fbc?: string | null;
+        fbp?: string | null;
+        userAgent?: string | null;
+      };
     };
+
+    // Capture IP address from request headers
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const clientIp = forwardedFor ? forwardedFor.split(",")[0].trim() : request.headers.get("x-real-ip");
 
     // For Pro plan, validate seat counts
     const isPro = plan.toLowerCase() === "pro";
@@ -62,6 +71,21 @@ export async function POST(request: NextRequest) {
       await prisma.account.update({
         where: { id: account.id },
         data: { stripeCustomerId: customerId },
+      });
+    }
+
+    // Store FB tracking data for CAPI event matching (improves Event Match Quality)
+    if (fbBrowserData || clientIp) {
+      await prisma.account.update({
+        where: { id: account.id },
+        data: {
+          fbTrackingData: {
+            fbc: fbBrowserData?.fbc || null,
+            fbp: fbBrowserData?.fbp || null,
+            userAgent: fbBrowserData?.userAgent || null,
+            clientIp: clientIp || null,
+          },
+        },
       });
     }
 

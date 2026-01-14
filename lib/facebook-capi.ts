@@ -41,6 +41,7 @@ interface UserData {
   clientUserAgent?: string | null;
   fbClickId?: string | null; // fbc cookie
   fbBrowserId?: string | null; // fbp cookie
+  externalId?: string | null; // Your user/account ID
 }
 
 interface EventData {
@@ -88,6 +89,7 @@ export async function sendFBEvent(event: EventData): Promise<boolean> {
         client_user_agent: event.userData.clientUserAgent || undefined,
         fbc: event.userData.fbClickId || undefined,
         fbp: event.userData.fbBrowserId || undefined,
+        external_id: hashData(event.userData.externalId),
       },
     };
 

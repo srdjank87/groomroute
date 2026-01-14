@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { captureFBBrowserData } from "@/lib/fb-browser-data";
 
 const MAX_GROOMER_SEATS = 19; // Max 19 additional groomer seats
 
@@ -86,6 +87,9 @@ function SignUpForm() {
         return;
       }
 
+      // Capture FB browser data for improved event matching
+      const fbBrowserData = captureFBBrowserData();
+
       // Create Stripe checkout session
       const checkoutResponse = await fetch("/api/create-checkout-session", {
         method: "POST",
@@ -93,6 +97,7 @@ function SignUpForm() {
         body: JSON.stringify({
           plan: formData.plan.toLowerCase(),
           billing: formData.billing.toLowerCase(),
+          fbBrowserData,
           ...(isProPlan && {
             additionalAdminSeats: additionalAdminSeats,
             groomerSeats: groomerSeats,

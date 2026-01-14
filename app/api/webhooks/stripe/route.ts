@@ -130,11 +130,25 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Track StartTrial event for Facebook CAPI
   if (account) {
     const user = account.users[0];
+
+    // Get stored FB tracking data for better event match quality
+    const fbData = account.fbTrackingData as {
+      fbc?: string | null;
+      fbp?: string | null;
+      userAgent?: string | null;
+      clientIp?: string | null;
+    } | null;
+
     await fbCapiStartTrial(
       {
         email: user?.email,
         firstName: user?.name?.split(" ")[0],
         lastName: user?.name?.split(" ").slice(1).join(" "),
+        fbClickId: fbData?.fbc,
+        fbBrowserId: fbData?.fbp,
+        clientUserAgent: fbData?.userAgent,
+        clientIpAddress: fbData?.clientIp,
+        externalId: accountId,
       },
       undefined,
       process.env.NEXT_PUBLIC_APP_URL
@@ -277,12 +291,25 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     const plan = subscription.metadata?.plan || account.subscriptionPlan;
     const amount = invoice.amount_paid ? invoice.amount_paid / 100 : 0; // Convert from cents
 
+    // Get stored FB tracking data for better event match quality
+    const fbData = account.fbTrackingData as {
+      fbc?: string | null;
+      fbp?: string | null;
+      userAgent?: string | null;
+      clientIp?: string | null;
+    } | null;
+
     // Facebook CAPI Subscribe event
     await fbCapiSubscribe(
       {
         email: user?.email,
         firstName: user?.name?.split(" ")[0],
         lastName: user?.name?.split(" ").slice(1).join(" "),
+        fbClickId: fbData?.fbc,
+        fbBrowserId: fbData?.fbp,
+        clientUserAgent: fbData?.userAgent,
+        clientIpAddress: fbData?.clientIp,
+        externalId: accountId,
       },
       amount,
       plan || "subscription",

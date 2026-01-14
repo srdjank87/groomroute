@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { AlertCircle } from "lucide-react";
+import { captureFBBrowserData } from "@/lib/fb-browser-data";
 
 export default function SubscriptionExpiredPage() {
   const { data: session } = useSession();
@@ -16,6 +17,9 @@ export default function SubscriptionExpiredPage() {
   const handleResubscribe = async () => {
     setIsLoading(true);
 
+    // Capture FB browser data for improved event matching
+    const fbBrowserData = captureFBBrowserData();
+
     try {
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
@@ -24,6 +28,7 @@ export default function SubscriptionExpiredPage() {
           plan: selectedPlan,
           billing: selectedBilling,
           resubscribe: true,
+          fbBrowserData,
         }),
       });
 

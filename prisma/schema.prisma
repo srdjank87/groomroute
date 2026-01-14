@@ -61,6 +61,9 @@ model Account {
   adminSeats         Int              @default(1)  // Total admin seats purchased (min 1)
   groomerSeats       Int              @default(0)  // Total groomer seats purchased
 
+  // Facebook tracking data (stored temporarily for CAPI event matching)
+  fbTrackingData     Json?            // { fbc, fbp, userAgent, clientIp }
+
   @@index([createdAt])
   @@index([subscriptionStatus])
   @@index([trialEndsAt])
