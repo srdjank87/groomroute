@@ -20,7 +20,7 @@ import {
   Scissors,
   Smartphone,
 } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 const GroomRouteLogo = () => (
   <span>Groom<span style={{ color: '#A5744A' }}>Route</span></span>
@@ -79,31 +79,31 @@ export default function DashboardLayout({
   // Filter navigation based on role
   // adminOnly: only show to admins (hide from groomers)
   // groomerOnly: only show to groomers (hide from admins)
-  const filterNavItems = (items: NavItem[]) =>
+  const filterNavItems = useCallback((items: NavItem[]) =>
     items.filter(item => {
       if (item.adminOnly && isGroomerRole) return false;
       if (item.groomerOnly && !isGroomerRole) return false;
       return true;
-    });
+    }), [isGroomerRole]);
 
   const mainNavigation = useMemo(() =>
     filterNavItems(allMainNavigation),
-    [isGroomerRole]
+    [filterNavItems]
   );
 
   const businessNavigation = useMemo(() =>
     filterNavItems(allBusinessNavigation),
-    [isGroomerRole]
+    [filterNavItems]
   );
 
   const supportNavigation = useMemo(() =>
     filterNavItems(allSupportNavigation),
-    [isGroomerRole]
+    [filterNavItems]
   );
 
   const settingsNavigation = useMemo(() =>
     filterNavItems(allSettingsNavigation),
-    [isGroomerRole]
+    [filterNavItems]
   );
 
   // Fetch assistant status for the day

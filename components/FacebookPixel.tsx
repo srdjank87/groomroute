@@ -57,8 +57,9 @@ export function FacebookPixel() {
         }}
       />
 
-      {/* NoScript fallback */}
+      {/* NoScript fallback - using img tag as required by Facebook Pixel */}
       <noscript>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           height="1"
           width="1"

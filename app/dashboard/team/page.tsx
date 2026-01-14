@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useFeature } from "@/hooks/useFeatures";
 import Link from "next/link";
 import {
@@ -84,13 +84,7 @@ export default function TeamCalendarPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<"day" | "week">("day");
 
-  useEffect(() => {
-    if (hasFeature) {
-      fetchCalendarData();
-    }
-  }, [hasFeature, selectedDate, viewMode]);
-
-  const fetchCalendarData = async () => {
+  const fetchCalendarData = useCallback(async () => {
     setIsLoading(true);
     try {
       const dateStr = format(selectedDate, "yyyy-MM-dd");
@@ -105,7 +99,13 @@ export default function TeamCalendarPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedDate, viewMode]);
+
+  useEffect(() => {
+    if (hasFeature) {
+      fetchCalendarData();
+    }
+  }, [hasFeature, fetchCalendarData]);
 
   const handlePrevDay = () => {
     setSelectedDate((prev) => addDays(prev, viewMode === "week" ? -7 : -1));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Clock, Phone, MessageSquare, Plus, Users, MapPin, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -82,11 +82,7 @@ export default function GapFillSuggestions({
   const [isLoading, setIsLoading] = useState(true);
   const [expandedGap, setExpandedGap] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchGaps();
-  }, [date, minGapMinutes]);
-
-  const fetchGaps = async () => {
+  const fetchGaps = useCallback(async () => {
     try {
       const targetDate = date || new Date().toISOString().split("T")[0];
       const response = await fetch(`/api/gaps?date=${targetDate}&minGap=${minGapMinutes}`);
@@ -103,7 +99,11 @@ export default function GapFillSuggestions({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [date, minGapMinutes]);
+
+  useEffect(() => {
+    fetchGaps();
+  }, [fetchGaps]);
 
   const handleCall = (phone: string) => {
     window.location.href = `tel:${phone}`;

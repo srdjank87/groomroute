@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -32,11 +32,7 @@ export default function AcceptInvitePage({
     confirmPassword: "",
   });
 
-  useEffect(() => {
-    fetchInvitation();
-  }, [token]);
-
-  const fetchInvitation = async () => {
+  const fetchInvitation = useCallback(async () => {
     try {
       const response = await fetch(`/api/invite/${token}`);
       const data = await response.json();
@@ -47,12 +43,16 @@ export default function AcceptInvitePage({
       }
 
       setInvitation(data.invitation);
-    } catch (err) {
+    } catch {
       setError("Failed to load invitation");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchInvitation();
+  }, [fetchInvitation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

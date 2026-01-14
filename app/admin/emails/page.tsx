@@ -206,14 +206,14 @@ export default function AdminEmailsPage() {
               <div className="text-sm text-gray-600 space-y-2">
                 {selectedTemplate === "welcome" && (
                   <>
-                    <p><strong>Subject:</strong> Welcome to GroomRoute! Let's get you started</p>
+                    <p><strong>Subject:</strong> Welcome to GroomRoute! Let&apos;s get you started</p>
                     <p><strong>Trigger:</strong> User registration</p>
                     <p><strong>Variables:</strong> userName, planName, trialDays</p>
                   </>
                 )}
                 {selectedTemplate === "team-invite" && (
                   <>
-                    <p><strong>Subject:</strong> You've been invited to join [Business] on GroomRoute</p>
+                    <p><strong>Subject:</strong> You&apos;ve been invited to join [Business] on GroomRoute</p>
                     <p><strong>Trigger:</strong> Team member invitation</p>
                     <p><strong>Variables:</strong> inviterName, businessName, role, inviteToken</p>
                   </>
@@ -280,11 +280,11 @@ function EmailPreview({ template }: EmailPreviewProps) {
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              Thank you for signing up for GroomRoute! We're thrilled to have you join our community of mobile pet groomers who are taking control of their business.
+              Thank you for signing up for GroomRoute! We&apos;re thrilled to have you join our community of mobile pet groomers who are taking control of their business.
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              You're starting your <strong>{trialDays}-day free trial</strong> of the <strong>{planName} plan</strong>. During your trial, you'll have full access to:
+              You&apos;re starting your <strong>{trialDays}-day free trial</strong> of the <strong>{planName} plan</strong>. During your trial, you&apos;ll have full access to:
             </p>
 
             <div style={{ margin: '24px 0', padding: '0 16px' }}>
@@ -319,7 +319,7 @@ function EmailPreview({ template }: EmailPreviewProps) {
             </h2>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              Here's what we recommend doing first:
+              Here&apos;s what we recommend doing first:
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
@@ -335,7 +335,7 @@ function EmailPreview({ template }: EmailPreviewProps) {
             <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              Have questions? Reply to this email or check out our <span style={{ color: '#A5744A', textDecoration: 'underline' }}>help center</span>. We're here to help you succeed!
+              Have questions? Reply to this email or check out our <span style={{ color: '#A5744A', textDecoration: 'underline' }}>help center</span>. We&apos;re here to help you succeed!
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '24px 0 0' }}>
@@ -364,7 +364,7 @@ function EmailPreview({ template }: EmailPreviewProps) {
     const { inviterName, businessName, role } = sampleData["team-invite"];
     const roleDisplay = role === "ADMIN" ? "Admin" : "Groomer";
     const roleDescription = role === "ADMIN"
-      ? "As an Admin, you'll have full access to manage appointments, customers, and team settings."
+      ? "As an Admin, you&apos;ll have full access to manage appointments, customers, and team settings."
       : "As a Groomer, you'll be able to view your appointments, manage your route, and update appointment statuses.";
 
     return (
@@ -378,7 +378,7 @@ function EmailPreview({ template }: EmailPreviewProps) {
           {/* Content */}
           <div style={{ padding: '0 48px' }}>
             <h1 style={{ color: '#1a1a1a', fontSize: '28px', fontWeight: 'bold', textAlign: 'center', margin: '32px 0 24px' }}>
-              You're Invited!
+              You&apos;re Invited!
             </h1>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
@@ -405,13 +405,13 @@ function EmailPreview({ template }: EmailPreviewProps) {
             </div>
 
             <p style={{ color: '#8898aa', fontSize: '13px', lineHeight: '20px', textAlign: 'center', margin: '16px 0' }}>
-              This invitation link will expire in 7 days. If you didn't expect this email, you can safely ignore it.
+              This invitation link will expire in 7 days. If you didn&apos;t expect this email, you can safely ignore it.
             </p>
 
             <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              Questions? Reply to this email and we'll help you get started.
+              Questions? Reply to this email and we&apos;ll help you get started.
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '24px 0 0' }}>
@@ -466,13 +466,13 @@ function EmailPreview({ template }: EmailPreviewProps) {
             </div>
 
             <p style={{ color: '#8898aa', fontSize: '13px', lineHeight: '20px', textAlign: 'center', margin: '16px 0' }}>
-              This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email - your password won't be changed.
+              This link will expire in 1 hour. If you didn&apos;t request a password reset, you can safely ignore this email - your password won&apos;t be changed.
             </p>
 
             <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              If the button doesn't work, copy and paste this link into your browser:
+              If the button doesn&apos;t work, copy and paste this link into your browser:
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '14px', lineHeight: '20px', wordBreak: 'break-all' }}>
@@ -482,7 +482,7 @@ function EmailPreview({ template }: EmailPreviewProps) {
             <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              Need help? Reply to this email and we'll assist you.
+              Need help? Reply to this email and we&apos;ll assist you.
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '24px 0 0' }}>
