@@ -293,6 +293,8 @@ export async function GET(req: NextRequest) {
         ...gap,
         startTimeFormatted: format(gap.startTime, "h:mm a"),
         endTimeFormatted: format(gap.endTime, "h:mm a"),
+        startTime24h: format(gap.startTime, "HH:mm"),
+        endTime24h: format(gap.endTime, "HH:mm"),
         suggestedClients: matches,
       };
     });

@@ -32,6 +32,8 @@ interface Gap {
   endTime: string;
   startTimeFormatted: string;
   endTimeFormatted: string;
+  startTime24h: string;
+  endTime24h: string;
   durationMinutes: number;
   previousAppointment: {
     id: string;
@@ -327,7 +329,7 @@ export default function GapFillSuggestions({
                           </>
                         )}
                         <Link
-                          href={`/dashboard/appointments/new?customerId=${client.customerId}&suggestedDate=${gapData.date}&suggestedTime=${gap.startTimeFormatted}`}
+                          href={`/dashboard/appointments/new?customerId=${client.customerId}&suggestedDate=${gapData.date}&suggestedTime=${gap.startTime24h}`}
                           className="btn btn-xs bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1 ml-auto"
                         >
                           <Plus className="h-3 w-3" />
@@ -340,7 +342,7 @@ export default function GapFillSuggestions({
 
                 {/* Quick Book - new client */}
                 <Link
-                  href={`/dashboard/appointments/new?suggestedDate=${gapData.date}&suggestedTime=${gap.startTimeFormatted}`}
+                  href={`/dashboard/appointments/new?suggestedDate=${gapData.date}&suggestedTime=${gap.startTime24h}`}
                   className="flex items-center justify-center gap-2 text-sm text-[#A5744A] hover:bg-orange-50 p-2 rounded-lg transition-colors"
                 >
                   <Plus className="h-4 w-4" />
