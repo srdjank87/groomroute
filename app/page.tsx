@@ -174,7 +174,7 @@ export default function Home() {
             <p className="text-lg text-gray-600 mb-4">
               Most grooming software promises &quot;more appointments&quot; and &quot;more revenue&quot;.
             </p>
-            <p className="text-2xl lg:text-3xl font-bold text-[#A5744A]">
+            <p className="text-2xl lg:text-3xl font-bold text-gray-900">
               But what if you just want a calm, predictable day?
             </p>
           </div>
@@ -219,7 +219,8 @@ export default function Home() {
                     src="/images/area_days.png"
                     alt="Area Days feature - assign neighborhoods to specific days"
                     width={300}
-                    height={300}
+                    height={400}
+                    quality={100}
                     className="rounded-lg w-full shadow-md"
                   />
                 </div>
@@ -249,7 +250,8 @@ export default function Home() {
                     src="/images/workload_protection.png"
                     alt="Workload Protection feature - set daily limits and get warnings"
                     width={300}
-                    height={300}
+                    height={400}
+                    quality={100}
                     className="rounded-lg w-full shadow-md"
                   />
                 </div>
@@ -278,7 +280,8 @@ export default function Home() {
                     src="/images/day_rescue.png"
                     alt="Day-of Rescue feature - one-tap solutions for problems"
                     width={300}
-                    height={300}
+                    height={400}
+                    quality={100}
                     className="rounded-lg w-full shadow-md"
                   />
                 </div>
@@ -907,7 +910,16 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="footer footer-center p-10 bg-base-300 text-base-content">
         <aside>
-          <div className="font-bold text-xl mb-2"><GroomRouteLogo /></div>
+          <div className="flex items-center gap-2 font-bold text-xl mb-2">
+            <Image
+              src="/images/icon.svg"
+              alt="GroomRoute"
+              width={24}
+              height={24}
+              className="w-6 h-6"
+            />
+            <GroomRouteLogo />
+          </div>
           <p className="max-w-md">The scheduling system built only for mobile groomers.</p>
           <p className="max-w-md">Finally, a calm day.</p>
           <p className="text-sm opacity-70 mt-4">&copy; 2025 GroomRoute. All rights reserved.</p>
