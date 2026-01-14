@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
     // Fetch all appointments by their IDs
     const appointments = await prisma.appointment.findMany({
       where: {
+        accountId,
         id: { in: appointmentIds },
         groomerId: groomer.id,
         status: {

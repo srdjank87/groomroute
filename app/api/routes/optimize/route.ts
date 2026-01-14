@@ -125,6 +125,7 @@ export async function POST(req: NextRequest) {
 
     const appointments = await prisma.appointment.findMany({
       where: {
+        accountId,
         groomerId: groomer.id,
         startAt: {
           gte: startOfDay,
