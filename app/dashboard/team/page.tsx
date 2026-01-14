@@ -218,32 +218,32 @@ export default function TeamCalendarPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-100 rounded-lg">
-              <Calendar className="h-6 w-6 text-indigo-600" />
+      <div className="mb-4 md:mb-6">
+        <div className="flex items-center justify-between gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <div className="p-1.5 md:p-2 bg-indigo-100 rounded-lg flex-shrink-0">
+              <Calendar className="h-5 w-5 md:h-6 md:w-6 text-indigo-600" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Team Calendar</h1>
-              <p className="text-gray-600 text-sm">
+            <div className="min-w-0">
+              <h1 className="text-lg md:text-2xl font-bold text-gray-900 truncate">Team Calendar</h1>
+              <p className="text-gray-600 text-xs md:text-sm">
                 {calendarData?.groomers.length || 0} groomer
-                {calendarData?.groomers.length !== 1 ? "s" : ""} active
+                {calendarData?.groomers.length !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
 
           {/* View Toggle */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center flex-shrink-0">
             <div className="btn-group">
               <button
-                className={`btn btn-sm ${viewMode === "day" ? "btn-active" : ""}`}
+                className={`btn btn-xs md:btn-sm ${viewMode === "day" ? "btn-active" : ""}`}
                 onClick={() => setViewMode("day")}
               >
                 Day
               </button>
               <button
-                className={`btn btn-sm ${viewMode === "week" ? "btn-active" : ""}`}
+                className={`btn btn-xs md:btn-sm ${viewMode === "week" ? "btn-active" : ""}`}
                 onClick={() => setViewMode("week")}
               >
                 Week
@@ -253,21 +253,21 @@ export default function TeamCalendarPage() {
         </div>
 
         {/* Date Navigation */}
-        <div className="flex items-center justify-between mt-4 bg-white rounded-lg border p-3">
+        <div className="flex items-center justify-between mt-4 bg-white rounded-lg border p-2 md:p-3">
           <button
             onClick={handlePrevDay}
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost btn-sm btn-square md:btn-wide"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-gray-900">
+          <div className="flex flex-col md:flex-row items-center gap-1 md:gap-3 text-center">
+            <h2 className="text-sm md:text-lg font-semibold text-gray-900">
               {viewMode === "week"
                 ? `${format(startOfWeek(selectedDate), "MMM d")} - ${format(
                     addDays(startOfWeek(selectedDate), 6),
-                    "MMM d, yyyy"
+                    "MMM d"
                   )}`
-                : format(selectedDate, "EEEE, MMMM d, yyyy")}
+                : format(selectedDate, "EEE, MMM d")}
             </h2>
             {!isSameDay(selectedDate, new Date()) && (
               <button
@@ -280,7 +280,7 @@ export default function TeamCalendarPage() {
           </div>
           <button
             onClick={handleNextDay}
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost btn-sm btn-square md:btn-wide"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -289,42 +289,42 @@ export default function TeamCalendarPage() {
 
       {/* Team Summary Stats */}
       {calendarData && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
-              <Users className="h-4 w-4" />
-              Groomers
+        <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6">
+          <div className="bg-white rounded-xl border p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 text-gray-500 text-xs md:text-sm mb-1">
+              <Users className="h-3.5 w-3.5 md:h-4 md:w-4" />
+              <span className="truncate">Groomers</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl md:text-2xl font-bold text-gray-900">
               {calendarData.groomers.length}
             </div>
           </div>
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
-              <Calendar className="h-4 w-4" />
-              Appointments
+          <div className="bg-white rounded-xl border p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 text-gray-500 text-xs md:text-sm mb-1">
+              <Calendar className="h-3.5 w-3.5 md:h-4 md:w-4" />
+              <span className="truncate">Appointments</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl md:text-2xl font-bold text-gray-900">
               {calendarData.totals.totalAppointments}
             </div>
           </div>
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
-              <Clock className="h-4 w-4" />
-              Total Hours
+          <div className="bg-white rounded-xl border p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 text-gray-500 text-xs md:text-sm mb-1">
+              <Clock className="h-3.5 w-3.5 md:h-4 md:w-4" />
+              <span className="truncate">Hours</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl md:text-2xl font-bold text-gray-900">
               {Math.round(
                 calendarData.groomerStats.reduce((sum, s) => sum + s.totalMinutes, 0) / 60
               )}
             </div>
           </div>
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
-              <DollarSign className="h-4 w-4" />
-              Revenue
+          <div className="bg-white rounded-xl border p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 text-gray-500 text-xs md:text-sm mb-1">
+              <DollarSign className="h-3.5 w-3.5 md:h-4 md:w-4" />
+              <span className="truncate">Revenue</span>
             </div>
-            <div className="text-2xl font-bold text-emerald-600">
+            <div className="text-xl md:text-2xl font-bold text-emerald-600">
               ${calendarData.totals.totalRevenue}
             </div>
           </div>
@@ -355,7 +355,7 @@ export default function TeamCalendarPage() {
       ) : (
         /* Groomer Columns - Day View */
         viewMode === "day" && calendarData && (
-          <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(calendarData.groomers.length, 4)}, 1fr)` }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {calendarData.groomers.map((groomer) => {
               const appointments = calendarData.appointmentsByGroomer[groomer.id] || [];
               const stats = calendarData.groomerStats.find((s) => s.groomerId === groomer.id);
@@ -364,27 +364,36 @@ export default function TeamCalendarPage() {
                 <div key={groomer.id} className="bg-white rounded-xl border overflow-hidden">
                   {/* Groomer Header */}
                   <div
-                    className="p-4 border-b"
+                    className="p-3 md:p-4 border-b"
                     style={{ backgroundColor: `${groomer.color || "#6366f1"}15` }}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold"
+                        className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm md:text-base"
                         style={{ backgroundColor: groomer.color || "#6366f1" }}
                       >
                         {groomer.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 truncate">
+                        <h3 className="font-semibold text-gray-900 truncate text-sm md:text-base">
                           {groomer.name}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs md:text-sm text-gray-500">
                           {stats?.totalAppointments || 0} appointments
                         </p>
                       </div>
+                      {/* Mobile: Show stats inline */}
+                      <div className="flex md:hidden flex-col items-end text-xs">
+                        <span className="font-medium text-gray-900">
+                          {Math.round((stats?.totalMinutes || 0) / 60)}h
+                        </span>
+                        <span className="font-medium text-emerald-600">
+                          ${stats?.totalRevenue || 0}
+                        </span>
+                      </div>
                     </div>
-                    {/* Mini Stats */}
-                    <div className="flex gap-4 mt-3 text-xs">
+                    {/* Desktop: Mini Stats row */}
+                    <div className="hidden md:flex gap-4 mt-3 text-xs">
                       <div>
                         <span className="text-gray-500">Hours:</span>
                         <span className="font-medium text-gray-900 ml-1">
@@ -401,26 +410,26 @@ export default function TeamCalendarPage() {
                   </div>
 
                   {/* Appointments List */}
-                  <div className="divide-y max-h-[60vh] overflow-y-auto">
+                  <div className="divide-y max-h-[50vh] md:max-h-[60vh] overflow-y-auto">
                     {appointments.length === 0 ? (
-                      <div className="p-6 text-center text-gray-400">
-                        <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">No appointments</p>
+                      <div className="p-4 md:p-6 text-center text-gray-400">
+                        <Calendar className="h-6 w-6 md:h-8 md:w-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-xs md:text-sm">No appointments</p>
                       </div>
                     ) : (
                       appointments.map((apt) => (
                         <Link
                           key={apt.id}
                           href={`/dashboard/appointments/${apt.id}`}
-                          className="block p-3 hover:bg-gray-50 transition-colors"
+                          className="block p-2.5 md:p-3 hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex items-start justify-between mb-1">
-                            <span className="text-sm font-medium text-gray-900">
+                            <span className="text-xs md:text-sm font-medium text-gray-900">
                               {formatTime(apt.startAt)}
                             </span>
                             {getStatusBadge(apt.status)}
                           </div>
-                          <p className="font-medium text-gray-900 text-sm truncate">
+                          <p className="font-medium text-gray-900 text-xs md:text-sm truncate">
                             {apt.customer.name}
                           </p>
                           {apt.pet && (
@@ -460,115 +469,187 @@ export default function TeamCalendarPage() {
         )
       )}
 
-      {/* Week View */}
+      {/* Week View - Mobile: Card layout per groomer */}
       {viewMode === "week" && calendarData && calendarData.groomers.length > 0 && (
-        <div className="bg-white rounded-xl border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="p-3 text-left font-medium text-gray-500 min-w-[120px]">
-                    Groomer
-                  </th>
-                  {Array.from({ length: 7 }).map((_, i) => {
-                    const day = addDays(startOfWeek(selectedDate), i);
-                    const isToday = isSameDay(day, new Date());
-                    return (
-                      <th
-                        key={i}
-                        className={`p-3 text-center min-w-[100px] ${
-                          isToday ? "bg-blue-50" : ""
-                        }`}
-                      >
-                        <div className="text-xs text-gray-500">
-                          {format(day, "EEE")}
-                        </div>
+        <>
+          {/* Mobile Week View */}
+          <div className="md:hidden space-y-4">
+            {calendarData.groomers.map((groomer) => {
+              const appointments = calendarData.appointmentsByGroomer[groomer.id] || [];
+
+              return (
+                <div key={groomer.id} className="bg-white rounded-xl border overflow-hidden">
+                  {/* Groomer Header */}
+                  <div
+                    className="p-3 border-b flex items-center gap-3"
+                    style={{ backgroundColor: `${groomer.color || "#6366f1"}15` }}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                      style={{ backgroundColor: groomer.color || "#6366f1" }}
+                    >
+                      {groomer.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="font-semibold text-gray-900 text-sm">
+                      {groomer.name}
+                    </span>
+                  </div>
+
+                  {/* Days Grid */}
+                  <div className="grid grid-cols-7 divide-x">
+                    {Array.from({ length: 7 }).map((_, i) => {
+                      const day = addDays(startOfWeek(selectedDate), i);
+                      const dayStr = format(day, "yyyy-MM-dd");
+                      const dayAppointments = appointments.filter(
+                        (apt) => apt.startAt.split("T")[0] === dayStr
+                      );
+                      const isToday = isSameDay(day, new Date());
+
+                      return (
                         <div
-                          className={`text-sm font-semibold ${
-                            isToday ? "text-blue-600" : "text-gray-900"
+                          key={i}
+                          className={`p-1.5 text-center ${isToday ? "bg-blue-50" : ""}`}
+                        >
+                          <div className="text-[10px] text-gray-500 uppercase">
+                            {format(day, "EEE").slice(0, 1)}
+                          </div>
+                          <div
+                            className={`text-xs font-semibold mb-1 ${
+                              isToday ? "text-blue-600" : "text-gray-900"
+                            }`}
+                          >
+                            {format(day, "d")}
+                          </div>
+                          {dayAppointments.length > 0 ? (
+                            <div
+                              className="w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white text-xs font-medium"
+                              style={{ backgroundColor: groomer.color || "#6366f1" }}
+                            >
+                              {dayAppointments.length}
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 mx-auto rounded-full flex items-center justify-center text-gray-300 text-xs">
+                              -
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop Week View - Table */}
+          <div className="hidden md:block bg-white rounded-xl border overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="p-3 text-left font-medium text-gray-500 min-w-[120px]">
+                      Groomer
+                    </th>
+                    {Array.from({ length: 7 }).map((_, i) => {
+                      const day = addDays(startOfWeek(selectedDate), i);
+                      const isToday = isSameDay(day, new Date());
+                      return (
+                        <th
+                          key={i}
+                          className={`p-3 text-center min-w-[100px] ${
+                            isToday ? "bg-blue-50" : ""
                           }`}
                         >
-                          {format(day, "d")}
-                        </div>
-                      </th>
+                          <div className="text-xs text-gray-500">
+                            {format(day, "EEE")}
+                          </div>
+                          <div
+                            className={`text-sm font-semibold ${
+                              isToday ? "text-blue-600" : "text-gray-900"
+                            }`}
+                          >
+                            {format(day, "d")}
+                          </div>
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {calendarData.groomers.map((groomer) => {
+                    const appointments = calendarData.appointmentsByGroomer[groomer.id] || [];
+
+                    return (
+                      <tr key={groomer.id}>
+                        <td className="p-3">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                              style={{ backgroundColor: groomer.color || "#6366f1" }}
+                            >
+                              {groomer.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="font-medium text-gray-900 text-sm truncate">
+                              {groomer.name}
+                            </span>
+                          </div>
+                        </td>
+                        {Array.from({ length: 7 }).map((_, i) => {
+                          const day = addDays(startOfWeek(selectedDate), i);
+                          const dayStr = format(day, "yyyy-MM-dd");
+                          const dayAppointments = appointments.filter(
+                            (apt) => apt.startAt.split("T")[0] === dayStr
+                          );
+                          const isToday = isSameDay(day, new Date());
+
+                          return (
+                            <td
+                              key={i}
+                              className={`p-2 align-top ${isToday ? "bg-blue-50" : ""}`}
+                            >
+                              {dayAppointments.length > 0 ? (
+                                <div className="space-y-1">
+                                  {dayAppointments.slice(0, 3).map((apt) => (
+                                    <Link
+                                      key={apt.id}
+                                      href={`/dashboard/appointments/${apt.id}`}
+                                      className="block p-1.5 rounded text-xs bg-gray-100 hover:bg-gray-200 transition-colors"
+                                      style={{
+                                        borderLeft: `3px solid ${
+                                          groomer.color || "#6366f1"
+                                        }`,
+                                      }}
+                                    >
+                                      <div className="font-medium text-gray-900 truncate">
+                                        {formatTime(apt.startAt)}
+                                      </div>
+                                      <div className="text-gray-500 truncate">
+                                        {apt.customer.name}
+                                      </div>
+                                    </Link>
+                                  ))}
+                                  {dayAppointments.length > 3 && (
+                                    <div className="text-xs text-gray-400 text-center">
+                                      +{dayAppointments.length - 3} more
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="text-xs text-gray-300 text-center py-2">
+                                  -
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
                     );
                   })}
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {calendarData.groomers.map((groomer) => {
-                  const appointments = calendarData.appointmentsByGroomer[groomer.id] || [];
-
-                  return (
-                    <tr key={groomer.id}>
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
-                            style={{ backgroundColor: groomer.color || "#6366f1" }}
-                          >
-                            {groomer.name.charAt(0).toUpperCase()}
-                          </div>
-                          <span className="font-medium text-gray-900 text-sm truncate">
-                            {groomer.name}
-                          </span>
-                        </div>
-                      </td>
-                      {Array.from({ length: 7 }).map((_, i) => {
-                        const day = addDays(startOfWeek(selectedDate), i);
-                        const dayStr = format(day, "yyyy-MM-dd");
-                        const dayAppointments = appointments.filter(
-                          (apt) => apt.startAt.split("T")[0] === dayStr
-                        );
-                        const isToday = isSameDay(day, new Date());
-
-                        return (
-                          <td
-                            key={i}
-                            className={`p-2 align-top ${isToday ? "bg-blue-50" : ""}`}
-                          >
-                            {dayAppointments.length > 0 ? (
-                              <div className="space-y-1">
-                                {dayAppointments.slice(0, 3).map((apt) => (
-                                  <Link
-                                    key={apt.id}
-                                    href={`/dashboard/appointments/${apt.id}`}
-                                    className="block p-1.5 rounded text-xs bg-gray-100 hover:bg-gray-200 transition-colors"
-                                    style={{
-                                      borderLeft: `3px solid ${
-                                        groomer.color || "#6366f1"
-                                      }`,
-                                    }}
-                                  >
-                                    <div className="font-medium text-gray-900 truncate">
-                                      {formatTime(apt.startAt)}
-                                    </div>
-                                    <div className="text-gray-500 truncate">
-                                      {apt.customer.name}
-                                    </div>
-                                  </Link>
-                                ))}
-                                {dayAppointments.length > 3 && (
-                                  <div className="text-xs text-gray-400 text-center">
-                                    +{dayAppointments.length - 3} more
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="text-xs text-gray-300 text-center py-2">
-                                -
-                              </div>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

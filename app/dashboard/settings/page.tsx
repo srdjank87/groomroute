@@ -1,9 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Shield, Smartphone, CreditCard, ChevronRight, Settings as SettingsIcon, Users } from "lucide-react";
+import { MapPin, Shield, Smartphone, CreditCard, ChevronRight, Settings as SettingsIcon, Users, Building2 } from "lucide-react";
 
 const settingsCategories = [
+  {
+    name: "Account",
+    description: "Manage your business name, profile, and timezone",
+    href: "/dashboard/settings/account",
+    icon: Building2,
+    iconBg: "bg-orange-100",
+    iconColor: "text-orange-600",
+    badge: null,
+    badgeColor: "",
+  },
   {
     name: "Service Areas",
     description: "Define geographic areas and assign them to days of the week",

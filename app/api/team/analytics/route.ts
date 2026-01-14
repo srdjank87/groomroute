@@ -47,18 +47,24 @@ export async function GET(req: NextRequest) {
     const period = searchParams.get("period") || "30days";
 
     // Calculate date range
+    // Use rolling periods to match revenue-stats API for consistency
     const now = new Date();
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+
     let startDate: Date;
     let endDate: Date = now;
 
     switch (period) {
       case "week":
-        startDate = startOfWeek(now, { weekStartsOn: 1 });
-        endDate = endOfWeek(now, { weekStartsOn: 1 });
+        // Rolling 7 days (matching revenue-stats: last 7 days excluding today)
+        startDate = subDays(today, 7);
+        endDate = today;
         break;
       case "month":
-        startDate = startOfMonth(now);
-        endDate = endOfMonth(now);
+        // Rolling 30 days (matching revenue-stats)
+        startDate = subDays(today, 29);
+        endDate = now;
         break;
       default: // 30days
         startDate = subDays(now, 30);

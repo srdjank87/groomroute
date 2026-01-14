@@ -294,23 +294,23 @@ export default function BillingSettingsPage() {
       </div>
 
       {/* Plan Comparison */}
-      <div className="mt-6 bg-gray-50 rounded-xl border p-6">
+      <div className="mt-6 bg-gray-50 rounded-xl border p-4 md:p-6">
         <h2 className="font-semibold text-gray-900 mb-4">Plan Features</h2>
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="p-4 bg-white rounded-lg border">
-            <h3 className="font-semibold text-emerald-600 mb-1">Starter</h3>
-            <p className="text-2xl font-bold text-gray-900">$79<span className="text-sm font-normal text-gray-500">/mo</span></p>
-            <p className="text-xs text-gray-500 mt-2">Perfect for solo groomers</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 text-center">
+          <div className="p-3 md:p-4 bg-white rounded-lg border">
+            <h3 className="font-semibold text-emerald-600 mb-1 text-sm md:text-base">Starter</h3>
+            <p className="text-lg md:text-2xl font-bold text-gray-900">$79<span className="text-xs md:text-sm font-normal text-gray-500">/mo</span></p>
+            <p className="text-xs text-gray-500 mt-1 md:mt-2">Perfect for solo groomers</p>
           </div>
-          <div className="p-4 bg-white rounded-lg border-2 border-purple-300">
-            <h3 className="font-semibold text-purple-600 mb-1">Growth</h3>
-            <p className="text-2xl font-bold text-gray-900">$179<span className="text-sm font-normal text-gray-500">/mo</span></p>
-            <p className="text-xs text-gray-500 mt-2">For growing businesses</p>
+          <div className="p-3 md:p-4 bg-white rounded-lg border-2 border-purple-300">
+            <h3 className="font-semibold text-purple-600 mb-1 text-sm md:text-base">Growth</h3>
+            <p className="text-lg md:text-2xl font-bold text-gray-900">$179<span className="text-xs md:text-sm font-normal text-gray-500">/mo</span></p>
+            <p className="text-xs text-gray-500 mt-1 md:mt-2">For growing businesses</p>
           </div>
-          <div className="p-4 bg-white rounded-lg border">
-            <h3 className="font-semibold text-amber-600 mb-1">Pro</h3>
-            <p className="text-2xl font-bold text-gray-900">$279<span className="text-sm font-normal text-gray-500">/mo</span></p>
-            <p className="text-xs text-gray-500 mt-2">For established teams</p>
+          <div className="p-3 md:p-4 bg-white rounded-lg border">
+            <h3 className="font-semibold text-amber-600 mb-1 text-sm md:text-base">Pro</h3>
+            <p className="text-lg md:text-2xl font-bold text-gray-900">$279<span className="text-xs md:text-sm font-normal text-gray-500">/mo</span></p>
+            <p className="text-xs text-gray-500 mt-1 md:mt-2">For established teams</p>
           </div>
         </div>
         <p className="text-xs text-gray-500 text-center mt-4">

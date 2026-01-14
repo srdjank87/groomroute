@@ -552,7 +552,7 @@ export default function TeamSettingsPage() {
           </div>
           <button
             onClick={() => setShowInviteModal(true)}
-            className="btn btn-sm bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1"
+            className="btn btn-sm bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1 px-3"
           >
             <UserPlus className="h-4 w-4" />
             Invite
@@ -670,7 +670,7 @@ export default function TeamSettingsPage() {
           </div>
           <button
             onClick={() => openGroomerModal()}
-            className="btn btn-sm bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1"
+            className="btn btn-sm bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1 px-3"
           >
             <Plus className="h-4 w-4" />
             Add Groomer
@@ -1062,7 +1062,7 @@ export default function TeamSettingsPage() {
               <button
                 onClick={handleSaveGroomer}
                 disabled={isSavingGroomer}
-                className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+                className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 px-4"
               >
                 {isSavingGroomer && (
                   <span className="loading loading-spinner loading-sm"></span>

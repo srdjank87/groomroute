@@ -6,7 +6,6 @@ import {
   Heading,
   Hr,
   Html,
-  Img,
   Link,
   Preview,
   Section,
@@ -44,13 +43,7 @@ export default function TeamInviteEmail({
         <Container style={container}>
           {/* Logo */}
           <Section style={logoSection}>
-            <Img
-              src={`${baseUrl}/logo.png`}
-              width="150"
-              height="40"
-              alt="GroomRoute"
-              style={logo}
-            />
+            <Text style={logoText}>GroomRoute</Text>
           </Section>
 
           {/* Main Content */}
@@ -132,8 +125,12 @@ const logoSection = {
   textAlign: "center" as const,
 };
 
-const logo = {
-  margin: "0 auto",
+const logoText = {
+  color: "#A5744A",
+  fontSize: "28px",
+  fontWeight: "bold",
+  textAlign: "center" as const,
+  margin: "0",
 };
 
 const content = {

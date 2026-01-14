@@ -642,8 +642,7 @@ export default function AnalyticsPage() {
               onChange={(e) => setTeamPeriod(e.target.value as "week" | "month" | "30days")}
               className="select select-sm select-bordered"
             >
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
+              <option value="week">Last 7 Days</option>
               <option value="30days">Last 30 Days</option>
             </select>
           </div>
@@ -662,8 +661,69 @@ export default function AnalyticsPage() {
             </div>
           )}
 
-          {/* Groomer Stats Table */}
-          <div className="overflow-x-auto">
+          {/* Groomer Stats - Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {teamAnalytics.groomerStats.map((gs) => (
+              <div key={gs.groomer.id} className="bg-gray-50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0"
+                    style={{ backgroundColor: gs.groomer.color || "#6366f1" }}
+                  >
+                    {gs.groomer.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="font-medium text-gray-900 truncate">{gs.groomer.name}</span>
+                  <span
+                    className={`ml-auto px-2 py-0.5 rounded-full text-xs font-medium ${
+                      gs.stats.completionRate >= 90
+                        ? "bg-green-100 text-green-700"
+                        : gs.stats.completionRate >= 75
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {gs.stats.completionRate}%
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="bg-white rounded p-2">
+                    <div className="font-semibold text-gray-900">{gs.stats.completedCount}</div>
+                    <div className="text-gray-500">Jobs</div>
+                  </div>
+                  <div className="bg-white rounded p-2">
+                    <div className="font-semibold text-green-600">${gs.stats.totalRevenue}</div>
+                    <div className="text-gray-500">Revenue</div>
+                  </div>
+                  <div className="bg-white rounded p-2">
+                    <div className="font-semibold text-gray-700">${gs.stats.avgRevenuePerAppointment}</div>
+                    <div className="text-gray-500">Avg/Job</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {/* Team Total - Mobile */}
+            <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-semibold text-gray-900">Team Total</span>
+                <span className="ml-auto px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                  {Math.round(teamAnalytics.teamTotals.avgCompletionRate)}% avg
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                <div className="bg-white rounded p-2">
+                  <div className="font-semibold text-gray-900">{teamAnalytics.teamTotals.completedCount}</div>
+                  <div className="text-gray-500">Total Jobs</div>
+                </div>
+                <div className="bg-white rounded p-2">
+                  <div className="font-semibold text-green-600">${teamAnalytics.teamTotals.totalRevenue}</div>
+                  <div className="text-gray-500">Total Revenue</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Groomer Stats Table - Desktop */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200">
