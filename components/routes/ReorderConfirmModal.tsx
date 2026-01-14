@@ -1,6 +1,6 @@
 "use client";
 
-import { X, MessageSquare, Send } from "lucide-react";
+import { X, MessageSquare } from "lucide-react";
 
 interface TimeChange {
   id: string;
@@ -42,16 +42,6 @@ function generateNotificationMessage(
   return `Hi ${firstName}, your grooming appointment for ${petName} has been rescheduled from ${oldTime} to ${newTime} today. Let me know if this works for you!`;
 }
 
-function generateETAMessage(customerName: string, petName: string, newTime: string): string {
-  const firstName = customerName.split(" ")[0];
-  return `Hi ${firstName}! I'll be arriving for ${petName}'s grooming around ${newTime} today. See you soon!`;
-}
-
-// Generic message for group notifications (no personalization)
-function generateGroupMessage(): string {
-  return `Hi! Your grooming appointment time has been adjusted for today. Please check your updated time. Let me know if you have any questions!`;
-}
-
 export default function ReorderConfirmModal({
   isOpen,
   onClose,
@@ -82,28 +72,6 @@ export default function ReorderConfirmModal({
       window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
     } else {
       window.location.href = `sms:${change.customerPhone}?body=${encodedMessage}`;
-    }
-  }
-
-  function handleNotifyAll() {
-    // Open notification for each affected customer with a phone number
-    const customersToNotify = affectedChanges.filter((change) => change.customerPhone);
-
-    if (customersToNotify.length === 0) return;
-
-    // Use generic message for group notifications
-    const message = generateGroupMessage();
-    const encodedMessage = encodeURIComponent(message);
-
-    if (useWhatsApp) {
-      // WhatsApp doesn't support group compose, notify first customer
-      const firstCustomer = customersToNotify[0];
-      const cleanPhone = firstCustomer.customerPhone!.replace(/\D/g, "");
-      window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
-    } else {
-      // Combine all phone numbers for group SMS
-      const phoneNumbers = customersToNotify.map((c) => c.customerPhone).join(",");
-      window.location.href = `sms:${phoneNumbers}?body=${encodedMessage}`;
     }
   }
 
@@ -175,17 +143,6 @@ export default function ReorderConfirmModal({
 
         {/* Footer */}
         <div className="p-4 border-t bg-gray-50">
-          {affectedChanges.length > 0 &&
-            affectedChanges.some((c) => c.customerPhone) && (
-              <button
-                onClick={handleNotifyAll}
-                className="btn btn-outline w-full mb-3 gap-2"
-              >
-                <Send className="h-4 w-4" />
-                Notify All Customers ({affectedChanges.filter((c) => c.customerPhone).length})
-              </button>
-            )}
-
           <div className="flex gap-2">
             <button
               onClick={onClose}
