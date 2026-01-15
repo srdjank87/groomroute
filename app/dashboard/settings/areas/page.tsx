@@ -424,7 +424,7 @@ export default function SettingsAreasPage() {
             </p>
             <button
               onClick={openCreateModal}
-              className="btn bg-[#A5744A] hover:bg-[#8B5A2B] text-white border-none"
+              className="btn bg-[#A5744A] hover:bg-[#8B5A2B] text-white border-none px-6"
             >
               Create Your First Area
             </button>

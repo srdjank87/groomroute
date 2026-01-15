@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, Save, Building2, User, Globe } from "lucide-react";
+import { ArrowLeft, Save, Building2, User, Clock } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -17,6 +17,10 @@ interface AccountInfo {
     email: string;
     role: string;
   };
+  groomer: {
+    workingHoursStart: string;
+    workingHoursEnd: string;
+  } | null;
 }
 
 // Common US timezones
@@ -30,6 +34,41 @@ const timezones = [
   { value: "Pacific/Honolulu", label: "Hawaii Time (HT)" },
 ];
 
+// Time options for working hours dropdowns
+const timeOptions = [
+  { value: "06:00", label: "6:00 AM" },
+  { value: "06:30", label: "6:30 AM" },
+  { value: "07:00", label: "7:00 AM" },
+  { value: "07:30", label: "7:30 AM" },
+  { value: "08:00", label: "8:00 AM" },
+  { value: "08:30", label: "8:30 AM" },
+  { value: "09:00", label: "9:00 AM" },
+  { value: "09:30", label: "9:30 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "10:30", label: "10:30 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "11:30", label: "11:30 AM" },
+  { value: "12:00", label: "12:00 PM" },
+  { value: "12:30", label: "12:30 PM" },
+  { value: "13:00", label: "1:00 PM" },
+  { value: "13:30", label: "1:30 PM" },
+  { value: "14:00", label: "2:00 PM" },
+  { value: "14:30", label: "2:30 PM" },
+  { value: "15:00", label: "3:00 PM" },
+  { value: "15:30", label: "3:30 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "16:30", label: "4:30 PM" },
+  { value: "17:00", label: "5:00 PM" },
+  { value: "17:30", label: "5:30 PM" },
+  { value: "18:00", label: "6:00 PM" },
+  { value: "18:30", label: "6:30 PM" },
+  { value: "19:00", label: "7:00 PM" },
+  { value: "19:30", label: "7:30 PM" },
+  { value: "20:00", label: "8:00 PM" },
+  { value: "20:30", label: "8:30 PM" },
+  { value: "21:00", label: "9:00 PM" },
+];
+
 export default function AccountSettingsPage() {
   const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +77,8 @@ export default function AccountSettingsPage() {
   const [businessName, setBusinessName] = useState("");
   const [userName, setUserName] = useState("");
   const [timezone, setTimezone] = useState("America/New_York");
+  const [workingHoursStart, setWorkingHoursStart] = useState("08:00");
+  const [workingHoursEnd, setWorkingHoursEnd] = useState("17:00");
 
   useEffect(() => {
     fetchAccountInfo();
@@ -52,6 +93,10 @@ export default function AccountSettingsPage() {
         setBusinessName(data.account.name || "");
         setUserName(data.user.name || "");
         setTimezone(data.account.timezone || "America/New_York");
+        if (data.groomer) {
+          setWorkingHoursStart(data.groomer.workingHoursStart || "08:00");
+          setWorkingHoursEnd(data.groomer.workingHoursEnd || "17:00");
+        }
       }
     } catch (error) {
       console.error("Failed to fetch account info:", error);
@@ -76,6 +121,8 @@ export default function AccountSettingsPage() {
           businessName: businessName.trim(),
           userName: userName.trim() || null,
           timezone,
+          workingHoursStart,
+          workingHoursEnd,
         }),
       });
 
@@ -177,6 +224,61 @@ export default function AccountSettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Working Hours */}
+      {accountInfo?.groomer && (
+        <div className="bg-white rounded-xl border p-6 mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-emerald-100 rounded-lg">
+              <Clock className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-gray-900">Working Hours</h2>
+              <p className="text-sm text-gray-500">
+                Set your daily availability for appointments
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Start Time
+              </label>
+              <select
+                value={workingHoursStart}
+                onChange={(e) => setWorkingHoursStart(e.target.value)}
+                className="select select-bordered w-full pl-4"
+              >
+                {timeOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                End Time
+              </label>
+              <select
+                value={workingHoursEnd}
+                onChange={(e) => setWorkingHoursEnd(e.target.value)}
+                className="select select-bordered w-full pl-4"
+              >
+                {timeOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Appointments will be scheduled within these hours
+          </p>
+        </div>
+      )}
 
       {/* Your Profile */}
       <div className="bg-white rounded-xl border p-6 mb-6">

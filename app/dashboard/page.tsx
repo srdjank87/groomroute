@@ -1232,19 +1232,19 @@ function DashboardContent() {
               </div>
             </Link>
             <Link
-              href="/dashboard/services"
+              href="/dashboard/settings/areas"
               className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
             >
               <div className="p-2 bg-emerald-100 rounded-lg">
-                <Dog className="h-5 w-5 text-emerald-600" />
+                <Navigation className="h-5 w-5 text-emerald-600" />
               </div>
               <div className="flex-1">
-                <p className="font-medium text-gray-900">Set up your services</p>
-                <p className="text-sm text-gray-600">Define your grooming services with pricing and durations</p>
+                <p className="font-medium text-gray-900">Set up service areas</p>
+                <p className="text-sm text-gray-600">Organize your territory into zones for smarter routing</p>
               </div>
             </Link>
             <Link
-              href="/dashboard/settings"
+              href="/dashboard/settings/account"
               className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors"
             >
               <div className="p-2 bg-purple-100 rounded-lg">
@@ -1252,7 +1252,7 @@ function DashboardContent() {
               </div>
               <div className="flex-1">
                 <p className="font-medium text-gray-900">Configure working hours</p>
-                <p className="text-sm text-gray-600">Set your availability and service preferences</p>
+                <p className="text-sm text-gray-600">Set your availability and daily schedule</p>
               </div>
             </Link>
           </div>

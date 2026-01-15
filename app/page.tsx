@@ -222,6 +222,7 @@ export default function Home() {
                     height={400}
                     quality={100}
                     className="rounded-lg w-full shadow-md"
+                    unoptimized
                   />
                 </div>
               </div>
@@ -253,6 +254,7 @@ export default function Home() {
                     height={400}
                     quality={100}
                     className="rounded-lg w-full shadow-md"
+                    unoptimized
                   />
                 </div>
               </div>
@@ -283,6 +285,7 @@ export default function Home() {
                     height={400}
                     quality={100}
                     className="rounded-lg w-full shadow-md"
+                    unoptimized
                   />
                 </div>
               </div>

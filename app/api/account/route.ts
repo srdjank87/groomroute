@@ -36,6 +36,16 @@ export async function GET() {
       },
     });
 
+    // Get groomer working hours
+    const groomer = await prisma.groomer.findFirst({
+      where: { accountId, isActive: true },
+      select: {
+        id: true,
+        workingHoursStart: true,
+        workingHoursEnd: true,
+      },
+    });
+
     if (!account || !user) {
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
@@ -43,6 +53,10 @@ export async function GET() {
     return NextResponse.json({
       account,
       user,
+      groomer: groomer ? {
+        workingHoursStart: groomer.workingHoursStart || "08:00",
+        workingHoursEnd: groomer.workingHoursEnd || "17:00",
+      } : null,
     });
   } catch (error) {
     console.error("Account API error:", error);
@@ -82,7 +96,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { businessName, userName, timezone } = body;
+    const { businessName, userName, timezone, workingHoursStart, workingHoursEnd } = body;
 
     // Update account if businessName or timezone provided
     if (businessName !== undefined || timezone !== undefined) {
@@ -101,6 +115,23 @@ export async function PATCH(req: NextRequest) {
         where: { id: userId },
         data: { name: userName },
       });
+    }
+
+    // Update groomer working hours if provided
+    if (workingHoursStart !== undefined || workingHoursEnd !== undefined) {
+      const groomer = await prisma.groomer.findFirst({
+        where: { accountId, isActive: true },
+      });
+
+      if (groomer) {
+        await prisma.groomer.update({
+          where: { id: groomer.id },
+          data: {
+            ...(workingHoursStart !== undefined && { workingHoursStart }),
+            ...(workingHoursEnd !== undefined && { workingHoursEnd }),
+          },
+        });
+      }
     }
 
     return NextResponse.json({ success: true });
