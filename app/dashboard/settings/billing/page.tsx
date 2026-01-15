@@ -17,9 +17,9 @@ interface Subscription {
 
 const planInfo = {
   TRIAL: { name: "Free Trial", price: "Free", color: "text-blue-600", bg: "bg-blue-100" },
-  STARTER: { name: "Starter", price: "$79/mo", color: "text-emerald-600", bg: "bg-emerald-100" },
-  GROWTH: { name: "Growth", price: "$179/mo", color: "text-purple-600", bg: "bg-purple-100" },
-  PRO: { name: "Pro", price: "$279/mo", color: "text-amber-600", bg: "bg-amber-100" },
+  STARTER: { name: "Starter", price: "$39/mo", color: "text-emerald-600", bg: "bg-emerald-100" },
+  GROWTH: { name: "Growth", price: "$79/mo", color: "text-purple-600", bg: "bg-purple-100" },
+  PRO: { name: "Pro", price: "$149/mo", color: "text-amber-600", bg: "bg-amber-100" },
 };
 
 const statusInfo = {
@@ -293,28 +293,98 @@ export default function BillingSettingsPage() {
         )}
       </div>
 
-      {/* Plan Comparison */}
-      <div className="mt-6 bg-gray-50 rounded-xl border p-4 md:p-6">
-        <h2 className="font-semibold text-gray-900 mb-4">Plan Features</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 text-center">
-          <div className="p-3 md:p-4 bg-white rounded-lg border">
-            <h3 className="font-semibold text-emerald-600 mb-1 text-sm md:text-base">Starter</h3>
-            <p className="text-lg md:text-2xl font-bold text-gray-900">$79<span className="text-xs md:text-sm font-normal text-gray-500">/mo</span></p>
-            <p className="text-xs text-gray-500 mt-1 md:mt-2">Perfect for solo groomers</p>
+      {/* Change Plan */}
+      <div className="mt-6 bg-white rounded-xl border p-6">
+        <h2 className="font-semibold text-gray-900 mb-2">Change Plan</h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Upgrade or downgrade your subscription anytime. Changes take effect immediately.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+          {/* Starter Plan */}
+          <div className={`p-4 rounded-lg border-2 ${
+            subscription?.subscriptionPlan === "STARTER"
+              ? "border-emerald-500 bg-emerald-50"
+              : "border-gray-200 hover:border-emerald-300"
+          }`}>
+            <h3 className="font-semibold text-emerald-600 mb-1">Starter</h3>
+            <p className="text-2xl font-bold text-gray-900 mb-1">$39<span className="text-sm font-normal text-gray-500">/mo</span></p>
+            <p className="text-xs text-gray-500 mb-3">Up to 50 clients</p>
+            {subscription?.subscriptionPlan === "STARTER" ? (
+              <span className="text-xs text-emerald-600 font-medium">Current Plan</span>
+            ) : subscription?.stripeCustomerId ? (
+              <button
+                onClick={handleManageBilling}
+                disabled={isPortalLoading}
+                className="btn btn-sm w-full bg-emerald-600 hover:bg-emerald-700 text-white border-0"
+              >
+                {subscription?.subscriptionPlan === "GROWTH" || subscription?.subscriptionPlan === "PRO" ? "Downgrade" : "Select"}
+              </button>
+            ) : (
+              <Link href="/auth/signup?plan=starter" className="btn btn-sm w-full bg-emerald-600 hover:bg-emerald-700 text-white border-0">
+                Select
+              </Link>
+            )}
           </div>
-          <div className="p-3 md:p-4 bg-white rounded-lg border-2 border-purple-300">
-            <h3 className="font-semibold text-purple-600 mb-1 text-sm md:text-base">Growth</h3>
-            <p className="text-lg md:text-2xl font-bold text-gray-900">$179<span className="text-xs md:text-sm font-normal text-gray-500">/mo</span></p>
-            <p className="text-xs text-gray-500 mt-1 md:mt-2">For growing businesses</p>
+
+          {/* Growth Plan */}
+          <div className={`p-4 rounded-lg border-2 ${
+            subscription?.subscriptionPlan === "GROWTH"
+              ? "border-purple-500 bg-purple-50"
+              : "border-gray-200 hover:border-purple-300"
+          }`}>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-semibold text-purple-600">Growth</h3>
+              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Popular</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-900 mb-1">$79<span className="text-sm font-normal text-gray-500">/mo</span></p>
+            <p className="text-xs text-gray-500 mb-3">Unlimited clients + Calm Center</p>
+            {subscription?.subscriptionPlan === "GROWTH" ? (
+              <span className="text-xs text-purple-600 font-medium">Current Plan</span>
+            ) : subscription?.stripeCustomerId ? (
+              <button
+                onClick={handleManageBilling}
+                disabled={isPortalLoading}
+                className="btn btn-sm w-full bg-purple-600 hover:bg-purple-700 text-white border-0"
+              >
+                {subscription?.subscriptionPlan === "PRO" ? "Downgrade" : "Upgrade"}
+              </button>
+            ) : (
+              <Link href="/auth/signup?plan=growth" className="btn btn-sm w-full bg-purple-600 hover:bg-purple-700 text-white border-0">
+                Select
+              </Link>
+            )}
           </div>
-          <div className="p-3 md:p-4 bg-white rounded-lg border">
-            <h3 className="font-semibold text-amber-600 mb-1 text-sm md:text-base">Pro</h3>
-            <p className="text-lg md:text-2xl font-bold text-gray-900">$279<span className="text-xs md:text-sm font-normal text-gray-500">/mo</span></p>
-            <p className="text-xs text-gray-500 mt-1 md:mt-2">For established teams</p>
+
+          {/* Pro Plan */}
+          <div className={`p-4 rounded-lg border-2 ${
+            subscription?.subscriptionPlan === "PRO"
+              ? "border-amber-500 bg-amber-50"
+              : "border-gray-200 hover:border-amber-300"
+          }`}>
+            <h3 className="font-semibold text-amber-600 mb-1">Pro</h3>
+            <p className="text-2xl font-bold text-gray-900 mb-1">$149<span className="text-sm font-normal text-gray-500">/mo</span></p>
+            <p className="text-xs text-gray-500 mb-3">Team features + Analytics</p>
+            {subscription?.subscriptionPlan === "PRO" ? (
+              <span className="text-xs text-amber-600 font-medium">Current Plan</span>
+            ) : subscription?.stripeCustomerId ? (
+              <button
+                onClick={handleManageBilling}
+                disabled={isPortalLoading}
+                className="btn btn-sm w-full bg-amber-600 hover:bg-amber-700 text-white border-0"
+              >
+                Upgrade
+              </button>
+            ) : (
+              <Link href="/auth/signup?plan=pro" className="btn btn-sm w-full bg-amber-600 hover:bg-amber-700 text-white border-0">
+                Select
+              </Link>
+            )}
           </div>
         </div>
+
         <p className="text-xs text-gray-500 text-center mt-4">
-          Save 20% with annual billing. Manage your plan in the billing portal.
+          Save 17% with annual billing. Plan changes are prorated automatically.
         </p>
       </div>
     </div>

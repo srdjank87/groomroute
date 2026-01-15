@@ -43,6 +43,8 @@ type SortOption =
 
 type FilterOption = "all" | "active" | "inactive" | "vip" | "new";
 
+const ITEMS_PER_PAGE = 20;
+
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
@@ -51,6 +53,7 @@ export default function CustomersPage() {
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
   const [areaFilter, setAreaFilter] = useState<string>("all"); // "all" or areaId
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch service areas
   useEffect(() => {
@@ -204,6 +207,18 @@ export default function CustomersPage() {
     }
   }, [filteredCustomers, sortBy]);
 
+  // Pagination
+  const totalPages = Math.ceil(sortedCustomers.length / ITEMS_PER_PAGE);
+  const paginatedCustomers = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return sortedCustomers.slice(start, start + ITEMS_PER_PAGE);
+  }, [sortedCustomers, currentPage]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterBy, areaFilter, searchQuery, sortBy]);
+
   // Check if customer is VIP
   const isVipCustomer = useCallback(
     (customerId: string) => {
@@ -254,53 +269,53 @@ export default function CustomersPage() {
       </div>
 
       {/* Filter Pills */}
-      <div className="mb-4 grid grid-cols-3 sm:grid-cols-5 gap-2">
+      <div className="mb-4 flex flex-wrap gap-1.5">
         <button
           onClick={() => setFilterBy("all")}
-          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
             filterBy === "all"
-              ? "bg-[#A5744A] text-white border-[#A5744A]"
-              : "bg-white text-gray-700 border-gray-300 hover:border-[#A5744A]"
+              ? "bg-[#A5744A] text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
           All ({customerSegments.all})
         </button>
         <button
           onClick={() => setFilterBy("active")}
-          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
             filterBy === "active"
-              ? "bg-green-600 text-white border-green-600"
-              : "bg-white text-gray-700 border-gray-300 hover:border-green-600"
+              ? "bg-green-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
           Active ({customerSegments.active})
         </button>
         <button
           onClick={() => setFilterBy("inactive")}
-          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
             filterBy === "inactive"
-              ? "bg-gray-600 text-white border-gray-600"
-              : "bg-white text-gray-700 border-gray-300 hover:border-gray-600"
+              ? "bg-gray-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
           Inactive ({customerSegments.inactive})
         </button>
         <button
           onClick={() => setFilterBy("vip")}
-          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
             filterBy === "vip"
-              ? "bg-purple-600 text-white border-purple-600"
-              : "bg-white text-gray-700 border-gray-300 hover:border-purple-600"
+              ? "bg-purple-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
           VIP ({customerSegments.vip})
         </button>
         <button
           onClick={() => setFilterBy("new")}
-          className={`badge badge-lg h-10 px-2 sm:px-4 cursor-pointer transition-colors text-xs sm:text-sm justify-center ${
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
             filterBy === "new"
-              ? "bg-blue-600 text-white border-blue-600"
-              : "bg-white text-gray-700 border-gray-300 hover:border-blue-600"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
           New ({customerSegments.new})
@@ -361,7 +376,8 @@ export default function CustomersPage() {
 
       {/* Results Count */}
       <div className="mb-4 text-sm text-gray-600">
-        Showing {sortedCustomers.length} {sortedCustomers.length === 1 ? "client" : "clients"}
+        Showing {paginatedCustomers.length} of {sortedCustomers.length} {sortedCustomers.length === 1 ? "client" : "clients"}
+        {totalPages > 1 && ` (page ${currentPage} of ${totalPages})`}
         {(filterBy !== "all" || areaFilter !== "all") && (
           <button
             onClick={() => {
@@ -406,8 +422,9 @@ export default function CustomersPage() {
           )}
         </div>
       ) : (
+        <>
         <div className="space-y-3">
-          {sortedCustomers.map((customer) => {
+          {paginatedCustomers.map((customer) => {
             const isVip = isVipCustomer(customer.id);
             const isActive = isActiveCustomer(customer.lastAppointmentDate);
 
@@ -419,7 +436,7 @@ export default function CustomersPage() {
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <h3 className="font-semibold text-gray-900">
                         {customer.name}
                       </h3>
@@ -442,6 +459,11 @@ export default function CustomersPage() {
                         </span>
                       )}
                     </div>
+                    {customer.pets.length > 0 && (
+                      <p className="text-sm text-amber-700 font-medium mb-1">
+                        🐾 {customer.pets.map(p => p.name).join(", ")}
+                      </p>
+                    )}
                     {customer.phone && (
                       <p className="text-sm text-gray-600">{customer.phone}</p>
                     )}
@@ -460,8 +482,7 @@ export default function CustomersPage() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      {customer._count.appointments}{" "}
-                      {customer._count.appointments === 1 ? "appointment" : "appointments"}
+                      {customer._count.appointments}
                     </span>
                     <span className="flex items-center gap-1">
                       <DollarSign className="h-4 w-4" />
@@ -484,6 +505,54 @@ export default function CustomersPage() {
             );
           })}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-6">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="btn btn-sm bg-white border-gray-300 text-gray-700 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <div className="flex gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum: number;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`btn btn-sm min-w-[40px] ${
+                      currentPage === pageNum
+                        ? "bg-[#A5744A] text-white border-[#A5744A]"
+                        : "bg-white border-gray-300 text-gray-700"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="btn btn-sm bg-white border-gray-300 text-gray-700 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
+        </>
       )}
     </div>
   );

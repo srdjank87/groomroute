@@ -195,6 +195,157 @@ interface RevenueStats {
   calmImpact: CalmImpact;
 }
 
+// Demo Data Banner Component
+function DemoDataBanner({
+  showSampleData,
+  hasData,
+  onGenerateDemo,
+  isGenerating,
+}: {
+  showSampleData: boolean;
+  hasData: boolean;
+  onGenerateDemo: () => void;
+  isGenerating: boolean;
+}) {
+  const [isExpanded, setIsExpanded] = useState(showSampleData);
+  const [isClearing, setIsClearing] = useState(false);
+
+  // Auto-expand when showSampleData is true (first time with sample data)
+  useEffect(() => {
+    if (showSampleData) {
+      setIsExpanded(true);
+    }
+  }, [showSampleData]);
+
+  const handleClearData = async () => {
+    if (confirm("Clear all sample data and start fresh with your real clients?")) {
+      setIsClearing(true);
+      try {
+        await fetch("/api/dashboard/clear-sample", { method: "POST" });
+        toast.success("Sample data cleared!");
+        window.location.reload();
+      } catch {
+        toast.error("Failed to clear sample data");
+        setIsClearing(false);
+      }
+    }
+  };
+
+  // Collapsed state
+  if (!isExpanded) {
+    return (
+      <button
+        onClick={() => setIsExpanded(true)}
+        className="w-full mb-4 px-4 py-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg border border-purple-200 hover:border-purple-300 transition-colors flex items-center justify-between group"
+      >
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-purple-600" />
+          <span className="text-sm font-medium text-purple-800">Demo Mode</span>
+          {showSampleData && (
+            <span className="text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full">
+              Sample data loaded
+            </span>
+          )}
+        </div>
+        <ChevronDown className="h-4 w-4 text-purple-600 group-hover:translate-y-0.5 transition-transform" />
+      </button>
+    );
+  }
+
+  // Expanded state
+  return (
+    <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg text-white p-5 mb-6">
+      <div className="flex items-start gap-3">
+        <Sparkles className="h-6 w-6 flex-shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <div className="flex items-start justify-between mb-2">
+            <h3 className="font-bold text-lg">
+              {showSampleData ? "See GroomRoute in Action" : "Try Demo Mode"}
+            </h3>
+            <button
+              onClick={() => setIsExpanded(false)}
+              className="p-1 hover:bg-white/20 rounded transition-colors"
+            >
+              <ChevronUp className="h-4 w-4" />
+            </button>
+          </div>
+
+          {showSampleData ? (
+            <>
+              <p className="text-white/90 text-sm mb-4">
+                We&apos;ve loaded sample data with clients, pets, and appointments to show you how GroomRoute works. Explore the route optimizer, client management, and scheduling features. Clear anytime to start fresh!
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href="/dashboard/routes"
+                  className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0 font-semibold"
+                >
+                  View Sample Route
+                </Link>
+                <Link
+                  href="/dashboard/customers"
+                  className="btn btn-sm bg-white/20 text-white border border-white/40 hover:bg-white/30 font-medium"
+                >
+                  View Sample Clients
+                </Link>
+                <button
+                  onClick={handleClearData}
+                  disabled={isClearing}
+                  className="btn btn-sm bg-white/20 text-white border border-white/40 hover:bg-white/30 font-medium"
+                >
+                  {isClearing ? (
+                    <span className="loading loading-spinner loading-xs"></span>
+                  ) : (
+                    "Clear & Start Fresh"
+                  )}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-white/90 text-sm mb-4">
+                Want to see how GroomRoute handles a full day of appointments? Generate demo data with sample clients, pets, and routes to explore all features.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={onGenerateDemo}
+                  disabled={isGenerating}
+                  className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0 font-semibold gap-2"
+                >
+                  {isGenerating ? (
+                    <>
+                      <span className="loading loading-spinner loading-xs"></span>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Generate Demo Data
+                    </>
+                  )}
+                </button>
+                {hasData && (
+                  <button
+                    onClick={handleClearData}
+                    disabled={isClearing}
+                    className="btn btn-sm bg-white/20 text-white border border-white/40 hover:bg-white/30 font-medium"
+                  >
+                    {isClearing ? (
+                      <span className="loading loading-spinner loading-xs"></span>
+                    ) : (
+                      "Clear Existing Data"
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Format time from ISO string - display the UTC time as-is (not converted to local)
 // This is because we store appointment times as "intended display time" in UTC
 function formatTime(isoString: string): string {
@@ -788,67 +939,19 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Demo Buttons - Show when no appointments today */}
-      {!stats?.hasData && !isFullscreen && (
-        <div className="mb-4 flex justify-end gap-2">
-          <button
-            onClick={async () => {
-              if (confirm("Clear all sample data and start fresh?")) {
-                await fetch("/api/dashboard/clear-sample", { method: "POST" });
-                toast.success("Sample data cleared");
-                window.location.reload();
-              }
-            }}
-            className="btn btn-sm btn-ghost text-gray-500 hover:text-gray-700 gap-2"
-          >
-            <X className="h-4 w-4" />
-            Clear Sample Data
-          </button>
-          <button
-            onClick={generateDemoData}
-            className="btn btn-sm bg-purple-600 hover:bg-purple-700 text-white border-0 gap-2"
-          >
-            <Sparkles className="h-4 w-4" />
-            Generate Demo Appointments
-          </button>
-        </div>
-      )}
+      {/* Demo Buttons removed - functionality moved to collapsible banner below */}
 
       {/* Trial/Subscription Status */}
       {!isFullscreen && <TrialStatus />}
 
-      {/* Sample Data Banner - Only show on first login with no data */}
-      {stats?.showSampleData && !isFullscreen && (
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg text-white p-6 mb-6">
-          <div className="flex items-start gap-3">
-            <Sparkles className="h-6 w-6 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h3 className="font-bold text-lg mb-1">See GroomRoute in Action</h3>
-              <p className="text-white/90 text-sm mb-4">
-                We&apos;ve created a sample route with 5 appointments to show you how much time and money you can save. This is just a preview - you can clear it anytime and add your real appointments.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/dashboard/routes"
-                  className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0 font-semibold"
-                >
-                  View Sample Route
-                </Link>
-                <button
-                  onClick={async () => {
-                    if (confirm("Clear sample data and start fresh?")) {
-                      await fetch("/api/dashboard/clear-sample", { method: "POST" });
-                      window.location.reload();
-                    }
-                  }}
-                  className="btn btn-sm bg-white/20 text-white border-2 border-white/40 hover:bg-white/30 hover:border-white/60 font-semibold px-4"
-                >
-                  Clear Sample Data
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Sample Data Banner - Collapsible, always available */}
+      {!isFullscreen && (
+        <DemoDataBanner
+          showSampleData={stats?.showSampleData || false}
+          hasData={stats?.hasData || false}
+          onGenerateDemo={generateDemoData}
+          isGenerating={isLoading}
+        />
       )}
 
       {/* Hero Section - Today's Route */}

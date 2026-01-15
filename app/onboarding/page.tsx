@@ -264,7 +264,7 @@ export default function OnboardingPage() {
                   </label>
                   <select
                     required
-                    className="select select-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20"
+                    className="select select-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20 pl-4"
                     value={hoursData.workingHoursStart}
                     onChange={(e) => setHoursData({ ...hoursData, workingHoursStart: e.target.value })}
                   >
@@ -282,7 +282,7 @@ export default function OnboardingPage() {
                   </label>
                   <select
                     required
-                    className="select select-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20"
+                    className="select select-bordered w-full border-2 border-gray-300 focus:border-[#A5744A] focus:ring-2 focus:ring-[#A5744A]/20 pl-4"
                     value={hoursData.workingHoursEnd}
                     onChange={(e) => setHoursData({ ...hoursData, workingHoursEnd: e.target.value })}
                   >
