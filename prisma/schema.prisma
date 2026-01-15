@@ -73,6 +73,13 @@ model Account {
   // Facebook tracking data (stored temporarily for CAPI event matching)
   fbTrackingData     Json?            // { fbc, fbp, userAgent, clientIp }
 
+  // Google Calendar integration
+  googleCalendarEnabled     Boolean @default(false)
+  googleCalendarId          String?  // Calendar ID to sync to (usually "primary")
+  googleAccessToken         String?  @db.Text
+  googleRefreshToken        String?  @db.Text
+  googleTokenExpiresAt      DateTime?
+
   @@index([createdAt])
   @@index([subscriptionStatus])
   @@index([trialEndsAt])
@@ -254,6 +261,8 @@ model Appointment {
   reminderSent2hr   Boolean @default(false)
   customerConfirmed Boolean @default(false)
   confirmedAt       DateTime?
+  // Google Calendar sync
+  googleCalendarEventId String?      // ID of synced Google Calendar event
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   routeStops      RouteStop[]
@@ -574,4 +583,21 @@ enum InvitationStatus {
   ACCEPTED
   EXPIRED
   REVOKED
+}
+
+// Admin audit log for tracking important system events
+model AdminEvent {
+  id          String   @id @default(cuid())
+  type        String   // signup, subscription_change, payment, login, etc.
+  accountId   String?  // Related account (if applicable)
+  accountName String?  // Snapshot of account name at time of event
+  userId      String?  // Related user (if applicable)
+  userEmail   String?  // Snapshot of user email at time of event
+  description String   // Human-readable description
+  metadata    Json?    // Additional event-specific data
+  createdAt   DateTime @default(now())
+
+  @@index([type])
+  @@index([accountId])
+  @@index([createdAt])
 }

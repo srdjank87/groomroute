@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { logAdminEvent } from "@/lib/admin-events";
 
 export async function POST(req: NextRequest) {
   try {
@@ -57,6 +58,15 @@ export async function POST(req: NextRequest) {
         passwordResetToken: null,
         passwordResetExpiresAt: null,
       },
+    });
+
+    // Log admin event
+    await logAdminEvent({
+      type: "password_reset_completed",
+      accountId: user.accountId,
+      userId: user.id,
+      userEmail: user.email,
+      description: `Password reset completed for ${user.email}`,
     });
 
     return NextResponse.json({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { logAdminEvent } from "@/lib/admin-events";
 
 // POST - Accept invitation and create user account
 export async function POST(
@@ -159,6 +160,20 @@ export async function POST(
       });
 
       return user;
+    });
+
+    // Log admin event
+    await logAdminEvent({
+      type: "team_member_joined",
+      accountId: invitation.accountId,
+      accountName: account.name,
+      userId: result.id,
+      userEmail: result.email,
+      description: `${result.name} joined as ${invitation.role}`,
+      metadata: {
+        role: invitation.role,
+        autoLinkedToGroomer: !!matchingGroomerId,
+      },
     });
 
     return NextResponse.json({

@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { trackAccountCreated } from "@/lib/posthog-server";
+import { logAdminEvent } from "@/lib/admin-events";
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -78,6 +79,20 @@ export async function POST(request: NextRequest) {
     await trackAccountCreated(result.account.id, validatedData.email, {
       signupSource: "direct",
       planSelected: validatedData.plan,
+    });
+
+    // Log admin event
+    await logAdminEvent({
+      type: "signup",
+      accountId: result.account.id,
+      accountName: validatedData.businessName,
+      userId: result.user.id,
+      userEmail: validatedData.email,
+      description: `New account "${validatedData.businessName}" created by ${validatedData.email}`,
+      metadata: {
+        plan: validatedData.plan,
+        billing: validatedData.billing,
+      },
     });
 
     return NextResponse.json(

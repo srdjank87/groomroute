@@ -6,6 +6,7 @@ import Stripe from "stripe";
 import { fbCapiStartTrial, fbCapiSubscribe } from "@/lib/facebook-capi";
 import { trackTrialConverted, trackServerEvent } from "@/lib/posthog-server";
 import { onboardNewUser } from "@/lib/email";
+import { logAdminEvent } from "@/lib/admin-events";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -165,6 +166,21 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       const planDisplayName = planName.charAt(0).toUpperCase() + planName.slice(1).toLowerCase();
       await onboardNewUser(user.email, user.name || "there", planDisplayName, 14);
     }
+
+    // Log admin event for subscription start
+    await logAdminEvent({
+      type: "subscription_started",
+      accountId,
+      accountName: account.name,
+      userId: account.users[0]?.email ? undefined : undefined,
+      userEmail: account.users[0]?.email,
+      description: `Trial started for "${account.name}" on ${session.metadata?.plan || "Growth"} plan`,
+      metadata: {
+        plan: session.metadata?.plan,
+        billing: session.metadata?.billing,
+        trialEndsAt: trialEndsAt.toISOString(),
+      },
+    });
   }
 
   console.log(`Checkout completed for account ${accountId}`);
@@ -233,12 +249,37 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     return;
   }
 
+  // Get account details before updating
+  const account = await prisma.account.findUnique({
+    where: { id: accountId },
+    include: {
+      users: {
+        take: 1,
+        select: { email: true },
+      },
+    },
+  });
+
   await prisma.account.update({
     where: { id: accountId },
     data: {
       subscriptionStatus: "CANCELED",
     },
   });
+
+  // Log admin event for subscription cancellation
+  if (account) {
+    await logAdminEvent({
+      type: "subscription_canceled",
+      accountId,
+      accountName: account.name,
+      userEmail: account.users[0]?.email,
+      description: `Subscription canceled for "${account.name}"`,
+      metadata: {
+        previousPlan: account.subscriptionPlan,
+      },
+    });
+  }
 
   console.log(`Subscription canceled for account ${accountId}`);
 }
@@ -326,6 +367,35 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       plan: plan || "unknown",
       daysInTrial,
     });
+
+    // Log admin event for trial conversion
+    await logAdminEvent({
+      type: "payment_succeeded",
+      accountId,
+      accountName: account.name,
+      userEmail: user?.email,
+      description: `Trial converted to paid for "${account.name}" - $${amount}`,
+      metadata: {
+        plan,
+        amount,
+        daysInTrial,
+        isTrialConversion: true,
+      },
+    });
+  } else if (account) {
+    // Renewal payment
+    const amount = invoice.amount_paid ? invoice.amount_paid / 100 : 0;
+    await logAdminEvent({
+      type: "subscription_renewed",
+      accountId,
+      accountName: account.name,
+      userEmail: account.users[0]?.email,
+      description: `Subscription renewed for "${account.name}" - $${amount}`,
+      metadata: {
+        plan: subscription.metadata?.plan || account.subscriptionPlan,
+        amount,
+      },
+    });
   }
 
   console.log(`Invoice payment succeeded for account ${accountId}`);
@@ -345,12 +415,39 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     return;
   }
 
+  // Get account details
+  const account = await prisma.account.findUnique({
+    where: { id: accountId },
+    include: {
+      users: {
+        take: 1,
+        select: { email: true },
+      },
+    },
+  });
+
   await prisma.account.update({
     where: { id: accountId },
     data: {
       subscriptionStatus: "PAST_DUE",
     },
   });
+
+  // Log admin event for payment failure
+  if (account) {
+    const amount = invoice.amount_due ? invoice.amount_due / 100 : 0;
+    await logAdminEvent({
+      type: "payment_failed",
+      accountId,
+      accountName: account.name,
+      userEmail: account.users[0]?.email,
+      description: `Payment failed for "${account.name}" - $${amount}`,
+      metadata: {
+        plan: account.subscriptionPlan,
+        amount,
+      },
+    });
+  }
 
   console.log(`Invoice payment failed for account ${accountId}`);
 }

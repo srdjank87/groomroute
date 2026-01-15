@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { logAdminEvent } from "@/lib/admin-events";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -48,6 +49,15 @@ export async function POST(req: NextRequest) {
         user.name || "User",
         resetToken
       );
+
+      // Log admin event
+      await logAdminEvent({
+        type: "password_reset_requested",
+        accountId: user.accountId,
+        userId: user.id,
+        userEmail: user.email,
+        description: `Password reset requested for ${user.email}`,
+      });
     }
 
     // Always return success message

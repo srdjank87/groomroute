@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { randomBytes } from "crypto";
 import { sendTeamInviteEmail } from "@/lib/email";
+import { logAdminEvent } from "@/lib/admin-events";
 
 export async function POST(request: NextRequest) {
   try {
@@ -160,6 +161,20 @@ export async function POST(request: NextRequest) {
       role,
       token
     );
+
+    // Log admin event
+    await logAdminEvent({
+      type: "team_member_invited",
+      accountId: account.id,
+      accountName: account.name,
+      userId: session.user.id,
+      userEmail: session.user.email || undefined,
+      description: `${inviter?.name || session.user.email} invited ${email} as ${role}`,
+      metadata: {
+        invitedEmail: email.toLowerCase(),
+        role,
+      },
+    });
 
     return NextResponse.json({
       success: true,

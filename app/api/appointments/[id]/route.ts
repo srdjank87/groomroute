@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { AppointmentStatus } from "@prisma/client";
+import { syncAppointmentToCalendar, deleteCalendarEvent } from "@/lib/google-calendar";
 
 const updateAppointmentSchema = z.object({
   status: z.enum(["BOOKED", "CONFIRMED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "NO_SHOW"]).optional(),
@@ -133,8 +134,35 @@ export async function PATCH(
       include: {
         customer: true,
         pet: true,
+        groomer: true,
       },
     });
+
+    // Sync to Google Calendar if connected (async, don't wait)
+    // For cancelled/no-show, delete from calendar; otherwise update
+    if (validatedData.status === "CANCELLED" || validatedData.status === "NO_SHOW") {
+      if (appointment.googleCalendarEventId) {
+        deleteCalendarEvent(accountId, appointment.googleCalendarEventId).catch((err) =>
+          console.error("Calendar delete failed:", err)
+        );
+      }
+    } else {
+      syncAppointmentToCalendar(accountId, {
+        id: appointment.id,
+        startAt: appointment.startAt,
+        serviceMinutes: appointment.serviceMinutes,
+        appointmentType: appointment.appointmentType,
+        notes: appointment.notes,
+        googleCalendarEventId: appointment.googleCalendarEventId,
+        customer: {
+          name: appointment.customer.name,
+          phone: appointment.customer.phone,
+          address: appointment.customer.address,
+        },
+        pet: appointment.pet,
+        groomer: { name: appointment.groomer.name },
+      }).catch((err) => console.error("Calendar sync failed:", err));
+    }
 
     return NextResponse.json({
       success: true,
@@ -181,6 +209,13 @@ export async function DELETE(
 
     if (!existingAppointment) {
       return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
+    }
+
+    // Delete from Google Calendar if synced
+    if (existingAppointment.googleCalendarEventId) {
+      deleteCalendarEvent(accountId, existingAppointment.googleCalendarEventId).catch((err) =>
+        console.error("Calendar delete failed:", err)
+      );
     }
 
     // Delete appointment

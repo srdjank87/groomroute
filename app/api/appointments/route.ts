@@ -6,6 +6,7 @@ import { AppointmentType, AppointmentStatus } from "@prisma/client";
 import { canAddAppointment, requireAdminRole } from "@/lib/feature-helpers";
 import { getUserGroomerId } from "@/lib/get-user-groomer";
 import { trackAppointmentCreated, checkAndTrackFirstAction } from "@/lib/posthog-server";
+import { syncAppointmentToCalendar } from "@/lib/google-calendar";
 
 const appointmentSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
@@ -188,6 +189,27 @@ export async function POST(req: NextRequest) {
 
     // Check if this is the first meaningful action
     await checkAndTrackFirstAction(accountId, "appointment_created");
+
+    // Sync to Google Calendar if connected (async, don't wait)
+    const groomer = await prisma.groomer.findUnique({
+      where: { id: groomerId },
+      select: { name: true },
+    });
+
+    syncAppointmentToCalendar(accountId, {
+      id: appointment.id,
+      startAt: appointment.startAt,
+      serviceMinutes: appointment.serviceMinutes,
+      appointmentType: appointment.appointmentType,
+      notes: appointment.notes,
+      customer: {
+        name: appointment.customer.name,
+        phone: appointment.customer.phone,
+        address: appointment.customer.address,
+      },
+      pet: appointment.pet,
+      groomer: { name: groomer?.name || "Groomer" },
+    }).catch((err) => console.error("Calendar sync failed:", err));
 
     return NextResponse.json({
       success: true,

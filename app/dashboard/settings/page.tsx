@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Shield, Smartphone, CreditCard, ChevronRight, Settings as SettingsIcon, Users, Building2 } from "lucide-react";
+import { MapPin, Shield, Smartphone, CreditCard, ChevronRight, Settings as SettingsIcon, Users, Building2, Calendar } from "lucide-react";
 
 const settingsCategories = [
   {
@@ -51,6 +51,14 @@ const settingsCategories = [
     iconColor: "text-indigo-600",
     badge: "Pro",
     badgeColor: "bg-purple-100 text-purple-700",
+  },
+  {
+    name: "Integrations",
+    description: "Connect Google Calendar and other services",
+    href: "/dashboard/settings/integrations",
+    icon: Calendar,
+    iconBg: "bg-sky-100",
+    iconColor: "text-sky-600",
   },
   {
     name: "Billing",
