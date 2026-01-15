@@ -78,7 +78,7 @@ export default function Home() {
                 Start Your Calm Day
                 <ChevronRight className="h-5 w-5" />
               </Link>
-              <Link href="/book-demo" className="btn btn-outline btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8 border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white">
+              <Link href="#how-it-works" className="btn btn-outline btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8 border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white">
                 See How It Works
               </Link>
             </div>
