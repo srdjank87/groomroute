@@ -278,20 +278,14 @@ function DemoDataBanner({
               <div className="flex flex-wrap gap-2">
                 <Link
                   href="/dashboard/routes"
-                  className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0 font-semibold"
+                  className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0 font-semibold px-4"
                 >
                   View Sample Route
-                </Link>
-                <Link
-                  href="/dashboard/customers"
-                  className="btn btn-sm bg-white/20 text-white border border-white/40 hover:bg-white/30 font-medium"
-                >
-                  View Sample Clients
                 </Link>
                 <button
                   onClick={handleClearData}
                   disabled={isClearing}
-                  className="btn btn-sm bg-white/20 text-white border border-white/40 hover:bg-white/30 font-medium"
+                  className="btn btn-sm bg-white/20 text-white border border-white/40 hover:bg-white/30 font-medium px-4"
                 >
                   {isClearing ? (
                     <span className="loading loading-spinner loading-xs"></span>
@@ -310,7 +304,7 @@ function DemoDataBanner({
                 <button
                   onClick={onGenerateDemo}
                   disabled={isGenerating}
-                  className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0 font-semibold gap-2"
+                  className="btn btn-sm bg-white text-purple-600 hover:bg-gray-100 border-0 font-semibold gap-2 px-4"
                 >
                   {isGenerating ? (
                     <>
@@ -328,7 +322,7 @@ function DemoDataBanner({
                   <button
                     onClick={handleClearData}
                     disabled={isClearing}
-                    className="btn btn-sm bg-white/20 text-white border border-white/40 hover:bg-white/30 font-medium"
+                    className="btn btn-sm bg-white/20 text-white border border-white/40 hover:bg-white/30 font-medium px-4"
                   >
                     {isClearing ? (
                       <span className="loading loading-spinner loading-xs"></span>
@@ -852,6 +846,12 @@ function DashboardContent() {
           const perfData = await perfResponse.json();
           setPerformanceData(perfData);
         }
+        // Refresh dashboard stats to update workload message
+        const statsResponse = await fetch("/api/dashboard/today");
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          setStats(statsData);
+        }
         // Dispatch event to notify layout of assistant status change
         window.dispatchEvent(new CustomEvent("assistantStatusChanged", { detail: { hasAssistant: newValue } }));
       } else {
@@ -1208,6 +1208,57 @@ function DashboardContent() {
             <Plus className="h-5 w-5 flex-shrink-0" />
             <span>Schedule an Appointment</span>
           </Link>
+        </div>
+      )}
+
+      {/* Getting Started Hints - Show when user has no data */}
+      {!isFullscreen && !stats?.hasData && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Zap className="h-5 w-5 text-amber-500" />
+            Getting Started
+          </h3>
+          <div className="space-y-3">
+            <Link
+              href="/dashboard/customers/new"
+              className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors"
+            >
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <UserPlus className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">Add your first client</p>
+                <p className="text-sm text-gray-600">Start building your client list with their pets and contact info</p>
+              </div>
+            </Link>
+            <Link
+              href="/dashboard/services"
+              className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
+            >
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <Dog className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">Set up your services</p>
+                <p className="text-sm text-gray-600">Define your grooming services with pricing and durations</p>
+              </div>
+            </Link>
+            <Link
+              href="/dashboard/settings"
+              className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors"
+            >
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Clock className="h-5 w-5 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">Configure working hours</p>
+                <p className="text-sm text-gray-600">Set your availability and service preferences</p>
+              </div>
+            </Link>
+          </div>
+          <p className="text-sm text-gray-500 mt-4 text-center">
+            Or try <button onClick={generateDemoData} className="text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2">demo mode</button> to explore all features first
+          </p>
         </div>
       )}
 
