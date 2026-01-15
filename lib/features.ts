@@ -442,9 +442,9 @@ export function getMessagingTier(plan: SubscriptionPlan): "shared" | "dedicated"
  */
 export const PLAN_PRICING = {
   TRIAL: { monthly: 0, yearly: 0 },
-  STARTER: { monthly: 89, yearly: 890 }, // ~2 months free
-  GROWTH: { monthly: 179, yearly: 1790 }, // ~2 months free
-  PRO: { monthly: 329, yearly: 3290 }, // ~2 months free
+  STARTER: { monthly: 39, yearly: 384 }, // $32/mo when paid yearly (~17% savings)
+  GROWTH: { monthly: 79, yearly: 792 }, // $66/mo when paid yearly (~17% savings)
+  PRO: { monthly: 149, yearly: 1488 }, // $124/mo when paid yearly (~17% savings)
 } as const;
 
 /**

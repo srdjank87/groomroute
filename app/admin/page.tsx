@@ -8,10 +8,10 @@ import {
   Calendar,
   CreditCard,
   Activity,
-  LogOut,
   ChevronRight,
   Mail,
 } from "lucide-react";
+import AdminLogoutButton from "./AdminLogoutButton";
 
 async function getMetrics() {
   const now = new Date();
@@ -115,15 +115,7 @@ export default async function AdminDashboard() {
               </h1>
               <p className="text-sm text-gray-600">Analytics & Account Management</p>
             </div>
-            <form action="/api/admin/login" method="DELETE">
-              <button
-                type="submit"
-                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
-            </form>
+            <AdminLogoutButton />
           </div>
         </div>
       </header>
