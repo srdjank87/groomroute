@@ -86,6 +86,7 @@ interface TodaysStats {
   hasAssistant?: boolean;
   largeDogCount?: number;
   totalMinutes?: number;
+  accountCreatedAt?: string | null;
 }
 
 interface CalmImpact {
@@ -201,12 +202,22 @@ function DemoDataBanner({
   hasData,
   onGenerateDemo,
   isGenerating,
+  accountCreatedAt,
 }: {
   showSampleData: boolean;
   hasData: boolean;
   onGenerateDemo: () => void;
   isGenerating: boolean;
+  accountCreatedAt: string | null;
 }) {
+  // Check if account is older than 3 days
+  const isAccountOlderThan3Days = accountCreatedAt
+    ? Date.now() - new Date(accountCreatedAt).getTime() > 3 * 24 * 60 * 60 * 1000
+    : false;
+
+  // Determine if banner should be visible
+  const shouldShow = !isAccountOlderThan3Days || showSampleData;
+
   const [isExpanded, setIsExpanded] = useState(showSampleData);
   const [isClearing, setIsClearing] = useState(false);
 
@@ -216,6 +227,11 @@ function DemoDataBanner({
       setIsExpanded(true);
     }
   }, [showSampleData]);
+
+  // Hide the banner if account is older than 3 days (unless sample data is loaded)
+  if (!shouldShow) {
+    return null;
+  }
 
   const handleClearData = async () => {
     if (confirm("Clear all sample data and start fresh with your real clients?")) {
@@ -944,13 +960,14 @@ function DashboardContent() {
       {/* Trial/Subscription Status */}
       {!isFullscreen && <TrialStatus />}
 
-      {/* Sample Data Banner - Collapsible, always available */}
+      {/* Sample Data Banner - Collapsible, hidden after 3 days unless sample data loaded */}
       {!isFullscreen && (
         <DemoDataBanner
           showSampleData={stats?.showSampleData || false}
           hasData={stats?.hasData || false}
           onGenerateDemo={generateDemoData}
           isGenerating={isLoading}
+          accountCreatedAt={stats?.accountCreatedAt || null}
         />
       )}
 

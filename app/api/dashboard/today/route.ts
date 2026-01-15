@@ -46,11 +46,15 @@ export async function GET(req: NextRequest) {
             account: {
               select: {
                 timezone: true,
+                createdAt: true,
               },
             },
           },
         })
       : null;
+
+    // Get account creation date for demo banner visibility
+    const accountCreatedAt = groomer?.account?.createdAt || null;
 
     // Get the account's timezone (default to America/New_York)
     const timezone = groomer?.account?.timezone || "America/New_York";
@@ -233,6 +237,7 @@ export async function GET(req: NextRequest) {
       hasAssistant,
       largeDogCount,
       totalMinutes,
+      accountCreatedAt: accountCreatedAt?.toISOString() || null,
     };
 
     // Track day view in PostHog (async, don't await)
