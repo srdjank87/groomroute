@@ -63,11 +63,16 @@ export default function Home() {
       <section className="hero bg-gradient-to-br from-amber-50 via-orange-50 to-white py-6 sm:py-8 lg:py-12">
         <div className="hero-content max-w-6xl w-full px-4">
           <div className="text-center w-full">
-            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight text-gray-900">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-3 sm:mb-4 leading-tight text-gray-900">
               Finally, a calm day.
             </h1>
 
-            {/* Hero image - positioned between headline and subheadline */}
+            <p className="text-base sm:text-lg lg:text-2xl mb-4 sm:mb-6 leading-relaxed max-w-3xl mx-auto text-gray-700">
+              The scheduling system built only for mobile groomers.&nbsp;<br className="hidden lg:block" />
+              Keep routes tight, days predictable, and your energy protected.
+            </p>
+
+            {/* Hero image - positioned below subheadline */}
             <div className="flex justify-center mb-4 sm:mb-6">
               <Image
                 src="/images/hero.jpg"
@@ -78,11 +83,6 @@ export default function Home() {
                 priority
               />
             </div>
-
-            <p className="text-base sm:text-lg lg:text-2xl mb-4 sm:mb-6 leading-relaxed max-w-3xl mx-auto text-gray-700">
-              The scheduling system built only for mobile groomers.&nbsp;<br className="hidden lg:block" />
-              Keep routes tight, days predictable, and your energy protected.
-            </p>
 
             {/* Value props */}
             <div className="hidden sm:flex max-w-3xl mx-auto mb-4 gap-4 lg:gap-6 justify-center flex-wrap text-sm lg:text-base text-gray-600">
