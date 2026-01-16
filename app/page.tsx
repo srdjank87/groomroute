@@ -63,28 +63,28 @@ export default function Home() {
       <section className="hero bg-gradient-to-br from-amber-50 via-orange-50 to-white py-6 sm:py-8 lg:py-12">
         <div className="hero-content max-w-6xl w-full px-4">
           <div className="text-center w-full">
-            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-3 sm:mb-4 lg:mb-6 leading-tight text-gray-900">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight text-gray-900">
               Finally, a calm day.
             </h1>
+
+            {/* Hero image - positioned between headline and subheadline */}
+            <div className="flex justify-center mb-4 sm:mb-6">
+              <Image
+                src="/images/hero.jpg"
+                alt="GroomRoute app showing optimized route - finally a calm day for mobile groomers"
+                width={1200}
+                height={675}
+                className="rounded-xl sm:rounded-2xl w-full max-w-xl sm:max-w-2xl lg:max-w-3xl shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white"
+                priority
+              />
+            </div>
 
             <p className="text-base sm:text-lg lg:text-2xl mb-4 sm:mb-6 leading-relaxed max-w-3xl mx-auto text-gray-700">
               The scheduling system built only for mobile groomers.&nbsp;<br className="hidden lg:block" />
               Keep routes tight, days predictable, and your energy protected.
             </p>
 
-            {/* CTAs - moved above image for mobile */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4 sm:mb-6">
-              <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8">
-                Start Your Calm Day
-                <ChevronRight className="h-5 w-5" />
-              </Link>
-              <Link href="#how-it-works" className="btn btn-outline btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8 border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white">
-                See How It Works
-              </Link>
-            </div>
-            <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">14-day free trial. No commitment. Cancel anytime.</p>
-
-            {/* Value props - hidden on mobile, shown above image on larger screens */}
+            {/* Value props */}
             <div className="hidden sm:flex max-w-3xl mx-auto mb-4 gap-4 lg:gap-6 justify-center flex-wrap text-sm lg:text-base text-gray-600">
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
@@ -100,17 +100,17 @@ export default function Home() {
               </span>
             </div>
 
-            {/* Hero image - smaller on mobile */}
-            <div className="flex justify-center">
-              <Image
-                src="/images/hero.jpg"
-                alt="GroomRoute app showing optimized route - finally a calm day for mobile groomers"
-                width={1200}
-                height={675}
-                className="rounded-xl sm:rounded-2xl w-full max-w-xl sm:max-w-2xl lg:max-w-3xl shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white"
-                priority
-              />
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-3 sm:mb-4">
+              <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8">
+                Start Your Calm Day
+                <ChevronRight className="h-5 w-5" />
+              </Link>
+              <Link href="#how-it-works" className="btn btn-outline btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8 border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white">
+                See How It Works
+              </Link>
             </div>
+            <p className="text-xs sm:text-sm text-gray-500">14-day free trial. No commitment. Cancel anytime.</p>
           </div>
         </div>
       </section>
