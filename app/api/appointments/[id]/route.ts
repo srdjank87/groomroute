@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { AppointmentStatus } from "@prisma/client";
 import { syncAppointmentToCalendar, deleteCalendarEvent } from "@/lib/google-calendar";
+import { hasFeature } from "@/lib/features";
+import { requireAdminRole } from "@/lib/feature-helpers";
 
 const updateAppointmentSchema = z.object({
   status: z.enum(["BOOKED", "CONFIRMED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "NO_SHOW"]).optional(),
@@ -11,6 +13,8 @@ const updateAppointmentSchema = z.object({
   serviceMinutes: z.number().optional(),
   price: z.number().optional(),
   notes: z.string().optional(),
+  // Optional groomerId for Pro accounts to reassign appointments
+  groomerId: z.string().optional(),
 });
 
 // GET single appointment
@@ -125,6 +129,34 @@ export async function PATCH(
 
     if (validatedData.notes !== undefined) {
       updateData.notes = validatedData.notes || null;
+    }
+
+    // Handle groomer reassignment (Pro accounts only)
+    if (validatedData.groomerId !== undefined) {
+      // Get account to check subscription plan
+      const account = await prisma.account.findUnique({
+        where: { id: accountId },
+        select: { subscriptionPlan: true },
+      });
+
+      if (account && hasFeature(account.subscriptionPlan, "multi_groomer")) {
+        // Only admins can reassign appointments
+        const roleError = requireAdminRole(session.user.role);
+        if (!roleError) {
+          // Verify the groomer belongs to this account
+          const groomer = await prisma.groomer.findFirst({
+            where: {
+              id: validatedData.groomerId,
+              accountId,
+              isActive: true,
+            },
+          });
+
+          if (groomer) {
+            updateData.groomerId = groomer.id;
+          }
+        }
+      }
     }
 
     // Update appointment

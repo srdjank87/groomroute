@@ -7,6 +7,7 @@ import { canAddAppointment, requireAdminRole } from "@/lib/feature-helpers";
 import { getUserGroomerId } from "@/lib/get-user-groomer";
 import { trackAppointmentCreated, checkAndTrackFirstAction } from "@/lib/posthog-server";
 import { syncAppointmentToCalendar } from "@/lib/google-calendar";
+import { hasFeature } from "@/lib/features";
 
 const appointmentSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
@@ -17,6 +18,8 @@ const appointmentSchema = z.object({
   serviceMinutes: z.number().min(1, "Service duration is required"),
   price: z.number().min(0, "Price is required"),
   notes: z.string().optional(),
+  // Optional groomerId for Pro accounts with multi_groomer feature
+  groomerId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -76,8 +79,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get the current user's groomer ID
-    const groomerId = await getUserGroomerId();
+    // Determine which groomer to assign the appointment to
+    let groomerId: string | null = null;
+
+    // If groomerId is provided and user has multi_groomer feature (Pro plan), use it
+    if (validatedData.groomerId && hasFeature(account.subscriptionPlan, "multi_groomer")) {
+      // Verify the groomer belongs to this account
+      const groomer = await prisma.groomer.findFirst({
+        where: {
+          id: validatedData.groomerId,
+          accountId,
+          isActive: true,
+        },
+      });
+
+      if (!groomer) {
+        return NextResponse.json(
+          { error: "Invalid groomer selected" },
+          { status: 400 }
+        );
+      }
+
+      groomerId = groomer.id;
+    } else {
+      // Default behavior: use the current user's groomer (for Starter/Growth or when no groomerId specified)
+      groomerId = await getUserGroomerId();
+    }
 
     if (!groomerId) {
       return NextResponse.json(

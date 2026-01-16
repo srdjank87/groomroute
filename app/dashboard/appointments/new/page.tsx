@@ -2,14 +2,22 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon, MapPin, AlertTriangle, DollarSign, ShieldAlert } from "lucide-react";
+import { ChevronLeft, Search, Plus, Check, Calendar as CalendarIcon, MapPin, AlertTriangle, DollarSign, ShieldAlert, User } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { AppointmentCalendar } from "@/components/ui/appointment-calendar";
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-type Step = "customer" | "pet" | "details" | "datetime";
+type Step = "customer" | "pet" | "groomer" | "details" | "datetime";
+
+interface Groomer {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  baseAddress?: string;
+}
 
 interface ServiceArea {
   id: string;
@@ -138,12 +146,18 @@ function NewAppointmentContent() {
     serviceMinutes: 90,
     price: 85,
     notes: "",
+    groomerId: "", // For Pro accounts with multiple groomers
   });
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [areaSuggestion, setAreaSuggestion] = useState<AreaDaySuggestion | null>(null);
   const [groomerId, setGroomerId] = useState<string | null>(null);
+
+  // Pro account multi-groomer state
+  const [groomers, setGroomers] = useState<Groomer[]>([]);
+  const [selectedGroomer, setSelectedGroomer] = useState<Groomer | null>(null);
+  const [isMultiGroomer, setIsMultiGroomer] = useState(false);
   const [largeDogCheck, setLargeDogCheck] = useState<LargeDogCheck | null>(null);
   const [largeDogWarningDismissed, setLargeDogWarningDismissed] = useState(false);
   const [workingHoursCheck, setWorkingHoursCheck] = useState<WorkingHoursCheck | null>(null);
@@ -254,6 +268,26 @@ function NewAppointmentContent() {
     return null;
   }, []);
 
+  // Fetch all groomers for the account (for Pro multi-groomer accounts)
+  const fetchGroomers = useCallback(async () => {
+    try {
+      const response = await fetch("/api/groomers");
+      if (response.ok) {
+        const data = await response.json();
+        const groomersList = data.groomers || [];
+        setGroomers(groomersList);
+        // If there are multiple active groomers, enable multi-groomer mode
+        if (groomersList.length > 1) {
+          setIsMultiGroomer(true);
+        }
+        return groomersList;
+      }
+    } catch (error) {
+      console.error("Failed to fetch groomers:", error);
+    }
+    return [];
+  }, []);
+
   // Scroll to top when changing steps
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -275,10 +309,11 @@ function NewAppointmentContent() {
     }
   }, [groomerId, fetchDefaultGroomer, fetchAreaSuggestion, scrollToTop]);
 
-  // Fetch customers on mount
+  // Fetch customers and groomers on mount
   useEffect(() => {
     fetchCustomers();
-  }, [fetchCustomers]);
+    fetchGroomers();
+  }, [fetchCustomers, fetchGroomers]);
 
   // Pre-select customer if provided
   useEffect(() => {
@@ -346,8 +381,23 @@ function NewAppointmentContent() {
         setAppointmentData({ ...appointmentData, petId: pet.id, serviceMinutes: 120, price: 105 });
       }
     }
-    setCurrentStep("details"); // Go to details step now (before datetime)
+    // Go to groomer step for multi-groomer accounts, otherwise go to details
+    setCurrentStep(isMultiGroomer ? "groomer" : "details");
     scrollToTop();
+  };
+
+  // Select groomer (for Pro multi-groomer accounts)
+  const selectGroomer = (groomer: Groomer) => {
+    setSelectedGroomer(groomer);
+    setAppointmentData({ ...appointmentData, groomerId: groomer.id });
+    setGroomerId(groomer.id); // Also update groomerId for area suggestions
+    setCurrentStep("details");
+    scrollToTop();
+
+    // Fetch area day suggestion for the selected groomer
+    if (selectedCustomer) {
+      fetchAreaSuggestion(selectedCustomer.id, groomer.id);
+    }
   };
 
   const [isCustomService, setIsCustomService] = useState(false);
@@ -394,9 +444,11 @@ function NewAppointmentContent() {
     }
   };
 
+  // Build steps array - include groomer step only for multi-groomer accounts
   const steps = [
     { id: "customer", label: "Client", active: currentStep === "customer" },
     { id: "pet", label: "Pet", active: currentStep === "pet" },
+    ...(isMultiGroomer ? [{ id: "groomer", label: "Groomer", active: currentStep === "groomer" }] : []),
     { id: "details", label: "Details", active: currentStep === "details" },
     { id: "datetime", label: "Time", active: currentStep === "datetime" },
   ];
@@ -669,6 +721,61 @@ function NewAppointmentContent() {
           </div>
         )}
 
+        {/* Step 3 (Pro only): Select Groomer */}
+        {currentStep === "groomer" && isMultiGroomer && (
+          <div className="space-y-4">
+            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+              <p className="text-sm font-medium text-blue-900">Selected Pet</p>
+              <p className="text-blue-700">{selectedPet?.name} ({selectedCustomer?.name})</p>
+            </div>
+
+            <h2 className="text-lg font-semibold text-gray-900">Which groomer will do this appointment?</h2>
+
+            <div className="space-y-3">
+              {groomers.map((groomer) => (
+                <button
+                  key={groomer.id}
+                  onClick={() => selectGroomer(groomer)}
+                  className="w-full bg-white rounded-xl shadow-sm p-4 text-left hover:shadow-md transition-shadow border-2 border-transparent hover:border-[#A5744A]"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-10 h-10 bg-[#A5744A]/10 rounded-full flex items-center justify-center">
+                          <User className="h-5 w-5 text-[#A5744A]" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{groomer.name}</h3>
+                          {groomer.email && (
+                            <p className="text-sm text-gray-600">{groomer.email}</p>
+                          )}
+                        </div>
+                      </div>
+                      {groomer.baseAddress && (
+                        <p className="text-sm text-gray-500 mt-2 flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          {groomer.baseAddress}
+                        </p>
+                      )}
+                    </div>
+                    <ChevronLeft className="h-5 w-5 text-gray-400 rotate-180" />
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => {
+                setCurrentStep("pet");
+                scrollToTop();
+              }}
+              className="w-full btn btn-ghost"
+            >
+              Back to Pet Selection
+            </button>
+          </div>
+        )}
+
         {/* Step 4: Date & Time - Final step, now knows exact duration */}
         {currentStep === "datetime" && (
           <div className="space-y-6">
@@ -687,6 +794,7 @@ function NewAppointmentContent() {
                   </p>
                   <p className="text-xs text-blue-600">
                     {appointmentData.serviceMinutes} minutes • ${appointmentData.price}
+                    {selectedGroomer && ` • Assigned to ${selectedGroomer.name}`}
                   </p>
                 </div>
               </div>
@@ -1208,7 +1316,8 @@ function NewAppointmentContent() {
             <div className="flex gap-3">
               <button
                 onClick={() => {
-                  setCurrentStep("pet");
+                  // Go back to groomer step for multi-groomer accounts, otherwise pet step
+                  setCurrentStep(isMultiGroomer ? "groomer" : "pet");
                   scrollToTop();
                 }}
                 className="btn flex-1 h-12"
