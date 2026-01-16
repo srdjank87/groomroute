@@ -85,17 +85,17 @@ export default function Home() {
             </div>
 
             {/* Value props */}
-            <div className="flex max-w-3xl mx-auto mb-4 gap-3 sm:gap-4 lg:gap-6 justify-center flex-wrap text-sm lg:text-base text-gray-600">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+            <div className="flex max-w-3xl mx-auto mb-4 gap-2 sm:gap-4 lg:gap-6 justify-center text-xs sm:text-sm lg:text-base text-gray-600">
+              <span className="flex items-center gap-1 sm:gap-1.5">
+                <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 flex-shrink-0" />
                 Less driving
               </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              <span className="flex items-center gap-1 sm:gap-1.5">
+                <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 flex-shrink-0" />
                 Energy protected
               </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              <span className="flex items-center gap-1 sm:gap-1.5">
+                <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 flex-shrink-0" />
                 Fewer surprises
               </span>
             </div>
