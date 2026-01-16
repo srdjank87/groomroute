@@ -35,6 +35,7 @@ export default function BillingSettingsPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
+  const [changingPlan, setChangingPlan] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSubscription();
@@ -74,6 +75,52 @@ export default function BillingSettingsPage() {
       toast.error("Failed to open billing portal");
     } finally {
       setIsPortalLoading(false);
+    }
+  }
+
+  async function handleChangePlan(plan: "starter" | "growth" | "pro") {
+    // Don't allow changes for users without an active subscription
+    if (!subscription?.stripeSubscriptionId) {
+      toast.error("Please subscribe first to change plans");
+      return;
+    }
+
+    // Confirm the action
+    const currentPlan = subscription.subscriptionPlan;
+    const isDowngrade =
+      (currentPlan === "PRO" && (plan === "growth" || plan === "starter")) ||
+      (currentPlan === "GROWTH" && plan === "starter");
+
+    const action = isDowngrade ? "downgrade" : "upgrade";
+    const confirmed = window.confirm(
+      `Are you sure you want to ${action} to the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan? ` +
+      `Your billing will be prorated automatically.`
+    );
+
+    if (!confirmed) return;
+
+    setChangingPlan(plan);
+    try {
+      const response = await fetch("/api/subscription/change-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || `Successfully changed to ${plan} plan!`);
+        // Refresh subscription data
+        fetchSubscription();
+      } else {
+        toast.error(data.error || "Failed to change plan");
+      }
+    } catch (error) {
+      console.error("Failed to change plan:", error);
+      toast.error("Failed to change plan");
+    } finally {
+      setChangingPlan(null);
     }
   }
 
@@ -312,13 +359,19 @@ export default function BillingSettingsPage() {
             <p className="text-xs text-gray-500 mb-3">Up to 50 clients</p>
             {subscription?.subscriptionPlan === "STARTER" ? (
               <span className="text-xs text-emerald-600 font-medium">Current Plan</span>
-            ) : subscription?.stripeCustomerId ? (
+            ) : subscription?.stripeSubscriptionId ? (
               <button
-                onClick={handleManageBilling}
-                disabled={isPortalLoading}
+                onClick={() => handleChangePlan("starter")}
+                disabled={changingPlan !== null}
                 className="btn btn-sm w-full bg-emerald-600 hover:bg-emerald-700 text-white border-0"
               >
-                {subscription?.subscriptionPlan === "GROWTH" || subscription?.subscriptionPlan === "PRO" ? "Downgrade" : "Select"}
+                {changingPlan === "starter" ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : subscription?.subscriptionPlan === "GROWTH" || subscription?.subscriptionPlan === "PRO" ? (
+                  "Downgrade"
+                ) : (
+                  "Select"
+                )}
               </button>
             ) : (
               <Link href="/auth/signup?plan=starter" className="btn btn-sm w-full bg-emerald-600 hover:bg-emerald-700 text-white border-0">
@@ -341,13 +394,19 @@ export default function BillingSettingsPage() {
             <p className="text-xs text-gray-500 mb-3">Unlimited clients + Calm Center</p>
             {subscription?.subscriptionPlan === "GROWTH" ? (
               <span className="text-xs text-purple-600 font-medium">Current Plan</span>
-            ) : subscription?.stripeCustomerId ? (
+            ) : subscription?.stripeSubscriptionId ? (
               <button
-                onClick={handleManageBilling}
-                disabled={isPortalLoading}
+                onClick={() => handleChangePlan("growth")}
+                disabled={changingPlan !== null}
                 className="btn btn-sm w-full bg-purple-600 hover:bg-purple-700 text-white border-0"
               >
-                {subscription?.subscriptionPlan === "PRO" ? "Downgrade" : "Upgrade"}
+                {changingPlan === "growth" ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : subscription?.subscriptionPlan === "PRO" ? (
+                  "Downgrade"
+                ) : (
+                  "Upgrade"
+                )}
               </button>
             ) : (
               <Link href="/auth/signup?plan=growth" className="btn btn-sm w-full bg-purple-600 hover:bg-purple-700 text-white border-0">
@@ -367,13 +426,17 @@ export default function BillingSettingsPage() {
             <p className="text-xs text-gray-500 mb-3">Team features + Analytics</p>
             {subscription?.subscriptionPlan === "PRO" ? (
               <span className="text-xs text-amber-600 font-medium">Current Plan</span>
-            ) : subscription?.stripeCustomerId ? (
+            ) : subscription?.stripeSubscriptionId ? (
               <button
-                onClick={handleManageBilling}
-                disabled={isPortalLoading}
+                onClick={() => handleChangePlan("pro")}
+                disabled={changingPlan !== null}
                 className="btn btn-sm w-full bg-amber-600 hover:bg-amber-700 text-white border-0"
               >
-                Upgrade
+                {changingPlan === "pro" ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  "Upgrade"
+                )}
               </button>
             ) : (
               <Link href="/auth/signup?plan=pro" className="btn btn-sm w-full bg-amber-600 hover:bg-amber-700 text-white border-0">
