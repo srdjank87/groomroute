@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search, Calendar, DollarSign, ArrowUpDown, MapPin, Users } from "lucide-react";
+import { Plus, Search, Calendar, DollarSign, ArrowUpDown, MapPin, Users, Upload, ChevronDown } from "lucide-react";
 
 interface ServiceArea {
   id: string;
@@ -245,13 +245,40 @@ export default function CustomersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
-        <Link
-          href="/dashboard/customers/new"
-          className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
-        >
-          <Plus className="h-5 w-5" />
-          Add Client
-        </Link>
+        <div className="dropdown dropdown-end">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
+          >
+            <Plus className="h-5 w-5" />
+            Add Client
+            <ChevronDown className="h-4 w-4" />
+          </div>
+          <ul
+            tabIndex={0}
+            className="dropdown-content z-[1] menu p-2 shadow-lg bg-white rounded-lg w-52 mt-2 border"
+          >
+            <li>
+              <Link
+                href="/dashboard/customers/new"
+                className="flex items-center gap-2 py-3"
+              >
+                <Plus className="h-4 w-4" />
+                Add Manually
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/dashboard/customers/import"
+                className="flex items-center gap-2 py-3"
+              >
+                <Upload className="h-4 w-4" />
+                Import from CSV
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
 
       {/* Search */}
