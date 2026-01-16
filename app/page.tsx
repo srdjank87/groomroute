@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Shield, Clock, Heart, CheckCircle2, XCircle, X, ChevronRight, Zap, MessageSquare } from "lucide-react";
 import { useState } from "react";
+import { LandingPageAnalytics, trackCTAClick } from "@/components/LandingPageAnalytics";
 
 const GroomRouteLogo = () => (
   <span>Groom<span style={{ color: '#A5744A' }}>Route</span></span>
@@ -14,6 +15,7 @@ export default function Home() {
 
   return (
     <main>
+      <LandingPageAnalytics />
       {/* HEADER */}
       <header className="border-b border-base-300 bg-base-100">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
@@ -46,12 +48,17 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link href="/auth/signin" className="btn btn-ghost btn-sm">
+            <Link
+              href="/auth/signin"
+              className="btn btn-ghost btn-sm"
+              onClick={() => trackCTAClick("sign_in", "header", "signin")}
+            >
               Sign In
             </Link>
             <Link
               href="/auth/signup?plan=growth&billing=monthly"
               className="btn btn-gradient btn-sm hidden sm:inline-flex items-center"
+              onClick={() => trackCTAClick("start_free_trial", "header")}
             >
               Start Free Trial
             </Link>
@@ -102,11 +109,19 @@ export default function Home() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-3 sm:mb-4">
-              <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8">
+              <Link
+                href="/auth/signup?plan=growth&billing=monthly"
+                className="btn btn-gradient btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8"
+                onClick={() => trackCTAClick("start_your_calm_day", "hero")}
+              >
                 Start Your Calm Day
                 <ChevronRight className="h-5 w-5" />
               </Link>
-              <Link href="#how-it-works" className="btn btn-outline btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8 border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white">
+              <Link
+                href="#how-it-works"
+                className="btn btn-outline btn-md sm:btn-lg text-base sm:text-lg px-6 sm:px-8 border-2 border-[#A5744A] text-[#A5744A] hover:bg-[#A5744A] hover:text-white"
+                onClick={() => trackCTAClick("see_how_it_works", "hero", "how_it_works")}
+              >
                 See How It Works
               </Link>
             </div>
@@ -759,7 +774,11 @@ export default function Home() {
                   </li>
                 </ul>
 
-                <Link href={`/auth/signup?plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
+                <Link
+                  href={`/auth/signup?plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`}
+                  className="btn btn-outline btn-block border-2"
+                  onClick={() => trackCTAClick("start_free_trial", "pricing_starter")}
+                >
                   Start Free Trial
                 </Link>
               </div>
@@ -803,7 +822,11 @@ export default function Home() {
                   </li>
                 </ul>
 
-                <Link href={`/auth/signup?plan=growth&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-block bg-[#A5744A] hover:bg-[#8B6239] text-white border-0">
+                <Link
+                  href={`/auth/signup?plan=growth&billing=${isYearly ? 'yearly' : 'monthly'}`}
+                  className="btn btn-block bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
+                  onClick={() => trackCTAClick("start_free_trial", "pricing_growth")}
+                >
                   Start Free Trial
                 </Link>
               </div>
@@ -850,7 +873,11 @@ export default function Home() {
                   </li>
                 </ul>
 
-                <Link href={`/auth/signup?plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`} className="btn btn-outline btn-block border-2">
+                <Link
+                  href={`/auth/signup?plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`}
+                  className="btn btn-outline btn-block border-2"
+                  onClick={() => trackCTAClick("start_free_trial", "pricing_pro")}
+                >
                   Start Free Trial
                 </Link>
               </div>
@@ -898,7 +925,11 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-            <Link href="/auth/signup?plan=growth&billing=monthly" className="btn btn-gradient btn-lg text-lg px-10">
+            <Link
+              href="/auth/signup?plan=growth&billing=monthly"
+              className="btn btn-gradient btn-lg text-lg px-10"
+              onClick={() => trackCTAClick("start_your_calm_day", "final_cta")}
+            >
               Start Your Calm Day
               <ChevronRight className="h-5 w-5" />
             </Link>
