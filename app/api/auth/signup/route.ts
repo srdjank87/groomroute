@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { trackAccountCreated } from "@/lib/posthog-server";
 import { logAdminEvent } from "@/lib/admin-events";
+import { loopsOnSignup } from "@/lib/loops";
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -94,6 +95,16 @@ export async function POST(request: NextRequest) {
         billing: validatedData.billing,
       },
     });
+
+    // Add to Loops for abandoned checkout sequence
+    // (will trigger emails if they don't complete Stripe checkout)
+    loopsOnSignup(
+      validatedData.email,
+      validatedData.name,
+      validatedData.businessName,
+      validatedData.plan,
+      result.account.id
+    ).catch((err) => console.error("Loops signup event failed:", err));
 
     return NextResponse.json(
       {

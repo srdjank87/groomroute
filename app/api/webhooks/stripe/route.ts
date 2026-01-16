@@ -7,6 +7,12 @@ import { fbCapiStartTrial, fbCapiSubscribe } from "@/lib/facebook-capi";
 import { trackTrialConverted, trackServerEvent } from "@/lib/posthog-server";
 import { onboardNewUser } from "@/lib/email";
 import { logAdminEvent } from "@/lib/admin-events";
+import {
+  loopsOnCheckoutCompleted,
+  loopsOnTrialConverted,
+  loopsOnSubscriptionCanceled,
+  loopsOnResubscribed,
+} from "@/lib/loops";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -104,7 +110,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Pro plan includes 1 admin seat in base price
   const totalAdminSeats = subscription.metadata?.plan === "PRO" ? 1 + additionalAdminSeats : 1;
 
-  // Get account details for tracking
+  // Get account details for tracking (check if returning customer)
   const account = await prisma.account.findUnique({
     where: { id: accountId },
     include: {
@@ -114,6 +120,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       },
     },
   });
+
+  // Check if this is a resubscription (previously canceled)
+  const isResubscription = account?.subscriptionStatus === "CANCELED";
 
   await prisma.account.update({
     where: { id: accountId },
@@ -165,6 +174,22 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       const planName = session.metadata?.plan || account.subscriptionPlan || "Growth";
       const planDisplayName = planName.charAt(0).toUpperCase() + planName.slice(1).toLowerCase();
       await onboardNewUser(user.email, user.name || "there", planDisplayName, 14);
+
+      // Notify Loops that checkout completed (exits abandoned checkout sequence)
+      // If resubscription, also exits winback sequence
+      if (isResubscription) {
+        loopsOnResubscribed(
+          user.email,
+          planName,
+          accountId
+        ).catch((err) => console.error("Loops resubscription event failed:", err));
+      } else {
+        loopsOnCheckoutCompleted(
+          user.email,
+          planName,
+          accountId
+        ).catch((err) => console.error("Loops checkout event failed:", err));
+      }
     }
 
     // Log admin event for subscription start
@@ -279,6 +304,15 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
         previousPlan: account.subscriptionPlan,
       },
     });
+
+    // Notify Loops for winback sequence (60-day delay configured in Loops)
+    if (account.users[0]?.email) {
+      loopsOnSubscriptionCanceled(
+        account.users[0].email,
+        account.subscriptionPlan,
+        accountId
+      ).catch((err) => console.error("Loops cancellation event failed:", err));
+    }
   }
 
   console.log(`Subscription canceled for account ${accountId}`);
@@ -382,6 +416,15 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
         isTrialConversion: true,
       },
     });
+
+    // Notify Loops of trial conversion
+    if (user?.email) {
+      loopsOnTrialConverted(
+        user.email,
+        plan || "unknown",
+        accountId
+      ).catch((err) => console.error("Loops trial converted event failed:", err));
+    }
   } else if (account) {
     // Renewal payment
     const amount = invoice.amount_paid ? invoice.amount_paid / 100 : 0;
