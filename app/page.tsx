@@ -45,6 +45,9 @@ export default function Home() {
             <Link href="#pricing" className="link link-hover">
               Pricing
             </Link>
+            <Link href="/help" className="link link-hover">
+              Help
+            </Link>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -960,6 +963,7 @@ export default function Home() {
           <p className="max-w-md">The scheduling system built only for mobile groomers.</p>
           <p className="max-w-md">Finally, a calm day.</p>
           <div className="flex gap-4 mt-4">
+            <Link href="/help" className="link link-hover text-sm">Help Center</Link>
             <Link href="/privacy" className="link link-hover text-sm">Privacy Policy</Link>
             <Link href="/terms" className="link link-hover text-sm">Terms of Service</Link>
           </div>
