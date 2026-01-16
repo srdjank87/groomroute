@@ -85,7 +85,7 @@ export default function Home() {
             </div>
 
             {/* Value props */}
-            <div className="hidden sm:flex max-w-3xl mx-auto mb-4 gap-4 lg:gap-6 justify-center flex-wrap text-sm lg:text-base text-gray-600">
+            <div className="flex max-w-3xl mx-auto mb-4 gap-3 sm:gap-4 lg:gap-6 justify-center flex-wrap text-sm lg:text-base text-gray-600">
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 Less driving
