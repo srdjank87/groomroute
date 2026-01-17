@@ -250,38 +250,28 @@ export default function TodaysRoutePage() {
   }
 
   function startDrivingRoute() {
-    const validAppointments = activeAppointments.filter((apt) => apt.customer.address);
+    // Get the next/first incomplete appointment
+    const nextAppointment = activeAppointments.find((apt) => apt.customer.address);
 
-    if (validAppointments.length === 0) {
-      toast.error("No appointments to export");
+    if (!nextAppointment) {
+      toast.error("No appointment address available");
       return;
     }
 
     let url: string;
     const mapsApp = preferredMaps === "APPLE" ? "Apple Maps" : "Google Maps";
+    const destination = encodeURIComponent(nextAppointment.customer.address);
 
     if (preferredMaps === "APPLE") {
-      // Apple Maps URL with multiple waypoints
-      // Apple Maps format: https://maps.apple.com/?daddr=<address1>&daddr=<address2>...
-      url = "https://maps.apple.com/?";
-      validAppointments.forEach((apt, index) => {
-        if (index === 0) {
-          url += `daddr=${encodeURIComponent(apt.customer.address)}`;
-        } else {
-          url += `&daddr=${encodeURIComponent(apt.customer.address)}`;
-        }
-      });
-      url += "&dirflg=d"; // Driving directions
+      // Apple Maps - directions from current location to destination
+      url = `https://maps.apple.com/?daddr=${destination}&dirflg=d`;
     } else {
-      // Google Maps
-      url = "https://www.google.com/maps/dir/";
-      validAppointments.forEach((apt) => {
-        url += encodeURIComponent(apt.customer.address) + "/";
-      });
+      // Google Maps - directions from current location to destination
+      url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
     }
 
     window.open(url, "_blank");
-    toast.success(`Opened route with ${validAppointments.length} stops in ${mapsApp}`);
+    toast.success(`Navigating to ${nextAppointment.customer.name} in ${mapsApp}`);
   }
 
   function handleOptimizeClick() {
