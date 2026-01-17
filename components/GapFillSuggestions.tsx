@@ -109,12 +109,17 @@ export default function GapFillSuggestions({
     window.location.href = `tel:${phone}`;
   };
 
-  const handleMessage = (phone: string) => {
+  const handleMessage = (phone: string, customerName: string, petNames: string[], timeSlot: string) => {
+    const firstName = customerName.split(" ")[0];
+    const petText = petNames.length > 0 ? petNames.join(" and ") : "your pet";
+    const message = `Hi ${firstName}! I have an opening today at ${timeSlot} - would you like to bring ${petText} in for a groom? Let me know!`;
+    const encodedMessage = encodeURIComponent(message);
+
     if (preferredMessaging === "WHATSAPP") {
       const cleanPhone = phone.replace(/\D/g, "");
-      window.open(`https://wa.me/1${cleanPhone}`, "_blank");
+      window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, "_blank");
     } else {
-      window.location.href = `sms:${phone}`;
+      window.location.href = `sms:${phone}?body=${encodedMessage}`;
     }
   };
 
@@ -320,7 +325,12 @@ export default function GapFillSuggestions({
                               Call
                             </button>
                             <button
-                              onClick={() => handleMessage(client.customerPhone!)}
+                              onClick={() => handleMessage(
+                                client.customerPhone!,
+                                client.customerName,
+                                client.pets.map(p => p.name),
+                                gap.startTimeFormatted
+                              )}
                               className="btn btn-xs btn-ghost gap-1"
                             >
                               <MessageSquare className="h-3 w-3" />
