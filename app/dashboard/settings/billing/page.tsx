@@ -296,7 +296,7 @@ export default function BillingSettingsPage() {
               <div>
                 <p className="font-medium text-blue-800">You&apos;re on a Free Trial</p>
                 <p className="text-sm text-blue-700 mt-1">
-                  Enjoy full access to all features during your trial. You&apos;ll be prompted to select a plan when your trial ends.
+                  Enjoy full access to your {plan?.name} plan features. Your card will be charged when your trial ends.
                 </p>
               </div>
             </div>
