@@ -138,7 +138,7 @@ export default function OptimizePreviewModal({
     <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 overflow-hidden">
       <div
         className="bg-white rounded-t-xl sm:rounded-xl shadow-xl max-w-2xl w-full overflow-hidden flex flex-col"
-        style={{ maxHeight: 'min(85dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 20px))' }}
+        style={{ maxHeight: 'min(92dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 16px))' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-emerald-50 to-teal-50">
@@ -329,14 +329,14 @@ export default function OptimizePreviewModal({
             <button
               onClick={onClose}
               disabled={isLoading}
-              className="btn btn-ghost flex-1 px-4"
+              className="btn btn-ghost flex-1 px-2"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
               disabled={isLoading}
-              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white flex-1 gap-2 px-4"
+              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white flex-1 gap-1 px-2"
             >
               {isLoading ? (
                 <span className="loading loading-spinner loading-sm"></span>
