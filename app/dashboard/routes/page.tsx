@@ -21,6 +21,7 @@ import {
 } from "@dnd-kit/sortable";
 import SortableAppointment from "@/components/routes/SortableAppointment";
 import ReorderConfirmModal from "@/components/routes/ReorderConfirmModal";
+import OptimizePreviewModal from "@/components/routes/OptimizePreviewModal";
 import GapFillSuggestions from "@/components/GapFillSuggestions";
 
 interface Appointment {
@@ -106,6 +107,29 @@ export default function TodaysRoutePage() {
 
   // Optimize route confirmation state
   const [showOptimizeModal, setShowOptimizeModal] = useState(false);
+
+  // Optimize preview state
+  const [showOptimizePreview, setShowOptimizePreview] = useState(false);
+  const [optimizePreviewData, setOptimizePreviewData] = useState<{
+    changes: {
+      id: string;
+      order: number;
+      customerName: string;
+      petName: string;
+      customerPhone: string | null;
+      address: string;
+      oldStartAt: string;
+      newStartAt: string;
+      timeChanged: boolean;
+      serviceMinutes: number;
+    }[];
+    routeDetails: RouteDetails | null;
+    estimatedFinish: string | null;
+    appointmentsAffected: number;
+    preferredMessaging: "SMS" | "WHATSAPP";
+  } | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [isApplyingOptimization, setIsApplyingOptimization] = useState(false);
 
   // Configure sensors for both desktop and mobile
   const sensors = useSensors(
@@ -266,34 +290,48 @@ export default function TodaysRoutePage() {
 
   async function optimizeRoute(mode: "reorder" | "tighten") {
     setShowOptimizeModal(false);
-    setIsOptimizing(true);
-    try {
-      const now = new Date();
-      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-      if (mode === "reorder") {
-        // Full optimization - reorder by distance
-        const response = await fetch("/api/routes/optimize", {
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+    if (mode === "reorder") {
+      // Show preview first before applying optimization
+      setIsLoadingPreview(true);
+      try {
+        const response = await fetch("/api/routes/optimize-preview", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ date: today }),
         });
 
         if (!response.ok) {
-          throw new Error("Failed to optimize route");
+          throw new Error("Failed to get optimization preview");
         }
 
         const data = await response.json();
 
         if (data.success) {
-          toast.success(data.message);
-          setOptimizationResult(data);
-          await fetchTodaysRoute();
+          setOptimizePreviewData({
+            changes: data.changes,
+            routeDetails: data.routeDetails,
+            estimatedFinish: data.estimatedFinish,
+            appointmentsAffected: data.appointmentsAffected,
+            preferredMessaging: data.preferredMessaging,
+          });
+          setShowOptimizePreview(true);
         } else {
-          toast.error(data.message || "Could not optimize route");
+          toast.error(data.message || "Could not generate preview");
         }
-      } else {
-        // Tighten mode - keep order, just adjust times
+      } catch (error) {
+        console.error("Route optimization preview error:", error);
+        toast.error("Failed to generate optimization preview");
+      } finally {
+        setIsLoadingPreview(false);
+      }
+    } else {
+      // Tighten mode - keep order, just adjust times (apply immediately)
+      setIsOptimizing(true);
+      try {
         const response = await fetch("/api/routes/reorder", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -304,18 +342,53 @@ export default function TodaysRoutePage() {
         });
 
         if (response.ok) {
-          const data = await response.json();
           toast.success("Times tightened! Gaps between appointments reduced.");
           await fetchTodaysRoute();
         } else {
           toast.error("Failed to tighten times");
         }
+      } catch (error) {
+        console.error("Route optimization error:", error);
+        toast.error("Failed to optimize route");
+      } finally {
+        setIsOptimizing(false);
+      }
+    }
+  }
+
+  // Apply the optimization after user confirms in preview modal
+  async function applyOptimization() {
+    setIsApplyingOptimization(true);
+    try {
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+      const response = await fetch("/api/routes/optimize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: today }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to optimize route");
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message);
+        setOptimizationResult(data);
+        setShowOptimizePreview(false);
+        setOptimizePreviewData(null);
+        await fetchTodaysRoute();
+      } else {
+        toast.error(data.message || "Could not optimize route");
       }
     } catch (error) {
       console.error("Route optimization error:", error);
       toast.error("Failed to optimize route");
     } finally {
-      setIsOptimizing(false);
+      setIsApplyingOptimization(false);
     }
   }
 
@@ -481,10 +554,10 @@ export default function TodaysRoutePage() {
               {activeAppointments.length > 1 && (
                 <button
                   onClick={handleOptimizeClick}
-                  disabled={isOptimizing}
+                  disabled={isOptimizing || isLoadingPreview}
                   className="btn h-12 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2 px-6"
                 >
-                  {isOptimizing ? (
+                  {isOptimizing || isLoadingPreview ? (
                     <span className="loading loading-spinner loading-sm"></span>
                   ) : (
                     <Zap className="h-5 w-5" />
@@ -715,6 +788,22 @@ export default function TodaysRoutePage() {
         isLoading={isReordering}
         contactMethods={contactMethods}
         preferredMessaging={preferredMessaging}
+      />
+
+      {/* Optimize Preview Modal - shows before applying distance optimization */}
+      <OptimizePreviewModal
+        isOpen={showOptimizePreview}
+        onClose={() => {
+          setShowOptimizePreview(false);
+          setOptimizePreviewData(null);
+        }}
+        onConfirm={applyOptimization}
+        changes={optimizePreviewData?.changes || []}
+        routeDetails={optimizePreviewData?.routeDetails || null}
+        estimatedFinish={optimizePreviewData?.estimatedFinish || null}
+        appointmentsAffected={optimizePreviewData?.appointmentsAffected || 0}
+        isLoading={isApplyingOptimization}
+        preferredMessaging={optimizePreviewData?.preferredMessaging || preferredMessaging}
       />
 
       {/* Optimize Route Confirmation Modal */}
