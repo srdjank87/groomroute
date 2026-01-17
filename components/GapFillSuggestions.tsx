@@ -227,7 +227,7 @@ export default function GapFillSuggestions({
               </div>
               <div className="flex items-center gap-2">
                 {gap.suggestedClients.length > 0 && (
-                  <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full whitespace-nowrap">
                     {gap.suggestedClients.length} match{gap.suggestedClients.length !== 1 ? "es" : ""}
                   </span>
                 )}
@@ -330,9 +330,9 @@ export default function GapFillSuggestions({
                         )}
                         <Link
                           href={`/dashboard/appointments/new?customerId=${client.customerId}&suggestedDate=${gapData.date}&suggestedTime=${gap.startTime24h}`}
-                          className="btn btn-xs bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1 ml-auto"
+                          className="btn btn-sm bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-1 ml-auto"
                         >
-                          <Plus className="h-3 w-3" />
+                          <Plus className="h-4 w-4" />
                           Book
                         </Link>
                       </div>
