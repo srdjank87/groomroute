@@ -74,6 +74,7 @@ interface TodaysStats {
   hasData: boolean;
   showSampleData: boolean;
   hasSampleCustomers: boolean;
+  hasRealAppointments: boolean;
   workdayStarted: boolean;
   contactMethods?: string[];
   preferredMessaging?: "SMS" | "WHATSAPP";
@@ -202,6 +203,7 @@ function DemoDataBanner({
   showSampleData,
   hasData,
   hasSampleCustomers,
+  hasRealAppointments,
   onGenerateDemo,
   isGenerating,
   accountCreatedAt,
@@ -209,6 +211,7 @@ function DemoDataBanner({
   showSampleData: boolean;
   hasData: boolean;
   hasSampleCustomers: boolean;
+  hasRealAppointments: boolean;
   onGenerateDemo: () => void;
   isGenerating: boolean;
   accountCreatedAt: string | null;
@@ -219,8 +222,12 @@ function DemoDataBanner({
     : false;
 
   // Determine if banner should be visible
-  // Show if: account is new (<3 days), or there's sample data loaded, or there are old sample customers to clear
-  const shouldShow = !isAccountOlderThan3Days || showSampleData || hasSampleCustomers;
+  // Show if:
+  // 1. Account is new (<3 days), OR
+  // 2. There's sample data loaded, OR
+  // 3. There are old sample customers to clear, OR
+  // 4. Account is older than 3 days but has NO real appointments (encourage them to try demo)
+  const shouldShow = !isAccountOlderThan3Days || showSampleData || hasSampleCustomers || !hasRealAppointments;
 
   const [isExpanded, setIsExpanded] = useState(showSampleData);
   const [isClearing, setIsClearing] = useState(false);
@@ -1021,6 +1028,7 @@ function DashboardContent() {
           showSampleData={stats?.showSampleData || false}
           hasData={stats?.hasData || false}
           hasSampleCustomers={stats?.hasSampleCustomers || false}
+          hasRealAppointments={stats?.hasRealAppointments || false}
           onGenerateDemo={generateDemoData}
           isGenerating={isLoading}
           accountCreatedAt={stats?.accountCreatedAt || null}

@@ -138,6 +138,18 @@ export async function GET(req: NextRequest) {
     });
     const hasSampleCustomers = !!sampleCustomerExists;
 
+    // Check if there are any real (non-sample) customers with appointments
+    // This is used to determine if the demo banner should be shown after 3 days
+    const realCustomerWithAppointments = await prisma.customer.findFirst({
+      where: {
+        accountId,
+        NOT: { notes: { contains: "[SAMPLE_DATA]" } },
+        appointments: { some: {} },
+      },
+      select: { id: true },
+    });
+    const hasRealAppointments = !!realCustomerWithAppointments;
+
     // Get today's route to check if optimized, workday started, and assistant status
     const route = hasData
       ? await prisma.route.findFirst({
@@ -229,6 +241,7 @@ export async function GET(req: NextRequest) {
       hasData,
       showSampleData,
       hasSampleCustomers,
+      hasRealAppointments,
       workdayStarted,
       contactMethods: groomer?.contactMethods || ["call", "sms"],
       preferredMessaging: groomer?.preferredMessaging || "SMS",
