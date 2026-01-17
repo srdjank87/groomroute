@@ -303,14 +303,14 @@ export default function OptimizePreviewModal({
             <button
               onClick={onClose}
               disabled={isLoading}
-              className="btn btn-ghost flex-1"
+              className="btn btn-ghost flex-1 px-4"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
               disabled={isLoading}
-              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white flex-1 gap-2"
+              className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white flex-1 gap-2 px-4"
             >
               {isLoading ? (
                 <span className="loading loading-spinner loading-sm"></span>
