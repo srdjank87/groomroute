@@ -478,7 +478,7 @@ function getDayStatusColor(stats: TodaysStats | null): { color: string; label: s
 // Generate encouraging message based on remaining appointments
 function getRemainingMessage(remaining: number, petName?: string): string {
   if (remaining === 0) {
-    return "Last one — you got this! 🎉";
+    return "Last one - you got this! 🎉";
   }
 
   // Personalized messages with pet name when available
@@ -487,7 +487,7 @@ function getRemainingMessage(remaining: number, petName?: string): string {
   if (remaining === 1) {
     const messages = [
       `Just 1 more after ${petNameDisplay}! Almost there 💪`,
-      `1 more to go — you're crushing it! ⭐`,
+      `1 more to go - you're crushing it! ⭐`,
       `Only 1 left after this one! 🙌`,
     ];
     return messages[Math.floor(Math.random() * messages.length)];
@@ -495,27 +495,27 @@ function getRemainingMessage(remaining: number, petName?: string): string {
 
   if (remaining === 2) {
     const messages = [
-      `2 more after ${petNameDisplay} — home stretch! 🏁`,
+      `2 more after ${petNameDisplay} - home stretch! 🏁`,
       `Just 2 more to go! You've got this 💪`,
-      `2 left — keep up the great work! ⭐`,
+      `2 left - keep up the great work! ⭐`,
     ];
     return messages[Math.floor(Math.random() * messages.length)];
   }
 
   if (remaining <= 4) {
     const messages = [
-      `${remaining} more after ${petNameDisplay} — steady pace! 🌟`,
-      `${remaining} to go — you're doing great! 💫`,
-      `${remaining} left — keep that rhythm going! ✨`,
+      `${remaining} more after ${petNameDisplay} - steady pace! 🌟`,
+      `${remaining} to go - you're doing great! 💫`,
+      `${remaining} left - keep that rhythm going! ✨`,
     ];
     return messages[Math.floor(Math.random() * messages.length)];
   }
 
   // 5 or more remaining
   const messages = [
-    `${remaining} more today — one pup at a time! 🐕`,
-    `${remaining} to go — you've got this! 💪`,
-    `${remaining} left — stay focused, stay calm 🌿`,
+    `${remaining} more today - one pup at a time! 🐕`,
+    `${remaining} to go - you've got this! 💪`,
+    `${remaining} left - stay focused, stay calm 🌿`,
   ];
   return messages[Math.floor(Math.random() * messages.length)];
 }
