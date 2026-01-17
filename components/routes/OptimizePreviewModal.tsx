@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, MessageSquare, Check, Clock, MapPin, Zap, ChevronDown, ChevronUp } from "lucide-react";
 
 interface RouteChange {
@@ -71,6 +71,29 @@ export default function OptimizePreviewModal({
   const [notifiedCustomers, setNotifiedCustomers] = useState<Set<string>>(new Set());
   const [showAllStops, setShowAllStops] = useState(false);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Save current scroll position and lock body
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.overflow = 'hidden';
+
+      return () => {
+        // Restore scroll position when modal closes
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const useWhatsApp = preferredMessaging === "WHATSAPP";
@@ -112,8 +135,11 @@ export default function OptimizePreviewModal({
   ).length;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white rounded-t-xl sm:rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 overflow-hidden">
+      <div
+        className="bg-white rounded-t-xl sm:rounded-xl shadow-xl max-w-2xl w-full overflow-hidden flex flex-col"
+        style={{ maxHeight: 'min(85dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 20px))' }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-emerald-50 to-teal-50">
           <div>
