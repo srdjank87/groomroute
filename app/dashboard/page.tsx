@@ -475,6 +475,51 @@ function getDayStatusColor(stats: TodaysStats | null): { color: string; label: s
   return { color: 'bg-red-500', label: 'Heavy day', showCalmLink: true };
 }
 
+// Generate encouraging message based on remaining appointments
+function getRemainingMessage(remaining: number, petName?: string): string {
+  if (remaining === 0) {
+    return "Last one — you got this! 🎉";
+  }
+
+  // Personalized messages with pet name when available
+  const petNameDisplay = petName || "this cutie";
+
+  if (remaining === 1) {
+    const messages = [
+      `Just 1 more after ${petNameDisplay}! Almost there 💪`,
+      `1 more to go — you're crushing it! ⭐`,
+      `Only 1 left after this one! 🙌`,
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+
+  if (remaining === 2) {
+    const messages = [
+      `2 more after ${petNameDisplay} — home stretch! 🏁`,
+      `Just 2 more to go! You've got this 💪`,
+      `2 left — keep up the great work! ⭐`,
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+
+  if (remaining <= 4) {
+    const messages = [
+      `${remaining} more after ${petNameDisplay} — steady pace! 🌟`,
+      `${remaining} to go — you're doing great! 💫`,
+      `${remaining} left — keep that rhythm going! ✨`,
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+
+  // 5 or more remaining
+  const messages = [
+    `${remaining} more today — one pup at a time! 🐕`,
+    `${remaining} to go — you've got this! 💪`,
+    `${remaining} left — stay focused, stay calm 🌿`,
+  ];
+  return messages[Math.floor(Math.random() * messages.length)];
+}
+
 function DashboardContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
@@ -1029,9 +1074,7 @@ function DashboardContent() {
             <div className="flex items-center gap-2">
               {/* Badge hidden on mobile - shown below buttons instead */}
               <p className="hidden sm:block text-gray-500 text-sm">
-                {stats.appointments - 1 === 0
-                  ? "Last one — you got this! 🎉"
-                  : `${stats.appointments - 1} more after this one`}
+                {getRemainingMessage(stats.appointments - 1, stats.nextAppointment.petName)}
               </p>
               <button
                 onClick={toggleFullscreen}
@@ -1189,9 +1232,7 @@ function DashboardContent() {
             {/* Appointments left - separate row on mobile */}
             <div className="flex justify-center sm:hidden mt-3">
               <p className="text-gray-500 text-sm">
-                {stats.appointments - 1 === 0
-                  ? "Last one — you got this! 🎉"
-                  : `${stats.appointments - 1} more after this one`}
+                {getRemainingMessage(stats.appointments - 1, stats.nextAppointment.petName)}
               </p>
             </div>
           </div>
