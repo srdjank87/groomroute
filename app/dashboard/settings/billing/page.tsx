@@ -298,6 +298,12 @@ export default function BillingSettingsPage() {
                 <p className="text-sm text-blue-700 mt-1">
                   Enjoy full access to your {plan?.name} plan features. Your card will be charged when your trial ends.
                 </p>
+                <p className="text-sm text-blue-600 mt-2">
+                  Need to cancel? Contact us at{" "}
+                  <a href="mailto:hello@groomroute.com" className="underline font-medium hover:text-blue-800">
+                    hello@groomroute.com
+                  </a>
+                </p>
               </div>
             </div>
           </div>
