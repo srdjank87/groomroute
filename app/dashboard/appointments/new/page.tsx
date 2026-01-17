@@ -370,17 +370,41 @@ function NewAppointmentContent() {
 
   const selectPet = (pet: Pet) => {
     setSelectedPet(pet);
-    setAppointmentData({ ...appointmentData, petId: pet.id });
-    // Auto-set duration based on pet weight
-    if (pet.weight) {
+
+    // Set defaults based on pet species
+    const isCat = pet.species === "cat";
+
+    // Default service type and pricing based on species
+    let defaultServiceType = "FULL_GROOM";
+    let defaultMinutes = isCat ? 60 : 90;
+    let defaultPrice = isCat ? 75 : 85;
+
+    // Override based on pet weight for dogs
+    if (!isCat && pet.weight) {
       if (pet.weight < 30) {
-        setAppointmentData({ ...appointmentData, petId: pet.id, serviceMinutes: 60, price: 65 });
+        defaultMinutes = 60;
+        defaultPrice = 65;
       } else if (pet.weight < 60) {
-        setAppointmentData({ ...appointmentData, petId: pet.id, serviceMinutes: 90, price: 85 });
+        defaultMinutes = 90;
+        defaultPrice = 85;
       } else {
-        setAppointmentData({ ...appointmentData, petId: pet.id, serviceMinutes: 120, price: 105 });
+        defaultMinutes = 120;
+        defaultPrice = 105;
       }
     }
+
+    setAppointmentData({
+      ...appointmentData,
+      petId: pet.id,
+      serviceType: defaultServiceType,
+      serviceMinutes: defaultMinutes,
+      price: defaultPrice,
+    });
+
+    // Reset custom service state
+    setIsCustomService(false);
+    setCustomServiceName("");
+
     // Go to groomer step for multi-groomer accounts, otherwise go to details
     setCurrentStep(isMultiGroomer ? "groomer" : "details");
     scrollToTop();
@@ -403,7 +427,8 @@ function NewAppointmentContent() {
   const [isCustomService, setIsCustomService] = useState(false);
   const [customServiceName, setCustomServiceName] = useState("");
 
-  const serviceTypes = [
+  // Service types for dogs
+  const dogServiceTypes = [
     { value: "FULL_GROOM", label: "Full Groom", emoji: "🐕", description: "Complete grooming package", minutes: 90, price: 85 },
     { value: "BATH_BRUSH", label: "Bath & Brush", emoji: "🛁", description: "Bath, blow-dry & brush out", minutes: 60, price: 65 },
     { value: "DESHED", label: "De-shed Treatment", emoji: "🪮", description: "Deep undercoat removal", minutes: 75, price: 75 },
@@ -413,6 +438,19 @@ function NewAppointmentContent() {
     { value: "HAND_STRIP", label: "Hand Stripping", emoji: "🧤", description: "For wire-coated breeds", minutes: 120, price: 120 },
     { value: "CUSTOM", label: "Custom", emoji: "⭐", description: "Define your own service", minutes: 60, price: 65 },
   ];
+
+  // Service types for cats (different services that make sense for cats)
+  const catServiceTypes = [
+    { value: "FULL_GROOM", label: "Full Groom", emoji: "🐈", description: "Complete cat grooming", minutes: 60, price: 75 },
+    { value: "BATH_BRUSH", label: "Bath & Brush", emoji: "🛁", description: "Bath, blow-dry & brush out", minutes: 45, price: 55 },
+    { value: "DESHED", label: "De-shed Treatment", emoji: "🪮", description: "Deep undercoat removal", minutes: 45, price: 55 },
+    { value: "NAIL_TRIM", label: "Nail Trim", emoji: "✂️", description: "Quick nail maintenance", minutes: 15, price: 20 },
+    { value: "BATH_ONLY", label: "Bath Only", emoji: "💧", description: "Bath and towel dry", minutes: 30, price: 40 },
+    { value: "CUSTOM", label: "Custom", emoji: "⭐", description: "Define your own service", minutes: 45, price: 55 },
+  ];
+
+  // Get service types based on selected pet species
+  const serviceTypes = selectedPet?.species === "cat" ? catServiceTypes : dogServiceTypes;
 
   const handleSubmit = async () => {
     if (!appointmentData.customerId || !appointmentData.date || !appointmentData.time) {
