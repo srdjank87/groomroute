@@ -22,6 +22,7 @@ const customerSchema = z.object({
   species: z.string().optional(),
   breed: z.string().optional(),
   weight: z.string().optional(),
+  ageYears: z.string().optional(),
   behaviorFlags: z.array(z.string()).optional(),
   specialHandling: z.string().optional(),
 });
@@ -106,6 +107,7 @@ export async function POST(req: NextRequest) {
             species: validatedData.species || "dog",
             breed: validatedData.breed || null,
             weight: validatedData.weight ? parseFloat(validatedData.weight) : null,
+            ageYears: validatedData.ageYears ? parseInt(validatedData.ageYears) : null,
             behaviorFlags: (validatedData.behaviorFlags || []) as BehaviorFlag[],
             specialHandling: validatedData.specialHandling || null,
           },

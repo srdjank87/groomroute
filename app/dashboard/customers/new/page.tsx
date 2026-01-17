@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Check, ChevronDown, ChevronUp, MapPin, Sparkles, Phone, Mail } from "lucide-react";
+import { ChevronLeft, Check, ChevronDown, ChevronUp, MapPin, Sparkles, Phone, Mail, Minus, Plus } from "lucide-react";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import MapPreview from "@/components/MapPreview";
 import toast from "react-hot-toast";
@@ -55,6 +55,7 @@ export default function NewCustomerPage() {
     species: "dog",
     breed: "",
     weight: "",
+    ageYears: "",
     behaviorFlags: [] as string[],
     specialHandling: "",
     // Notes
@@ -565,31 +566,91 @@ export default function NewCustomerPage() {
                 </div>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Breed
+                </label>
+                <input
+                  type="text"
+                  value={formData.breed}
+                  onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
+                  className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                  placeholder="Golden Retriever"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Breed
+                    Age (years)
                   </label>
-                  <input
-                    type="text"
-                    value={formData.breed}
-                    onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
-                    className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
-                    placeholder="Golden Retriever"
-                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = parseInt(formData.ageYears) || 0;
+                        if (current > 0) setFormData({ ...formData, ageYears: String(current - 1) });
+                      }}
+                      className="btn btn-square h-12 w-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-200 text-gray-700"
+                    >
+                      <Minus className="h-5 w-5" />
+                    </button>
+                    <input
+                      type="number"
+                      value={formData.ageYears}
+                      onChange={(e) => setFormData({ ...formData, ageYears: e.target.value })}
+                      className="input flex-1 h-12 text-base text-center bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                      placeholder="0"
+                      min="0"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = parseInt(formData.ageYears) || 0;
+                        setFormData({ ...formData, ageYears: String(current + 1) });
+                      }}
+                      className="btn btn-square h-12 w-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-200 text-gray-700"
+                    >
+                      <Plus className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Weight (lbs)
                   </label>
-                  <input
-                    type="number"
-                    value={formData.weight}
-                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                    className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
-                    placeholder="65"
-                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = parseFloat(formData.weight) || 0;
+                        if (current >= 5) setFormData({ ...formData, weight: String(current - 5) });
+                      }}
+                      className="btn btn-square h-12 w-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-200 text-gray-700"
+                    >
+                      <Minus className="h-5 w-5" />
+                    </button>
+                    <input
+                      type="number"
+                      value={formData.weight}
+                      onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                      className="input flex-1 h-12 text-base text-center bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
+                      placeholder="0"
+                      min="0"
+                      step="1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = parseFloat(formData.weight) || 0;
+                        setFormData({ ...formData, weight: String(current + 5) });
+                      }}
+                      className="btn btn-square h-12 w-12 bg-gray-100 hover:bg-gray-200 border-2 border-gray-200 text-gray-700"
+                    >
+                      <Plus className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
