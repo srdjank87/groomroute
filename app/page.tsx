@@ -555,14 +555,14 @@ export default function Home() {
                   &quot;I was burning out hard. Back hurt, brain was mush by 3pm. GroomRoute&apos;s workload thing actually gets that a day with 4 doodles isn&apos;t the same as 4 chihuahuas. <span className="font-semibold text-gray-900">My body doesn&apos;t hate me anymore.</span>&quot;
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="avatar placeholder">
-                    <div className="bg-amber-100 text-amber-800 rounded-full w-12">
-                      <span className="text-lg">SM</span>
+                  <div className="avatar">
+                    <div className="w-12 rounded-full">
+                      <Image src="/images/sarah.jpg" alt="Sarah M." width={48} height={48} className="rounded-full object-cover" />
                     </div>
                   </div>
                   <div>
                     <div className="font-bold text-gray-900">Sarah M.</div>
-                    <div className="text-sm text-gray-500">Solo mobile groomer, 6 years</div>
+                    <div className="text-sm text-gray-500">San Diego, CA</div>
                   </div>
                 </div>
               </div>
@@ -574,9 +574,9 @@ export default function Home() {
                   &quot;The area days feature changed everything. I used to drive 45 minutes between appointments. Now? <span className="font-semibold text-gray-900">I&apos;m home by 4:30 most days.</span> My husband thought I got fired.&quot;
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="avatar placeholder">
-                    <div className="bg-emerald-100 text-emerald-800 rounded-full w-12">
-                      <span className="text-lg">JP</span>
+                  <div className="avatar">
+                    <div className="w-12 rounded-full">
+                      <Image src="/images/jessica.jpg" alt="Jessica P." width={48} height={48} className="rounded-full object-cover" />
                     </div>
                   </div>
                   <div>
@@ -593,9 +593,9 @@ export default function Home() {
                   &quot;The running late button saved my sanity. I used to stress SO HARD about texting everyone while I&apos;m elbow-deep in a giant poodle. <span className="font-semibold text-gray-900">Now it&apos;s just... handled.</span>&quot;
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="avatar placeholder">
-                    <div className="bg-blue-100 text-blue-800 rounded-full w-12">
-                      <span className="text-lg">MT</span>
+                  <div className="avatar">
+                    <div className="w-12 rounded-full">
+                      <Image src="/images/mike.jpg" alt="Mike T." width={48} height={48} className="rounded-full object-cover" />
                     </div>
                   </div>
                   <div>
@@ -612,9 +612,9 @@ export default function Home() {
                   &quot;Finally, software that doesn&apos;t feel like it was built by someone who&apos;s never groomed a day in their life. <span className="font-semibold text-gray-900">It knows I can&apos;t do 3 giant breeds back-to-back.</span>&quot;
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="avatar placeholder">
-                    <div className="bg-purple-100 text-purple-800 rounded-full w-12">
-                      <span className="text-lg">CR</span>
+                  <div className="avatar">
+                    <div className="w-12 rounded-full">
+                      <Image src="/images/carlos.jpg" alt="Carlos R." width={48} height={48} className="rounded-full object-cover" />
                     </div>
                   </div>
                   <div>
