@@ -112,7 +112,7 @@ export default function GapFillSuggestions({
   const handleMessage = (phone: string, customerName: string, petNames: string[], timeSlot: string) => {
     const firstName = customerName.split(" ")[0];
     const petText = petNames.length > 0 ? petNames.join(" and ") : "your pet";
-    const message = `Hi ${firstName}! I have an opening today at ${timeSlot} - would you like to bring ${petText} in for a groom? Let me know!`;
+    const message = `Hi ${firstName}! I have an opening today at ${timeSlot} - would you like me to come by and groom ${petText}? Let me know!`;
     const encodedMessage = encodeURIComponent(message);
 
     if (preferredMessaging === "WHATSAPP") {
