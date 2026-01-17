@@ -73,6 +73,7 @@ interface TodaysStats {
   };
   hasData: boolean;
   showSampleData: boolean;
+  hasSampleCustomers: boolean;
   workdayStarted: boolean;
   contactMethods?: string[];
   preferredMessaging?: "SMS" | "WHATSAPP";
@@ -200,12 +201,14 @@ interface RevenueStats {
 function DemoDataBanner({
   showSampleData,
   hasData,
+  hasSampleCustomers,
   onGenerateDemo,
   isGenerating,
   accountCreatedAt,
 }: {
   showSampleData: boolean;
   hasData: boolean;
+  hasSampleCustomers: boolean;
   onGenerateDemo: () => void;
   isGenerating: boolean;
   accountCreatedAt: string | null;
@@ -216,7 +219,8 @@ function DemoDataBanner({
     : false;
 
   // Determine if banner should be visible
-  const shouldShow = !isAccountOlderThan3Days || showSampleData;
+  // Show if: account is new (<3 days), or there's sample data loaded, or there are old sample customers to clear
+  const shouldShow = !isAccountOlderThan3Days || showSampleData || hasSampleCustomers;
 
   const [isExpanded, setIsExpanded] = useState(showSampleData);
   const [isClearing, setIsClearing] = useState(false);
@@ -257,11 +261,15 @@ function DemoDataBanner({
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-purple-600" />
           <span className="text-sm font-medium text-purple-800">Demo Mode</span>
-          {showSampleData && (
+          {showSampleData ? (
             <span className="text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full">
               Sample data loaded
             </span>
-          )}
+          ) : hasSampleCustomers ? (
+            <span className="text-xs bg-amber-200 text-amber-700 px-2 py-0.5 rounded-full">
+              Old demo data exists
+            </span>
+          ) : null}
         </div>
         <ChevronDown className="h-4 w-4 text-purple-600 group-hover:translate-y-0.5 transition-transform" />
       </button>
@@ -334,7 +342,7 @@ function DemoDataBanner({
                     </>
                   )}
                 </button>
-                {hasData && (
+                {(hasData || hasSampleCustomers) && (
                   <button
                     onClick={handleClearData}
                     disabled={isClearing}
@@ -342,6 +350,8 @@ function DemoDataBanner({
                   >
                     {isClearing ? (
                       <span className="loading loading-spinner loading-xs"></span>
+                    ) : hasSampleCustomers ? (
+                      "Clear Demo Data"
                     ) : (
                       "Clear Existing Data"
                     )}
@@ -965,6 +975,7 @@ function DashboardContent() {
         <DemoDataBanner
           showSampleData={stats?.showSampleData || false}
           hasData={stats?.hasData || false}
+          hasSampleCustomers={stats?.hasSampleCustomers || false}
           onGenerateDemo={generateDemoData}
           isGenerating={isLoading}
           accountCreatedAt={stats?.accountCreatedAt || null}

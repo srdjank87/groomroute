@@ -127,6 +127,17 @@ export async function GET(req: NextRequest) {
         apt.customer.notes?.includes("[SAMPLE_DATA]")
       );
 
+    // Check if sample customers exist (even if no appointments today)
+    // This allows showing "Clear Demo Data" even when demo appointments are all in the past
+    const sampleCustomerExists = await prisma.customer.findFirst({
+      where: {
+        accountId,
+        notes: { contains: "[SAMPLE_DATA]" },
+      },
+      select: { id: true },
+    });
+    const hasSampleCustomers = !!sampleCustomerExists;
+
     // Get today's route to check if optimized, workday started, and assistant status
     const route = hasData
       ? await prisma.route.findFirst({
@@ -217,6 +228,7 @@ export async function GET(req: NextRequest) {
         : undefined,
       hasData,
       showSampleData,
+      hasSampleCustomers,
       workdayStarted,
       contactMethods: groomer?.contactMethods || ["call", "sms"],
       preferredMessaging: groomer?.preferredMessaging || "SMS",
