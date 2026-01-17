@@ -288,7 +288,7 @@ export default function BillingSettingsPage() {
           </div>
         )}
 
-        {/* Trial upgrade prompt */}
+        {/* Trial info */}
         {subscription?.subscriptionStatus === "TRIAL" && (
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-start gap-3">
@@ -296,7 +296,7 @@ export default function BillingSettingsPage() {
               <div>
                 <p className="font-medium text-blue-800">You&apos;re on a Free Trial</p>
                 <p className="text-sm text-blue-700 mt-1">
-                  Upgrade to a paid plan anytime to unlock all features and ensure uninterrupted service.
+                  Enjoy full access to all features during your trial. You&apos;ll be prompted to select a plan when your trial ends.
                 </p>
               </div>
             </div>
