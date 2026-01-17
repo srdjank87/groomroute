@@ -16,6 +16,7 @@ export async function POST() {
       where: { id: session.user.accountId },
       select: {
         stripeCustomerId: true,
+        subscriptionStatus: true,
       },
     });
 
@@ -30,9 +31,21 @@ export async function POST() {
       );
     }
 
+    // For trial users, use a restricted portal configuration that hides cancellation
+    // Paying customers can cancel via the portal; trial users must contact support
+    const isTrialUser = account.subscriptionStatus === "TRIAL";
+
+    // Create portal session with inline configuration
+    // Trial users: hide subscription cancellation to prevent trial abuse
+    // Paying users: allow full portal access including cancellation
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: account.stripeCustomerId,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/billing`,
+      ...(isTrialUser && {
+        flow_data: {
+          type: "payment_method_update",
+        },
+      }),
     });
 
     return NextResponse.json({ url: portalSession.url });

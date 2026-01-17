@@ -65,7 +65,7 @@ export default function BillingSettingsPage() {
 
       if (response.ok) {
         const { url } = await response.json();
-        window.location.href = url;
+        window.open(url, "_blank");
       } else {
         const data = await response.json();
         toast.error(data.error || "Failed to open billing portal");
