@@ -89,7 +89,20 @@ export default function HelpPage() {
             </div>
 
             <div className="bg-white rounded-xl border p-6">
-              <h3 className="font-semibold text-gray-900 mb-3">2. Schedule Appointments</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">2. Set Up Your Service Areas</h3>
+              <p className="text-gray-600 mb-3">
+                Areas help you group appointments by location so you&apos;re not driving all over town. For example, &quot;North Austin&quot; on Mondays and &quot;South Austin&quot; on Tuesdays.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1 ml-4 list-disc">
+                <li>Go to <strong>Settings</strong> &rarr; <strong>Areas</strong></li>
+                <li>Click <strong>Add Area</strong> and name it (e.g., &quot;Downtown&quot;, &quot;Westside&quot;)</li>
+                <li>Optionally assign specific days to each area</li>
+                <li>When adding or editing clients, assign them to an area based on their location</li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-xl border p-6">
+              <h3 className="font-semibold text-gray-900 mb-3">3. Schedule Appointments</h3>
               <p className="text-gray-600 mb-3">
                 Once you have clients, schedule their appointments for the day.
               </p>
@@ -101,7 +114,7 @@ export default function HelpPage() {
             </div>
 
             <div className="bg-white rounded-xl border p-6">
-              <h3 className="font-semibold text-gray-900 mb-3">3. Optimize Your Route</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">4. Optimize Your Route</h3>
               <p className="text-gray-600 mb-3">
                 Let GroomRoute figure out the best order for your appointments to minimize driving time.
               </p>
@@ -113,7 +126,7 @@ export default function HelpPage() {
             </div>
 
             <div className="bg-white rounded-xl border p-6">
-              <h3 className="font-semibold text-gray-900 mb-3">4. Start Your Day</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">5. Start Your Day</h3>
               <p className="text-gray-600 mb-3">
                 When you&apos;re ready to hit the road, start your workday to begin navigation.
               </p>
