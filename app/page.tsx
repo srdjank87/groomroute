@@ -942,7 +942,7 @@ export default function Home() {
             14-day free trial. No commitment. Cancel anytime.
           </p>
           <p className="text-sm text-gray-400 mt-1">
-            Import from spreadsheets, MoeGo, or start fresh — we&apos;ll help either way.
+            Import from spreadsheets, MoeGo, or start fresh - we&apos;ll help either way.
           </p>
         </div>
       </section>
