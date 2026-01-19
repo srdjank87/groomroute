@@ -343,14 +343,14 @@ export default function HelpPage() {
             We&apos;re here to help! Reach out and we&apos;ll get back to you as quickly as possible.
           </p>
           <a
-            href="mailto:support@groomroute.com"
+            href="mailto:hello@groomroute.com"
             className="btn bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
           >
             <Mail className="h-5 w-5" />
             Email Support
           </a>
           <p className="text-sm text-gray-500 mt-4">
-            support@groomroute.com
+            hello@groomroute.com
           </p>
         </div>
       </section>
