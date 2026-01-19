@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geocoding";
 import { AppointmentStatus, BehaviorFlag, EquipmentRequired } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 // Service areas for demo - simple name + color groupings
 const SERVICE_AREAS = [
@@ -530,14 +531,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingSampleData) {
-      console.log("Sample data already exists for accountId", accountId);
+      logger.debug("Sample data already exists", { accountId });
       return NextResponse.json(
         { error: "Sample data already exists" },
         { status: 400 }
       );
     }
 
-    console.log("No existing sample data found, proceeding to generate...");
+    logger.debug("No existing sample data found, proceeding to generate...");
 
     // Get or create groomers for this account
     let primaryGroomer = await prisma.groomer.findFirst({
@@ -555,7 +556,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("Found primary groomer:", primaryGroomer.id, "for account:", accountId);
+    logger.debug("Found primary groomer", { groomerId: primaryGroomer.id, accountId });
 
     // Check if account is on Pro plan for multi-groomer support
     const account = await prisma.account.findUnique({
@@ -592,13 +593,13 @@ export async function POST(req: NextRequest) {
             },
           });
           allGroomers.push(newGroomer);
-          console.log("Created additional groomer:", newGroomer.name);
+          logger.debug("Created additional groomer", { name: newGroomer.name });
         } else {
           allGroomers.push(existingGroomer);
         }
       }
     } else {
-      console.log("Skipping additional groomers - not on Pro plan");
+      logger.debug("Skipping additional groomers - not on Pro plan");
     }
 
     // Generate appointments for the last 30 days (more data for analytics)
@@ -639,7 +640,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.log("Service areas ready:", Object.keys(areaIdsByName));
+    logger.debug("Service areas ready", { areas: Object.keys(areaIdsByName) });
 
     // Create area day assignments for all groomers
     const dayAssignments = [
@@ -678,7 +679,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.log("Area day assignments ready for all groomers");
+    logger.debug("Area day assignments ready for all groomers");
 
     // Create customers with geocoding, area assignment, and multiple pets
     for (const sampleCustomer of SAMPLE_CUSTOMERS) {
@@ -738,7 +739,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    console.log(`Created ${createdCustomers.length} customers with ${totalPetsCreated} pets`);
+    logger.debug("Created customers and pets", { customers: createdCustomers.length, pets: totalPetsCreated });
 
     // Track cancellation/no-show counts per customer
     const customerCancellations: { [customerId: string]: number } = {};
@@ -875,7 +876,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    console.log("Updated customer cancellation/no-show counts");
+    logger.debug("Updated customer cancellation/no-show counts");
 
     return NextResponse.json({
       success: true,

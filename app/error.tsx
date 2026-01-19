@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import * as Sentry from "@sentry/nextjs";
 
 const GroomRouteLogo = () => (
   <span>Groom<span style={{ color: '#A5744A' }}>Route</span></span>
@@ -16,7 +17,8 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("Application error:", error);
+    // Report error to Sentry
+    Sentry.captureException(error);
   }, [error]);
 
   return (

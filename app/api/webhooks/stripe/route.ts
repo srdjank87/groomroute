@@ -13,6 +13,7 @@ import {
   loopsOnSubscriptionCanceled,
   loopsOnResubscribed,
 } from "@/lib/loops";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        logger.debug(`Unhandled Stripe event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
@@ -208,7 +209,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
   }
 
-  console.log(`Checkout completed for account ${accountId}`);
+  logger.webhook("checkout.session.completed", `Checkout completed for account ${accountId}`);
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
@@ -263,7 +264,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     },
   });
 
-  console.log(`Subscription updated for account ${accountId}: ${status}`);
+  logger.webhook("customer.subscription.updated", `Subscription updated for account ${accountId}: ${status}`);
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
@@ -315,7 +316,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     }
   }
 
-  console.log(`Subscription canceled for account ${accountId}`);
+  logger.webhook("customer.subscription.deleted", `Subscription canceled for account ${accountId}`);
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
@@ -441,7 +442,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     });
   }
 
-  console.log(`Invoice payment succeeded for account ${accountId}`);
+  logger.webhook("invoice.payment_succeeded", `Invoice payment succeeded for account ${accountId}`);
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
@@ -492,5 +493,5 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     });
   }
 
-  console.log(`Invoice payment failed for account ${accountId}`);
+  logger.webhook("invoice.payment_failed", `Invoice payment failed for account ${accountId}`);
 }
