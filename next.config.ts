@@ -46,18 +46,21 @@ export default withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
 
-  // Only upload source maps in production builds
+  // Only print logs in CI
   silent: !process.env.CI,
 
   // Upload source maps for better stack traces
   widenClientFileUpload: true,
 
-  // Hide source maps from the client
-  hideSourceMaps: true,
-
   // Disable Sentry logger
   disableLogger: true,
 
-  // Automatically tree-shake Sentry logger statements
+  // Automatically instrument Vercel cron monitors
   automaticVercelMonitors: true,
+
+  // Source maps configuration
+  sourcemaps: {
+    // Don't expose source maps to the client
+    deleteSourcemapsAfterUpload: true,
+  },
 });
