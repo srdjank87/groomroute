@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
   DollarSign,
@@ -16,6 +16,14 @@ import {
 } from "lucide-react";
 import { useFeature } from "@/hooks/useFeatures";
 
+type Period = "this_week" | "last_week" | "this_month" | "last_month";
+
+interface Groomer {
+  id: string;
+  name: string;
+  color: string | null;
+}
+
 interface CalmImpact {
   weeklyTimeRecoveredMinutes: number;
   monthlyTimeRecoveredMinutes: number;
@@ -28,25 +36,31 @@ interface CalmImpact {
   calmImpactMessage: string;
 }
 
+interface ChartDataPoint {
+  date: string;
+  label: string;
+  revenue: number;
+  lostRevenue: number;
+  appointments: number;
+  lostAppointments: number;
+}
+
 interface RevenueStats {
-  dailyRevenue: {
-    date: string;
-    dayName: string;
-    revenue: number;
-    lostRevenue: number;
-    appointments: number;
-    lostAppointments: number;
-  }[];
-  weeklyRevenue: number;
-  weeklyLostRevenue: number;
-  weeklyAppointments: number;
-  monthlyRevenue: number;
-  monthlyLostRevenue: number;
-  monthlyAppointments: number;
+  period: Period;
+  periodLabel: string;
+  periodStart: string;
+  periodEnd: string;
+  isMonthlyView: boolean;
+  chartData: ChartDataPoint[];
+  periodRevenue: number;
+  periodLostRevenue: number;
+  periodAppointments: number;
   avgRevenuePerAppointment: number;
   avgRevenuePerCustomer: number;
   uniqueCustomers: number;
   completionRate: number;
+  groomerId: string;
+  canFilterByGroomer: boolean;
   calmImpact: CalmImpact;
 }
 
@@ -128,22 +142,72 @@ interface TeamAnalytics {
   } | null;
 }
 
+const PERIOD_OPTIONS: { value: Period; label: string }[] = [
+  { value: "this_week", label: "This Week" },
+  { value: "last_week", label: "Last Week" },
+  { value: "this_month", label: "This Month" },
+  { value: "last_month", label: "Last Month" },
+];
+
 export default function AnalyticsPage() {
   const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null);
   const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null);
   const [teamAnalytics, setTeamAnalytics] = useState<TeamAnalytics | null>(null);
+  const [groomers, setGroomers] = useState<Groomer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRevenueLoading, setIsRevenueLoading] = useState(false);
   const [showPerformanceCharts, setShowPerformanceCharts] = useState(false);
   const [teamPeriod, setTeamPeriod] = useState<"week" | "month" | "30days">("30days");
 
+  // Revenue filters
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>("this_week");
+  const [selectedGroomerId, setSelectedGroomerId] = useState<string>("all");
+
   const { hasFeature: hasTeamAnalytics } = useFeature("groomer_performance_analytics");
 
+  // Fetch groomers list (for Pro plan filter)
+  useEffect(() => {
+    async function fetchGroomers() {
+      try {
+        const response = await fetch("/api/groomers");
+        if (response.ok) {
+          const data = await response.json();
+          setGroomers(data.groomers || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch groomers:", error);
+      }
+    }
+    fetchGroomers();
+  }, []);
+
+  // Fetch revenue stats with filters
+  const fetchRevenueStats = useCallback(async () => {
+    setIsRevenueLoading(true);
+    try {
+      const params = new URLSearchParams({
+        period: selectedPeriod,
+        groomerId: selectedGroomerId,
+      });
+      const response = await fetch(`/api/dashboard/revenue-stats?${params}`);
+      if (response.ok) {
+        const data = await response.json();
+        setRevenueStats(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch revenue stats:", error);
+    } finally {
+      setIsRevenueLoading(false);
+    }
+  }, [selectedPeriod, selectedGroomerId]);
+
+  // Initial data fetch
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
       try {
         const [revenueRes, perfRes] = await Promise.all([
-          fetch("/api/dashboard/revenue-stats"),
+          fetch(`/api/dashboard/revenue-stats?period=${selectedPeriod}&groomerId=${selectedGroomerId}`),
           fetch("/api/dashboard/performance"),
         ]);
 
@@ -164,7 +228,14 @@ export default function AnalyticsPage() {
     }
 
     fetchData();
-  }, []);
+  }, []); // Only run once on mount
+
+  // Refetch revenue when filters change (after initial load)
+  useEffect(() => {
+    if (!isLoading) {
+      fetchRevenueStats();
+    }
+  }, [selectedPeriod, selectedGroomerId, fetchRevenueStats, isLoading]);
 
   // Fetch team analytics when feature is available
   useEffect(() => {
@@ -263,11 +334,55 @@ export default function AnalyticsPage() {
       {/* Your Earnings */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Your Earnings</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h2 className="text-lg font-semibold text-gray-900">Your Earnings</h2>
+
+            {/* Filters */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Period selector */}
+              <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+                {PERIOD_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setSelectedPeriod(option.value)}
+                    className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                      selectedPeriod === option.value
+                        ? "bg-[#A5744A] text-white"
+                        : "bg-white text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Groomer filter - only for Pro with multiple groomers */}
+              {revenueStats?.canFilterByGroomer && groomers.length > 1 && (
+                <select
+                  value={selectedGroomerId}
+                  onChange={(e) => setSelectedGroomerId(e.target.value)}
+                  className="select select-sm select-bordered text-xs"
+                >
+                  <option value="all">All Groomers</option>
+                  {groomers.map((groomer) => (
+                    <option key={groomer.id} value={groomer.id}>
+                      {groomer.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Revenue Chart */}
-        <div className="p-6">
+        <div className="p-6 relative">
+          {isRevenueLoading && (
+            <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-10">
+              <span className="loading loading-spinner loading-md"></span>
+            </div>
+          )}
+
           {!revenueStats ? (
             <div className="text-center py-8 text-gray-500">
               <DollarSign className="h-12 w-12 mx-auto mb-3 text-gray-300" />
@@ -276,111 +391,112 @@ export default function AnalyticsPage() {
             </div>
           ) : (
             <>
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-700">Last 7 Days</h3>
-                <div className="flex items-center gap-4 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded bg-gradient-to-t from-green-500 to-green-400"></div>
-                    <span className="text-gray-600">Earned</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded bg-red-300"></div>
-                    <span className="text-gray-600">Lost</span>
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-gray-700">
+                    {revenueStats.periodLabel}
+                    {revenueStats.isMonthlyView && " (by week)"}
+                  </h3>
+                  <div className="flex items-center gap-4 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded bg-gradient-to-t from-green-500 to-green-400"></div>
+                      <span className="text-gray-600">Earned</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded bg-red-300"></div>
+                      <span className="text-gray-600">Lost</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              {/* Chart with Y-axis */}
-              <div className="flex gap-2">
-                {/* Y-axis labels */}
-                <div className="flex flex-col justify-between h-[160px] text-xs text-gray-500 pr-2" style={{ minWidth: '40px' }}>
-                  {(() => {
-                    const maxTotal = Math.max(...revenueStats.dailyRevenue.map(d => d.revenue + d.lostRevenue), 1);
-                    return (
-                      <>
-                        <span>${maxTotal.toFixed(0)}</span>
-                        <span>${(maxTotal * 0.75).toFixed(0)}</span>
-                        <span>${(maxTotal * 0.5).toFixed(0)}</span>
-                        <span>${(maxTotal * 0.25).toFixed(0)}</span>
-                        <span>$0</span>
-                      </>
-                    );
-                  })()}
-                </div>
-                {/* Chart bars */}
-                <div className="flex-1 flex items-end justify-between gap-2 h-48">
-                  {revenueStats.dailyRevenue.map((day) => {
-                    const totalRevenue = day.revenue + day.lostRevenue;
-                    const maxTotal = Math.max(...revenueStats.dailyRevenue.map(d => d.revenue + d.lostRevenue));
-                    const totalHeightPercent = maxTotal > 0 ? (totalRevenue / maxTotal) * 100 : 0;
-                    const earnedHeightPercent = totalRevenue > 0 ? (day.revenue / totalRevenue) * 100 : 0;
-                    const lostHeightPercent = totalRevenue > 0 ? (day.lostRevenue / totalRevenue) * 100 : 0;
 
-                    return (
-                      <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
-                        <div className="relative w-full flex flex-col justify-end" style={{ height: '160px' }}>
-                          <div
-                            className="w-full flex flex-col justify-end cursor-pointer group"
-                            style={{ height: `${totalHeightPercent}%`, minHeight: totalRevenue > 0 ? '8px' : '0' }}
-                          >
-                            {/* Lost revenue (top - red) */}
-                            {day.lostRevenue > 0 && (
-                              <div
-                                className="w-full bg-red-300 rounded-t-lg transition-all hover:bg-red-400"
-                                style={{ height: `${lostHeightPercent}%`, minHeight: '4px' }}
-                                title={`Lost: $${day.lostRevenue.toFixed(0)} (${day.lostAppointments} cancelled/no-show)`}
-                              />
-                            )}
-                            {/* Earned revenue (bottom - green) */}
-                            {day.revenue > 0 && (
-                              <div
-                                className={`w-full bg-gradient-to-t from-green-500 to-green-400 transition-all hover:opacity-80 ${day.lostRevenue === 0 ? 'rounded-t-lg' : ''}`}
-                                style={{ height: `${earnedHeightPercent}%`, minHeight: '4px' }}
-                                title={`Earned: $${day.revenue.toFixed(0)} (${day.appointments} completed)`}
-                              />
-                            )}
-                            {/* Tooltip */}
-                            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1.5 rounded whitespace-nowrap z-10">
-                              <div className="text-green-300">${day.revenue.toFixed(0)} earned</div>
-                              {day.lostRevenue > 0 && <div className="text-red-300">${day.lostRevenue.toFixed(0)} lost</div>}
+                {/* Chart with Y-axis */}
+                <div className="flex gap-2">
+                  {/* Y-axis labels */}
+                  <div className="flex flex-col justify-between h-[160px] text-xs text-gray-500 pr-2" style={{ minWidth: '40px' }}>
+                    {(() => {
+                      const maxTotal = Math.max(...revenueStats.chartData.map(d => d.revenue + d.lostRevenue), 1);
+                      return (
+                        <>
+                          <span>${maxTotal.toFixed(0)}</span>
+                          <span>${(maxTotal * 0.75).toFixed(0)}</span>
+                          <span>${(maxTotal * 0.5).toFixed(0)}</span>
+                          <span>${(maxTotal * 0.25).toFixed(0)}</span>
+                          <span>$0</span>
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Chart bars */}
+                  <div className="flex-1 flex items-end justify-between gap-1 sm:gap-2 h-48">
+                    {revenueStats.chartData.map((dataPoint) => {
+                      const totalRevenue = dataPoint.revenue + dataPoint.lostRevenue;
+                      const maxTotal = Math.max(...revenueStats.chartData.map(d => d.revenue + d.lostRevenue), 1);
+                      const totalHeightPercent = maxTotal > 0 ? (totalRevenue / maxTotal) * 100 : 0;
+                      const earnedHeightPercent = totalRevenue > 0 ? (dataPoint.revenue / totalRevenue) * 100 : 0;
+                      const lostHeightPercent = totalRevenue > 0 ? (dataPoint.lostRevenue / totalRevenue) * 100 : 0;
+
+                      return (
+                        <div key={dataPoint.date} className="flex-1 flex flex-col items-center gap-2 min-w-0">
+                          <div className="relative w-full flex flex-col justify-end" style={{ height: '160px' }}>
+                            <div
+                              className="w-full flex flex-col justify-end cursor-pointer group"
+                              style={{ height: `${totalHeightPercent}%`, minHeight: totalRevenue > 0 ? '8px' : '0' }}
+                            >
+                              {/* Lost revenue (top - red) */}
+                              {dataPoint.lostRevenue > 0 && (
+                                <div
+                                  className="w-full bg-red-300 rounded-t-lg transition-all hover:bg-red-400"
+                                  style={{ height: `${lostHeightPercent}%`, minHeight: '4px' }}
+                                  title={`Lost: $${dataPoint.lostRevenue.toFixed(0)} (${dataPoint.lostAppointments} cancelled/no-show)`}
+                                />
+                              )}
+                              {/* Earned revenue (bottom - green) */}
+                              {dataPoint.revenue > 0 && (
+                                <div
+                                  className={`w-full bg-gradient-to-t from-green-500 to-green-400 transition-all hover:opacity-80 ${dataPoint.lostRevenue === 0 ? 'rounded-t-lg' : ''}`}
+                                  style={{ height: `${earnedHeightPercent}%`, minHeight: '4px' }}
+                                  title={`Earned: $${dataPoint.revenue.toFixed(0)} (${dataPoint.appointments} completed)`}
+                                />
+                              )}
+                              {/* Tooltip */}
+                              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1.5 rounded whitespace-nowrap z-10">
+                                <div className="text-green-300">${dataPoint.revenue.toFixed(0)} earned</div>
+                                {dataPoint.lostRevenue > 0 && <div className="text-red-300">${dataPoint.lostRevenue.toFixed(0)} lost</div>}
+                              </div>
                             </div>
                           </div>
+                          <div className="text-xs text-gray-600 font-medium truncate w-full text-center">{dataPoint.label}</div>
                         </div>
-                        <div className="text-xs text-gray-600 font-medium">{day.dayName}</div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">${revenueStats.weeklyRevenue.toFixed(0)}</p>
-                <p className="text-xs text-gray-600 mt-1">Weekly Earnings</p>
-                <p className="text-xs text-gray-500">{revenueStats.weeklyAppointments} jobs completed</p>
-                {revenueStats.weeklyLostRevenue > 0 && (
-                  <p className="text-xs text-red-500 mt-1">-${revenueStats.weeklyLostRevenue.toFixed(0)} lost</p>
-                )}
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">${revenueStats.periodRevenue.toFixed(0)}</p>
+                  <p className="text-xs text-gray-600 mt-1">{revenueStats.periodLabel} Earnings</p>
+                  <p className="text-xs text-gray-500">{revenueStats.periodAppointments} jobs completed</p>
+                  {revenueStats.periodLostRevenue > 0 && (
+                    <p className="text-xs text-red-500 mt-1">-${revenueStats.periodLostRevenue.toFixed(0)} lost</p>
+                  )}
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">${revenueStats.avgRevenuePerAppointment.toFixed(0)}</p>
+                  <p className="text-xs text-gray-600 mt-1">Avg per Job</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">{revenueStats.uniqueCustomers}</p>
+                  <p className="text-xs text-gray-600 mt-1">Unique Clients</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">{revenueStats.completionRate.toFixed(0)}%</p>
+                  <p className="text-xs text-gray-600 mt-1">Completion Rate</p>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">${revenueStats.monthlyRevenue.toFixed(0)}</p>
-                <p className="text-xs text-gray-600 mt-1">Monthly Earnings</p>
-                <p className="text-xs text-gray-500">{revenueStats.monthlyAppointments} jobs completed</p>
-                {revenueStats.monthlyLostRevenue > 0 && (
-                  <p className="text-xs text-red-500 mt-1">-${revenueStats.monthlyLostRevenue.toFixed(0)} lost</p>
-                )}
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">${revenueStats.avgRevenuePerAppointment.toFixed(0)}</p>
-                <p className="text-xs text-gray-600 mt-1">Avg per Job</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-600">{revenueStats.completionRate.toFixed(0)}%</p>
-                <p className="text-xs text-gray-600 mt-1">Completion Rate</p>
-              </div>
-            </div>
             </>
           )}
         </div>
