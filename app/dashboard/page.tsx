@@ -79,6 +79,7 @@ interface TodaysStats {
   contactMethods?: string[];
   preferredMessaging?: "SMS" | "WHATSAPP";
   preferredMaps?: "GOOGLE" | "APPLE";
+  businessName?: string;
   remainingAppointments?: {
     customerName: string;
     customerPhone?: string;
