@@ -15,6 +15,17 @@ export default function InstallAppPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
+    // Detect device type first
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
+    const isAndroidDevice = /android/.test(userAgent);
+    const isMobileDevice = isIOSDevice || isAndroidDevice;
+
+    // Only show on mobile devices
+    if (!isMobileDevice) {
+      return;
+    }
+
     // Check if already installed (standalone mode)
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches
       || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
@@ -34,11 +45,6 @@ export default function InstallAppPrompt() {
         return;
       }
     }
-
-    // Detect device type
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
-    const isAndroidDevice = /android/.test(userAgent);
 
     setIsIOS(isIOSDevice);
     setIsAndroid(isAndroidDevice);
