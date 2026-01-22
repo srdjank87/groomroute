@@ -146,8 +146,9 @@ export default function InstallAppPrompt() {
                   Install App
                 </button>
               ) : (
-                <div className="text-xs text-gray-700 bg-white/60 rounded-lg p-2">
-                  <p>Tap the <strong>menu (⋮)</strong> in Chrome → <strong>&quot;Add to Home screen&quot;</strong></p>
+                <div className="text-xs text-gray-700 bg-white/60 rounded-lg p-2 space-y-1">
+                  <p><strong>1.</strong> Tap Chrome menu <strong>(⋮)</strong> at top right</p>
+                  <p><strong>2.</strong> Look for <strong>&quot;Install app&quot;</strong> or <strong>&quot;Add to Home screen&quot;</strong></p>
                 </div>
               )
             ) : (
