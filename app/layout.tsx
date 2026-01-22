@@ -10,8 +10,15 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "GroomRoute - Smart Routing for Mobile Pet Groomers",
   description: "Optimize your grooming routes, reduce drive time, and serve more clients with GroomRoute. The scheduling app built specifically for mobile dog groomers.",
+  manifest: "/manifest.json",
   icons: {
     icon: "/images/icon.svg",
+    apple: "/images/icon-192.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "GroomRoute",
   },
   metadataBase: new URL("https://groomroute.com"),
   openGraph: {
@@ -40,6 +47,13 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
+};
+
+export const viewport = {
+  themeColor: "#A5744A",
 };
 
 export default function RootLayout({

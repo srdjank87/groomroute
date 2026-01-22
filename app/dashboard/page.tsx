@@ -34,6 +34,7 @@ import {
   Info,
 } from "lucide-react";
 import TrialStatus from "@/components/TrialStatus";
+import InstallAppPrompt from "@/components/InstallAppPrompt";
 import toast from "react-hot-toast";
 
 interface WorkloadData {
@@ -1005,6 +1006,9 @@ function DashboardContent() {
 
       {/* Trial/Subscription Status */}
       {!isFullscreen && <TrialStatus />}
+
+      {/* PWA Install Prompt - Only shows on mobile, dismissible */}
+      {!isFullscreen && <InstallAppPrompt />}
 
       {/* Sample Data Banner - Collapsible, hidden after 3 days unless sample data loaded */}
       {!isFullscreen && (
