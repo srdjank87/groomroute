@@ -65,12 +65,12 @@ export default function InstallAppPrompt() {
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-    // For iOS, show the prompt after a short delay (no native prompt available)
-    if (isIOSDevice) {
-      setTimeout(() => {
-        setShowPrompt(true);
-      }, 2000);
-    }
+    // Show the prompt after a short delay for all mobile devices
+    // For Android: if beforeinstallprompt fires, we'll have the install button
+    // If it doesn't fire, we'll show fallback instructions
+    setTimeout(() => {
+      setShowPrompt(true);
+    }, 2000);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
@@ -137,13 +137,19 @@ export default function InstallAppPrompt() {
                   <PlusSquare className="h-3.5 w-3.5 text-gray-500" />
                 </div>
               </div>
-            ) : isAndroid && deferredPrompt ? (
-              <button
-                onClick={handleInstall}
-                className="w-full btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
-              >
-                Install App
-              </button>
+            ) : isAndroid ? (
+              deferredPrompt ? (
+                <button
+                  onClick={handleInstall}
+                  className="w-full btn btn-sm h-9 bg-[#A5744A] hover:bg-[#8B6239] text-white border-0"
+                >
+                  Install App
+                </button>
+              ) : (
+                <div className="text-xs text-gray-700 bg-white/60 rounded-lg p-2">
+                  <p>Tap the <strong>menu (⋮)</strong> in Chrome → <strong>&quot;Add to Home screen&quot;</strong></p>
+                </div>
+              )
             ) : (
               <p className="text-xs text-gray-600">
                 Use your browser menu to &quot;Add to Home Screen&quot;
