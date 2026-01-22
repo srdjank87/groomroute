@@ -557,9 +557,6 @@ function DashboardContent() {
   const [showRunningLateModal, setShowRunningLateModal] = useState(false);
   const [delayMinutes, setDelayMinutes] = useState(15);
   const [isStartingWorkday, setIsStartingWorkday] = useState(false);
-  const [showMessageModal, setShowMessageModal] = useState(false);
-  const [messageModalType, setMessageModalType] = useState<"sms" | "whatsapp">("sms");
-  const [customMessage, setCustomMessage] = useState("");
 
   // Check if user can use Running Late feature (GROWTH+ only)
   const canUseRunningLate = ['GROWTH', 'PRO', 'TRIAL'].includes(
@@ -730,14 +727,26 @@ function DashboardContent() {
     window.location.href = `tel:${phone}`;
   }
 
+  // Generate personalized "On My Way" message
+  function getOnMyWayMessage() {
+    const firstName = stats?.nextAppointment?.customerName?.split(" ")[0] || "";
+    const petName = stats?.nextAppointment?.petName;
+    const businessName = stats?.businessName || "Your Groomer";
+
+    if (petName) {
+      return `Hi ${firstName}! This is ${businessName}. I'm on my way to groom ${petName} now! See you soon.`;
+    }
+    return `Hi ${firstName}! This is ${businessName}. I'm on my way to you now! See you soon.`;
+  }
+
   function handleSMS(phone?: string) {
     if (!phone) {
       toast.error("No phone number available");
       return;
     }
-    setMessageModalType("sms");
-    setCustomMessage("");
-    setShowMessageModal(true);
+    const message = getOnMyWayMessage();
+    const encodedMessage = encodeURIComponent(message);
+    window.location.href = `sms:${phone}?body=${encodedMessage}`;
   }
 
   function handleWhatsApp(phone?: string) {
@@ -745,36 +754,10 @@ function DashboardContent() {
       toast.error("No phone number available");
       return;
     }
-    setMessageModalType("whatsapp");
-    setCustomMessage("");
-    setShowMessageModal(true);
-  }
-
-  function sendMessage(messageType: "onmyway" | "custom") {
-    const phone = stats?.nextAppointment?.customerPhone;
-    if (!phone) {
-      toast.error("No phone number available");
-      return;
-    }
-
-    let message = "";
-    if (messageType === "onmyway") {
-      message = "Hi! I'm on my way to you now. See you soon!";
-    } else {
-      message = customMessage;
-    }
-
+    const message = getOnMyWayMessage();
     const encodedMessage = encodeURIComponent(message);
-
-    if (messageModalType === "sms") {
-      window.location.href = `sms:${phone}?body=${encodedMessage}`;
-    } else {
-      const cleanPhone = phone.replace(/\D/g, '');
-      window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, '_blank');
-    }
-
-    setShowMessageModal(false);
-    setCustomMessage("");
+    const cleanPhone = phone.replace(/\D/g, '');
+    window.open(`https://wa.me/1${cleanPhone}?text=${encodedMessage}`, '_blank');
   }
 
   function handleSignal(phone?: string) {
@@ -2017,70 +2000,6 @@ function DashboardContent() {
                   disabled={!stats?.remainingAppointments?.length}
                 >
                   Send Updates
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Message Modal - SMS/WhatsApp message selection */}
-      {showMessageModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-lg font-semibold">
-                Send {messageModalType === "sms" ? "SMS" : "WhatsApp"} Message
-              </h3>
-              <button
-                onClick={() => setShowMessageModal(false)}
-                className="btn btn-ghost btn-sm btn-circle"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="p-4">
-              <p className="text-gray-600 mb-4">
-                Choose a quick message or write your own to send to {stats?.nextAppointment?.customerName}.
-              </p>
-
-              {/* Quick message options */}
-              <div className="space-y-2 mb-4">
-                <button
-                  onClick={() => sendMessage("onmyway")}
-                  className="w-full p-3 text-left rounded-lg border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-emerald-100 rounded-full">
-                      <Clock className="h-5 w-5 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-emerald-800">On My Way</p>
-                      <p className="text-sm text-emerald-600">&ldquo;Hi! I&apos;m on my way to you now. See you soon!&rdquo;</p>
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              {/* Custom message section */}
-              <div className="border-t pt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Or write a custom message
-                </label>
-                <textarea
-                  value={customMessage}
-                  onChange={(e) => setCustomMessage(e.target.value)}
-                  placeholder="Type your message here..."
-                  className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  rows={3}
-                />
-                <button
-                  onClick={() => sendMessage("custom")}
-                  disabled={!customMessage.trim()}
-                  className="w-full mt-3 btn bg-gray-800 hover:bg-gray-900 text-white disabled:bg-gray-300 disabled:cursor-not-allowed"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Send Custom Message
                 </button>
               </div>
             </div>
