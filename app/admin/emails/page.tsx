@@ -351,10 +351,16 @@ function EmailPreview({ template }: EmailPreviewProps) {
               <strong>1. Add your customers</strong> - Import your existing clients or add them one by one.
             </p>
             <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
-              <strong>2. Schedule appointments</strong> - Set up your first day of appointments.
+              <strong>2. Set up service areas</strong> - Define the areas you serve and assign days to each area for smarter scheduling.
             </p>
             <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
-              <strong>3. Optimize your route</strong> - Let GroomRoute find the best order for your stops.
+              <strong>3. Schedule appointments</strong> - Set up your first day of appointments.
+            </p>
+            <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
+              <strong>4. Optimize your route</strong> - Let GroomRoute find the best order for your stops.
+            </p>
+            <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
+              <strong>5. Add to home screen</strong> - Install GroomRoute on your phone for quick access every morning. Just tap Share → Add to Home Screen.
             </p>
 
             <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />

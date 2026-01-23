@@ -91,11 +91,19 @@ export default function WelcomeEmail({
               by one.
             </Text>
             <Text style={stepItem}>
-              <strong>2. Schedule appointments</strong> - Set up your first day of appointments.
+              <strong>2. Set up service areas</strong> - Define the areas you serve and assign days
+              to each area for smarter scheduling.
             </Text>
             <Text style={stepItem}>
-              <strong>3. Optimize your route</strong> - Let GroomRoute find the best order for your
+              <strong>3. Schedule appointments</strong> - Set up your first day of appointments.
+            </Text>
+            <Text style={stepItem}>
+              <strong>4. Optimize your route</strong> - Let GroomRoute find the best order for your
               stops.
+            </Text>
+            <Text style={stepItem}>
+              <strong>5. Add to home screen</strong> - Install GroomRoute on your phone for quick
+              access every morning. Just tap Share → Add to Home Screen.
             </Text>
 
             <Hr style={hr} />
