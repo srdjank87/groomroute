@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { trackEvent } from "@/lib/posthog-server";
+import { trackServerEvent } from "@/lib/posthog-server";
 
 export async function POST() {
   try {
@@ -31,13 +31,7 @@ export async function POST() {
     });
 
     // Track in PostHog
-    trackEvent({
-      distinctId: session.user.id,
-      event: "pwa_installed",
-      properties: {
-        accountId,
-      },
-    });
+    trackServerEvent(session.user.id, "pwa_installed", { accountId });
 
     return NextResponse.json({ success: true });
   } catch (error) {
