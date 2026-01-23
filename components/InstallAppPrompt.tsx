@@ -41,6 +41,12 @@ export default function InstallAppPrompt() {
       return; // Already installed, don't show prompt
     }
 
+    // Check if user has already installed the app (via our tracking)
+    const alreadyInstalled = localStorage.getItem("pwa-installed");
+    if (alreadyInstalled) {
+      return; // Already installed, don't show prompt
+    }
+
     // Check if user has dismissed the prompt before
     const dismissed = localStorage.getItem("pwa-install-dismissed");
     const dismissedAt = dismissed ? new Date(dismissed) : null;
@@ -65,6 +71,13 @@ export default function InstallAppPrompt() {
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
+    // Listen for successful installation (works for all install methods)
+    const handleAppInstalled = () => {
+      localStorage.setItem("pwa-installed", "true");
+      setShowPrompt(false);
+    };
+    window.addEventListener("appinstalled", handleAppInstalled);
+
     // Show the prompt after a short delay for all mobile devices
     // For Android: if beforeinstallprompt fires, we'll have the install button
     // If it doesn't fire, we'll show fallback instructions
@@ -74,6 +87,7 @@ export default function InstallAppPrompt() {
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -82,6 +96,7 @@ export default function InstallAppPrompt() {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === "accepted") {
+        localStorage.setItem("pwa-installed", "true");
         setShowPrompt(false);
       }
       setDeferredPrompt(null);
