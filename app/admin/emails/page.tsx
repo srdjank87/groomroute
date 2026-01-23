@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Mail, Send, Eye, CheckCircle, AlertCircle } from "lucide-react";
 
-type EmailTemplate = "welcome" | "team-invite" | "password-reset";
+type EmailTemplate = "welcome" | "team-invite" | "password-reset" | "pwa-install-reminder";
 
 interface EmailPreviewProps {
   template: EmailTemplate;
@@ -26,6 +26,10 @@ const sampleData = {
   "password-reset": {
     userName: "John Smith",
     resetToken: "sample-reset-token-abc123",
+  },
+  "pwa-install-reminder": {
+    userName: "John Smith",
+    daysSinceSignup: 5,
   },
 };
 
@@ -140,6 +144,19 @@ export default function AdminEmailsPage() {
                     Sent for forgot password requests
                   </p>
                 </button>
+                <button
+                  onClick={() => setSelectedTemplate("pwa-install-reminder")}
+                  className={`w-full p-4 text-left transition-colors ${
+                    selectedTemplate === "pwa-install-reminder"
+                      ? "bg-amber-50 border-l-4 border-[#A5744A]"
+                      : "hover:bg-gray-50"
+                  }`}
+                >
+                  <p className="font-medium text-gray-900">PWA Install Reminder</p>
+                  <p className="text-sm text-gray-500">
+                    Reminder to install the mobile app
+                  </p>
+                </button>
               </div>
             </div>
 
@@ -225,6 +242,13 @@ export default function AdminEmailsPage() {
                     <p><strong>Variables:</strong> userName, resetToken</p>
                   </>
                 )}
+                {selectedTemplate === "pwa-install-reminder" && (
+                  <>
+                    <p><strong>Subject:</strong> Quick tip: Add GroomRoute to your home screen</p>
+                    <p><strong>Trigger:</strong> 5 days after signup (if PWA not installed)</p>
+                    <p><strong>Variables:</strong> userName, daysSinceSignup</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -241,6 +265,7 @@ export default function AdminEmailsPage() {
                   {selectedTemplate === "welcome" && "Welcome Email"}
                   {selectedTemplate === "team-invite" && "Team Invitation"}
                   {selectedTemplate === "password-reset" && "Password Reset"}
+                  {selectedTemplate === "pwa-install-reminder" && "PWA Install Reminder"}
                 </span>
               </div>
               <div className="p-4 bg-gray-50">
@@ -496,6 +521,116 @@ function EmailPreview({ template }: EmailPreviewProps) {
               GroomRoute - Route planning for mobile pet groomers
             </p>
             <p style={{ color: '#8898aa', fontSize: '12px', lineHeight: '16px', margin: '8px 0' }}>
+              <span style={{ color: '#8898aa', textDecoration: 'underline' }}>Privacy Policy</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (template === "pwa-install-reminder") {
+    const { userName, daysSinceSignup } = sampleData["pwa-install-reminder"];
+    const firstName = userName.split(" ")[0];
+
+    return (
+      <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', backgroundColor: '#f6f9fc', padding: '20px' }}>
+        <div style={{ backgroundColor: '#ffffff', maxWidth: '600px', margin: '0 auto', padding: '20px 0 48px' }}>
+          {/* Logo */}
+          <div style={{ textAlign: 'center', padding: '32px 20px 0' }}>
+            <span style={{ color: '#A5744A', fontSize: '28px', fontWeight: 'bold' }}>GroomRoute</span>
+          </div>
+
+          {/* Content */}
+          <div style={{ padding: '0 48px' }}>
+            <h1 style={{ color: '#1a1a1a', fontSize: '28px', fontWeight: 'bold', textAlign: 'center', margin: '32px 0 24px' }}>
+              Access GroomRoute in One Tap
+            </h1>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              Hi {firstName},
+            </p>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              You&apos;ve been using GroomRoute for {daysSinceSignup} days now - we hope it&apos;s making your
+              grooming days smoother! Here&apos;s a quick tip to make things even easier:
+            </p>
+
+            <div style={{ backgroundColor: '#f8f5f2', borderRadius: '8px', padding: '20px 24px', margin: '24px 0', borderLeft: '4px solid #A5744A' }}>
+              <p style={{ color: '#A5744A', fontSize: '18px', fontWeight: 'bold', margin: '0 0 8px' }}>
+                Add GroomRoute to Your Home Screen
+              </p>
+              <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '0' }}>
+                Install GroomRoute as an app on your phone for instant access - no searching
+                through bookmarks or typing URLs. It works just like a native app!
+              </p>
+            </div>
+
+            <h2 style={{ color: '#1a1a1a', fontSize: '20px', fontWeight: 'bold', margin: '24px 0 16px' }}>
+              How to Install (30 seconds)
+            </h2>
+
+            <div style={{ margin: '16px 0', padding: '12px 16px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
+              <p style={{ color: '#1a1a1a', fontSize: '15px', fontWeight: 'bold', margin: '0 0 8px' }}>
+                On iPhone (Safari):
+              </p>
+              <p style={{ color: '#525f7f', fontSize: '14px', lineHeight: '22px', margin: '4px 0', paddingLeft: '8px' }}>
+                1. Open groomroute.com/dashboard in Safari
+              </p>
+              <p style={{ color: '#525f7f', fontSize: '14px', lineHeight: '22px', margin: '4px 0', paddingLeft: '8px' }}>
+                2. Tap the Share button (square with arrow)
+              </p>
+              <p style={{ color: '#525f7f', fontSize: '14px', lineHeight: '22px', margin: '4px 0', paddingLeft: '8px' }}>
+                3. Scroll down and tap &quot;Add to Home Screen&quot;
+              </p>
+            </div>
+
+            <div style={{ margin: '16px 0', padding: '12px 16px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
+              <p style={{ color: '#1a1a1a', fontSize: '15px', fontWeight: 'bold', margin: '0 0 8px' }}>
+                On Android (Chrome):
+              </p>
+              <p style={{ color: '#525f7f', fontSize: '14px', lineHeight: '22px', margin: '4px 0', paddingLeft: '8px' }}>
+                1. Open groomroute.com/dashboard in Chrome
+              </p>
+              <p style={{ color: '#525f7f', fontSize: '14px', lineHeight: '22px', margin: '4px 0', paddingLeft: '8px' }}>
+                2. Tap the menu (three dots) at the top right
+              </p>
+              <p style={{ color: '#525f7f', fontSize: '14px', lineHeight: '22px', margin: '4px 0', paddingLeft: '8px' }}>
+                3. Tap &quot;Install app&quot; or &quot;Add to Home screen&quot;
+              </p>
+            </div>
+
+            <div style={{ textAlign: 'center', margin: '32px 0' }}>
+              <span style={{ backgroundColor: '#A5744A', borderRadius: '8px', color: '#ffffff', fontSize: '16px', fontWeight: 'bold', padding: '14px 32px', display: 'inline-block' }}>
+                Open GroomRoute Now
+              </span>
+            </div>
+
+            <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              Once installed, you&apos;ll have GroomRoute right on your home screen - perfect for
+              checking your route each morning or updating appointments on the go.
+            </p>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              Questions or need help? Just reply to this email!
+            </p>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '24px 0 0' }}>
+              Happy grooming!<br />
+              The GroomRoute Team
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div style={{ padding: '32px 48px 0', textAlign: 'center' }}>
+            <p style={{ color: '#8898aa', fontSize: '12px', lineHeight: '16px', margin: '8px 0' }}>
+              GroomRoute - Route planning for mobile pet groomers
+            </p>
+            <p style={{ color: '#8898aa', fontSize: '12px', lineHeight: '16px', margin: '8px 0' }}>
+              <span style={{ color: '#8898aa', textDecoration: 'underline' }}>Unsubscribe</span>
+              {" | "}
               <span style={{ color: '#8898aa', textDecoration: 'underline' }}>Privacy Policy</span>
             </p>
           </div>

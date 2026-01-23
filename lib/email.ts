@@ -2,6 +2,7 @@ import { resend, addToMarketingList } from "./resend";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 import TeamInviteEmail from "@/emails/TeamInviteEmail";
 import PasswordResetEmail from "@/emails/PasswordResetEmail";
+import PWAInstallReminderEmail from "@/emails/PWAInstallReminderEmail";
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "GroomRoute <hello@groomroute.com>";
 
@@ -79,6 +80,31 @@ export async function sendPasswordResetEmail(
     return result;
   } catch (error) {
     console.error("Failed to send password reset email:", error);
+    return null;
+  }
+}
+
+/**
+ * Send PWA install reminder email
+ */
+export async function sendPWAInstallReminderEmail(
+  email: string,
+  userName: string,
+  daysSinceSignup: number
+) {
+  try {
+    const client = resend();
+    const result = await client.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: "Quick tip: Add GroomRoute to your home screen",
+      react: PWAInstallReminderEmail({ userName, daysSinceSignup }),
+    });
+
+    console.log("PWA install reminder email sent:", email);
+    return result;
+  } catch (error) {
+    console.error("Failed to send PWA install reminder email:", error);
     return null;
   }
 }

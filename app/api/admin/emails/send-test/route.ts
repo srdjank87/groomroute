@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
-import { sendWelcomeEmail, sendTeamInviteEmail, sendPasswordResetEmail } from "@/lib/email";
+import { sendWelcomeEmail, sendTeamInviteEmail, sendPasswordResetEmail, sendPWAInstallReminderEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -56,6 +56,14 @@ export async function POST(req: NextRequest) {
           email,
           "John Smith",           // Sample name
           "test-reset-token-123"  // Sample token (won't work for actual reset)
+        );
+        break;
+
+      case "pwa-install-reminder":
+        result = await sendPWAInstallReminderEmail(
+          email,
+          "John Smith",  // Sample name
+          5              // Sample days since signup
         );
         break;
 
