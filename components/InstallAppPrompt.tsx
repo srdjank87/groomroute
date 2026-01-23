@@ -75,6 +75,10 @@ export default function InstallAppPrompt() {
     const handleAppInstalled = () => {
       localStorage.setItem("pwa-installed", "true");
       setShowPrompt(false);
+      // Track installation server-side
+      fetch("/api/user/pwa-install", { method: "POST" }).catch(() => {
+        // Silently fail - localStorage tracking is the backup
+      });
     };
     window.addEventListener("appinstalled", handleAppInstalled);
 
@@ -98,6 +102,10 @@ export default function InstallAppPrompt() {
       if (outcome === "accepted") {
         localStorage.setItem("pwa-installed", "true");
         setShowPrompt(false);
+        // Track installation server-side
+        fetch("/api/user/pwa-install", { method: "POST" }).catch(() => {
+          // Silently fail - localStorage tracking is the backup
+        });
       }
       setDeferredPrompt(null);
     }

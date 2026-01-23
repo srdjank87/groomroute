@@ -53,6 +53,7 @@ model Account {
   lastActiveAt         DateTime?        // Track last user activity for analytics
   firstActionAt        DateTime?        // Track when first meaningful action occurred (for analytics)
   firstActionType      String?          // Type of first action: appointment_created, customer_created, route_optimized
+  pwaInstalledAt       DateTime?        // Track when PWA was installed (for engagement analytics)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   users           User[]
