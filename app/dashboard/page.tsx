@@ -231,15 +231,8 @@ function DemoDataBanner({
   // 4. Account is older than 3 days but has NO real appointments (encourage them to try demo)
   const shouldShow = !isAccountOlderThan3Days || showSampleData || hasSampleCustomers || !hasRealAppointments;
 
-  const [isExpanded, setIsExpanded] = useState(showSampleData);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
-
-  // Auto-expand when showSampleData is true (first time with sample data)
-  useEffect(() => {
-    if (showSampleData) {
-      setIsExpanded(true);
-    }
-  }, [showSampleData]);
 
   // Hide the banner if account is older than 3 days (unless sample data is loaded)
   if (!shouldShow) {
