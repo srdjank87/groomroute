@@ -12,6 +12,8 @@ import {
   loopsOnTrialConverted,
   loopsOnSubscriptionCanceled,
   loopsOnResubscribed,
+  loopsOnPaymentFailed,
+  loopsOnPaymentSucceeded,
 } from "@/lib/loops";
 import { logger } from "@/lib/logger";
 
@@ -353,6 +355,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   });
 
   const wasInTrial = account?.subscriptionStatus === "TRIAL";
+  const wasPastDue = account?.subscriptionStatus === "PAST_DUE";
 
   // Extract the period end date with type assertion
   const currentPeriodEnd = (subscription as any).current_period_end;
@@ -448,6 +451,13 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
         amount,
       },
     });
+
+    // If recovering from failed payment, notify Loops to exit payment recovery sequence
+    if (wasPastDue && account.users[0]?.email) {
+      loopsOnPaymentSucceeded(account.users[0].email, accountId).catch((err) =>
+        console.error("Loops payment_succeeded event failed:", err)
+      );
+    }
   }
 
   logger.webhook("invoice.payment_succeeded", `Invoice payment succeeded for account ${accountId}`);
@@ -499,6 +509,13 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
         amount,
       },
     });
+
+    // Notify Loops to trigger payment recovery sequence
+    if (account.users[0]?.email) {
+      loopsOnPaymentFailed(account.users[0].email, accountId, amount).catch((err) =>
+        console.error("Loops payment_failed event failed:", err)
+      );
+    }
   }
 
   logger.webhook("invoice.payment_failed", `Invoice payment failed for account ${accountId}`);

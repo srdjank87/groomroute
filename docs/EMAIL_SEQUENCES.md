@@ -15,10 +15,13 @@ Before setting up sequences, ensure these events are being sent to Loops:
 | `trial_converted` | First payment made | Yes |
 | `subscription_canceled` | Subscription canceled | Yes |
 | `resubscribed` | Churned user resubscribes | Yes |
-| `customer_added` | First customer created | **Add to app** |
-| `appointment_created` | First appointment created | **Add to app** |
-| `route_optimized` | First route optimization | **Add to app** |
-| `pwa_installed` | PWA installed | **Add to app** |
+| `customer_added` | First customer created | Yes |
+| `appointment_created` | First appointment created | Yes |
+| `route_optimized` | First route optimization | Yes |
+| `pwa_installed` | PWA installed | Yes |
+| `user_active` | User logs in | Yes |
+| `payment_failed` | Invoice payment fails | Yes |
+| `payment_succeeded` | Payment recovered after failure | Yes |
 
 ---
 
@@ -593,8 +596,9 @@ Make sure these properties are set up in Loops:
 - [x] Send `appointment_created` event on first appointment ✓ Implemented
 - [x] Send `route_optimized` event on first optimization ✓ Implemented
 - [x] Send `pwa_installed` event when PWA is installed ✓ Implemented
-- [ ] Send `user_active` event on login (for re-engagement exit)
-- [ ] Send `payment_failed` event from Stripe webhook
+- [x] Send `user_active` event on login (for re-engagement exit) ✓ Implemented
+- [x] Send `payment_failed` event from Stripe webhook ✓ Implemented
+- [x] Send `payment_succeeded` event from Stripe webhook ✓ Implemented
 
 ### Environment Variables:
 ```

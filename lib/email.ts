@@ -20,7 +20,7 @@ export async function sendWelcomeEmail(
     const result = await client.emails.send({
       from: FROM_EMAIL,
       to: email,
-      subject: "Welcome to GroomRoute! Let's get you started",
+      subject: "Welcome to GroomRoute - Finally, a calm day awaits",
       react: WelcomeEmail({ userName, planName, trialDays }),
     });
 

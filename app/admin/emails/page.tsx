@@ -223,7 +223,7 @@ export default function AdminEmailsPage() {
               <div className="text-sm text-gray-600 space-y-2">
                 {selectedTemplate === "welcome" && (
                   <>
-                    <p><strong>Subject:</strong> Welcome to GroomRoute! Let&apos;s get you started</p>
+                    <p><strong>Subject:</strong> Welcome to GroomRoute - Finally, a calm day awaits</p>
                     <p><strong>Trigger:</strong> User registration</p>
                     <p><strong>Variables:</strong> userName, planName, trialDays</p>
                   </>
@@ -315,8 +315,8 @@ function EmailPreview({ template }: EmailPreviewProps) {
 
           {/* Content */}
           <div style={{ padding: '0 48px' }}>
-            <h1 style={{ color: '#1a1a1a', fontSize: '28px', fontWeight: 'bold', textAlign: 'center', margin: '32px 0 24px' }}>
-              Welcome to GroomRoute!
+            <h1 style={{ color: '#1a1a1a', fontSize: '32px', fontWeight: 'bold', textAlign: 'center', margin: '32px 0 24px' }}>
+              Finally, a calm day.
             </h1>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
@@ -324,85 +324,109 @@ function EmailPreview({ template }: EmailPreviewProps) {
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              Thank you for signing up for GroomRoute! We&apos;re thrilled to have you join our community of mobile pet groomers who are taking control of their business.
+              Welcome to GroomRoute. We&apos;re genuinely glad you&apos;re here.
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              You&apos;re starting your <strong>{trialDays}-day free trial</strong> of the <strong>{planName} plan</strong>. During your trial, you&apos;ll have full access to:
+              We built this for groomers like you - people who love what they do, but are tired of the chaos. The zigzagging across town. The stress of running late. The days that leave your body aching and your energy depleted.
             </p>
 
-            <div style={{ margin: '24px 0', padding: '0 16px' }}>
-              <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '8px 0' }}>
-                <span style={{ color: '#A5744A', fontWeight: 'bold', marginRight: '8px' }}>✓</span>
-                Smart route optimization to save time and gas
-              </p>
-              <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '8px 0' }}>
-                <span style={{ color: '#A5744A', fontWeight: 'bold', marginRight: '8px' }}>✓</span>
-                Easy appointment scheduling and management
-              </p>
-              <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '8px 0' }}>
-                <span style={{ color: '#A5744A', fontWeight: 'bold', marginRight: '8px' }}>✓</span>
-                Customer and pet profiles at your fingertips
-              </p>
-              <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '8px 0' }}>
-                <span style={{ color: '#A5744A', fontWeight: 'bold', marginRight: '8px' }}>✓</span>
-                Quick client messaging tools
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              <strong>You deserve calm, predictable days.</strong> That&apos;s what GroomRoute is about.
+            </p>
+
+            {/* Trial Info Box */}
+            <div style={{ backgroundColor: '#fef7f0', borderRadius: '12px', padding: '20px 24px', margin: '24px 0', textAlign: 'center', border: '1px solid #f5e6d8' }}>
+              <p style={{ color: '#8B6239', fontSize: '16px', lineHeight: '24px', margin: '0' }}>
+                <strong>Your {trialDays}-day free trial is active</strong>
+                <br />
+                <span style={{ fontSize: '14px', opacity: 0.8 }}>
+                  {planName} Plan - Full access, no commitment
+                </span>
               </p>
             </div>
 
+            <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
+
+            <h2 style={{ color: '#1a1a1a', fontSize: '20px', fontWeight: 'bold', margin: '24px 0 16px' }}>
+              Your first step: Add a customer
+            </h2>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              The best way to see how GroomRoute works? Add one of your regular customers. Just one. It takes 30 seconds.
+            </p>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              Once you have customers in the system, you can schedule appointments and watch GroomRoute optimize your route - finding the best order so you spend less time driving and more time grooming (or resting).
+            </p>
+
             <div style={{ textAlign: 'center', margin: '32px 0' }}>
               <span style={{ backgroundColor: '#A5744A', borderRadius: '8px', color: '#ffffff', fontSize: '16px', fontWeight: 'bold', padding: '14px 32px', display: 'inline-block' }}>
-                Go to Your Dashboard
+                Add Your First Customer
               </span>
             </div>
 
             <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
 
             <h2 style={{ color: '#1a1a1a', fontSize: '20px', fontWeight: 'bold', margin: '24px 0 16px' }}>
-              Getting Started
+              What groomers notice first
             </h2>
 
-            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              Here&apos;s what we recommend doing first:
-            </p>
+            <div style={{ margin: '20px 0' }}>
+              <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '26px', margin: '12px 0' }}>
+                <span style={{ color: '#10b981', fontWeight: 'bold', marginRight: '8px' }}>✓</span>
+                <strong>Less driving</strong> - Routes clustered by area, not scattered across town
+              </p>
+              <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '26px', margin: '12px 0' }}>
+                <span style={{ color: '#10b981', fontWeight: 'bold', marginRight: '8px' }}>✓</span>
+                <strong>Energy protected</strong> - Workload limits so you don&apos;t overbook yourself
+              </p>
+              <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '26px', margin: '12px 0' }}>
+                <span style={{ color: '#10b981', fontWeight: 'bold', marginRight: '8px' }}>✓</span>
+                <strong>Fewer surprises</strong> - One tap handles &quot;running late&quot; messages to all your clients
+              </p>
+            </div>
 
-            <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
-              <strong>1. Add your customers</strong> - Import your existing clients or add them one by one.
-            </p>
-            <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
-              <strong>2. Set up service areas</strong> - Define the areas you serve and assign days to each area for smarter scheduling.
-            </p>
-            <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
-              <strong>3. Schedule appointments</strong> - Set up your first day of appointments.
-            </p>
-            <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
-              <strong>4. Optimize your route</strong> - Let GroomRoute find the best order for your stops.
-            </p>
-            <p style={{ color: '#525f7f', fontSize: '15px', lineHeight: '24px', margin: '12px 0', paddingLeft: '8px' }}>
-              <strong>5. Add to home screen</strong> - Install GroomRoute on your phone for quick access every morning. Just tap Share → Add to Home Screen.
+            <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
+
+            {/* Help Box */}
+            <div style={{ backgroundColor: '#f0fdf4', borderRadius: '12px', padding: '20px 24px', margin: '24px 0', border: '1px solid #dcfce7' }}>
+              <p style={{ color: '#166534', fontSize: '16px', margin: '0 0 8px 0' }}>
+                <strong>We&apos;re here for you</strong>
+              </p>
+              <p style={{ color: '#15803d', fontSize: '14px', lineHeight: '22px', margin: '0' }}>
+                Questions? Need help importing your client list? Just reply to this email. A real person reads every message - usually within a few hours.
+              </p>
+            </div>
+
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
+              Or check out our <span style={{ color: '#A5744A', textDecoration: 'underline' }}>help center</span> anytime.
             </p>
 
             <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
 
-            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              Have questions? Reply to this email or check out our <span style={{ color: '#A5744A', textDecoration: 'underline' }}>help center</span>. We&apos;re here to help you succeed!
+            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0 4px' }}>
+              Here&apos;s to calmer days ahead,
             </p>
 
-            <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '24px 0 0' }}>
-              Happy grooming!<br />
+            <p style={{ color: '#1a1a1a', fontSize: '16px', fontWeight: '600', margin: '0 0 24px' }}>
               The GroomRoute Team
+            </p>
+
+            <p style={{ color: '#6b7280', fontSize: '14px', lineHeight: '22px', margin: '24px 0 0', fontStyle: 'italic' }}>
+              <strong>P.S.</strong> If GroomRoute doesn&apos;t make your days noticeably calmer within 30 days, we&apos;ll refund every penny. No questions asked.
             </p>
           </div>
 
           {/* Footer */}
           <div style={{ padding: '32px 48px 0', textAlign: 'center' }}>
             <p style={{ color: '#8898aa', fontSize: '12px', lineHeight: '16px', margin: '8px 0' }}>
-              GroomRoute - Route planning for mobile pet groomers
+              GroomRoute - The scheduling system built only for mobile groomers
             </p>
             <p style={{ color: '#8898aa', fontSize: '12px', lineHeight: '16px', margin: '8px 0' }}>
-              <span style={{ color: '#8898aa', textDecoration: 'underline' }}>Unsubscribe</span>
-              {" | "}
               <span style={{ color: '#8898aa', textDecoration: 'underline' }}>Privacy Policy</span>
+              {" | "}
+              <span style={{ color: '#8898aa', textDecoration: 'underline' }}>Terms of Service</span>
             </p>
           </div>
         </div>

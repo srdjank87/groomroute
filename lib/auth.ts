@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { UserRole, SubscriptionStatus, SubscriptionPlan } from "@prisma/client";
+import { loopsOnUserActive } from "@/lib/loops";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -50,6 +51,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  events: {
+    async signIn({ user }) {
+      // Update lastActiveAt and notify Loops on login (exits re-engagement sequence)
+      if (user.accountId && user.email) {
+        prisma.account
+          .update({
+            where: { id: user.accountId },
+            data: { lastActiveAt: new Date() },
+          })
+          .catch((err) => console.error("Failed to update lastActiveAt:", err));
+
+        loopsOnUserActive(user.email, user.accountId).catch((err) =>
+          console.error("Loops user_active event failed:", err)
+        );
+      }
+    },
+  },
   callbacks: {
     async jwt({ token, user, trigger }) {
       if (user) {

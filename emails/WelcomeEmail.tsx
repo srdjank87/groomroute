@@ -32,7 +32,7 @@ export default function WelcomeEmail({
   return (
     <Html>
       <Head />
-      <Preview>Welcome to GroomRoute - Your mobile grooming business just got easier!</Preview>
+      <Preview>Welcome to GroomRoute - Finally, a calm day awaits.</Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Logo */}
@@ -59,100 +59,131 @@ export default function WelcomeEmail({
 
           {/* Main Content */}
           <Section style={content}>
-            <Heading style={heading}>Welcome to GroomRoute!</Heading>
+            <Heading style={heading}>Finally, a calm day.</Heading>
 
             <Text style={paragraph}>Hi {firstName},</Text>
 
             <Text style={paragraph}>
-              Thank you for signing up for GroomRoute! We're thrilled to have you join our
-              community of mobile pet groomers who are taking control of their business.
+              Welcome to GroomRoute. We're genuinely glad you're here.
             </Text>
 
             <Text style={paragraph}>
-              You're starting your <strong>{trialDays}-day free trial</strong> of the{" "}
-              <strong>{planName} plan</strong>. During your trial, you'll have full access to:
+              We built this for groomers like you - people who love what they do,
+              but are tired of the chaos. The zigzagging across town. The stress of running late.
+              The days that leave your body aching and your energy depleted.
             </Text>
 
-            <Section style={featureList}>
-              <Text style={featureItem}>
-                <span style={checkmark}>✓</span> Smart route optimization to save time and gas
-              </Text>
-              <Text style={featureItem}>
-                <span style={checkmark}>✓</span> Easy appointment scheduling and management
-              </Text>
-              <Text style={featureItem}>
-                <span style={checkmark}>✓</span> Customer and pet profiles at your fingertips
-              </Text>
-              <Text style={featureItem}>
-                <span style={checkmark}>✓</span> Quick client messaging tools
+            <Text style={paragraph}>
+              <strong>You deserve calm, predictable days.</strong> That's what GroomRoute is about.
+            </Text>
+
+            {/* Trial Info Box */}
+            <Section style={trialBox}>
+              <Text style={trialBoxText}>
+                <strong>Your {trialDays}-day free trial is active</strong>
+                <br />
+                <span style={{ fontSize: "14px", opacity: 0.8 }}>
+                  {planName} Plan - Full access, no commitment
+                </span>
               </Text>
             </Section>
 
+            <Hr style={hr} />
+
+            {/* Single Clear Next Step */}
+            <Heading as="h2" style={subheading}>
+              Your first step: Add a customer
+            </Heading>
+
+            <Text style={paragraph}>
+              The best way to see how GroomRoute works? Add one of your regular customers.
+              Just one. It takes 30 seconds.
+            </Text>
+
+            <Text style={paragraph}>
+              Once you have customers in the system, you can schedule appointments and
+              watch GroomRoute optimize your route - finding the best order so you spend
+              less time driving and more time grooming (or resting).
+            </Text>
+
             <Section style={buttonSection}>
-              <Button style={button} href={`${baseUrl}/dashboard`}>
-                Go to Your Dashboard
+              <Button style={button} href={`${baseUrl}/dashboard/customers/new`}>
+                Add Your First Customer
               </Button>
             </Section>
 
             <Hr style={hr} />
 
+            {/* What You'll Notice */}
             <Heading as="h2" style={subheading}>
-              Getting Started
+              What groomers notice first
             </Heading>
 
-            <Text style={paragraph}>
-              Here's what we recommend doing first:
-            </Text>
+            <Section style={featureList}>
+              <Text style={featureItem}>
+                <span style={checkmark}>✓</span> <strong>Less driving</strong> - Routes
+                clustered by area, not scattered across town
+              </Text>
+              <Text style={featureItem}>
+                <span style={checkmark}>✓</span> <strong>Energy protected</strong> -
+                Workload limits so you don't overbook yourself
+              </Text>
+              <Text style={featureItem}>
+                <span style={checkmark}>✓</span> <strong>Fewer surprises</strong> -
+                One tap handles "running late" messages to all your clients
+              </Text>
+            </Section>
 
-            <Text style={stepItem}>
-              <strong>1. Add your customers</strong> - Import your existing clients or add them one
-              by one.
-            </Text>
-            <Text style={stepItem}>
-              <strong>2. Set up service areas</strong> - Define the areas you serve and assign days
-              to each area for smarter scheduling.
-            </Text>
-            <Text style={stepItem}>
-              <strong>3. Schedule appointments</strong> - Set up your first day of appointments.
-            </Text>
-            <Text style={stepItem}>
-              <strong>4. Optimize your route</strong> - Let GroomRoute find the best order for your
-              stops.
-            </Text>
-            <Text style={stepItem}>
-              <strong>5. Add to home screen</strong> - Install GroomRoute on your phone for quick
-              access every morning. Just tap Share → Add to Home Screen.
+            <Hr style={hr} />
+
+            {/* Help Offer */}
+            <Section style={helpBox}>
+              <Text style={helpBoxText}>
+                <strong>We're here for you</strong>
+              </Text>
+              <Text style={helpBoxSubtext}>
+                Questions? Need help importing your client list? Just reply to this email.
+                A real person reads every message - usually within a few hours.
+              </Text>
+            </Section>
+
+            <Text style={paragraph}>
+              Or check out our{" "}
+              <Link href={`${baseUrl}/help`} style={link}>
+                help center
+              </Link>{" "}
+              anytime.
             </Text>
 
             <Hr style={hr} />
 
-            <Text style={paragraph}>
-              Have questions? Reply to this email or check out our{" "}
-              <Link href={`${baseUrl}/help`} style={link}>
-                help center
-              </Link>
-              . We're here to help you succeed!
+            {/* Sign off */}
+            <Text style={signature}>
+              Here's to calmer days ahead,
             </Text>
 
-            <Text style={signature}>
-              Happy grooming!
-              <br />
+            <Text style={signatureTeam}>
               The GroomRoute Team
+            </Text>
+
+            <Text style={ps}>
+              <strong>P.S.</strong> If GroomRoute doesn't make your days noticeably calmer
+              within 30 days, we'll refund every penny. No questions asked.
             </Text>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              GroomRoute - Route planning for mobile pet groomers
+              GroomRoute - The scheduling system built only for mobile groomers
             </Text>
             <Text style={footerText}>
-              <Link href={`${baseUrl}/unsubscribe`} style={footerLink}>
-                Unsubscribe
-              </Link>
-              {" | "}
               <Link href={`${baseUrl}/privacy`} style={footerLink}>
                 Privacy Policy
+              </Link>
+              {" | "}
+              <Link href={`${baseUrl}/terms`} style={footerLink}>
+                Terms of Service
               </Link>
             </Text>
           </Section>
@@ -197,7 +228,7 @@ const content = {
 
 const heading = {
   color: "#1a1a1a",
-  fontSize: "28px",
+  fontSize: "32px",
   fontWeight: "bold",
   textAlign: "center" as const,
   margin: "32px 0 24px",
@@ -217,30 +248,37 @@ const paragraph = {
   margin: "16px 0",
 };
 
-const featureList = {
+const trialBox = {
+  backgroundColor: "#fef7f0",
+  borderRadius: "12px",
+  padding: "20px 24px",
   margin: "24px 0",
-  padding: "0 16px",
+  textAlign: "center" as const,
+  border: "1px solid #f5e6d8",
+};
+
+const trialBoxText = {
+  color: "#8B6239",
+  fontSize: "16px",
+  lineHeight: "24px",
+  margin: "0",
+};
+
+const featureList = {
+  margin: "20px 0",
 };
 
 const featureItem = {
   color: "#525f7f",
   fontSize: "15px",
-  lineHeight: "24px",
-  margin: "8px 0",
+  lineHeight: "26px",
+  margin: "12px 0",
 };
 
 const checkmark = {
-  color: "#A5744A",
+  color: "#10b981",
   fontWeight: "bold",
   marginRight: "8px",
-};
-
-const stepItem = {
-  color: "#525f7f",
-  fontSize: "15px",
-  lineHeight: "24px",
-  margin: "12px 0",
-  paddingLeft: "8px",
 };
 
 const buttonSection = {
@@ -260,6 +298,27 @@ const button = {
   padding: "14px 32px",
 };
 
+const helpBox = {
+  backgroundColor: "#f0fdf4",
+  borderRadius: "12px",
+  padding: "20px 24px",
+  margin: "24px 0",
+  border: "1px solid #dcfce7",
+};
+
+const helpBoxText = {
+  color: "#166534",
+  fontSize: "16px",
+  margin: "0 0 8px 0",
+};
+
+const helpBoxSubtext = {
+  color: "#15803d",
+  fontSize: "14px",
+  lineHeight: "22px",
+  margin: "0",
+};
+
 const hr = {
   borderColor: "#e6ebf1",
   margin: "32px 0",
@@ -274,7 +333,22 @@ const signature = {
   color: "#525f7f",
   fontSize: "16px",
   lineHeight: "26px",
+  margin: "16px 0 4px",
+};
+
+const signatureTeam = {
+  color: "#1a1a1a",
+  fontSize: "16px",
+  fontWeight: "600",
+  margin: "0 0 24px",
+};
+
+const ps = {
+  color: "#6b7280",
+  fontSize: "14px",
+  lineHeight: "22px",
   margin: "24px 0 0",
+  fontStyle: "italic",
 };
 
 const footer = {

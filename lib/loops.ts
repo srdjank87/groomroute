@@ -342,3 +342,56 @@ export async function loopsOnPWAInstalled(
     },
   });
 }
+
+/**
+ * Called when user logs in
+ * Exits: "Re-engagement" sequence for inactive users
+ */
+export async function loopsOnUserActive(
+  email: string,
+  accountId: string
+): Promise<void> {
+  await sendLoopsEvent({
+    email,
+    eventName: "user_active",
+    eventProperties: {
+      accountId,
+    },
+  });
+}
+
+/**
+ * Called when invoice payment fails
+ * Triggers: "Payment Failed" recovery sequence
+ */
+export async function loopsOnPaymentFailed(
+  email: string,
+  accountId: string,
+  amount: number
+): Promise<void> {
+  await sendLoopsEvent({
+    email,
+    eventName: "payment_failed",
+    eventProperties: {
+      accountId,
+      amount,
+    },
+  });
+}
+
+/**
+ * Called when payment succeeds (after a failed payment)
+ * Exits: "Payment Failed" recovery sequence
+ */
+export async function loopsOnPaymentSucceeded(
+  email: string,
+  accountId: string
+): Promise<void> {
+  await sendLoopsEvent({
+    email,
+    eventName: "payment_succeeded",
+    eventProperties: {
+      accountId,
+    },
+  });
+}
