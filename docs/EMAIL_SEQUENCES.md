@@ -294,11 +294,45 @@ The GroomRoute Team
 
 ## Sequence 5: PWA Installation Reminder
 
-**Trigger:** `checkout_completed` + 5 days delay
+**Trigger:** `checkout_completed` event + 5 days delay (configure in Loops)
 **Exit Condition:** `pwa_installed` event
 **Goal:** Get users to install the mobile app
 
-*Note: This is already implemented via Resend cron job. Consider moving to Loops for consistency.*
+### Email 1: 5 Days After Checkout
+
+**Subject:** Quick tip: Add GroomRoute to your home screen
+
+**Body:**
+```
+Hi {{firstName}},
+
+You've been using GroomRoute for a few days now - we hope it's making your grooming days smoother! Here's a quick tip to make things even easier:
+
+**Add GroomRoute to Your Home Screen**
+
+Install GroomRoute as an app on your phone for instant access - no searching through bookmarks or typing URLs. It works just like a native app!
+
+**How to Install (30 seconds)**
+
+On iPhone (Safari):
+1. Open groomroute.com/dashboard in Safari
+2. Tap the Share button (square with arrow)
+3. Scroll down and tap "Add to Home Screen"
+
+On Android (Chrome):
+1. Open groomroute.com/dashboard in Chrome
+2. Tap the menu (three dots) at the top right
+3. Tap "Install app" or "Add to Home screen"
+
+[Open GroomRoute Now →]
+
+Once installed, you'll have GroomRoute right on your home screen - perfect for checking your route each morning or updating appointments on the go.
+
+Questions or need help? Just reply to this email!
+
+Happy grooming!
+The GroomRoute Team
+```
 
 ---
 
