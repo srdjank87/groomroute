@@ -6,6 +6,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -43,7 +44,24 @@ export default function TeamInviteEmail({
         <Container style={container}>
           {/* Logo */}
           <Section style={logoSection}>
-            <Text style={logoText}>GroomRoute</Text>
+            <table cellPadding="0" cellSpacing="0" style={{ margin: "0 auto" }}>
+              <tr>
+                <td style={{ verticalAlign: "middle", paddingRight: "8px" }}>
+                  <Img
+                    src={`${baseUrl}/images/app-icon-192.png`}
+                    width="32"
+                    height="32"
+                    alt="GroomRoute"
+                    style={{ borderRadius: "6px" }}
+                  />
+                </td>
+                <td style={{ verticalAlign: "middle" }}>
+                  <Text style={logoText}>
+                    Groom<span style={{ color: "#A5744A" }}>Route</span>
+                  </Text>
+                </td>
+              </tr>
+            </table>
           </Section>
 
           {/* Main Content */}
@@ -126,11 +144,12 @@ const logoSection = {
 };
 
 const logoText = {
-  color: "#A5744A",
+  color: "#1a1a1a",
   fontSize: "28px",
   fontWeight: "bold",
   textAlign: "center" as const,
   margin: "0",
+  display: "inline",
 };
 
 const content = {

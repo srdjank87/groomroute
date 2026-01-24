@@ -291,7 +291,26 @@ function EmailPreview({ template }: EmailPreviewProps) {
         <div style={{ backgroundColor: '#ffffff', maxWidth: '600px', margin: '0 auto', padding: '20px 0 48px' }}>
           {/* Logo */}
           <div style={{ textAlign: 'center', padding: '32px 20px 0' }}>
-            <span style={{ color: '#A5744A', fontSize: '28px', fontWeight: 'bold' }}>GroomRoute</span>
+            <table cellPadding="0" cellSpacing="0" style={{ margin: '0 auto' }}>
+              <tbody>
+                <tr>
+                  <td style={{ verticalAlign: 'middle', paddingRight: '8px' }}>
+                    <img
+                      src="/images/app-icon-192.png"
+                      width="32"
+                      height="32"
+                      alt="GroomRoute"
+                      style={{ borderRadius: '6px' }}
+                    />
+                  </td>
+                  <td style={{ verticalAlign: 'middle' }}>
+                    <span style={{ color: '#1a1a1a', fontSize: '28px', fontWeight: 'bold' }}>
+                      Groom<span style={{ color: '#A5744A' }}>Route</span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           {/* Content */}
@@ -403,7 +422,26 @@ function EmailPreview({ template }: EmailPreviewProps) {
         <div style={{ backgroundColor: '#ffffff', maxWidth: '600px', margin: '0 auto', padding: '20px 0 48px' }}>
           {/* Logo */}
           <div style={{ textAlign: 'center', padding: '32px 20px 0' }}>
-            <span style={{ color: '#A5744A', fontSize: '28px', fontWeight: 'bold' }}>GroomRoute</span>
+            <table cellPadding="0" cellSpacing="0" style={{ margin: '0 auto' }}>
+              <tbody>
+                <tr>
+                  <td style={{ verticalAlign: 'middle', paddingRight: '8px' }}>
+                    <img
+                      src="/images/app-icon-192.png"
+                      width="32"
+                      height="32"
+                      alt="GroomRoute"
+                      style={{ borderRadius: '6px' }}
+                    />
+                  </td>
+                  <td style={{ verticalAlign: 'middle' }}>
+                    <span style={{ color: '#1a1a1a', fontSize: '28px', fontWeight: 'bold' }}>
+                      Groom<span style={{ color: '#A5744A' }}>Route</span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           {/* Content */}
@@ -473,7 +511,26 @@ function EmailPreview({ template }: EmailPreviewProps) {
         <div style={{ backgroundColor: '#ffffff', maxWidth: '600px', margin: '0 auto', padding: '20px 0 48px' }}>
           {/* Logo */}
           <div style={{ textAlign: 'center', padding: '32px 20px 0' }}>
-            <span style={{ color: '#A5744A', fontSize: '28px', fontWeight: 'bold' }}>GroomRoute</span>
+            <table cellPadding="0" cellSpacing="0" style={{ margin: '0 auto' }}>
+              <tbody>
+                <tr>
+                  <td style={{ verticalAlign: 'middle', paddingRight: '8px' }}>
+                    <img
+                      src="/images/app-icon-192.png"
+                      width="32"
+                      height="32"
+                      alt="GroomRoute"
+                      style={{ borderRadius: '6px' }}
+                    />
+                  </td>
+                  <td style={{ verticalAlign: 'middle' }}>
+                    <span style={{ color: '#1a1a1a', fontSize: '28px', fontWeight: 'bold' }}>
+                      Groom<span style={{ color: '#A5744A' }}>Route</span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           {/* Content */}
@@ -544,7 +601,26 @@ function EmailPreview({ template }: EmailPreviewProps) {
         <div style={{ backgroundColor: '#ffffff', maxWidth: '600px', margin: '0 auto', padding: '20px 0 48px' }}>
           {/* Logo */}
           <div style={{ textAlign: 'center', padding: '32px 20px 0' }}>
-            <span style={{ color: '#A5744A', fontSize: '28px', fontWeight: 'bold' }}>GroomRoute</span>
+            <table cellPadding="0" cellSpacing="0" style={{ margin: '0 auto' }}>
+              <tbody>
+                <tr>
+                  <td style={{ verticalAlign: 'middle', paddingRight: '8px' }}>
+                    <img
+                      src="/images/app-icon-192.png"
+                      width="32"
+                      height="32"
+                      alt="GroomRoute"
+                      style={{ borderRadius: '6px' }}
+                    />
+                  </td>
+                  <td style={{ verticalAlign: 'middle' }}>
+                    <span style={{ color: '#1a1a1a', fontSize: '28px', fontWeight: 'bold' }}>
+                      Groom<span style={{ color: '#A5744A' }}>Route</span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           {/* Content */}
