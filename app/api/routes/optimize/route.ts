@@ -9,6 +9,7 @@ import {
 } from "@/lib/benchmarks";
 import { getUserGroomerId } from "@/lib/get-user-groomer";
 import { trackRouteOptimized, checkAndTrackFirstAction } from "@/lib/posthog-server";
+import { loopsOnFirstRouteOptimized } from "@/lib/loops";
 
 interface Location {
   id: string;
@@ -320,8 +321,13 @@ export async function POST(req: NextRequest) {
       dayOfWeek: new Date().getDay(),
     });
 
-    // Check if this is the first meaningful action
-    await checkAndTrackFirstAction(accountId, "route_optimized");
+    // Check if this is the first meaningful action and notify Loops
+    const isFirstAction = await checkAndTrackFirstAction(accountId, "route_optimized");
+    if (isFirstAction && session.user.email) {
+      loopsOnFirstRouteOptimized(session.user.email, accountId, stops).catch((err) =>
+        console.error("Loops route_optimized event failed:", err)
+      );
+    }
 
     return NextResponse.json({
       success: true,

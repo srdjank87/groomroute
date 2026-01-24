@@ -268,3 +268,79 @@ export async function loopsOnResubscribed(
     },
   });
 }
+
+// ============================================
+// Onboarding Events - Trigger email sequences
+// ============================================
+
+/**
+ * Called when user adds their first customer
+ * Exits: "No customers added" sequence
+ * Triggers: "No appointments scheduled" sequence
+ */
+export async function loopsOnFirstCustomerAdded(
+  email: string,
+  accountId: string
+): Promise<void> {
+  await sendLoopsEvent({
+    email,
+    eventName: "customer_added",
+    eventProperties: {
+      accountId,
+    },
+  });
+}
+
+/**
+ * Called when user creates their first appointment
+ * Exits: "No appointments scheduled" sequence
+ * Triggers: "Route optimization nudge" sequence (if 2+ appointments)
+ */
+export async function loopsOnFirstAppointmentCreated(
+  email: string,
+  accountId: string
+): Promise<void> {
+  await sendLoopsEvent({
+    email,
+    eventName: "appointment_created",
+    eventProperties: {
+      accountId,
+    },
+  });
+}
+
+/**
+ * Called when user optimizes their first route
+ * Exits: "Route optimization nudge" sequence
+ */
+export async function loopsOnFirstRouteOptimized(
+  email: string,
+  accountId: string,
+  stops: number
+): Promise<void> {
+  await sendLoopsEvent({
+    email,
+    eventName: "route_optimized",
+    eventProperties: {
+      accountId,
+      stops,
+    },
+  });
+}
+
+/**
+ * Called when user installs the PWA
+ * Exits: "PWA installation reminder" sequence
+ */
+export async function loopsOnPWAInstalled(
+  email: string,
+  accountId: string
+): Promise<void> {
+  await sendLoopsEvent({
+    email,
+    eventName: "pwa_installed",
+    eventProperties: {
+      accountId,
+    },
+  });
+}

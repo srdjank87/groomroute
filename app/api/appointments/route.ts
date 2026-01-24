@@ -6,6 +6,7 @@ import { AppointmentType, AppointmentStatus } from "@prisma/client";
 import { canAddAppointment, requireAdminRole } from "@/lib/feature-helpers";
 import { getUserGroomerId } from "@/lib/get-user-groomer";
 import { trackAppointmentCreated, checkAndTrackFirstAction } from "@/lib/posthog-server";
+import { loopsOnFirstAppointmentCreated } from "@/lib/loops";
 import { syncAppointmentToCalendar } from "@/lib/google-calendar";
 import { hasFeature } from "@/lib/features";
 
@@ -214,8 +215,13 @@ export async function POST(req: NextRequest) {
       hasCustomer: true,
     });
 
-    // Check if this is the first meaningful action
-    await checkAndTrackFirstAction(accountId, "appointment_created");
+    // Check if this is the first meaningful action and notify Loops
+    const isFirstAction = await checkAndTrackFirstAction(accountId, "appointment_created");
+    if (isFirstAction && session.user.email) {
+      loopsOnFirstAppointmentCreated(session.user.email, accountId).catch((err) =>
+        console.error("Loops appointment_created event failed:", err)
+      );
+    }
 
     // Sync to Google Calendar if connected (async, don't wait)
     const groomer = await prisma.groomer.findUnique({

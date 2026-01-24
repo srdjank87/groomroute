@@ -6,6 +6,7 @@ import { BehaviorFlag } from "@prisma/client";
 import { canAddCustomer, requireAdminRole } from "@/lib/feature-helpers";
 import { geocodeAddress } from "@/lib/geocoding";
 import { trackCustomerCreated, checkAndTrackFirstAction } from "@/lib/posthog-server";
+import { loopsOnFirstCustomerAdded } from "@/lib/loops";
 
 const customerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -123,8 +124,13 @@ export async function POST(req: NextRequest) {
       hasPets: !!result.pet,
     });
 
-    // Check if this is the first meaningful action
-    await checkAndTrackFirstAction(accountId, "customer_created");
+    // Check if this is the first meaningful action and notify Loops
+    const isFirstAction = await checkAndTrackFirstAction(accountId, "customer_created");
+    if (isFirstAction && session.user.email) {
+      loopsOnFirstCustomerAdded(session.user.email, accountId).catch((err) =>
+        console.error("Loops customer_added event failed:", err)
+      );
+    }
 
     return NextResponse.json({
       success: true,

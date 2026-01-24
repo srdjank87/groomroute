@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { trackServerEvent } from "@/lib/posthog-server";
+import { loopsOnPWAInstalled } from "@/lib/loops";
 
 export async function POST() {
   try {
@@ -32,6 +33,13 @@ export async function POST() {
 
     // Track in PostHog
     trackServerEvent(session.user.id, "pwa_installed", { accountId });
+
+    // Notify Loops to exit PWA reminder sequence
+    if (session.user.email) {
+      loopsOnPWAInstalled(session.user.email, accountId).catch((err) =>
+        console.error("Loops pwa_installed event failed:", err)
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
