@@ -54,6 +54,7 @@ model Account {
   firstActionAt        DateTime?        // Track when first meaningful action occurred (for analytics)
   firstActionType      String?          // Type of first action: appointment_created, customer_created, route_optimized
   pwaInstalledAt       DateTime?        // Track when PWA was installed (for engagement analytics)
+  phone                String?          // Phone number collected from Stripe checkout (for SMS marketing)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   users           User[]

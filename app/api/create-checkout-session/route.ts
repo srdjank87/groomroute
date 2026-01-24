@@ -150,6 +150,9 @@ export async function POST(request: NextRequest) {
       customer: customerId,
       mode: "subscription",
       payment_method_types: ["card"],
+      phone_number_collection: {
+        enabled: true,
+      },
       line_items: lineItems,
       subscription_data: {
         ...(isResubscription ? {} : { trial_period_days: 14 }),

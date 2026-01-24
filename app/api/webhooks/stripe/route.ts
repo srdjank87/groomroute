@@ -125,6 +125,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Check if this is a resubscription (previously canceled)
   const isResubscription = account?.subscriptionStatus === "CANCELED";
 
+  // Extract phone number from checkout session for SMS marketing
+  const customerPhone = session.customer_details?.phone || undefined;
+
   await prisma.account.update({
     where: { id: accountId },
     data: {
@@ -135,6 +138,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       // Update seat counts for Pro plan
       adminSeats: totalAdminSeats,
       groomerSeats: groomerSeats,
+      // Store phone for SMS marketing
+      ...(customerPhone && { phone: customerPhone }),
     },
   });
 
@@ -178,17 +183,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
       // Notify Loops that checkout completed (exits abandoned checkout sequence)
       // If resubscription, also exits winback sequence
+      // Include phone number for SMS marketing
       if (isResubscription) {
         loopsOnResubscribed(
           user.email,
           planName,
-          accountId
+          accountId,
+          customerPhone
         ).catch((err) => console.error("Loops resubscription event failed:", err));
       } else {
         loopsOnCheckoutCompleted(
           user.email,
           planName,
-          accountId
+          accountId,
+          customerPhone
         ).catch((err) => console.error("Loops checkout event failed:", err));
       }
     }

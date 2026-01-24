@@ -24,6 +24,7 @@ interface LoopsContact {
   plan?: string;
   signupDate?: string;
   cancelDate?: string;
+  phone?: string; // For SMS marketing
 }
 
 interface LoopsEventPayload {
@@ -172,12 +173,14 @@ export async function loopsOnSignup(
 export async function loopsOnCheckoutCompleted(
   email: string,
   plan: string,
-  accountId: string
+  accountId: string,
+  phone?: string
 ): Promise<void> {
-  // Update contact group
+  // Update contact group and add phone for SMS marketing
   await upsertLoopsContact({
     email,
     userGroup: "trial",
+    ...(phone && { phone }),
   });
 
   // Send event to exit abandoned checkout sequence
@@ -247,11 +250,13 @@ export async function loopsOnSubscriptionCanceled(
 export async function loopsOnResubscribed(
   email: string,
   plan: string,
-  accountId: string
+  accountId: string,
+  phone?: string
 ): Promise<void> {
   await upsertLoopsContact({
     email,
     userGroup: "paying",
+    ...(phone && { phone }),
   });
 
   await sendLoopsEvent({
