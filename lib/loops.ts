@@ -18,11 +18,10 @@ interface LoopsContact {
   source?: string;
   subscribed?: boolean;
   userGroup?: string;
-  // Custom properties
+  // Custom properties (Loops has built-in createdAt, so no need for signupDate)
   accountId?: string;
   businessName?: string;
   plan?: string;
-  signupDate?: string;
   cancelDate?: string;
   phone?: string; // For SMS marketing
 }
@@ -151,7 +150,6 @@ export async function loopsOnSignup(
     accountId,
     businessName,
     plan,
-    signupDate: new Date().toISOString(),
   });
 
   // Send signup event (triggers abandoned checkout sequence)

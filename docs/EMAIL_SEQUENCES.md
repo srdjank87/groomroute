@@ -573,8 +573,9 @@ Make sure these properties are set up in Loops:
 | plan | String | Current subscription plan |
 | businessName | String | Their business name |
 | accountId | String | For tracking/support |
-| signupDate | Date | When they signed up |
 | userGroup | String | signups, trial, paying, churned |
+
+*Note: Loops has a built-in `createdAt` property, so no need for a custom signupDate.*
 
 ---
 
