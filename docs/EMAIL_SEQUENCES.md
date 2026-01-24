@@ -554,10 +554,10 @@ Make sure these properties are set up in Loops:
 - [ ] Set up the winback discount code in Stripe
 
 ### In GroomRoute App (Code Changes Needed):
-- [ ] Send `customer_added` event on first customer
-- [ ] Send `appointment_created` event on first appointment
-- [ ] Send `route_optimized` event on first optimization
-- [ ] Send `pwa_installed` event when PWA is installed
+- [x] Send `customer_added` event on first customer ✓ Implemented
+- [x] Send `appointment_created` event on first appointment ✓ Implemented
+- [x] Send `route_optimized` event on first optimization ✓ Implemented
+- [x] Send `pwa_installed` event when PWA is installed ✓ Implemented
 - [ ] Send `user_active` event on login (for re-engagement exit)
 - [ ] Send `payment_failed` event from Stripe webhook
 
