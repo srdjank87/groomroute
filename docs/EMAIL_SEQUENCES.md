@@ -25,18 +25,180 @@ Before setting up sequences, ensure these events are being sent to Loops:
 
 ---
 
-## Sequence 1: Onboarding - No Customers Added
+## Sequence 0: Abandoned Checkout
 
-**Trigger:** `checkout_completed` event
-**Exit Condition:** `customer_added` event received
-**Goal:** Get users to add their first customer
+Trigger: signed_up event
+Exit Condition: hasCompletedCheckout = true (Audience Filter)
+Goal: Get users who signed up but didn't complete Stripe checkout to start their trial
+
+### Email 1: 1 Hour After Signup
+
+Subject: You're almost there, {{firstName}}!
+
+Body:
+
+Hi {{firstName}},
+
+You started signing up for GroomRoute but didn't quite finish. No worries - your spot is saved!
+
+**Your free trial is just one click away.**
+
+Complete your signup now and get:
+• 14 days of full access — no charge today, you won't be billed until your trial ends
+• Route optimization to save hours every week
+• Client management that actually makes sense
+• The calm, organized days you deserve
+
+[Complete Your Free Trial →]
+
+It takes less than 60 seconds to finish.
+
+See you inside!
+The GroomRoute Team
+
+P.S. Have questions before signing up? Just reply to this email - we're happy to help.
+
+
+### Email 2: Day 1 (24 hours after signup)
+
+Subject: Still thinking about it?
+
+Body:
+
+Hi {{firstName}},
+
+We noticed you started signing up for GroomRoute yesterday but haven't finished yet.
+
+**Here's what other mobile groomers are saying:**
+
+"I used to spend 45 minutes every morning figuring out my route. Now it takes me 30 seconds." - Sarah M.
+
+"I finally have time to eat lunch between appointments." - Mike T.
+
+"My clients love that I'm never late anymore." - Jennifer K.
+
+Your trial is completely free for 14 days. No tricks, no hassle.
+
+[Start My Free Trial →]
+
+If something's holding you back, just reply to this email. I'd love to help.
+
+The GroomRoute Team
+
+
+### Email 3: Day 3 (72 hours after signup) - Founder Email
+
+Subject: Quick question from Srdjan
+
+Body:
+
+Hi {{firstName}},
+
+I'm Srdjan, one of the founders of GroomRoute.
+
+I noticed you signed up a few days ago but haven't started your trial yet. I wanted to reach out personally and ask:
+
+**Is there anything I can help with?**
+
+Sometimes the timing isn't right, and that's okay. But if you have questions about:
+• How GroomRoute works
+• Whether it's right for your business
+• Pricing or the trial
+
+...just hit reply. I read every email personally.
+
+We built GroomRoute specifically for mobile groomers because we saw how chaotic and exhausting the job can be. If there's a way I can help you have calmer days, I want to do that.
+
+No pressure either way.
+
+Srdjan
+GroomRoute Co-Founder
+
+
+### Email 4: Day 7 (Final reminder)
+
+Subject: Last check-in about your GroomRoute trial
+
+Body:
+
+Hi {{firstName}},
+
+This is my last email about your GroomRoute signup.
+
+I won't keep filling your inbox, but I wanted to reach out one more time in case you're still on the fence.
+
+**Before you go, here's what you'd be getting:**
+
+✓ Routes optimized in seconds, not hours
+✓ All your clients and pets in one place
+✓ Less driving, less stress, more energy
+✓ 14 days completely free to try it out
+
+[Complete My Signup →]
+
+If mobile grooming is working great for you without any route planning help, that's awesome! But if you ever feel like you're driving too much or running behind, we'll be here.
+
+All the best,
+The GroomRoute Team
+
+---
+
+## Sequence 0.5: Trial Ending Reminder
+
+Trigger: checkout_completed event + 10 day delay
+Exit Condition: trial_converted event (user already paid)
+Goal: Transparent billing reminder that builds trust and reduces disputes
+
+This single email goes out ~10-12 days into the trial, before auto-billing. It reduces support tickets, charge disputes, and angry cancellations while actually helping conversion through transparency.
+
+### Email 1: Day 10 of Trial
+
+Subject: Quick heads up about your trial
+
+Body:
+
+Hi {{firstName}},
+
+Just a quick heads up: your GroomRoute trial ends in a few days.
+
+**Here's what happens next:**
+
+• Your trial ends on {{trialEndDate}}
+• You'll be charged {{planPrice}}/month for the {{planName}} plan
+• Your card ending in {{cardLast4}} will be billed automatically
+
+**Before you decide, try this one thing:**
+
+If you haven't yet, open your schedule and tap "Optimize Route" on a day with 2+ appointments. Watch it find the fastest order in seconds. That's the time savings you'll get every single day.
+
+[Optimize a Route →]
+
+**Want to make changes?**
+
+No hard feelings if now isn't the right time. You can update your plan or cancel anytime from your account settings.
+
+[Manage Subscription →]
+
+Questions? Just reply to this email.
+
+The GroomRoute Team
+
+P.S. If GroomRoute has been saving you time, you don't need to do anything — your subscription will start automatically.
+
+---
+
+## Sequence 1: Onboarding - No Clients Added
+
+Trigger: checkout_completed event
+Exit Condition: hasAddedClient = false (Audience Filter)
+Goal: Get users to add their first client
 
 ### Email 1: Day 1 (24 hours after checkout)
 
-**Subject:** Ready to add your first client?
+Subject: Ready to add your first client?
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 Welcome to GroomRoute! You've taken the first step toward a more organized grooming business.
@@ -56,14 +218,14 @@ Need to import existing clients? Reply to this email and we'll help you get set 
 
 Happy grooming!
 The GroomRoute Team
-```
+
 
 ### Email 2: Day 3 (72 hours after checkout)
 
-**Subject:** Your client list is waiting
+Subject: Your client list is waiting
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 Just checking in! We noticed you haven't added any clients yet.
@@ -78,22 +240,20 @@ Most groomers start by adding just 5-10 of their regular clients. It takes about
 
 [Add Clients Now →]
 
-Pro tip: You can add clients right from your phone. Just open GroomRoute and tap the + button.
-
 Questions? Just reply to this email!
 
 The GroomRoute Team
-```
+
 
 ### Email 3: Day 5 (120 hours after checkout)
 
-**Subject:** Let's get you started (personal offer)
+Subject: Let's get you started (personal offer)
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
-I wanted to reach out personally. I'm [Name], one of the founders of GroomRoute.
+I wanted to reach out personally. I'm Srdjan, one of the founders of GroomRoute.
 
 I noticed you signed up but haven't added any clients yet. I want to make sure there's nothing blocking you from getting value from GroomRoute.
 
@@ -109,30 +269,30 @@ If you're just busy (we get it - grooming is demanding!), here's a quick way to 
 [Add One Client →]
 
 Looking forward to hearing from you,
-[Name]
+
+Srdjan
 GroomRoute Co-founder
-```
 
 ---
 
 ## Sequence 2: Onboarding - No Appointments Scheduled
 
-**Trigger:** `customer_added` event (first customer)
-**Exit Condition:** `appointment_created` event received
-**Goal:** Get users to schedule their first appointment
+Trigger: customer_added event (first customer)
+Exit Condition: appointment_created event received
+Goal: Get users to schedule their first appointment
 
 ### Email 1: Day 1 (24 hours after first customer added)
 
-**Subject:** Time to schedule your first appointment
+Subject: Time to schedule your first appointment
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 Great job adding your first client! Now let's put them on the calendar.
 
 Scheduling in GroomRoute is simple:
-1. Go to Dashboard → tap any date
+1. Go to Dashboard → Appointments
 2. Click "Add Appointment"
 3. Select your client and pick a time
 4. Done!
@@ -143,21 +303,21 @@ Once you have a few appointments scheduled, you can use route optimization to fi
 
 Happy grooming!
 The GroomRoute Team
-```
+
 
 ### Email 2: Day 3
 
-**Subject:** Your route is ready to optimize
+Subject: Your route is ready to optimize
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 You've got clients in the system - now let's put them to work!
 
 Here's how most successful groomers use GroomRoute:
 
-**Morning Routine:**
+Morning Routine:
 1. Open the app
 2. View today's appointments
 3. Tap "Optimize Route"
@@ -172,103 +332,22 @@ But first, you need appointments on the calendar.
 Already have appointments in another calendar? You can view them side-by-side and move them over as you go.
 
 The GroomRoute Team
-```
+
 
 ---
 
-## Sequence 3: Trial Ending Reminder
+## Sequence 3: First Route Optimization Nudge
 
-**Trigger:** 3 days before trial ends (use Loops delay from `checkout_completed`)
-**Exit Condition:** `trial_converted` event
-**Goal:** Convert trial to paid subscription
-
-### Email 1: 3 Days Before Trial Ends
-
-**Subject:** Your trial ends in 3 days
-
-**Body:**
-```
-Hi {{firstName}},
-
-Just a heads up - your GroomRoute trial ends in 3 days.
-
-Here's what you've accomplished so far:
-[Dynamic: show stats if possible, or generic encouragement]
-
-To keep using GroomRoute without interruption, make sure your payment method is up to date.
-
-[Update Payment Method →]
-
-Questions about pricing? Here's a quick breakdown:
-• Starter: $29/month - Perfect for solo groomers
-• Growth: $49/month - For growing businesses
-• Pro: $99/month - For teams with multiple groomers
-
-Not sure which plan is right for you? Reply to this email and we'll help you decide.
-
-The GroomRoute Team
-```
-
-### Email 2: 1 Day Before Trial Ends
-
-**Subject:** Last day of your free trial
-
-**Body:**
-```
-Hi {{firstName}},
-
-Your GroomRoute trial ends tomorrow.
-
-If you've been enjoying GroomRoute, now's the time to make sure you don't lose access to:
-• Your client database
-• Your appointment history
-• Route optimization
-• Everything you've set up
-
-[Continue with GroomRoute →]
-
-If GroomRoute isn't the right fit, no hard feelings! Your data will be saved for 30 days in case you change your mind.
-
-But if you're planning to continue, update your payment method today to avoid any interruption.
-
-The GroomRoute Team
-```
-
-### Email 3: Trial Expired (Day 0)
-
-**Subject:** Your trial has ended - here's what happens next
-
-**Body:**
-```
-Hi {{firstName}},
-
-Your GroomRoute trial has ended, but your account and all your data are still here waiting for you.
-
-To pick up right where you left off:
-
-[Reactivate Your Account →]
-
-Your clients, appointments, and settings are all saved. Just add a payment method and you're back in business.
-
-If you have any questions or need more time to decide, just reply to this email. We're here to help.
-
-The GroomRoute Team
-```
-
----
-
-## Sequence 4: First Route Optimization Nudge
-
-**Trigger:** `appointment_created` event (when they have 2+ appointments on same day)
-**Exit Condition:** `route_optimized` event
-**Goal:** Get users to experience the core value - route optimization
+Trigger: appointment_created event (when they have 2+ appointments on same day)
+Exit Condition: route_optimized event
+Goal: Get users to experience the core value - route optimization
 
 ### Email 1: Same day or next day
 
-**Subject:** Ready to optimize your route?
+Subject: Ready to optimize your route?
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 Nice! You've got multiple appointments scheduled. This is where GroomRoute really shines.
@@ -291,31 +370,31 @@ Most groomers save 30-60 minutes per day just by following the optimized order.
 Let us know what you think!
 
 The GroomRoute Team
-```
+
 
 ---
 
-## Sequence 5: PWA Installation Reminder
+## Sequence 4: PWA Installation Reminder
 
-**Trigger:** `checkout_completed` event + 5 days delay (configure in Loops)
-**Exit Condition:** `pwa_installed` event
-**Goal:** Get users to install the mobile app
+Trigger: checkout_completed event + 5 days delay (configure in Loops)
+Exit Condition: pwa_installed event
+Goal: Get users to install the mobile app
 
 ### Email 1: 5 Days After Checkout
 
-**Subject:** Quick tip: Add GroomRoute to your home screen
+Subject: Quick tip: Add GroomRoute to your home screen
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 You've been using GroomRoute for a few days now - we hope it's making your grooming days smoother! Here's a quick tip to make things even easier:
 
-**Add GroomRoute to Your Home Screen**
+Add GroomRoute to Your Home Screen
 
 Install GroomRoute as an app on your phone for instant access - no searching through bookmarks or typing URLs. It works just like a native app!
 
-**How to Install (30 seconds)**
+How to Install (30 seconds)
 
 On iPhone (Safari):
 1. Open groomroute.com/dashboard in Safari
@@ -335,22 +414,22 @@ Questions or need help? Just reply to this email!
 
 Happy grooming!
 The GroomRoute Team
-```
+
 
 ---
 
-## Sequence 6: Re-engagement (Inactive Users)
+## Sequence 5: Re-engagement (Inactive Users)
 
-**Trigger:** No login for 7 days (track via `lastActiveAt` in database)
-**Exit Condition:** User logs in (send `user_active` event)
-**Goal:** Bring back inactive users
+Trigger: No login for 7 days (track via lastActiveAt in database)
+Exit Condition: User logs in (send user_active event)
+Goal: Bring back inactive users
 
 ### Email 1: 7 Days Inactive
 
-**Subject:** We miss you at GroomRoute
+Subject: We miss you at GroomRoute
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 It's been a week since you've logged into GroomRoute. Everything okay?
@@ -368,14 +447,14 @@ If you're swamped with grooming appointments (which is a good problem!), remembe
 Just reply to this email if you have questions.
 
 The GroomRoute Team
-```
+
 
 ### Email 2: 14 Days Inactive
 
-**Subject:** Is GroomRoute working for you?
+Subject: Is GroomRoute working for you?
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 We noticed you haven't used GroomRoute in a couple weeks.
@@ -389,37 +468,38 @@ Or if you're just taking a break from the app, no worries! Your data is safe and
 [Get Back to GroomRoute →]
 
 Best,
-The GroomRoute Team
-```
+Sandra
+GroomRoute Co-Founder
+
 
 ---
 
-## Sequence 7: Winback (Canceled Customers)
+## Sequence 6: Winback (Canceled Customers)
 
-**Trigger:** `subscription_canceled` event + 60 day delay
-**Exit Condition:** `resubscribed` event
-**Goal:** Win back churned customers
+Trigger: subscription_canceled event + 60 day delay
+Exit Condition: resubscribed event
+Goal: Win back churned customers
 
 *Note: This is already configured in the Loops integration.*
 
 ### Email 1: 60 Days After Cancellation
 
-**Subject:** A lot has changed at GroomRoute
+Subject: A lot has changed at GroomRoute
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 It's been a couple months since you left GroomRoute. We've been busy making things better:
 
-**What's New:**
+What's New:
 • [List 2-3 recent feature updates]
 • Improved route optimization
 • Faster mobile experience
 
-We'd love to have you back. As a returning member, here's a special offer:
+We'd love to have you back. As a returning customer, here's a special offer:
 
-**Get 50% off your first month back**
+Get 50% off your first month back
 
 Use code: WELCOMEBACK50
 
@@ -428,14 +508,14 @@ Use code: WELCOMEBACK50
 No pressure - but if you're still doing mobile grooming, we think you'll love the improvements we've made.
 
 The GroomRoute Team
-```
+
 
 ### Email 2: 90 Days After Cancellation
 
-**Subject:** One more thing...
+Subject: One more thing...
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 Last email, I promise!
@@ -450,22 +530,22 @@ And if you ever want to give us another try, the door is always open.
 
 Thanks for being part of our journey,
 The GroomRoute Team
-```
+
 
 ---
 
-## Sequence 8: Payment Failed
+## Sequence 7: Payment Failed
 
-**Trigger:** `payment_failed` event (add to Stripe webhook)
-**Exit Condition:** `payment_succeeded` event
-**Goal:** Recover failed payments
+Trigger: payment_failed event (add to Stripe webhook)
+Exit Condition: payment_succeeded event
+Goal: Recover failed payments
 
 ### Email 1: Immediately
 
-**Subject:** Action needed: Payment failed
+Subject: Action needed: Payment failed
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 We tried to process your GroomRoute subscription payment, but it didn't go through.
@@ -484,14 +564,14 @@ Your account will remain active for 3 days while you sort this out. After that, 
 Need help? Just reply to this email.
 
 The GroomRoute Team
-```
+
 
 ### Email 2: 2 Days After Failed Payment
 
-**Subject:** Your GroomRoute access expires tomorrow
+Subject: Your GroomRoute access expires tomorrow
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 Quick reminder: your payment still hasn't gone through, and your account access expires tomorrow.
@@ -508,27 +588,27 @@ It only takes 30 seconds to update your payment method:
 If you're having trouble, reply to this email and we'll help.
 
 The GroomRoute Team
-```
+
 
 ---
 
-## Sequence 9: NPS/Feedback Request
+## Sequence 8: NPS/Feedback Request
 
-**Trigger:** 30 days after `trial_converted`
-**Exit Condition:** Survey completed (track via link click or webhook)
-**Goal:** Gather feedback and identify promoters
+Trigger: 30 days after trial_converted
+Exit Condition: Survey completed (track via link click or webhook)
+Goal: Gather feedback and identify promoters
 
 ### Email 1: 30 Days After First Payment
 
-**Subject:** Quick question (30 seconds)
+Subject: Quick question (30 seconds)
 
-**Body:**
-```
+Body:
+
 Hi {{firstName}},
 
 You've been using GroomRoute for a month now. We'd love to know how it's going!
 
-**How likely are you to recommend GroomRoute to a fellow mobile groomer?**
+How likely are you to recommend GroomRoute to a fellow mobile groomer?
 
 [1] [2] [3] [4] [5] [6] [7] [8] [9] [10]
 Not likely                          Very likely
@@ -539,192 +619,466 @@ Your feedback helps us build a better product.
 
 Thanks!
 The GroomRoute Team
-```
+
+
+---
+
+## Sequence 9: Paying Member Nurture
+
+Trigger: trial_converted event
+Exit Condition: None (ongoing nurture sequence)
+Goal: Engage paying customers, provide value, build loyalty, and encourage referrals
+
+This is a long-term nurture sequence that starts when a trial converts to a paid subscription. It provides ongoing value through tips, education, and community building.
+
+### Email 1: Day 0 (Immediately after trial converts)
+
+Subject: Welcome to the GroomRoute family!
+
+Body:
+
+Hi {{firstName}},
+
+Congratulations! You're officially a GroomRoute member.
+
+Thank you for trusting us with your mobile grooming business. We're honored to be part of your daily routine.
+
+**Here's what you can expect from us:**
+
+• Regular tips to help you get the most out of GroomRoute
+• Business insights from other successful mobile groomers
+• First access to new features
+• Priority support whenever you need it
+
+**Your Quick Stats:**
+You're joining a community of mobile groomers who collectively save over 500 hours per week on route planning. That's more time with family, more energy for clients, and less stress on the road.
+
+If you ever need anything, just reply to this email. We read and respond to every message.
+
+Here's to calmer grooming days ahead!
+
+The GroomRoute Team
+
+
+### Email 2: Day 3 (Power User Tips)
+
+Subject: 3 features you might have missed
+
+Body:
+
+Hi {{firstName}},
+
+Now that you're all set up, here are 3 power-user features that can save you even more time:
+
+**1. Quick Reschedule**
+Drag and drop appointments on your calendar to reschedule instantly. No need to delete and recreate.
+
+**2. Pet Notes**
+Add grooming notes to each pet's profile (temperament, preferred cuts, special instructions). They'll show up automatically on appointment day.
+
+**3. Navigation Integration**
+After optimizing your route, tap the "start driving" button to open driving directions in your preferred maps app. One-tap navigation to every stop.
+
+[Open GroomRoute →]
+
+Which feature will you try first?
+
+The GroomRoute Team
+
+
+### Email 3: Day 7 (Micro-feedback)
+
+Subject: Quick question (one-liner reply)
+
+Body:
+
+Hi {{firstName}},
+
+You've been using GroomRoute for a week now. One quick question:
+
+**What's one thing you wish was easier?**
+
+Just hit reply with whatever comes to mind — even a one-liner helps. I read every response.
+
+The GroomRoute Team
+
+
+### Email 4: Day 10 (Business Insight - Scheduling Strategies)
+
+Subject: How top groomers plan their week
+
+Body:
+
+Hi {{firstName}},
+
+After talking with hundreds of mobile groomers, we've noticed a pattern among the most successful ones:
+
+**They plan their week on Sunday night.**
+
+Here's the simple routine that works:
+
+1. Sunday evening: Open GroomRoute and review the upcoming week
+2. Look for scheduling gaps you can fill with recurring clients
+3. Check for back-to-back appointments that might need buffer time
+4. Optimize each day's route so you're ready to go
+
+This 15-minute habit can save hours of stress during the week.
+
+**Pro tip:** Block out lunch breaks and personal time as "appointments" so you don't accidentally overbook yourself.
+
+[Plan Your Week →]
+
+How do you plan your schedule? Reply and let us know - we love learning from our groomers.
+
+The GroomRoute Team
+
+
+### Email 5: Day 14 (Feature Spotlight - Route Optimization Deep Dive)
+
+Subject: Getting the most out of route optimization
+
+Body:
+
+Hi {{firstName}},
+
+Route optimization is the heart of GroomRoute. Here's how to squeeze every minute of saved time out of it:
+
+**The Basics:**
+• Works best with 3+ appointments per day
+• Considers drive time between each stop
+• Updates in real-time when you add or remove appointments
+
+**Advanced Tips:**
+
+**Set realistic appointment durations**
+If you typically spend 90 minutes on a full groom, don't schedule 60. Accurate durations = accurate route times.
+
+**Use time windows wisely**
+If a client says "anytime after 10am," set that as their earliest time. GroomRoute will respect it while optimizing around it.
+
+**Re-optimize after changes**
+Added a last-minute appointment? Tap optimize again. The best route may have changed.
+
+**Check time saved**
+After optimizing, compare the original vs. optimized drive time. That difference? That's free time back in your day.
+
+[Try It Now →]
+
+Questions about optimization? Just reply - we're happy to help.
+
+The GroomRoute Team
+
+
+### Email 6: Day 21 (Customer Success Story) - Founder Email
+
+Subject: How Maria cut her drive time in half
+
+Body:
+
+Hi {{firstName}},
+
+I wanted to share a quick story from one of our groomers.
+
+Maria runs a mobile grooming business in Phoenix. She was spending almost 2 hours a day just driving between clients - that's 10 hours a week.
+
+After using GroomRoute for a month, she reorganized how she groups her clients by neighborhood. Now she clusters appointments by area and uses route optimization to connect the dots.
+
+Her drive time dropped to under an hour a day.
+
+That extra hour each day? She uses it for an additional appointment - which brings in an extra $3,000+ per month.
+
+I love hearing stories like this. If GroomRoute is making a difference in your business, I'd love to hear about it.
+
+Just hit reply - I read every message.
+
+Srdjan
+Co-Founder, GroomRoute
+
+
+### Email 7: Day 30 (Referral Ask)
+
+Subject: Know another groomer who'd love this?
+
+Body:
+
+Hi {{firstName}},
+
+You've been with us for a month now, and we hope GroomRoute is making your days calmer and more organized.
+
+Here's something you might not know: **Most of our groomers found us through a recommendation from another groomer.**
+
+If GroomRoute has helped you, would you consider sharing it with a fellow mobile groomer?
+
+**Why refer a friend:**
+• They get a 14-day free trial to try it out
+• You'll be helping them discover the same time savings you're enjoying
+• Good karma for helping a fellow groomer!
+
+[Share GroomRoute →]
+
+No pressure at all. We just know that mobile groomers trust recommendations from other groomers more than anything we could say.
+
+Thanks for being part of our community!
+
+The GroomRoute Team
+
+
+### Email 8: Day 45 (Advanced Tips - Busy Season Planning)
+
+Subject: Preparing for your busy season
+
+Body:
+
+Hi {{firstName}},
+
+Whether it's holiday season, summer, or spring shedding - every groomer has their busy periods. Here's how to handle the rush without burning out:
+
+**1. Set Maximum Daily Appointments**
+Know your limit. If 6 appointments is your max, don't book 8 just because clients are asking.
+
+**2. Build in Buffer Days**
+Leave one day per week lighter than usual for overflow, emergencies, or catch-up.
+
+**3. Prioritize by Location**
+During busy times, it's okay to be picky about new clients. Prioritize ones that fit your existing routes.
+
+**4. Use Wait Lists**
+Fully booked? Add clients to a mental (or actual) wait list for cancellations. GroomRoute makes it easy to slot them in.
+
+**5. Batch Similar Appointments**
+If you have several small dogs, group them together. You'll get into a rhythm and work more efficiently.
+
+The goal isn't to do more appointments - it's to do the right appointments without exhausting yourself.
+
+[Open Your Schedule →]
+
+How do you handle busy season? We'd love to hear your tips.
+
+The GroomRoute Team
+
+
+### Email 9: Day 60 (Community Check-in) - Founder Email
+
+Subject: How's it going?
+
+Body:
+
+Hi {{firstName}},
+
+It's been 2 months since you joined GroomRoute. I wanted to personally check in.
+
+How's everything going? Is GroomRoute helping you the way you hoped?
+
+I'd genuinely love to know:
+• What's working well for you?
+• What could be better?
+• Any features you wish we had?
+
+Your feedback directly shapes what we build next. Many of our best features came from suggestions just like this.
+
+Just hit reply and share your thoughts. I read every email personally.
+
+Thanks for being part of the GroomRoute community.
+
+Srdjan
+Co-Founder, GroomRoute
+
+
+### Email 10: Day 90 (Milestone Celebration)
+
+Subject: 3 months together!
+
+Body:
+
+Hi {{firstName}},
+
+You've been a GroomRoute member for 3 months!
+
+We don't take that for granted. In a world of endless apps and subscriptions, you've chosen to make GroomRoute part of your daily routine. That means a lot to us.
+
+**By now, you've probably:**
+• Saved hours of route planning
+• Never forgotten a client's pet notes
+• Arrived at appointments calmer and more prepared
+
+**What's next:**
+We're always working on making GroomRoute better. Keep an eye on your inbox for updates, and remember - your feedback shapes our roadmap.
+
+**One small ask:**
+If you have a minute, a quick review on the App Store or Google Play helps other groomers find us. [Leave a Review →]
+
+Here's to the next 3 months!
+
+With gratitude,
+The GroomRoute Team
+
+
+### Email 11: Day 120 (Feature Request)
+
+Subject: What would make GroomRoute better for you?
+
+Body:
+
+Hi {{firstName}},
+
+Quick question: If you could add one feature to GroomRoute, what would it be?
+
+We're always planning our next improvements, and your input matters more than you might think. Some ideas:
+
+• Client reminders/notifications?
+• Payment tracking?
+• Team scheduling for multiple groomers?
+• Something else entirely?
+
+Just reply with your #1 wishlist item. Even a quick one-liner helps.
+
+Thanks for helping us build the best tool for mobile groomers.
+
+The GroomRoute Team
+
+
+### Email 12: Day 180 (6-Month Anniversary)
+
+Subject: Half a year with GroomRoute
+
+Body:
+
+Hi {{firstName}},
+
+6 months! You're officially a GroomRoute veteran.
+
+Thank you for sticking with us. Building a business is hard, and we're proud to be a small part of your journey.
+
+**A request:** If GroomRoute has made a difference in your work, would you consider recommending us to one other mobile groomer? Your word-of-mouth is how we grow.
+
+**A promise:** We'll keep working to make GroomRoute better, simpler, and more helpful. If you ever need anything, we're just an email away.
+
+Here's to the next 6 months!
+
+The GroomRoute Team
+
+
+### Email 13: Day 365 (1-Year Anniversary)
+
+Subject: Happy Anniversary!
+
+Body:
+
+Hi {{firstName}},
+
+One year ago, you joined GroomRoute.
+
+That's 365 days of organized schedules, optimized routes, and (hopefully) calmer grooming days.
+
+Thank you for being with us for this entire journey. Seriously - it means the world.
+
+We've grown a lot this year, and so much of that is because groomers like you believed in what we're building. Your feedback, your patience, and your word-of-mouth have shaped GroomRoute into what it is today.
+
+**Here's to year two!**
+
+If there's anything we can do to make your next year even better, just reply and let us know.
+
+With deep appreciation,
+
+The GroomRoute Team
 
 ---
 
 ## SMS Sequences (Using Phone from Stripe)
 
-SMS is powerful for time-sensitive nudges. Keep messages under 160 characters when possible. Use SMS to complement email - don't send both at the same time.
+Since we now collect phone numbers at checkout, consider these SMS sequences:
 
-**Best Practices:**
-- Send SMS during business hours (8am-8pm local time)
-- Limit to 2-3 SMS per sequence max
-- Always include a short link to take action
-- Use SMS for high-priority or time-sensitive moments
-- Include opt-out info in your Loops settings
+### SMS 1: Welcome (Day 0)
 
----
+Welcome to GroomRoute! 🐕 Download the app to your home screen for quick access: groomroute.com/dashboard
 
-### Onboarding SMS Sequence
+### SMS: First Customer Nudge (Day 2 - if no customers added)
 
-#### SMS: Welcome (Immediately after checkout)
-```
-Welcome to GroomRoute, {{firstName}}! 🐕 Add it to your home screen for quick access each morning: groomroute.com/dashboard
+Trigger: 48 hours after checkout_completed, exit on customer_added
 
-Reply STOP to opt out
-```
-*Trigger: `checkout_completed` event*
+{{firstName}}, ready to try GroomRoute? Add your first client in 30 seconds: groomroute.com/customers/new
 
-#### SMS: First Client Nudge (Day 2 - if no clients added)
-```
-{{firstName}}, ready to try GroomRoute? Add your first client in 30 seconds: groomroute.com/clients/new
-```
-*Trigger: 48 hours after `checkout_completed`, exit on `customer_added`*
 
-#### SMS: First Appointment Nudge (Day 1 after first client)
-```
-Nice! Now schedule an appointment for that client and see the magic: groomroute.com/dashboard
-```
-*Trigger: 24 hours after `customer_added`, exit on `appointment_created`*
+### SMS: Route Optimization Nudge (EVERY DAY with 2+ appointments)
 
-#### SMS: Route Optimization Nudge (Same day as 2+ appointments)
-```
+Trigger: Morning of day with 2+ appointments, exit on route_optimized
+
 You've got {{count}} appointments today! Tap "Optimize" to find the fastest route: groomroute.com/dashboard
-```
-*Trigger: Morning of day with 2+ appointments, exit on `route_optimized`*
+
 
 ---
 
 ### Payment Recovery SMS Sequence
 
-#### SMS: Payment Failed - Immediate
-```
+### SMS: Payment Failed - Immediate
+
+Trigger: payment_failed event
+
 ⚠️ Your GroomRoute payment didn't go through. Update your card to keep access: groomroute.com/dashboard
-```
-*Trigger: `payment_failed` event*
 
 #### SMS: Payment Failed - Day 2 (URGENT)
-```
+
+Trigger: 48 hours after payment_failed, exit on payment_succeeded
+
 URGENT: Your account expires tomorrow. Fix payment in 30 seconds: groomroute.com/dashboard
-```
-*Trigger: 48 hours after `payment_failed`, exit on `payment_succeeded`*
 
 ---
 
 ### Re-engagement SMS Sequence
 
 #### SMS: 7 Days Inactive
-```
+
+Trigger: 7 days since last user_active event
+
 Hey {{firstName}}, we miss you! Open GroomRoute and check your schedule: groomroute.com/dashboard
-```
-*Trigger: 7 days since last `user_active` event*
+
 
 #### SMS: 14 Days Inactive (Personal)
-```
+
+Trigger: 14 days since last user_active event
+
 {{firstName}}, stuck on something? Reply to this text and I'll help you out! - The GroomRoute Team
-```
-*Trigger: 14 days since last `user_active` event*
 
 ---
 
 ### Winback SMS Sequence
 
 #### SMS: 60 Days After Cancellation
-```
+
+Trigger: 60 days after subscription_canceled, exit on resubscribed
 {{firstName}}, a lot has changed at GroomRoute! Come back with 50% off: groomroute.com/comeback (code: WELCOMEBACK50)
-```
-*Trigger: 60 days after `subscription_canceled`, exit on `resubscribed`*
+
 
 ---
 
 ### Milestone & Celebration SMS
 
 #### SMS: First Route Optimized
-```
+
+Trigger: route_optimized event (first time only)
+
 🎉 You just optimized your first route! That's the GroomRoute magic. Keep it up: groomroute.com/dashboard
-```
-*Trigger: `route_optimized` event (first time only)*
 
 #### SMS: 7 Days Active
-```
+
+Trigger: 7 days of consecutive activity
+
 You've been using GroomRoute for a week! How's it going? Reply with any feedback - we read everything.
-```
-*Trigger: 7 days of consecutive activity*
 
 #### SMS: 30 Days Paid (NPS)
-```
+
+Trigger: 30 days after trial_converted
+
 {{firstName}}, you've been with us a month! Quick question: How likely are you to recommend GroomRoute? Reply 1-10
-```
-*Trigger: 30 days after `trial_converted`*
 
 ---
 
-### Operational SMS (Transactional)
-
-These are not marketing - they're service messages. Consider sending from app, not Loops.
-
-#### SMS: Appointment Reminder (Optional - if enabled by user)
-```
-Reminder: {{petName}} ({{clientName}}) at {{time}} tomorrow. View route: groomroute.com/dashboard
-```
-*Trigger: Day before appointment, user must opt-in*
-
-#### SMS: Running Late Confirmation
-```
-Got it! We've notified your remaining clients that you're running {{delay}} minutes late.
-```
-*Trigger: User taps "Running Late" in app*
-
----
-
-### SMS Timing Matrix
-
-| Event | Email | SMS | Notes |
-|-------|-------|-----|-------|
-| Checkout completed | Immediately | Immediately | Both OK - different purposes |
-| No clients (Day 2) | Day 1 | Day 2 | Stagger to avoid fatigue |
-| No appointments (Day 2) | Day 1 | Day 2 | SMS if email ignored |
-| Trial ending (3 days) | Day 11 | Day 11 AM | Send SMS in morning |
-| Trial ending (1 day) | Day 13 | Day 13 AM | High urgency |
-| Payment failed | Immediately | Immediately | Both - critical |
-| Payment failed (Day 2) | Day 2 | Day 2 | Last warning |
-| Inactive (7 days) | Day 7 | Day 7 | Pick one, not both |
-| Inactive (14 days) | Day 14 | Day 14 | Personal outreach |
-| Winback (60 days) | Day 60 | Day 60 | Special offer |
-
----
-
-### SMS A/B Test Ideas
-
-1. **With/Without Emoji:** Test if 🐕 improves click rates
-2. **Urgency Words:** "URGENT" vs "Quick reminder"
-3. **Personalization:** First name vs business name
-4. **Time of Day:** 8am vs 10am vs 6pm sends
-5. **Short vs Detailed:** One-liner vs two sentences
-
----
-
-### SMS Character Limits
-
-- **Standard SMS:** 160 characters
-- **With special chars/emoji:** 70 characters per segment
-- **Loops personalization:** `{{firstName}}` counts as ~10 chars average
-
-**Example character counts:**
-```
-Welcome to GroomRoute! Add your first client: groomroute.com/clients/new
-[74 characters - ✓ Single SMS]
-
-Hey {{firstName}}, your GroomRoute trial ends tomorrow! Update your payment method to keep access to your clients and routes: groomroute.com/billing
-[153 characters - ✓ Single SMS, but tight]
-```
-
----
-
-### SMS Consent & Compliance
-
-1. **Collect consent at checkout** - Stripe can capture this with the phone field
-2. **Include opt-out** - "Reply STOP to opt out" on first marketing SMS
-3. **Honor opt-outs immediately** - Loops handles this automatically
-4. **Separate transactional from marketing** - Appointment reminders are transactional, winback is marketing
-5. **Keep records** - Loops tracks consent automatically
-
----
 
 ## Loops Custom Properties Needed
 
 Make sure these properties are set up in Loops:
+
+### Basic Contact Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -732,44 +1086,120 @@ Make sure these properties are set up in Loops:
 | lastName | String | User's last name |
 | phone | String | Phone number for SMS |
 | plan | String | Current subscription plan |
+| planPrice | String | Monthly price display (e.g., "$79") |
 | businessName | String | Their business name |
 | accountId | String | For tracking/support |
 | userGroup | String | signups, trial, paying, churned |
+| cancelDate | String | ISO date when subscription was canceled |
+| lastActiveAt | String | ISO date of last activity |
+| trialEndDate | String | Formatted trial end date (e.g., "Friday, February 7") |
+| cardLast4 | String | Last 4 digits of payment card (e.g., "4242") |
 
-*Note: Loops has a built-in `createdAt` property, so no need for a custom signupDate.*
+### Audience Filter Properties (Boolean)
+
+These properties are used for **Audience Filters** to exit users from sequences:
+
+| Property | Type | Used By Sequence | Filter Condition |
+|----------|------|------------------|------------------|
+| hasCompletedCheckout | Boolean | Abandoned Checkout | `= false` to stay in sequence |
+| hasAddedClient | Boolean | No Clients Added | `= false` to stay in sequence |
+| hasCreatedAppointment | Boolean | No Appointments | `= false` to stay in sequence |
+| hasOptimizedRoute | Boolean | Route Optimization Nudge | `= false` to stay in sequence |
+| hasInstalledPwa | Boolean | PWA Reminder | `= false` to stay in sequence |
+| isActive | Boolean | Re-engagement | `= false` to stay in sequence |
+| hasPaymentFailed | Boolean | Payment Failed | `= true` to stay in sequence |
+| hasResubscribed | Boolean | Winback | `= false` to stay in sequence |
+
+*Note: Loops has a built-in createdAt property, so no need for a custom signupDate.*
+
+---
+
+## How Exit Conditions Work (Using Audience Filters)
+
+Loops doesn't have traditional "exit conditions". Instead, use **Audience Filters** with the "All following nodes" option:
+
+### Setup for Each Sequence:
+
+1. **Add an Audience Filter** right after the trigger
+2. **Set the condition** based on the boolean property
+3. **Choose "All following nodes"** so it's checked at every step
+4. When the property changes, the contact is removed at the next node
+
+### Example: No Clients Added Sequence
+
+```
+Flow:
+├── Trigger: checkout_completed event
+├── Audience Filter: hasAddedClient = false  ← "All following nodes"
+├── Timer: 24 hours
+├── Email 1
+├── Timer: 48 hours
+├── Email 2
+└── ...
+```
+
+When the user adds their first client, `hasAddedClient` is set to `true` by our API. At the next node (timer or email), the contact no longer matches the filter and exits the sequence.
+
+---
+
+## Sequence Configuration Summary
+
+| Sequence | Trigger Event | Audience Filter | Filter Value |
+|----------|---------------|-----------------|--------------|
+| Abandoned Checkout | `signed_up` | hasCompletedCheckout | `= false` |
+| Trial Ending Reminder | `checkout_completed` + 10 day delay | userGroup | `= trial` |
+| No Clients Added | `checkout_completed` | hasAddedClient | `= false` |
+| No Appointments | `customer_added` | hasCreatedAppointment | `= false` |
+| Route Optimization | `appointment_created` | hasOptimizedRoute | `= false` |
+| PWA Reminder | `checkout_completed` + 5 day delay | hasInstalledPwa | `= false` |
+| Re-engagement | Cron/scheduled (isActive = false) | isActive | `= false` |
+| Payment Failed | `payment_failed` | hasPaymentFailed | `= true` |
+| Winback | `subscription_canceled` + 60 day delay | hasResubscribed | `= false` |
+| Paying Member Nurture | `trial_converted` | None (ongoing) | N/A |
 
 ---
 
 ## Implementation Checklist
 
 ### In Loops Dashboard:
-- [ ] Create custom properties listed above
-- [ ] Set up each sequence with appropriate triggers
-- [ ] Configure exit conditions for each sequence
+- [ ] Create all custom properties listed above (both basic and boolean)
+- [ ] Set up each sequence with the trigger event
+- [ ] Add Audience Filter after each trigger with "All following nodes" selected
+- [ ] Configure the filter condition per the table above
 - [ ] Enable SMS for sequences that use it
-- [ ] Set up the winback discount code in Stripe
+- [ ] Set up the winback discount code in Stripe (WELCOMEBACK50)
 
-### In GroomRoute App (Code Changes Needed):
-- [x] Send `customer_added` event on first customer ✓ Implemented
-- [x] Send `appointment_created` event on first appointment ✓ Implemented
-- [x] Send `route_optimized` event on first optimization ✓ Implemented
-- [x] Send `pwa_installed` event when PWA is installed ✓ Implemented
-- [x] Send `user_active` event on login (for re-engagement exit) ✓ Implemented
-- [x] Send `payment_failed` event from Stripe webhook ✓ Implemented
-- [x] Send `payment_succeeded` event from Stripe webhook ✓ Implemented
+### In GroomRoute App (Code Changes):
+- [x] Send signed_up event + set hasCompletedCheckout=false ✓ Implemented
+- [x] Send checkout_completed event + set hasCompletedCheckout=true + initialize all boolean props ✓ Implemented
+- [x] Send customer_added event + set hasAddedClient=true ✓ Implemented
+- [x] Send appointment_created event + set hasCreatedAppointment=true ✓ Implemented
+- [x] Send route_optimized event + set hasOptimizedRoute=true ✓ Implemented
+- [x] Send pwa_installed event + set hasInstalledPwa=true ✓ Implemented
+- [x] Send user_active event + set isActive=true on login ✓ Implemented
+- [x] Send payment_failed event + set hasPaymentFailed=true ✓ Implemented
+- [x] Send payment_succeeded event + set hasPaymentFailed=false ✓ Implemented
+- [x] Send subscription_canceled event + set hasResubscribed=false ✓ Implemented
+- [x] Send resubscribed event + set hasResubscribed=true ✓ Implemented
+- [x] Create cron job to set isActive=false for users inactive 7+ days ✓ Implemented
 
 ### Environment Variables:
+
 ```
 LOOPS_API_KEY=your_loops_api_key
+CRON_SECRET=your_cron_secret  # Optional: for securing cron endpoints
 ```
 
 ---
 
 ## Notes
 
-1. **Personalization:** Use `{{firstName}}` for personalization in Loops
-2. **Links:** Replace `[Button Text →]` with actual Loops button/link syntax
+1. **Personalization:** Use {{firstName}} for personalization in Loops
+2. **Links:** Replace [Button Text →] with actual Loops button/link syntax
 3. **Timing:** Adjust delays based on your user behavior data
 4. **A/B Testing:** Consider testing subject lines for key emails
 5. **Unsubscribe:** Loops handles unsubscribe automatically
 6. **SMS Consent:** Ensure you have SMS consent during checkout (Stripe collects this with phone)
+7. **Re-engagement:** Requires a cron job to periodically set `isActive=false` for users who haven't logged in for 7+ days, which triggers them into the re-engagement sequence
+
+

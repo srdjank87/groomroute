@@ -22,8 +22,23 @@ interface LoopsContact {
   accountId?: string;
   businessName?: string;
   plan?: string;
+  planPrice?: string; // e.g., "$29" - for trial ending reminder
   cancelDate?: string;
   phone?: string; // For SMS marketing
+  trialEndDate?: string; // ISO date string for trial ending reminder
+  cardLast4?: string; // Last 4 digits of card for trial ending reminder
+
+  // Boolean properties for Audience Filter exit conditions
+  // These are updated when actions occur, allowing loops to filter out contacts
+  hasCompletedCheckout?: boolean; // Exit: Abandoned checkout sequence
+  hasAddedClient?: boolean; // Exit: No clients added sequence
+  hasCreatedAppointment?: boolean; // Exit: No appointments sequence
+  hasOptimizedRoute?: boolean; // Exit: Route optimization nudge sequence
+  hasInstalledPwa?: boolean; // Exit: PWA reminder sequence
+  isActive?: boolean; // Exit: Re-engagement sequence (reset by cron)
+  hasPaymentFailed?: boolean; // Trigger/Exit: Payment failed sequence
+  hasResubscribed?: boolean; // Exit: Winback sequence
+  lastActiveAt?: string; // ISO date string for activity tracking
 }
 
 interface LoopsEventPayload {
@@ -139,7 +154,7 @@ export async function loopsOnSignup(
   const firstName = name.split(" ")[0];
   const lastName = name.split(" ").slice(1).join(" ") || undefined;
 
-  // Create contact
+  // Create contact with initial properties
   await upsertLoopsContact({
     email,
     firstName,
@@ -150,6 +165,7 @@ export async function loopsOnSignup(
     accountId,
     businessName,
     plan,
+    hasCompletedCheckout: false, // For abandoned checkout sequence filtering
   });
 
   // Send signup event (triggers abandoned checkout sequence)
@@ -166,22 +182,47 @@ export async function loopsOnSignup(
 
 /**
  * Called when user completes Stripe checkout (trial started)
- * Exits: Abandoned Checkout sequence
+ * Exits: Abandoned Checkout sequence (via hasCompletedCheckout property)
+ * Triggers: Onboarding sequences + Trial Ending Reminder
  */
 export async function loopsOnCheckoutCompleted(
   email: string,
   plan: string,
   accountId: string,
-  phone?: string
+  options?: {
+    phone?: string;
+    planPrice?: string; // e.g., "$29"
+    trialEndDate?: Date; // When trial ends
+    cardLast4?: string; // Last 4 digits of card
+  }
 ): Promise<void> {
-  // Update contact group and add phone for SMS marketing
+  // Update contact with checkout status (exits abandoned checkout sequence)
+  // Also initialize onboarding properties to false
   await upsertLoopsContact({
     email,
     userGroup: "trial",
-    ...(phone && { phone }),
+    plan,
+    hasCompletedCheckout: true, // Exits abandoned checkout sequence
+    hasAddedClient: false, // Initialize for onboarding sequences
+    hasCreatedAppointment: false,
+    hasOptimizedRoute: false,
+    hasInstalledPwa: false,
+    isActive: true,
+    lastActiveAt: new Date().toISOString(),
+    // Trial reminder properties
+    ...(options?.phone && { phone: options.phone }),
+    ...(options?.planPrice && { planPrice: options.planPrice }),
+    ...(options?.trialEndDate && {
+      trialEndDate: options.trialEndDate.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+      }),
+    }),
+    ...(options?.cardLast4 && { cardLast4: options.cardLast4 }),
   });
 
-  // Send event to exit abandoned checkout sequence
+  // Send event to trigger onboarding sequences
   await sendLoopsEvent({
     email,
     eventName: "checkout_completed",
@@ -194,7 +235,7 @@ export async function loopsOnCheckoutCompleted(
 
 /**
  * Called when trial converts to paid subscription
- * Updates contact status
+ * Updates contact status to paying
  */
 export async function loopsOnTrialConverted(
   email: string,
@@ -204,6 +245,7 @@ export async function loopsOnTrialConverted(
   await upsertLoopsContact({
     email,
     userGroup: "paying",
+    hasPaymentFailed: false, // Ensure clean payment state
   });
 
   await sendLoopsEvent({
@@ -229,6 +271,7 @@ export async function loopsOnSubscriptionCanceled(
     email,
     userGroup: "churned",
     cancelDate: new Date().toISOString(),
+    hasResubscribed: false, // Reset for winback sequence filtering
   });
 
   await sendLoopsEvent({
@@ -243,7 +286,7 @@ export async function loopsOnSubscriptionCanceled(
 
 /**
  * Called when a churned customer resubscribes
- * Exits: Winback sequence
+ * Exits: Winback sequence (via hasResubscribed property)
  */
 export async function loopsOnResubscribed(
   email: string,
@@ -254,6 +297,8 @@ export async function loopsOnResubscribed(
   await upsertLoopsContact({
     email,
     userGroup: "paying",
+    hasResubscribed: true, // Exits winback sequence
+    cancelDate: undefined, // Clear cancel date
     ...(phone && { phone }),
   });
 
@@ -272,14 +317,21 @@ export async function loopsOnResubscribed(
 // ============================================
 
 /**
- * Called when user adds their first customer
- * Exits: "No customers added" sequence
+ * Called when user adds their first client
+ * Exits: "No clients added" sequence (via hasAddedClient property)
  * Triggers: "No appointments scheduled" sequence
  */
 export async function loopsOnFirstCustomerAdded(
   email: string,
   accountId: string
 ): Promise<void> {
+  // Update contact property to exit "no clients" sequence
+  await upsertLoopsContact({
+    email,
+    hasAddedClient: true, // Exits "no clients added" sequence
+  });
+
+  // Send event to trigger "no appointments" sequence
   await sendLoopsEvent({
     email,
     eventName: "customer_added",
@@ -291,13 +343,20 @@ export async function loopsOnFirstCustomerAdded(
 
 /**
  * Called when user creates their first appointment
- * Exits: "No appointments scheduled" sequence
- * Triggers: "Route optimization nudge" sequence (if 2+ appointments)
+ * Exits: "No appointments scheduled" sequence (via hasCreatedAppointment property)
+ * Triggers: "Route optimization nudge" sequence
  */
 export async function loopsOnFirstAppointmentCreated(
   email: string,
   accountId: string
 ): Promise<void> {
+  // Update contact property to exit "no appointments" sequence
+  await upsertLoopsContact({
+    email,
+    hasCreatedAppointment: true, // Exits "no appointments" sequence
+  });
+
+  // Send event to trigger "route optimization" sequence
   await sendLoopsEvent({
     email,
     eventName: "appointment_created",
@@ -309,13 +368,19 @@ export async function loopsOnFirstAppointmentCreated(
 
 /**
  * Called when user optimizes their first route
- * Exits: "Route optimization nudge" sequence
+ * Exits: "Route optimization nudge" sequence (via hasOptimizedRoute property)
  */
 export async function loopsOnFirstRouteOptimized(
   email: string,
   accountId: string,
   stops: number
 ): Promise<void> {
+  // Update contact property to exit "route optimization nudge" sequence
+  await upsertLoopsContact({
+    email,
+    hasOptimizedRoute: true, // Exits "route optimization" sequence
+  });
+
   await sendLoopsEvent({
     email,
     eventName: "route_optimized",
@@ -328,12 +393,18 @@ export async function loopsOnFirstRouteOptimized(
 
 /**
  * Called when user installs the PWA
- * Exits: "PWA installation reminder" sequence
+ * Exits: "PWA installation reminder" sequence (via hasInstalledPwa property)
  */
 export async function loopsOnPWAInstalled(
   email: string,
   accountId: string
 ): Promise<void> {
+  // Update contact property to exit "PWA reminder" sequence
+  await upsertLoopsContact({
+    email,
+    hasInstalledPwa: true, // Exits "PWA reminder" sequence
+  });
+
   await sendLoopsEvent({
     email,
     eventName: "pwa_installed",
@@ -345,12 +416,20 @@ export async function loopsOnPWAInstalled(
 
 /**
  * Called when user logs in
- * Exits: "Re-engagement" sequence for inactive users
+ * Exits: "Re-engagement" sequence (via isActive property)
+ * Note: A cron job should reset isActive to false for users inactive 7+ days
  */
 export async function loopsOnUserActive(
   email: string,
   accountId: string
 ): Promise<void> {
+  // Update contact to mark as active (exits re-engagement sequence)
+  await upsertLoopsContact({
+    email,
+    isActive: true, // Exits "re-engagement" sequence
+    lastActiveAt: new Date().toISOString(),
+  });
+
   await sendLoopsEvent({
     email,
     eventName: "user_active",
@@ -369,6 +448,12 @@ export async function loopsOnPaymentFailed(
   accountId: string,
   amount: number
 ): Promise<void> {
+  // Set payment failed flag (used for audience filtering)
+  await upsertLoopsContact({
+    email,
+    hasPaymentFailed: true, // Triggers "payment failed" sequence
+  });
+
   await sendLoopsEvent({
     email,
     eventName: "payment_failed",
@@ -381,12 +466,18 @@ export async function loopsOnPaymentFailed(
 
 /**
  * Called when payment succeeds (after a failed payment)
- * Exits: "Payment Failed" recovery sequence
+ * Exits: "Payment Failed" recovery sequence (via hasPaymentFailed property)
  */
 export async function loopsOnPaymentSucceeded(
   email: string,
   accountId: string
 ): Promise<void> {
+  // Clear payment failed flag (exits "payment failed" sequence)
+  await upsertLoopsContact({
+    email,
+    hasPaymentFailed: false, // Exits "payment failed" sequence
+  });
+
   await sendLoopsEvent({
     email,
     eventName: "payment_succeeded",

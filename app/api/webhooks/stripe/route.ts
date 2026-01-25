@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { stripe } from "@/lib/stripe";
+import { stripe, STRIPE_PLANS } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { fbCapiStartTrial, fbCapiSubscribe } from "@/lib/facebook-capi";
@@ -185,7 +185,28 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
       // Notify Loops that checkout completed (exits abandoned checkout sequence)
       // If resubscription, also exits winback sequence
-      // Include phone number for SMS marketing
+      // Include phone number for SMS marketing and trial reminder data
+      const billingType = (session.metadata?.billing || "monthly") as "monthly" | "yearly";
+      const planKey = planName.toLowerCase() as keyof typeof STRIPE_PLANS;
+      const planConfig = STRIPE_PLANS[planKey]?.[billingType];
+      const planPrice = planConfig
+        ? `$${(planConfig.amount / 100).toFixed(0)}`
+        : undefined;
+
+      // Get card last 4 digits from payment method
+      let cardLast4: string | undefined;
+      if (session.payment_intent && typeof session.payment_intent === "string") {
+        try {
+          const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+          if (paymentIntent.payment_method && typeof paymentIntent.payment_method === "string") {
+            const paymentMethod = await stripe.paymentMethods.retrieve(paymentIntent.payment_method);
+            cardLast4 = paymentMethod.card?.last4;
+          }
+        } catch {
+          // Card last 4 is optional, continue without it
+        }
+      }
+
       if (isResubscription) {
         loopsOnResubscribed(
           user.email,
@@ -198,7 +219,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           user.email,
           planName,
           accountId,
-          customerPhone
+          {
+            phone: customerPhone,
+            planPrice,
+            trialEndDate: trialEndsAt,
+            cardLast4,
+          }
         ).catch((err) => console.error("Loops checkout event failed:", err));
       }
     }
