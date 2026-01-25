@@ -349,20 +349,20 @@ function EmailPreview({ template }: EmailPreviewProps) {
             <hr style={{ borderColor: '#e6ebf1', margin: '32px 0', border: 'none', borderTop: '1px solid #e6ebf1' }} />
 
             <h2 style={{ color: '#1a1a1a', fontSize: '20px', fontWeight: 'bold', margin: '24px 0 16px' }}>
-              Your first step: Add a customer
+              Your first step: Add a client
             </h2>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              The best way to see how GroomRoute works? Add one of your regular customers. Just one. It takes 30 seconds.
+              The best way to see how GroomRoute works? Add one of your regular clients. Just one. It takes 30 seconds.
             </p>
 
             <p style={{ color: '#525f7f', fontSize: '16px', lineHeight: '26px', margin: '16px 0' }}>
-              Once you have customers in the system, you can schedule appointments and watch GroomRoute optimize your route - finding the best order so you spend less time driving and more time grooming (or resting).
+              Once you have clients in the system, you can schedule appointments and watch GroomRoute optimize your route - finding the best order so you spend less time driving and more time grooming (or resting).
             </p>
 
             <div style={{ textAlign: 'center', margin: '32px 0' }}>
               <span style={{ backgroundColor: '#A5744A', borderRadius: '8px', color: '#ffffff', fontSize: '16px', fontWeight: 'bold', padding: '14px 32px', display: 'inline-block' }}>
-                Add Your First Customer
+                Add Your First Client
               </span>
             </div>
 
@@ -438,7 +438,7 @@ function EmailPreview({ template }: EmailPreviewProps) {
     const { inviterName, businessName, role } = sampleData["team-invite"];
     const roleDisplay = role === "ADMIN" ? "Admin" : "Groomer";
     const roleDescription = role === "ADMIN"
-      ? "As an Admin, you&apos;ll have full access to manage appointments, customers, and team settings."
+      ? "As an Admin, you&apos;ll have full access to manage appointments, clients, and team settings."
       : "As a Groomer, you'll be able to view your appointments, manage your route, and update appointment statuses.";
 
     return (

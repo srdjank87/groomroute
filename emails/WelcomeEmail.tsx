@@ -92,23 +92,23 @@ export default function WelcomeEmail({
 
             {/* Single Clear Next Step */}
             <Heading as="h2" style={subheading}>
-              Your first step: Add a customer
+              Your first step: Add a client
             </Heading>
 
             <Text style={paragraph}>
-              The best way to see how GroomRoute works? Add one of your regular customers.
+              The best way to see how GroomRoute works? Add one of your regular clients.
               Just one. It takes 30 seconds.
             </Text>
 
             <Text style={paragraph}>
-              Once you have customers in the system, you can schedule appointments and
+              Once you have clients in the system, you can schedule appointments and
               watch GroomRoute optimize your route - finding the best order so you spend
               less time driving and more time grooming (or resting).
             </Text>
 
             <Section style={buttonSection}>
               <Button style={button} href={`${baseUrl}/dashboard/customers/new`}>
-                Add Your First Customer
+                Add Your First Client
               </Button>
             </Section>
 

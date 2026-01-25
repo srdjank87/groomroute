@@ -33,7 +33,7 @@ export default function TeamInviteEmail({
   const roleDisplay = role === "ADMIN" ? "Admin" : "Groomer";
   const roleDescription =
     role === "ADMIN"
-      ? "As an Admin, you'll have full access to manage appointments, customers, and team settings."
+      ? "As an Admin, you'll have full access to manage appointments, clients, and team settings."
       : "As a Groomer, you'll be able to view your appointments, manage your route, and update appointment statuses.";
 
   return (

@@ -33,7 +33,7 @@ Before setting up sequences, ensure these events are being sent to Loops:
 
 ### Email 1: Day 1 (24 hours after checkout)
 
-**Subject:** Ready to add your first customer?
+**Subject:** Ready to add your first client?
 
 **Body:**
 ```
@@ -41,18 +41,18 @@ Hi {{firstName}},
 
 Welcome to GroomRoute! You've taken the first step toward a more organized grooming business.
 
-The next step? Add your first customer.
+The next step? Add your first client.
 
 It only takes 30 seconds:
-1. Go to Customers → Add Customer
+1. Go to Clients → Add Client
 2. Enter their name, address, and pet info
 3. That's it!
 
-Once you have customers in the system, you can start scheduling appointments and optimizing your routes.
+Once you have clients in the system, you can start scheduling appointments and optimizing your routes.
 
-[Add Your First Customer →]
+[Add Your First Client →]
 
-Need to import existing customers? Reply to this email and we'll help you get set up.
+Need to import existing clients? Reply to this email and we'll help you get set up.
 
 Happy grooming!
 The GroomRoute Team
@@ -60,25 +60,25 @@ The GroomRoute Team
 
 ### Email 2: Day 3 (72 hours after checkout)
 
-**Subject:** Your customer list is waiting
+**Subject:** Your client list is waiting
 
 **Body:**
 ```
 Hi {{firstName}},
 
-Just checking in! We noticed you haven't added any customers yet.
+Just checking in! We noticed you haven't added any clients yet.
 
 Here's what you're missing out on:
-• One-tap access to customer addresses for navigation
+• One-tap access to client addresses for navigation
 • Complete pet profiles with grooming notes
 • Appointment history at your fingertips
 • Smart scheduling based on location
 
-Most groomers start by adding just 5-10 of their regular customers. It takes about 10 minutes and makes a huge difference.
+Most groomers start by adding just 5-10 of their regular clients. It takes about 10 minutes and makes a huge difference.
 
-[Add Customers Now →]
+[Add Clients Now →]
 
-Pro tip: You can add customers right from your phone. Just open GroomRoute and tap the + button.
+Pro tip: You can add clients right from your phone. Just open GroomRoute and tap the + button.
 
 Questions? Just reply to this email!
 
@@ -95,18 +95,18 @@ Hi {{firstName}},
 
 I wanted to reach out personally. I'm [Name], one of the founders of GroomRoute.
 
-I noticed you signed up but haven't added any customers yet. I want to make sure there's nothing blocking you from getting value from GroomRoute.
+I noticed you signed up but haven't added any clients yet. I want to make sure there's nothing blocking you from getting value from GroomRoute.
 
 Is there something we can help with?
-• Need help importing your customer list?
+• Need help importing your client list?
 • Not sure how to get started?
 • Having technical issues?
 
 Just reply to this email and let me know. I read every response personally.
 
-If you're just busy (we get it - grooming is demanding!), here's a quick way to get started: add just ONE customer today. That's it. One customer, one pet. Takes 60 seconds.
+If you're just busy (we get it - grooming is demanding!), here's a quick way to get started: add just ONE client today. That's it. One client, one pet. Takes 60 seconds.
 
-[Add One Customer →]
+[Add One Client →]
 
 Looking forward to hearing from you,
 [Name]
@@ -129,12 +129,12 @@ GroomRoute Co-founder
 ```
 Hi {{firstName}},
 
-Great job adding your first customer! Now let's put them on the calendar.
+Great job adding your first client! Now let's put them on the calendar.
 
 Scheduling in GroomRoute is simple:
 1. Go to Dashboard → tap any date
 2. Click "Add Appointment"
-3. Select your customer and pick a time
+3. Select your client and pick a time
 4. Done!
 
 [Schedule Your First Appointment →]
@@ -153,7 +153,7 @@ The GroomRoute Team
 ```
 Hi {{firstName}},
 
-You've got customers in the system - now let's put them to work!
+You've got clients in the system - now let's put them to work!
 
 Here's how most successful groomers use GroomRoute:
 
@@ -163,7 +163,7 @@ Here's how most successful groomers use GroomRoute:
 3. Tap "Optimize Route"
 4. Follow the suggested order
 
-That's it. No more figuring out which customer to visit first or backtracking across town.
+That's it. No more figuring out which client to visit first or backtracking across town.
 
 But first, you need appointments on the calendar.
 
@@ -220,7 +220,7 @@ Hi {{firstName}},
 Your GroomRoute trial ends tomorrow.
 
 If you've been enjoying GroomRoute, now's the time to make sure you don't lose access to:
-• Your customer database
+• Your client database
 • Your appointment history
 • Route optimization
 • Everything you've set up
@@ -248,7 +248,7 @@ To pick up right where you left off:
 
 [Reactivate Your Account →]
 
-Your customers, appointments, and settings are all saved. Just add a payment method and you're back in business.
+Your clients, appointments, and settings are all saved. Just add a payment method and you're back in business.
 
 If you have any questions or need more time to decide, just reply to this email. We're here to help.
 
@@ -356,7 +356,7 @@ Hi {{firstName}},
 It's been a week since you've logged into GroomRoute. Everything okay?
 
 We're here if you need help with:
-• Setting up your customer list
+• Setting up your client list
 • Scheduling appointments
 • Using route optimization
 • Anything else!
@@ -417,7 +417,7 @@ It's been a couple months since you left GroomRoute. We've been busy making thin
 • Improved route optimization
 • Faster mobile experience
 
-We'd love to have you back. As a returning customer, here's a special offer:
+We'd love to have you back. As a returning member, here's a special offer:
 
 **Get 50% off your first month back**
 
@@ -479,7 +479,7 @@ To keep your account active, please update your payment method:
 
 [Update Payment Method →]
 
-Your account will remain active for 3 days while you sort this out. After that, you may lose access to your dashboard and customer data.
+Your account will remain active for 3 days while you sort this out. After that, you may lose access to your dashboard and client data.
 
 Need help? Just reply to this email.
 
@@ -497,7 +497,7 @@ Hi {{firstName}},
 Quick reminder: your payment still hasn't gone through, and your account access expires tomorrow.
 
 Don't lose access to:
-• Your customer database
+• Your client database
 • Upcoming appointments
 • Route optimization
 
@@ -545,22 +545,180 @@ The GroomRoute Team
 
 ## SMS Sequences (Using Phone from Stripe)
 
-Since we now collect phone numbers at checkout, consider these SMS sequences:
+SMS is powerful for time-sensitive nudges. Keep messages under 160 characters when possible. Use SMS to complement email - don't send both at the same time.
 
-### SMS 1: Welcome (Day 0)
+**Best Practices:**
+- Send SMS during business hours (8am-8pm local time)
+- Limit to 2-3 SMS per sequence max
+- Always include a short link to take action
+- Use SMS for high-priority or time-sensitive moments
+- Include opt-out info in your Loops settings
+
+---
+
+### Onboarding SMS Sequence
+
+#### SMS: Welcome (Immediately after checkout)
 ```
-Welcome to GroomRoute! 🐕 Download the app to your home screen for quick access: groomroute.com/dashboard
+Welcome to GroomRoute, {{firstName}}! 🐕 Add it to your home screen for quick access each morning: groomroute.com/dashboard
+
+Reply STOP to opt out
+```
+*Trigger: `checkout_completed` event*
+
+#### SMS: First Client Nudge (Day 2 - if no clients added)
+```
+{{firstName}}, ready to try GroomRoute? Add your first client in 30 seconds: groomroute.com/clients/new
+```
+*Trigger: 48 hours after `checkout_completed`, exit on `customer_added`*
+
+#### SMS: First Appointment Nudge (Day 1 after first client)
+```
+Nice! Now schedule an appointment for that client and see the magic: groomroute.com/dashboard
+```
+*Trigger: 24 hours after `customer_added`, exit on `appointment_created`*
+
+#### SMS: Route Optimization Nudge (Same day as 2+ appointments)
+```
+You've got {{count}} appointments today! Tap "Optimize" to find the fastest route: groomroute.com/dashboard
+```
+*Trigger: Morning of day with 2+ appointments, exit on `route_optimized`*
+
+---
+
+### Payment Recovery SMS Sequence
+
+#### SMS: Payment Failed - Immediate
+```
+⚠️ Your GroomRoute payment didn't go through. Update your card to keep access: groomroute.com/dashboard
+```
+*Trigger: `payment_failed` event*
+
+#### SMS: Payment Failed - Day 2 (URGENT)
+```
+URGENT: Your account expires tomorrow. Fix payment in 30 seconds: groomroute.com/dashboard
+```
+*Trigger: 48 hours after `payment_failed`, exit on `payment_succeeded`*
+
+---
+
+### Re-engagement SMS Sequence
+
+#### SMS: 7 Days Inactive
+```
+Hey {{firstName}}, we miss you! Open GroomRoute and check your schedule: groomroute.com/dashboard
+```
+*Trigger: 7 days since last `user_active` event*
+
+#### SMS: 14 Days Inactive (Personal)
+```
+{{firstName}}, stuck on something? Reply to this text and I'll help you out! - The GroomRoute Team
+```
+*Trigger: 14 days since last `user_active` event*
+
+---
+
+### Winback SMS Sequence
+
+#### SMS: 60 Days After Cancellation
+```
+{{firstName}}, a lot has changed at GroomRoute! Come back with 50% off: groomroute.com/comeback (code: WELCOMEBACK50)
+```
+*Trigger: 60 days after `subscription_canceled`, exit on `resubscribed`*
+
+---
+
+### Milestone & Celebration SMS
+
+#### SMS: First Route Optimized
+```
+🎉 You just optimized your first route! That's the GroomRoute magic. Keep it up: groomroute.com/dashboard
+```
+*Trigger: `route_optimized` event (first time only)*
+
+#### SMS: 7 Days Active
+```
+You've been using GroomRoute for a week! How's it going? Reply with any feedback - we read everything.
+```
+*Trigger: 7 days of consecutive activity*
+
+#### SMS: 30 Days Paid (NPS)
+```
+{{firstName}}, you've been with us a month! Quick question: How likely are you to recommend GroomRoute? Reply 1-10
+```
+*Trigger: 30 days after `trial_converted`*
+
+---
+
+### Operational SMS (Transactional)
+
+These are not marketing - they're service messages. Consider sending from app, not Loops.
+
+#### SMS: Appointment Reminder (Optional - if enabled by user)
+```
+Reminder: {{petName}} ({{clientName}}) at {{time}} tomorrow. View route: groomroute.com/dashboard
+```
+*Trigger: Day before appointment, user must opt-in*
+
+#### SMS: Running Late Confirmation
+```
+Got it! We've notified your remaining clients that you're running {{delay}} minutes late.
+```
+*Trigger: User taps "Running Late" in app*
+
+---
+
+### SMS Timing Matrix
+
+| Event | Email | SMS | Notes |
+|-------|-------|-----|-------|
+| Checkout completed | Immediately | Immediately | Both OK - different purposes |
+| No clients (Day 2) | Day 1 | Day 2 | Stagger to avoid fatigue |
+| No appointments (Day 2) | Day 1 | Day 2 | SMS if email ignored |
+| Trial ending (3 days) | Day 11 | Day 11 AM | Send SMS in morning |
+| Trial ending (1 day) | Day 13 | Day 13 AM | High urgency |
+| Payment failed | Immediately | Immediately | Both - critical |
+| Payment failed (Day 2) | Day 2 | Day 2 | Last warning |
+| Inactive (7 days) | Day 7 | Day 7 | Pick one, not both |
+| Inactive (14 days) | Day 14 | Day 14 | Personal outreach |
+| Winback (60 days) | Day 60 | Day 60 | Special offer |
+
+---
+
+### SMS A/B Test Ideas
+
+1. **With/Without Emoji:** Test if 🐕 improves click rates
+2. **Urgency Words:** "URGENT" vs "Quick reminder"
+3. **Personalization:** First name vs business name
+4. **Time of Day:** 8am vs 10am vs 6pm sends
+5. **Short vs Detailed:** One-liner vs two sentences
+
+---
+
+### SMS Character Limits
+
+- **Standard SMS:** 160 characters
+- **With special chars/emoji:** 70 characters per segment
+- **Loops personalization:** `{{firstName}}` counts as ~10 chars average
+
+**Example character counts:**
+```
+Welcome to GroomRoute! Add your first client: groomroute.com/clients/new
+[74 characters - ✓ Single SMS]
+
+Hey {{firstName}}, your GroomRoute trial ends tomorrow! Update your payment method to keep access to your clients and routes: groomroute.com/billing
+[153 characters - ✓ Single SMS, but tight]
 ```
 
-### SMS 2: First Week Check-in (Day 3)
-```
-Hey {{firstName}}! How's GroomRoute going? Reply if you need any help getting started!
-```
+---
 
-### SMS 3: Trial Ending (Day 11)
-```
-Your GroomRoute trial ends in 3 days. Keep your routes optimized: groomroute.com/settings/billing
-```
+### SMS Consent & Compliance
+
+1. **Collect consent at checkout** - Stripe can capture this with the phone field
+2. **Include opt-out** - "Reply STOP to opt out" on first marketing SMS
+3. **Honor opt-outs immediately** - Loops handles this automatically
+4. **Separate transactional from marketing** - Appointment reminders are transactional, winback is marketing
+5. **Keep records** - Loops tracks consent automatically
 
 ---
 
