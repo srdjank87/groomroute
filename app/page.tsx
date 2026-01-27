@@ -171,7 +171,7 @@ export default function Home() {
                 <XCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-gray-900">30+ minutes between stops</p>
-                  <p className="text-sm text-gray-600">That&apos;s 2-3 hours lost to driving every day</p>
+                  <p className="text-sm text-gray-600">A route that zigzags across town — hours lost and a day that never settles.</p>
                 </div>
               </div>
             </div>
@@ -181,7 +181,7 @@ export default function Home() {
                 <XCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-gray-900">Body wrecked by 3pm</p>
-                  <p className="text-sm text-gray-600">Too many large dogs, no breaks, no buffer</p>
+                  <p className="text-sm text-gray-600">Too many heavy dogs stacked together - energy drained before the day is half over.</p>
                 </div>
               </div>
             </div>
@@ -201,7 +201,7 @@ export default function Home() {
                 <XCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-gray-900">Running late, panic texting</p>
-                  <p className="text-sm text-gray-600">Stress spirals while you&apos;re elbow-deep in a doodle</p>
+                  <p className="text-sm text-gray-600">One delay triggers five messages - focus gone while you&apos;re elbow-deep in a doodle.</p>
                 </div>
               </div>
             </div>
