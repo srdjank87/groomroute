@@ -346,7 +346,7 @@ export default function EditPetPage() {
               value={formData.breed}
               onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
               className="input w-full h-12 text-base pl-4 bg-gray-50 border-2 border-gray-200 focus:border-[#A5744A] focus:bg-white transition-colors"
-              placeholder="Golden Retriever"
+              placeholder={formData.species === "cat" ? "Persian" : "Golden Retriever"}
             />
           </div>
 
