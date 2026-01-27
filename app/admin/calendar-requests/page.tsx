@@ -131,10 +131,10 @@ export default function CalendarRequestsPage() {
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </li>
-                <li>Scroll down to "Test users" and click "Add Users"</li>
-                <li>Add the user's email address from below</li>
+                <li>Scroll down to &quot;Test users&quot; and click &quot;Add Users&quot;</li>
+                <li>Add the user&apos;s email address from below</li>
                 <li>
-                  Come back here and click "Approve" to enable their access
+                  Come back here and click &quot;Approve&quot; to enable their access
                 </li>
               </ol>
             </div>
