@@ -99,6 +99,17 @@ interface WorkingHoursCheck {
   outsideReason: string;
 }
 
+interface IntensityWarning {
+  exceedsLimit: boolean;
+  currentTotal: number;
+  wouldBeTotal: number;
+  limit: number;
+  petIntensity: string;
+  petIntensityValue: number;
+  petIntensityLabel: string;
+  message: string;
+}
+
 interface ConflictCheck {
   hasConflict: boolean;
   conflicts: Array<{
@@ -114,6 +125,7 @@ interface ConflictCheck {
     time: string;
     timeFormatted: string;
   } | null;
+  intensityWarning: IntensityWarning | null;
 }
 
 type AreaForDate = {
@@ -164,6 +176,7 @@ function NewAppointmentContent() {
   const [workingHoursWarningDismissed, setWorkingHoursWarningDismissed] = useState(false);
   const [conflictCheck, setConflictCheck] = useState<ConflictCheck | null>(null);
   const [isCheckingConflict, setIsCheckingConflict] = useState(false);
+  const [intensityWarningDismissed, setIntensityWarningDismissed] = useState(false);
   const [calendarAreaData, setCalendarAreaData] = useState<Record<string, AreaForDate>>({});
 
   // Memoized callback for calendar area data changes to prevent infinite loop
@@ -229,17 +242,20 @@ function NewAppointmentContent() {
     }
   }, []);
 
-  // Fetch conflict check for date and time
-  const fetchConflictCheck = useCallback(async (date: string, time: string, duration: number) => {
+  // Fetch conflict check for date and time (also checks intensity)
+  const fetchConflictCheck = useCallback(async (date: string, time: string, duration: number, petId?: string) => {
     if (!date || !time) {
       setConflictCheck(null);
       return;
     }
     setIsCheckingConflict(true);
+    setIntensityWarningDismissed(false); // Reset dismissal when params change
     try {
-      const response = await fetch(
-        `/api/appointments/check-conflict?date=${date}&time=${time}&duration=${duration}`
-      );
+      let url = `/api/appointments/check-conflict?date=${date}&time=${time}&duration=${duration}`;
+      if (petId) {
+        url += `&petId=${petId}`;
+      }
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         setConflictCheck(data);
@@ -351,14 +367,14 @@ function NewAppointmentContent() {
     }
   }, [appointmentData.time, appointmentData.serviceMinutes, fetchWorkingHoursCheck]);
 
-  // Fetch conflict check when date, time, or duration changes
+  // Fetch conflict check when date, time, duration, or pet changes
   useEffect(() => {
     if (appointmentData.date && appointmentData.time) {
-      fetchConflictCheck(appointmentData.date, appointmentData.time, appointmentData.serviceMinutes);
+      fetchConflictCheck(appointmentData.date, appointmentData.time, appointmentData.serviceMinutes, appointmentData.petId || undefined);
     } else {
       setConflictCheck(null);
     }
-  }, [appointmentData.date, appointmentData.time, appointmentData.serviceMinutes, fetchConflictCheck]);
+  }, [appointmentData.date, appointmentData.time, appointmentData.serviceMinutes, appointmentData.petId, fetchConflictCheck]);
 
   // Helper to check if current booking would exceed limit
   const wouldExceedLargeDogLimit = () => {
@@ -1193,6 +1209,34 @@ function NewAppointmentContent() {
                       <p className="text-xs">
                         <span className="font-medium">Time slot available</span> ({conflictCheck.proposedStart} - {conflictCheck.proposedEnd})
                       </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Intensity warning - shows when adding appointment would exceed daily limit */}
+                {conflictCheck?.intensityWarning?.exceedsLimit && !intensityWarningDismissed && (
+                  <div className="mt-2 p-3 rounded-lg text-sm bg-amber-50 text-amber-800 border border-amber-200">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <span className="font-medium block">
+                          Day Intensity Warning
+                        </span>
+                        <p className="text-xs mt-1 text-amber-700">
+                          {conflictCheck.intensityWarning.message}
+                        </p>
+                        <p className="text-xs mt-1 text-amber-600">
+                          Current day: {conflictCheck.intensityWarning.currentTotal}/{conflictCheck.intensityWarning.limit} →
+                          Would be: {conflictCheck.intensityWarning.wouldBeTotal}/{conflictCheck.intensityWarning.limit}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setIntensityWarningDismissed(true)}
+                          className="mt-2 text-xs text-amber-600 underline hover:text-amber-800"
+                        >
+                          I understand, continue anyway
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}

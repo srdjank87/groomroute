@@ -91,6 +91,17 @@ interface TodaysStats {
   largeDogCount?: number;
   totalMinutes?: number;
   accountCreatedAt?: string | null;
+  intensity?: {
+    current: number;
+    limit: number;
+    percentage: number;
+    status: {
+      level: "light" | "moderate" | "busy" | "heavy" | "overloaded";
+      color: string;
+      bgColor: string;
+      message: string;
+    };
+  };
 }
 
 interface CalmImpact {
@@ -1376,6 +1387,43 @@ function DashboardContent() {
                   <p className={`${messageColor} font-medium mt-2 text-sm italic`}>
                     &ldquo;{stats.workload?.message || stats.calmMessage}&rdquo;
                   </p>
+
+                  {/* Intensity Meter */}
+                  {stats.intensity && stats.intensity.limit > 0 && (
+                    <div className="mt-4 pt-3 border-t border-gray-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-gray-500">Day Intensity</span>
+                        <span className={`text-xs font-semibold ${stats.intensity.status.color}`}>
+                          {stats.intensity.current} / {stats.intensity.limit}
+                        </span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            stats.intensity.percentage >= 100 ? "bg-red-500" :
+                            stats.intensity.percentage >= 90 ? "bg-orange-500" :
+                            stats.intensity.percentage >= 75 ? "bg-amber-500" :
+                            stats.intensity.percentage >= 50 ? "bg-blue-500" :
+                            "bg-emerald-500"
+                          }`}
+                          style={{ width: `${Math.min(100, stats.intensity.percentage)}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1.5">
+                        {stats.intensity.percentage === 0
+                          ? "No appointments scheduled"
+                          : stats.intensity.percentage < 50
+                            ? "Light day - plenty of capacity"
+                            : stats.intensity.percentage < 75
+                              ? "Balanced day"
+                              : stats.intensity.percentage < 90
+                                ? "Getting busy"
+                                : stats.intensity.percentage < 100
+                                  ? "Near your daily limit"
+                                  : "Over your daily limit"}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

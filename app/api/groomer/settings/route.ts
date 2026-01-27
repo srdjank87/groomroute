@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
         id: true,
         name: true,
         largeDogDailyLimit: true,
+        dailyIntensityLimit: true,
         defaultHasAssistant: true,
         workingHoursStart: true,
         workingHoursEnd: true,
@@ -99,6 +100,22 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
+    if (body.dailyIntensityLimit !== undefined) {
+      // Validate: must be a positive integer 4-24 (or null to reset to default)
+      if (body.dailyIntensityLimit !== null) {
+        const limit = parseInt(body.dailyIntensityLimit);
+        if (isNaN(limit) || limit < 4 || limit > 24) {
+          return NextResponse.json(
+            { error: "Daily intensity limit must be between 4 and 24" },
+            { status: 400 }
+          );
+        }
+        updateData.dailyIntensityLimit = limit;
+      } else {
+        updateData.dailyIntensityLimit = 12; // Reset to default
+      }
+    }
+
     if (body.defaultHasAssistant !== undefined) {
       updateData.defaultHasAssistant = Boolean(body.defaultHasAssistant);
     }
@@ -152,6 +169,7 @@ export async function PATCH(req: NextRequest) {
         id: true,
         name: true,
         largeDogDailyLimit: true,
+        dailyIntensityLimit: true,
         defaultHasAssistant: true,
         workingHoursStart: true,
         workingHoursEnd: true,

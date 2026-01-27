@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geocoding";
-import { AppointmentStatus, BehaviorFlag, EquipmentRequired } from "@prisma/client";
+import { AppointmentStatus, BehaviorFlag, EquipmentRequired, GroomIntensity } from "@prisma/client";
 import { logger } from "@/lib/logger";
 
 // Service areas for demo - simple name + color groupings
@@ -48,6 +48,7 @@ interface SamplePet {
   equipmentRequired?: EquipmentRequired[];
   behaviorNotes?: string;
   groomingNotes?: string;
+  groomIntensity?: GroomIntensity;
 }
 
 // Customer type definition
@@ -91,6 +92,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 4,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Loves the dryer, very cooperative",
+        groomIntensity: GroomIntensity.MODERATE,
       },
       {
         name: "Buddy",
@@ -100,6 +102,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 6,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Max's brother, equally good boy",
+        groomIntensity: GroomIntensity.MODERATE,
       },
     ],
     duration: 90,
@@ -125,6 +128,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         equipmentRequired: [EquipmentRequired.SENSITIVE_SKIN_PRODUCTS],
         behaviorNotes: "Gets anxious with loud dryers, use low setting",
         groomingNotes: "Continental clip, show dog",
+        groomIntensity: GroomIntensity.DEMANDING, // Show dog prep is demanding
       },
     ],
     duration: 75,
@@ -149,6 +153,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         weight: 12,
         ageYears: 7,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
+        groomIntensity: GroomIntensity.MODERATE,
       },
       {
         name: "Gizmo",
@@ -158,6 +163,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 5,
         behaviorFlags: [BehaviorFlag.ANXIOUS],
         groomingNotes: "Tiny but feisty, prefers quick grooms",
+        groomIntensity: GroomIntensity.LIGHT, // Tiny, quick groom
       },
       {
         name: "Princess",
@@ -167,6 +173,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 4,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Puppy cut, very sweet",
+        groomIntensity: GroomIntensity.LIGHT, // Small, easy cut
       },
     ],
     duration: 90,
@@ -189,6 +196,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 2,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Show coat, extra careful with ears",
+        groomIntensity: GroomIntensity.MODERATE,
       },
     ],
     duration: 60,
@@ -212,6 +220,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         behaviorFlags: [BehaviorFlag.AGGRESSIVE, BehaviorFlag.MUZZLE_REQUIRED],
         equipmentRequired: [EquipmentRequired.MUZZLE, EquipmentRequired.HEAVY_DUTY_DRYER],
         behaviorNotes: "Protective, needs slow introduction. ALWAYS use muzzle.",
+        groomIntensity: GroomIntensity.INTENSIVE, // Aggressive + large = high stress
       },
     ],
     duration: 120,
@@ -238,6 +247,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 3,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Yellow lab, loves water during bath",
+        groomIntensity: GroomIntensity.MODERATE,
       },
       {
         name: "Scout",
@@ -247,6 +257,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 2,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Black lab, Charlie's puppy",
+        groomIntensity: GroomIntensity.MODERATE,
       },
     ],
     duration: 90,
@@ -271,6 +282,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 6,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Vocal during nail trims, otherwise great",
+        groomIntensity: GroomIntensity.LIGHT, // Short coat, easy groom
       },
     ],
     duration: 60,
@@ -295,6 +307,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         equipmentRequired: [EquipmentRequired.HEAVY_DUTY_DRYER, EquipmentRequired.EXTRA_TOWELS, EquipmentRequired.TABLE_EXTENDER],
         groomingNotes: "Gentle giant, large breed needs extra time",
+        groomIntensity: GroomIntensity.DEMANDING, // Large + heavy coat
       },
     ],
     duration: 120,
@@ -316,6 +329,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         weight: 22,
         ageYears: 3,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
+        groomIntensity: GroomIntensity.MODERATE,
       },
       {
         name: "Felix",
@@ -325,6 +339,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 5,
         behaviorFlags: [BehaviorFlag.ANXIOUS],
         groomingNotes: "Cat - lion cut every 3 months, surprisingly calm",
+        groomIntensity: GroomIntensity.LIGHT, // Cat, simple cut
       },
     ],
     duration: 75,
@@ -347,6 +362,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 2,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Teddy bear cut, super fluffy",
+        groomIntensity: GroomIntensity.DEMANDING, // Doodle = demanding coat
       },
     ],
     duration: 90,
@@ -372,6 +388,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         equipmentRequired: [EquipmentRequired.SENSITIVE_SKIN_PRODUCTS],
         groomingNotes: "Sensitive skin, use hypoallergenic products",
+        groomIntensity: GroomIntensity.LIGHT, // Short coat, easy
       },
       {
         name: "Stella",
@@ -381,6 +398,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 2,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Luna's sister, same skin sensitivity",
+        groomIntensity: GroomIntensity.LIGHT, // Short coat, easy
       },
     ],
     duration: 60,
@@ -405,6 +423,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         equipmentRequired: [EquipmentRequired.MUZZLE],
         behaviorNotes: "Protective of owner, nervous with strangers. Muzzle recommended.",
         groomingNotes: "Heavy shedder, deshed treatment every visit",
+        groomIntensity: GroomIntensity.INTENSIVE, // Bite risk = very demanding
       },
     ],
     duration: 90,
@@ -427,6 +446,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 3,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Loves being brushed, perfect coat",
+        groomIntensity: GroomIntensity.MODERATE,
       },
       {
         name: "Murphy",
@@ -437,6 +457,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         behaviorFlags: [BehaviorFlag.ANXIOUS],
         behaviorNotes: "High energy, needs to be tired out before groom",
         groomingNotes: "Regular trim, hates nail grinding",
+        groomIntensity: GroomIntensity.DEMANDING, // Anxious + high energy
       },
       {
         name: "Penny",
@@ -446,6 +467,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 1,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Puppy, still learning groom routine",
+        groomIntensity: GroomIntensity.MODERATE,
       },
     ],
     duration: 120,
@@ -468,6 +490,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         ageYears: 8,
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         groomingNotes: "Senior dog, takes her time",
+        groomIntensity: GroomIntensity.LIGHT, // Small, senior, easy-going
       },
     ],
     duration: 60,
@@ -492,6 +515,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         equipmentRequired: [EquipmentRequired.HEAVY_DUTY_DRYER, EquipmentRequired.EXTRA_TOWELS, EquipmentRequired.TABLE_EXTENDER],
         groomingNotes: "Massive fluffball, needs full deshed every visit",
+        groomIntensity: GroomIntensity.INTENSIVE, // Giant + heavy coat
       },
       {
         name: "Moose",
@@ -502,6 +526,7 @@ const SAMPLE_CUSTOMERS: SampleCustomer[] = [
         behaviorFlags: [BehaviorFlag.FRIENDLY],
         equipmentRequired: [EquipmentRequired.HEAVY_DUTY_DRYER, EquipmentRequired.EXTRA_TOWELS, EquipmentRequired.TABLE_EXTENDER],
         groomingNotes: "Even bigger than Bear, drools a lot",
+        groomIntensity: GroomIntensity.INTENSIVE, // Giant + heavy coat
       },
     ],
     duration: 180,
@@ -726,6 +751,7 @@ export async function POST(req: NextRequest) {
             equipmentRequired: petData.equipmentRequired || [],
             behaviorNotes: petData.behaviorNotes || null,
             groomingNotes: petData.groomingNotes || null,
+            groomIntensity: petData.groomIntensity || GroomIntensity.MODERATE,
           },
         });
         createdPets.push(pet);

@@ -1,9 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ChevronLeft, Save, PawPrint, ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
+import { ChevronLeft, Save, PawPrint, ChevronDown, ChevronUp, Minus, Plus, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
+import { suggestIntensity, type IntensitySuggestion } from "@/lib/workload-assessment";
+
+type GroomIntensity = "LIGHT" | "MODERATE" | "DEMANDING" | "INTENSIVE";
+
+// Intensity options with clear descriptions
+const intensityOptions: {
+  value: GroomIntensity;
+  label: string;
+  description: string;
+  examples: string;
+  color: string;
+  bgColor: string;
+}[] = [
+  {
+    value: "LIGHT",
+    label: "Light",
+    description: "Quick, easy groom",
+    examples: "Short coats, small cooperative dogs, bath-only",
+    color: "text-emerald-600",
+    bgColor: "bg-emerald-50 border-emerald-200",
+  },
+  {
+    value: "MODERATE",
+    label: "Moderate",
+    description: "Standard groom",
+    examples: "Average coat maintenance, typical behavior",
+    color: "text-blue-600",
+    bgColor: "bg-blue-50 border-blue-200",
+  },
+  {
+    value: "DEMANDING",
+    label: "Demanding",
+    description: "Heavy groom",
+    examples: "Doodles, double coats, large dogs, wiggly pups",
+    color: "text-amber-600",
+    bgColor: "bg-amber-50 border-amber-200",
+  },
+  {
+    value: "INTENSIVE",
+    label: "Intensive",
+    description: "Marathon groom",
+    examples: "Matted coats, reactive dogs, very large + heavy coat",
+    color: "text-red-600",
+    bgColor: "bg-red-50 border-red-200",
+  },
+];
 
 const behaviorOptions = [
   { value: "FRIENDLY", label: "Friendly", emoji: "😊" },
@@ -49,6 +95,7 @@ export default function NewPetPage() {
     behaviorFlags: [] as string[],
     equipmentRequired: [] as string[],
     specialHandling: "",
+    groomIntensity: "MODERATE" as GroomIntensity,
   });
 
   const toggleBehaviorFlag = (flag: string) => {
@@ -67,6 +114,37 @@ export default function NewPetPage() {
         ? prev.equipmentRequired.filter((e) => e !== equipment)
         : [...prev.equipmentRequired, equipment],
     }));
+  };
+
+  // Calculate suggested intensity based on pet characteristics
+  const intensitySuggestion = useMemo((): IntensitySuggestion | null => {
+    // Only suggest if we have at least breed or weight
+    if (!formData.breed && !formData.weight) return null;
+
+    return suggestIntensity({
+      breed: formData.breed || null,
+      weight: formData.weight ? parseFloat(formData.weight) : null,
+      species: formData.species || null,
+      behaviorFlags: formData.behaviorFlags.length > 0 ? formData.behaviorFlags : null,
+    });
+  }, [formData.breed, formData.weight, formData.species, formData.behaviorFlags]);
+
+  // Track if user has manually selected intensity (to know whether to auto-apply suggestion)
+  const [hasManuallySelectedIntensity, setHasManuallySelectedIntensity] = useState(false);
+
+  // Auto-apply suggestion when it changes (only if user hasn't manually selected)
+  useEffect(() => {
+    if (intensitySuggestion && !hasManuallySelectedIntensity) {
+      setFormData((prev) => ({
+        ...prev,
+        groomIntensity: intensitySuggestion.intensity,
+      }));
+    }
+  }, [intensitySuggestion, hasManuallySelectedIntensity]);
+
+  const handleIntensitySelect = (intensity: GroomIntensity) => {
+    setHasManuallySelectedIntensity(true);
+    setFormData({ ...formData, groomIntensity: intensity });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,6 +173,7 @@ export default function NewPetPage() {
           behaviorFlags: formData.behaviorFlags.length > 0 ? formData.behaviorFlags : undefined,
           equipmentRequired: formData.equipmentRequired.length > 0 ? formData.equipmentRequired : undefined,
           specialHandling: formData.specialHandling || undefined,
+          groomIntensity: formData.groomIntensity,
         }),
       });
 
@@ -312,9 +391,88 @@ export default function NewPetPage() {
           </div>
         </div>
 
-        {/* Grooming Notes */}
+        {/* Grooming */}
         <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Grooming</h2>
+
+          {/* Groom Intensity Selector */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              How demanding is this groom?
+            </label>
+            <p className="text-xs text-gray-500 mb-3">
+              This helps protect your workload - we&apos;ll warn you before your day gets too heavy.
+            </p>
+
+            {/* Suggestion Banner */}
+            {intensitySuggestion && (
+              <div className={`mb-3 p-3 rounded-lg border ${
+                intensitySuggestion.confidence === "high"
+                  ? "bg-emerald-50 border-emerald-200"
+                  : intensitySuggestion.confidence === "medium"
+                    ? "bg-blue-50 border-blue-200"
+                    : "bg-gray-50 border-gray-200"
+              }`}>
+                <div className="flex items-start gap-2">
+                  <Sparkles className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
+                    intensitySuggestion.confidence === "high"
+                      ? "text-emerald-500"
+                      : intensitySuggestion.confidence === "medium"
+                        ? "text-blue-500"
+                        : "text-gray-400"
+                  }`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium text-gray-900">
+                        Suggested: <span className={intensityOptions.find(o => o.value === intensitySuggestion.intensity)?.color}>
+                          {intensityOptions.find(o => o.value === intensitySuggestion.intensity)?.label}
+                        </span>
+                      </span>
+                      {formData.groomIntensity !== intensitySuggestion.intensity && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, groomIntensity: intensitySuggestion.intensity });
+                            setHasManuallySelectedIntensity(false);
+                          }}
+                          className="text-xs px-2 py-0.5 rounded bg-white border border-gray-300 hover:border-gray-400 text-gray-700"
+                        >
+                          Use suggestion
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {intensitySuggestion.reasons.join(" • ")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-2">
+              {intensityOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleIntensitySelect(option.value)}
+                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                    formData.groomIntensity === option.value
+                      ? `${option.bgColor} border-current ${option.color}`
+                      : "border-gray-200 hover:border-gray-300 bg-white"
+                  }`}
+                >
+                  <div className={`font-semibold text-sm ${
+                    formData.groomIntensity === option.value ? option.color : "text-gray-900"
+                  }`}>
+                    {option.label}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-0.5">
+                    {option.examples}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

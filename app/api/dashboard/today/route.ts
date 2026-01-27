@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { toZonedTime } from "date-fns-tz";
-import { assessWorkload, WorkloadAssessment } from "@/lib/workload-assessment";
+import { assessWorkload, WorkloadAssessment, calculateTotalIntensity, getIntensityPercentage, getIntensityStatus, DEFAULT_DAILY_INTENSITY_LIMIT } from "@/lib/workload-assessment";
 import { getUserGroomerId } from "@/lib/get-user-groomer";
 import { trackDayViewed } from "@/lib/posthog-server";
 
@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
             preferredMessaging: true,
             preferredMaps: true,
             defaultHasAssistant: true,
+            dailyIntensityLimit: true,
             account: {
               select: {
                 name: true,
@@ -192,6 +193,15 @@ export async function GET(req: NextRequest) {
       completedCount,
     });
 
+    // Calculate intensity-based metrics
+    const dailyIntensityLimit = groomer?.dailyIntensityLimit ?? DEFAULT_DAILY_INTENSITY_LIMIT;
+    const appointmentsWithIntensity = scheduledAppointments.map(apt => ({
+      pet: apt.pet ? { groomIntensity: apt.pet.groomIntensity } : null
+    }));
+    const totalIntensity = calculateTotalIntensity(appointmentsWithIntensity);
+    const intensityPercentage = getIntensityPercentage(appointmentsWithIntensity, dailyIntensityLimit);
+    const intensityStatus = getIntensityStatus(appointmentsWithIntensity, dailyIntensityLimit);
+
     // Get next appointment (first active one)
     const nextAppointment =
       activeAppointments.length > 0 ? activeAppointments[0] : null;
@@ -265,6 +275,13 @@ export async function GET(req: NextRequest) {
       largeDogCount,
       totalMinutes,
       accountCreatedAt: accountCreatedAt?.toISOString() || null,
+      // Intensity-based workload metrics
+      intensity: {
+        current: totalIntensity,
+        limit: dailyIntensityLimit,
+        percentage: intensityPercentage,
+        status: intensityStatus,
+      },
     };
 
     // Track day view in PostHog (async, don't await)

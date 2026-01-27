@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, Save, Dog, AlertTriangle, Clock, Shield } from "lucide-react";
+import { ArrowLeft, Save, Dog, AlertTriangle, Clock, Shield, Zap, Info } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
 interface GroomerSettings {
   name: string;
   largeDogDailyLimit: number | null;
+  dailyIntensityLimit: number | null;
   defaultHasAssistant: boolean;
   workingHoursStart: string;
   workingHoursEnd: string;
@@ -18,6 +19,7 @@ export default function ProfileSettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [largeDogLimit, setLargeDogLimit] = useState<string>("");
+  const [dailyIntensityLimit, setDailyIntensityLimit] = useState<number>(12);
   const [hasAssistant, setHasAssistant] = useState(false);
   const [workingHoursStart, setWorkingHoursStart] = useState("08:00");
   const [workingHoursEnd, setWorkingHoursEnd] = useState("17:00");
@@ -33,6 +35,7 @@ export default function ProfileSettingsPage() {
         const data = await response.json();
         setSettings(data.groomer);
         setLargeDogLimit(data.groomer.largeDogDailyLimit?.toString() || "");
+        setDailyIntensityLimit(data.groomer.dailyIntensityLimit ?? 12);
         setHasAssistant(data.groomer.defaultHasAssistant);
         setWorkingHoursStart(data.groomer.workingHoursStart || "08:00");
         setWorkingHoursEnd(data.groomer.workingHoursEnd || "17:00");
@@ -53,6 +56,7 @@ export default function ProfileSettingsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           largeDogDailyLimit: largeDogLimit === "" ? null : parseInt(largeDogLimit),
+          dailyIntensityLimit,
           defaultHasAssistant: hasAssistant,
           workingHoursStart,
           workingHoursEnd,
@@ -107,16 +111,96 @@ export default function ProfileSettingsPage() {
         </div>
       </div>
 
-      {/* Workload Preferences */}
+      {/* Daily Intensity Limit - Primary Workload Protection */}
+      <div className="bg-white rounded-xl border p-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-emerald-100 rounded-lg">
+            <Zap className="h-5 w-5 text-emerald-600" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-gray-900">Daily Intensity Limit</h2>
+            <p className="text-sm text-gray-500">
+              Your daily capacity for grooming based on difficulty, not just dog count
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {/* Explanation */}
+          <div className="p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-2">
+              <Info className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+              <div className="text-xs text-gray-600">
+                <p className="font-medium mb-1">How it works:</p>
+                <p>Each pet you groom has an intensity level you assign:</p>
+                <ul className="mt-1 space-y-0.5">
+                  <li><span className="inline-block w-20 font-medium text-emerald-600">Light (1)</span> — Short coats, small cooperative dogs, bath-only</li>
+                  <li><span className="inline-block w-20 font-medium text-blue-600">Moderate (2)</span> — Average coat maintenance, typical behavior</li>
+                  <li><span className="inline-block w-20 font-medium text-amber-600">Demanding (3)</span> — Doodles, double coats, large dogs</li>
+                  <li><span className="inline-block w-20 font-medium text-red-600">Intensive (4)</span> — Matted coats, reactive dogs, very large + heavy coat</li>
+                </ul>
+                <p className="mt-2">
+                  Your daily limit is the total intensity you can handle. Default of 12 = roughly 6 moderate grooms, or 4 demanding grooms, or 3 intensive grooms.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Slider */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Your Daily Intensity Limit
+            </label>
+            <div className="flex items-center gap-4">
+              <input
+                type="range"
+                min="4"
+                max="24"
+                step="1"
+                value={dailyIntensityLimit}
+                onChange={(e) => setDailyIntensityLimit(parseInt(e.target.value))}
+                className="range range-sm flex-1"
+                style={{
+                  background: `linear-gradient(to right, #10B981 0%, #10B981 ${((dailyIntensityLimit - 4) / (24 - 4)) * 100}%, #e5e7eb ${((dailyIntensityLimit - 4) / (24 - 4)) * 100}%, #e5e7eb 100%)`
+                }}
+              />
+              <div className="input input-bordered w-24 h-10 text-base text-center flex items-center justify-center font-semibold">
+                {dailyIntensityLimit}
+              </div>
+            </div>
+            <div className="flex justify-between text-xs text-gray-400 mt-1 px-1">
+              <span>Light days (4)</span>
+              <span>Default (12)</span>
+              <span>Heavy days (24)</span>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="p-3 bg-emerald-50 rounded-lg">
+            <p className="text-sm text-emerald-800">
+              <span className="font-medium">With a limit of {dailyIntensityLimit}:</span>{" "}
+              {dailyIntensityLimit >= 12 ? (
+                <>You can handle roughly {Math.floor(dailyIntensityLimit / 2)} moderate grooms, or {Math.floor(dailyIntensityLimit / 3)} demanding grooms per day.</>
+              ) : dailyIntensityLimit >= 8 ? (
+                <>A lighter workload — roughly {Math.floor(dailyIntensityLimit / 2)} moderate grooms, or {Math.floor(dailyIntensityLimit / 3)} demanding grooms.</>
+              ) : (
+                <>A very light day — roughly {Math.floor(dailyIntensityLimit / 2)} moderate grooms.</>
+              )}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Legacy Workload Preferences */}
       <div className="bg-white rounded-xl border p-6 mb-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-amber-100 rounded-lg">
             <Dog className="h-5 w-5 text-amber-600" />
           </div>
           <div>
-            <h2 className="font-semibold text-gray-900">Workload Preferences</h2>
+            <h2 className="font-semibold text-gray-900">Additional Limits</h2>
             <p className="text-sm text-gray-500">
-              Set limits to protect your energy and prevent overexertion
+              Extra limits based on dog size (optional)
             </p>
           </div>
         </div>

@@ -334,8 +334,8 @@ export default function Home() {
 
                 <p className="text-gray-600 text-sm mb-4">
                   GroomRoute knows that 4 doodles isn&apos;t the same as 4 chihuahuas.
-                  Set your limits - max large dogs, no back-to-back giants, hard stop at 5pm.
-                  Get warned <em>before</em> you overcommit.
+                  It auto-detects breed difficulty - type &quot;Goldendoodle&quot; and we&apos;ll suggest &quot;Demanding&quot;.
+                  Set your daily limits and get warned <em>before</em> you overcommit.
                 </p>
 
                 {/* Screenshot as footnote */}
@@ -426,11 +426,11 @@ export default function Home() {
               <ul className="space-y-4">
                 {[
                   "Route clustering by neighborhood",
+                  "Smart breed difficulty detection",
                   "Large dog limits & working hours",
                   "One-tap navigation to Google or Apple Maps",
                   "Quick client messaging",
                   "Pet details & behavior flags",
-                  "Simple, clean daily view",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />

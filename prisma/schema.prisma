@@ -128,7 +128,11 @@ model Groomer {
   preferredMessaging  MessagingPreference @default(SMS) // SMS or WhatsApp for messaging buttons
   preferredMaps       MapsPreference @default(GOOGLE) // Google Maps or Apple Maps for navigation
   defaultHasAssistant Boolean       @default(false) // Default setting for working with a bather
-  largeDogDailyLimit  Int?          // Max large/giant dogs per day (null = no limit)
+  largeDogDailyLimit  Int?          // DEPRECATED: Use dailyIntensityLimit instead
+  // Workload protection - daily intensity limit (null = no limit)
+  // Light=1, Moderate=2, Demanding=3, Intensive=4
+  // Default 12 = roughly 6 moderate grooms or 4 demanding grooms
+  dailyIntensityLimit Int?          @default(12)
   isActive            Boolean       @default(true)
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
@@ -208,11 +212,13 @@ model Pet {
   name              String
   breed             String?
   species           String?            // dog, cat, etc.
-  weight            Float?             // in lbs or kg
+  weight            Float?             // in lbs or kg (for reference, not used for limits)
   ageYears          Int?
   notes             String?            @db.Text
   groomingNotes     String?            @db.Text
   behaviorNotes     String?            @db.Text
+  // Workload protection - groomer-assigned intensity level
+  groomIntensity    GroomIntensity     @default(MODERATE)
   // MVP Breakage Fix #2: Behavior warnings & special handling
   behaviorFlags     BehaviorFlag[]
   equipmentRequired EquipmentRequired[]
@@ -238,6 +244,15 @@ enum EquipmentRequired {
   HEAVY_DUTY_DRYER
   EXTRA_TOWELS
   SENSITIVE_SKIN_PRODUCTS
+}
+
+// Groom Intensity - how demanding is this groom on the groomer's body and energy?
+// Used for workload protection to prevent burnout
+enum GroomIntensity {
+  LIGHT      // Quick grooms: short coats, small cooperative dogs, bath-only
+  MODERATE   // Standard grooms: average coat maintenance, typical behavior
+  DEMANDING  // Heavy grooms: doodles, double coats, full coats, large dogs
+  INTENSIVE  // Marathon grooms: matted coats, reactive dogs, very large + heavy coat
 }
 
 // Appointment

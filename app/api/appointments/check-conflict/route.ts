@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { checkIntensityLimit, INTENSITY_VALUES, INTENSITY_INFO, DEFAULT_DAILY_INTENSITY_LIMIT } from "@/lib/workload-assessment";
+import { GroomIntensity } from "@prisma/client";
 
 /**
  * GET /api/appointments/check-conflict
  * Check if a proposed appointment time conflicts with existing appointments
+ * Also checks if adding this appointment would exceed daily intensity limit
  *
  * Query params:
  * - date: YYYY-MM-DD format
  * - time: HH:MM format (24-hour)
  * - duration: number of minutes for the appointment
  * - excludeId: (optional) appointment ID to exclude from conflict check (for edits)
+ * - petId: (optional) pet ID to get intensity level for workload check
  */
 export async function GET(req: NextRequest) {
   try {
@@ -26,6 +30,7 @@ export async function GET(req: NextRequest) {
     const time = searchParams.get("time");
     const durationStr = searchParams.get("duration");
     const excludeId = searchParams.get("excludeId");
+    const petId = searchParams.get("petId");
 
     if (!date || !time) {
       return NextResponse.json(
@@ -36,9 +41,15 @@ export async function GET(req: NextRequest) {
 
     const duration = parseInt(durationStr || "90");
 
-    // Get groomer for this account
+    // Get groomer for this account (including dailyIntensityLimit)
     const groomer = await prisma.groomer.findFirst({
       where: { accountId },
+      select: {
+        id: true,
+        workingHoursStart: true,
+        workingHoursEnd: true,
+        dailyIntensityLimit: true,
+      },
     });
 
     if (!groomer) {
@@ -74,6 +85,7 @@ export async function GET(req: NextRequest) {
         pet: {
           select: {
             name: true,
+            groomIntensity: true,
           },
         },
         customer: {
@@ -201,6 +213,56 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Check intensity limit if petId is provided
+    let intensityWarning: {
+      exceedsLimit: boolean;
+      currentTotal: number;
+      wouldBeTotal: number;
+      limit: number;
+      petIntensity: GroomIntensity;
+      petIntensityValue: number;
+      petIntensityLabel: string;
+      message: string;
+    } | null = null;
+
+    if (petId) {
+      // Get the pet's intensity level
+      const pet = await prisma.pet.findUnique({
+        where: { id: petId },
+        select: { groomIntensity: true, name: true },
+      });
+
+      if (pet) {
+        const petIntensity = pet.groomIntensity || "MODERATE";
+        const dailyLimit = groomer?.dailyIntensityLimit ?? DEFAULT_DAILY_INTENSITY_LIMIT;
+
+        // Get all appointments for this day (for intensity calculation, exclude the current one if editing)
+        const appointmentsForIntensity = existingAppointments
+          .filter(apt => !excludeId || apt.id !== excludeId)
+          .map(apt => ({ pet: { groomIntensity: apt.pet?.groomIntensity || null } }));
+
+        const intensityCheck = checkIntensityLimit(
+          appointmentsForIntensity,
+          petIntensity,
+          dailyLimit
+        );
+
+        if (!intensityCheck.allowed) {
+          const intensityInfo = INTENSITY_INFO[petIntensity];
+          intensityWarning = {
+            exceedsLimit: true,
+            currentTotal: intensityCheck.currentTotal,
+            wouldBeTotal: intensityCheck.wouldBeTotal,
+            limit: dailyLimit,
+            petIntensity,
+            petIntensityValue: INTENSITY_VALUES[petIntensity],
+            petIntensityLabel: intensityInfo.label,
+            message: `Adding ${pet.name || "this pet"} (${intensityInfo.label} intensity) would put you at ${intensityCheck.wouldBeTotal}/${dailyLimit} for the day. You can still book, but consider your daily capacity.`,
+          };
+        }
+      }
+    }
+
     return NextResponse.json({
       hasConflict,
       conflicts,
@@ -210,6 +272,8 @@ export async function GET(req: NextRequest) {
       time,
       duration,
       nextAvailable,
+      // Intensity check result
+      intensityWarning,
     });
   } catch (error) {
     console.error("Check conflict error:", error);

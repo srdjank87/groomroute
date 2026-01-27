@@ -27,6 +27,12 @@ const createPetSchema = z.object({
     "SENSITIVE_SKIN_PRODUCTS"
   ])).optional(),
   specialHandling: z.string().optional(),
+  groomIntensity: z.enum([
+    "LIGHT",
+    "MODERATE",
+    "DEMANDING",
+    "INTENSIVE"
+  ]).optional(),
 });
 
 // GET all pets for a customer
@@ -117,6 +123,7 @@ export async function POST(
         behaviorFlags: validatedData.behaviorFlags || [],
         equipmentRequired: validatedData.equipmentRequired || [],
         specialHandling: validatedData.specialHandling || null,
+        groomIntensity: validatedData.groomIntensity || "MODERATE",
       },
     });
 

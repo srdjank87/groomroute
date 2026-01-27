@@ -27,6 +27,12 @@ const updatePetSchema = z.object({
     "SENSITIVE_SKIN_PRODUCTS"
   ])).optional(),
   specialHandling: z.string().optional().nullable(),
+  groomIntensity: z.enum([
+    "LIGHT",
+    "MODERATE",
+    "DEMANDING",
+    "INTENSIVE"
+  ]).optional(),
 });
 
 // GET single pet
@@ -133,6 +139,7 @@ export async function PATCH(
         ...(validatedData.behaviorFlags !== undefined && { behaviorFlags: validatedData.behaviorFlags }),
         ...(validatedData.equipmentRequired !== undefined && { equipmentRequired: validatedData.equipmentRequired }),
         ...(validatedData.specialHandling !== undefined && { specialHandling: validatedData.specialHandling }),
+        ...(validatedData.groomIntensity !== undefined && { groomIntensity: validatedData.groomIntensity }),
       },
     });
 
