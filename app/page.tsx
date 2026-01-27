@@ -78,7 +78,7 @@ export default function Home() {
             </h1>
 
             <p className="text-base sm:text-lg lg:text-2xl mb-4 sm:mb-6 leading-relaxed max-w-3xl mx-auto text-gray-700">
-              GroomRoute takes over after your clients are booked&nbsp;—&nbsp;<br className="hidden lg:block" />
+              GroomRoute takes over after your clients are booked&nbsp;-&nbsp;<br className="hidden lg:block" />
               organizing routes, protecting your energy, and keeping your day on track.
             </p>
 
@@ -143,7 +143,7 @@ export default function Home() {
             GroomRoute doesn&apos;t replace your booking system.
           </p>
           <p className="text-lg text-gray-600">
-            It fixes what happens <em>after</em> clients are booked — the routing, the workload,
+            It fixes what happens <em>after</em> clients are booked - the routing, the workload,
             the running late chaos, and the days that leave you exhausted by 3pm.
           </p>
           <p className="text-base text-gray-500 mt-4">
@@ -235,7 +235,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mt-2 mb-3 text-gray-900">Clients get booked</h3>
               <p className="text-gray-600">
-                Using whatever you already use — your website, booking app, text messages, DMs, or phone calls.
+                Using whatever you already use - your website, booking app, text messages, DMs, or phone calls.
               </p>
             </div>
 
@@ -1014,7 +1014,7 @@ export default function Home() {
                 Do I need to switch my booking app?
               </h3>
               <p className="text-gray-600">
-                No. GroomRoute works alongside whatever you already use. Booking gets clients on the calendar — GroomRoute makes the day actually manageable.
+                No. GroomRoute works alongside whatever you already use. Booking gets clients on the calendar - GroomRoute makes the day actually manageable.
               </p>
             </div>
 
