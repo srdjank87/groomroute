@@ -22,6 +22,8 @@ Before setting up sequences, ensure these events are being sent to Loops:
 | `user_active` | User logs in | Yes |
 | `payment_failed` | Invoice payment fails | Yes |
 | `payment_succeeded` | Payment recovered after failure | Yes |
+| `booking_enabled` | Groomer enables online booking | No |
+| `booking_received` | New booking from public booking page | No |
 
 ---
 
@@ -984,6 +986,174 @@ The GroomRoute Team
 
 ---
 
+## Sequence 10: Online Booking Enabled
+
+Trigger: booking_enabled event
+Exit Condition: None (single email)
+Goal: Congratulate user on enabling online booking, teach them how to share their booking link
+
+### Email 1: Immediately after enabling
+
+Subject: Your booking page is live!
+
+Body:
+
+Hi {{firstName}},
+
+Great news - your online booking page is now live! Clients can book appointments with you 24/7.
+
+**Your booking link:**
+{{bookingUrl}}
+
+**Here's how it works:**
+
+1. **Share your link** - Text it to clients, add it to your email signature, or post it on social media
+2. **Clients enter their address** - We check if they're in your service area and suggest the best days
+3. **They pick a time** - Based on your availability and working hours
+4. **Booking appears on your calendar** - No back-and-forth texting needed
+
+**Pro tips for sharing your link:**
+
+• Add it to your Instagram bio or Facebook page
+• Include it in appointment confirmation texts
+• Put it on your business cards
+• Add a "Book Now" button to your website
+
+**Calm-first booking:**
+
+Your booking page respects your service areas and workload limits. Clients in areas you serve on specific days will see those days recommended first - keeping your routes tight and your energy protected.
+
+[View Your Booking Page →]
+
+Questions about online booking? Just reply to this email.
+
+The GroomRoute Team
+
+P.S. You can customize your booking URL and turn it off anytime from Settings → Online Booking.
+
+
+---
+
+## Sequence 11: First Booking Received
+
+Trigger: booking_received event (first time only)
+Exit Condition: None (single celebration email)
+Goal: Celebrate first online booking, reinforce the value
+
+### Email 1: Immediately after first booking
+
+Subject: You just got your first online booking!
+
+Body:
+
+Hi {{firstName}},
+
+Congratulations - you just received your first booking through your online booking page!
+
+**What just happened:**
+
+A client visited your booking link, entered their address, picked a date and time, and booked an appointment - all without you having to answer a text, call, or email.
+
+That's the magic of 24/7 booking. While you were grooming (or sleeping, or eating lunch), your business was still accepting appointments.
+
+**What's next:**
+
+• The appointment is already on your calendar
+• The client's address is saved
+• You'll see them on your route when that day comes
+
+**Want more bookings?**
+
+The more you share your link, the more bookings you'll get. Try:
+
+• Texting it to your regular clients who always text to rebook
+• Adding it to your "thank you" message after appointments
+• Posting it on social media with "Book your next groom!"
+
+[Share Your Booking Link →]
+
+Here's to many more hands-free bookings!
+
+The GroomRoute Team
+
+
+---
+
+## Sequence 12: Online Booking Nudge (For users who haven't enabled it)
+
+Trigger: trial_converted event + 14 day delay
+Exit Condition: hasEnabledBooking = true (Audience Filter)
+Goal: Encourage users to try online booking
+
+### Email 1: 14 Days After Converting to Paid
+
+Subject: Let clients book while you groom
+
+Body:
+
+Hi {{firstName}},
+
+Quick question: How much time do you spend each week scheduling appointments?
+
+Between text messages, phone calls, and back-and-forth about availability, it adds up. Many groomers tell us it's 30-60 minutes a day.
+
+**What if clients could book themselves?**
+
+GroomRoute now has online booking - your own personal booking page where clients can:
+
+• See your availability in real-time
+• Pick a date and time that works for them
+• Book instantly without waiting for a response
+
+**The best part?**
+
+It respects your service areas and workload limits. Clients only see days you're available in their area, so your routes stay tight and you don't overbook.
+
+**Setting it up takes 60 seconds:**
+
+1. Go to Settings → Online Booking
+2. Toggle it on
+3. Copy your personal booking link
+4. Share it with clients
+
+[Set Up Online Booking →]
+
+Imagine finishing a groom and seeing a new booking already on your calendar - without touching your phone. That's what online booking does.
+
+The GroomRoute Team
+
+
+### Email 2: 21 Days After Converting (if still not enabled)
+
+Subject: "I wish I'd done this sooner"
+
+Body:
+
+Hi {{firstName}},
+
+That's what groomers tell us after setting up online booking.
+
+The back-and-forth to schedule appointments is one of the most draining parts of running a mobile grooming business. Every text, every call, every "what time works for you?" takes energy.
+
+**Here's what online booking gives you:**
+
+✓ **24/7 availability** - Clients book while you're grooming, sleeping, or on vacation
+✓ **Zero back-and-forth** - They see your openings and pick one
+✓ **Smarter scheduling** - Bookings respect your service areas and days
+✓ **Protected energy** - Your workload limits prevent overbooking
+
+**One groomer's experience:**
+
+"I used to spend my lunch break returning calls about scheduling. Now I actually eat lunch. Clients love that they can book anytime, and I love that I don't have to think about it." - Michelle R.
+
+[Turn On Online Booking →]
+
+Takes 60 seconds. Try it for a week and see what you think.
+
+The GroomRoute Team
+
+---
+
 ## SMS Sequences (Using Phone from Stripe)
 
 Since we now collect phone numbers at checkout, consider these SMS sequences:
@@ -1094,6 +1264,8 @@ Make sure these properties are set up in Loops:
 | lastActiveAt | String | ISO date of last activity |
 | trialEndDate | String | Formatted trial end date (e.g., "Friday, February 7") |
 | cardLast4 | String | Last 4 digits of payment card (e.g., "4242") |
+| bookingUrl | String | User's online booking page URL (e.g., "https://groomroute.com/book/johns-grooming") |
+| bookingSlug | String | User's booking slug (e.g., "johns-grooming") |
 
 ### Audience Filter Properties (Boolean)
 
@@ -1109,6 +1281,8 @@ These properties are used for **Audience Filters** to exit users from sequences:
 | isActive | Boolean | Re-engagement | `= false` to stay in sequence |
 | hasPaymentFailed | Boolean | Payment Failed | `= true` to stay in sequence |
 | hasResubscribed | Boolean | Winback | `= false` to stay in sequence |
+| hasEnabledBooking | Boolean | Online Booking Nudge | `= false` to stay in sequence |
+| hasReceivedBooking | Boolean | First Booking Celebration | `= false` to trigger celebration |
 
 *Note: Loops has a built-in createdAt property, so no need for a custom signupDate.*
 
@@ -1156,6 +1330,9 @@ When the user adds their first client, `hasAddedClient` is set to `true` by our 
 | Payment Failed | `payment_failed` | hasPaymentFailed | `= true` |
 | Winback | `subscription_canceled` + 60 day delay | hasResubscribed | `= false` |
 | Paying Member Nurture | `trial_converted` | None (ongoing) | N/A |
+| Online Booking Enabled | `booking_enabled` | None (single email) | N/A |
+| First Booking Received | `booking_received` | hasReceivedBooking | `= false` (first time only) |
+| Online Booking Nudge | `trial_converted` + 14 day delay | hasEnabledBooking | `= false` |
 
 ---
 
@@ -1182,6 +1359,8 @@ When the user adds their first client, `hasAddedClient` is set to `true` by our 
 - [x] Send subscription_canceled event + set hasResubscribed=false ✓ Implemented
 - [x] Send resubscribed event + set hasResubscribed=true ✓ Implemented
 - [x] Create cron job to set isActive=false for users inactive 7+ days ✓ Implemented
+- [ ] Send booking_enabled event + set hasEnabledBooking=true + set bookingUrl when groomer enables online booking
+- [ ] Send booking_received event + set hasReceivedBooking=true when first booking is received from public page
 
 ### Environment Variables:
 

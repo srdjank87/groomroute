@@ -132,6 +132,10 @@ export default function WelcomeEmail({
                 <span style={checkmark}>✓</span> <strong>Fewer surprises</strong> -
                 One tap handles "running late" messages to all your clients
               </Text>
+              <Text style={featureItem}>
+                <span style={checkmark}>✓</span> <strong>24/7 booking</strong> -
+                Your own booking page so clients can book while you groom
+              </Text>
             </Section>
 
             <Hr style={hr} />

@@ -71,14 +71,14 @@ export async function POST(req: NextRequest) {
       state?: string;
     };
 
-    if (lat && lng && zipCode) {
-      // Use pre-geocoded data from client
+    if (lat && lng) {
+      // Use pre-geocoded data from client (zip code is optional)
       geocodeResult = {
         success: true,
         lat,
         lng,
         formattedAddress: address,
-        zipCode,
+        zipCode: zipCode || undefined,
         city,
         state,
       };
@@ -87,12 +87,14 @@ export async function POST(req: NextRequest) {
       geocodeResult = await geocodeAddress(address);
     }
 
-    if (!geocodeResult.success || !geocodeResult.zipCode) {
+    // Check if geocoding failed completely
+    if (!geocodeResult.success) {
       return NextResponse.json({
         success: true,
         inServiceArea: false,
         geocoded: false,
-        message: "Could not verify this address. Please check and try again.",
+        message:
+          "Could not verify this address. Please select an address from the dropdown suggestions.",
       });
     }
 
@@ -114,15 +116,69 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (areas.length === 0) {
-      // No service areas defined - accept all addresses
+    // Check if any areas have customers with zip codes for matching
+    const totalCustomerZipCodes = areas.reduce(
+      (sum, area) => sum + area.customers.length,
+      0
+    );
+
+    // If no service areas defined OR areas exist but no customers assigned yet,
+    // accept all addresses (groomer hasn't set up area-based routing yet)
+    if (areas.length === 0 || totalCustomerZipCodes === 0) {
+      // Get all days the groomer has assigned to any area (for recommendations)
+      const allAssignedDays = areas.flatMap((area) =>
+        area.dayAssignments.map((a) => ({
+          dayOfWeek: a.dayOfWeek,
+          dayName: DAY_NAMES[a.dayOfWeek],
+        }))
+      );
+
+      // Remove duplicates
+      const uniqueDays = allAssignedDays.filter(
+        (day, index, self) =>
+          index === self.findIndex((d) => d.dayOfWeek === day.dayOfWeek)
+      );
+
       return NextResponse.json({
         success: true,
         inServiceArea: true,
         areaId: null,
         areaName: null,
-        recommendedDays: [],
-        allDaysAvailable: true,
+        recommendedDays: uniqueDays,
+        allDaysAvailable: areas.length === 0,
+        geocoded: true,
+        lat: geocodeResult.lat,
+        lng: geocodeResult.lng,
+        formattedAddress: geocodeResult.formattedAddress,
+        zipCode: geocodeResult.zipCode,
+        city: geocodeResult.city,
+        state: geocodeResult.state,
+      });
+    }
+
+    // If we have areas with customers but no zip code from the address,
+    // we can't do zip-based matching - accept anyway with a note
+    if (!geocodeResult.zipCode) {
+      // Get all days the groomer works
+      const allAssignedDays = areas.flatMap((area) =>
+        area.dayAssignments.map((a) => ({
+          dayOfWeek: a.dayOfWeek,
+          dayName: DAY_NAMES[a.dayOfWeek],
+        }))
+      );
+
+      const uniqueDays = allAssignedDays.filter(
+        (day, index, self) =>
+          index === self.findIndex((d) => d.dayOfWeek === day.dayOfWeek)
+      );
+
+      return NextResponse.json({
+        success: true,
+        inServiceArea: true,
+        areaId: null,
+        areaName: null,
+        recommendedDays: uniqueDays,
+        allDaysAvailable: false,
         geocoded: true,
         lat: geocodeResult.lat,
         lng: geocodeResult.lng,
@@ -187,16 +243,37 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // If still no match, accept the address but without area assignment
+    // (groomer can manually assign later, or the address is in a new area)
     if (!matchedArea) {
+      // Get all days the groomer works
+      const allAssignedDays = areas.flatMap((area) =>
+        area.dayAssignments.map((a) => ({
+          dayOfWeek: a.dayOfWeek,
+          dayName: DAY_NAMES[a.dayOfWeek],
+        }))
+      );
+
+      const uniqueDays = allAssignedDays.filter(
+        (day, index, self) =>
+          index === self.findIndex((d) => d.dayOfWeek === day.dayOfWeek)
+      );
+
       return NextResponse.json({
         success: true,
-        inServiceArea: false,
+        inServiceArea: true,
+        areaId: null,
+        areaName: null,
+        matchType: "new_area",
+        recommendedDays: uniqueDays,
+        allDaysAvailable: false,
         geocoded: true,
-        message:
-          "This address appears to be outside the service area. Please contact the groomer directly.",
         lat: geocodeResult.lat,
         lng: geocodeResult.lng,
         formattedAddress: geocodeResult.formattedAddress,
+        zipCode: geocodeResult.zipCode,
+        city: geocodeResult.city,
+        state: geocodeResult.state,
       });
     }
 

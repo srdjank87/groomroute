@@ -3763,6 +3763,657 @@ All emails use this base structure. The content section changes per email.
 
 ---
 
+## Sequence 10: Online Booking Enabled
+
+### Email 1: Your booking page is live!
+
+**Subject:** Your booking page is live!
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background-color: #f6f9fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f6f9fc;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; max-width: 600px; margin: 0 auto;">
+
+          <!-- Logo Section -->
+          <tr>
+            <td align="center" style="padding: 32px 20px 0;">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: 8px;">
+                    <img src="https://groomroute.com/images/app-icon-192.png" width="32" height="32" alt="GroomRoute" style="border-radius: 6px;">
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <span style="color: #1a1a1a; font-size: 28px; font-weight: bold;">Groom<span style="color: #A5744A;">Route</span></span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content Section -->
+          <tr>
+            <td style="padding: 0 48px;">
+
+              <h1 style="color: #1a1a1a; font-size: 28px; font-weight: bold; text-align: center; margin: 32px 0 24px;">Your booking page is live!</h1>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Hi {{firstName}},
+              </p>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Great news - your online booking page is now live! Clients can book appointments with you 24/7.
+              </p>
+
+              <!-- Booking URL Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border-radius: 12px; border: 1px solid #dcfce7; margin: 24px 0;">
+                <tr>
+                  <td style="padding: 20px 24px; text-align: center;">
+                    <p style="color: #166534; font-size: 14px; font-weight: bold; margin: 0 0 8px 0;">Your booking link:</p>
+                    <p style="color: #15803d; font-size: 16px; margin: 0; word-break: break-all;">
+                      {{bookingUrl}}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: bold; margin: 24px 0 12px;">
+                Here's how it works:
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 16px 0;">
+                <tr>
+                  <td style="padding: 8px 0;">
+                    <span style="color: #A5744A; font-weight: bold; margin-right: 8px;">1.</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>Share your link</strong> - Text it to clients, add it to your email signature, or post it on social media</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0;">
+                    <span style="color: #A5744A; font-weight: bold; margin-right: 8px;">2.</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>Clients enter their address</strong> - We check if they're in your service area and suggest the best days</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0;">
+                    <span style="color: #A5744A; font-weight: bold; margin-right: 8px;">3.</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>They pick a time</strong> - Based on your availability and working hours</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0;">
+                    <span style="color: #A5744A; font-weight: bold; margin-right: 8px;">4.</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>Booking appears on your calendar</strong> - No back-and-forth texting needed</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Pro Tips Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fef7f0; border-radius: 12px; border: 1px solid #f5e6d8; margin: 24px 0;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <p style="color: #8B6239; font-size: 16px; font-weight: bold; margin: 0 0 12px 0;">Pro tips for sharing your link:</p>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding: 4px 0;">
+                          <span style="color: #10b981; font-weight: bold; margin-right: 8px;">•</span>
+                          <span style="color: #8B6239; font-size: 15px;">Add it to your Instagram bio or Facebook page</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 4px 0;">
+                          <span style="color: #10b981; font-weight: bold; margin-right: 8px;">•</span>
+                          <span style="color: #8B6239; font-size: 15px;">Include it in appointment confirmation texts</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 4px 0;">
+                          <span style="color: #10b981; font-weight: bold; margin-right: 8px;">•</span>
+                          <span style="color: #8B6239; font-size: 15px;">Put it on your business cards</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 4px 0;">
+                          <span style="color: #10b981; font-weight: bold; margin-right: 8px;">•</span>
+                          <span style="color: #8B6239; font-size: 15px;">Add a "Book Now" button to your website</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="{{bookingUrl}}" style="background-color: #A5744A; border-radius: 8px; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; display: inline-block; padding: 14px 32px;">
+                      View Your Booking Page
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Questions about online booking? Just reply to this email.
+              </p>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin: 0 0 24px;">
+                The GroomRoute Team
+              </p>
+
+              <p style="color: #6b7280; font-size: 14px; line-height: 22px; margin: 24px 0 0; font-style: italic;">
+                <strong>P.S.</strong> You can customize your booking URL and turn it off anytime from Settings → Online Booking.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding: 32px 48px;">
+              <p style="color: #8898aa; font-size: 12px; line-height: 16px; margin: 8px 0;">
+                GroomRoute - The scheduling system built only for mobile groomers
+              </p>
+              <p style="color: #8898aa; font-size: 12px; line-height: 16px; margin: 8px 0;">
+                <a href="https://groomroute.com/privacy" style="color: #8898aa; text-decoration: underline;">Privacy Policy</a>
+                |
+                <a href="https://groomroute.com/terms" style="color: #8898aa; text-decoration: underline;">Terms of Service</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+```
+
+---
+
+## Sequence 11: First Booking Received
+
+### Email 1: You just got your first online booking!
+
+**Subject:** You just got your first online booking!
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background-color: #f6f9fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f6f9fc;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; max-width: 600px; margin: 0 auto;">
+
+          <!-- Logo Section -->
+          <tr>
+            <td align="center" style="padding: 32px 20px 0;">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: 8px;">
+                    <img src="https://groomroute.com/images/app-icon-192.png" width="32" height="32" alt="GroomRoute" style="border-radius: 6px;">
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <span style="color: #1a1a1a; font-size: 28px; font-weight: bold;">Groom<span style="color: #A5744A;">Route</span></span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content Section -->
+          <tr>
+            <td style="padding: 0 48px;">
+
+              <h1 style="color: #1a1a1a; font-size: 28px; font-weight: bold; text-align: center; margin: 32px 0 24px;">Your first online booking!</h1>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Hi {{firstName}},
+              </p>
+
+              <!-- Celebration Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border-radius: 12px; border: 1px solid #dcfce7; margin: 24px 0;">
+                <tr>
+                  <td style="padding: 24px; text-align: center;">
+                    <p style="color: #166534; font-size: 20px; font-weight: bold; margin: 0 0 8px 0;">
+                      Congratulations!
+                    </p>
+                    <p style="color: #15803d; font-size: 15px; line-height: 24px; margin: 0;">
+                      You just received your first booking through your online booking page!
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: bold; margin: 24px 0 12px;">
+                What just happened:
+              </p>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                A client visited your booking link, entered their address, picked a date and time, and booked an appointment - all without you having to answer a text, call, or email.
+              </p>
+
+              <!-- Magic Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fef7f0; border-radius: 12px; border: 1px solid #f5e6d8; margin: 24px 0;">
+                <tr>
+                  <td style="padding: 20px 24px; text-align: center;">
+                    <p style="color: #8B6239; font-size: 15px; line-height: 24px; margin: 0;">
+                      That's the magic of 24/7 booking. While you were grooming (or sleeping, or eating lunch), your business was still accepting appointments.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: bold; margin: 24px 0 12px;">
+                What's next:
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 16px 0;">
+                <tr>
+                  <td style="padding: 6px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;">The appointment is already on your calendar</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;">The client's address is saved</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;">You'll see them on your route when that day comes</span>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: bold; margin: 24px 0 12px;">
+                Want more bookings?
+              </p>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                The more you share your link, the more bookings you'll get. Try:
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 16px 0;">
+                <tr>
+                  <td style="padding: 4px 0;">
+                    <span style="color: #A5744A; font-weight: bold; margin-right: 8px;">•</span>
+                    <span style="color: #525f7f; font-size: 15px;">Texting it to your regular clients who always text to rebook</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0;">
+                    <span style="color: #A5744A; font-weight: bold; margin-right: 8px;">•</span>
+                    <span style="color: #525f7f; font-size: 15px;">Adding it to your "thank you" message after appointments</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0;">
+                    <span style="color: #A5744A; font-weight: bold; margin-right: 8px;">•</span>
+                    <span style="color: #525f7f; font-size: 15px;">Posting it on social media with "Book your next groom!"</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="{{bookingUrl}}" style="background-color: #A5744A; border-radius: 8px; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; display: inline-block; padding: 14px 32px;">
+                      Share Your Booking Link
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Here's to many more hands-free bookings!
+              </p>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin: 0 0 24px;">
+                The GroomRoute Team
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding: 32px 48px;">
+              <p style="color: #8898aa; font-size: 12px; line-height: 16px; margin: 8px 0;">
+                GroomRoute - The scheduling system built only for mobile groomers
+              </p>
+              <p style="color: #8898aa; font-size: 12px; line-height: 16px; margin: 8px 0;">
+                <a href="https://groomroute.com/privacy" style="color: #8898aa; text-decoration: underline;">Privacy Policy</a>
+                |
+                <a href="https://groomroute.com/terms" style="color: #8898aa; text-decoration: underline;">Terms of Service</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+```
+
+---
+
+## Sequence 12: Online Booking Nudge
+
+### Email 1: Day 14 - Let clients book while you groom
+
+**Subject:** Let clients book while you groom
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background-color: #f6f9fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f6f9fc;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; max-width: 600px; margin: 0 auto;">
+
+          <!-- Logo Section -->
+          <tr>
+            <td align="center" style="padding: 32px 20px 0;">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: 8px;">
+                    <img src="https://groomroute.com/images/app-icon-192.png" width="32" height="32" alt="GroomRoute" style="border-radius: 6px;">
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <span style="color: #1a1a1a; font-size: 28px; font-weight: bold;">Groom<span style="color: #A5744A;">Route</span></span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content Section -->
+          <tr>
+            <td style="padding: 0 48px;">
+
+              <h1 style="color: #1a1a1a; font-size: 28px; font-weight: bold; text-align: center; margin: 32px 0 24px;">Let clients book while you groom</h1>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Hi {{firstName}},
+              </p>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Quick question: How much time do you spend each week scheduling appointments?
+              </p>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Between text messages, phone calls, and back-and-forth about availability, it adds up. Many groomers tell us it's 30-60 minutes a day.
+              </p>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: bold; margin: 24px 0 12px;">
+                What if clients could book themselves?
+              </p>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                GroomRoute now has <strong>online booking</strong> - your own personal booking page where clients can:
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 16px 0;">
+                <tr>
+                  <td style="padding: 6px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;">See your availability in real-time</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;">Pick a date and time that works for them</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;">Book instantly without waiting for a response</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Calm-First Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0fdf4; border-radius: 12px; border: 1px solid #dcfce7; margin: 24px 0;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <p style="color: #166534; font-size: 16px; font-weight: bold; margin: 0 0 8px 0;">The best part?</p>
+                    <p style="color: #15803d; font-size: 15px; line-height: 24px; margin: 0;">
+                      It respects your service areas and workload limits. Clients only see days you're available in their area, so your routes stay tight and you don't overbook.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Setup Steps -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fef7f0; border-radius: 12px; border: 1px solid #f5e6d8; margin: 24px 0;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <p style="color: #8B6239; font-size: 16px; font-weight: bold; margin: 0 0 12px 0;">Setting it up takes 60 seconds:</p>
+                    <p style="color: #8B6239; font-size: 15px; line-height: 24px; margin: 0;">
+                      1. Go to Settings → Online Booking<br>
+                      2. Toggle it on<br>
+                      3. Copy your personal booking link<br>
+                      4. Share it with clients
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="https://groomroute.com/dashboard/settings/booking" style="background-color: #A5744A; border-radius: 8px; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; display: inline-block; padding: 14px 32px;">
+                      Set Up Online Booking
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Imagine finishing a groom and seeing a new booking already on your calendar - without touching your phone. That's what online booking does.
+              </p>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin: 0 0 24px;">
+                The GroomRoute Team
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding: 32px 48px;">
+              <p style="color: #8898aa; font-size: 12px; line-height: 16px; margin: 8px 0;">
+                GroomRoute - The scheduling system built only for mobile groomers
+              </p>
+              <p style="color: #8898aa; font-size: 12px; line-height: 16px; margin: 8px 0;">
+                <a href="https://groomroute.com/privacy" style="color: #8898aa; text-decoration: underline;">Privacy Policy</a>
+                |
+                <a href="https://groomroute.com/terms" style="color: #8898aa; text-decoration: underline;">Terms of Service</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+```
+
+---
+
+### Email 2: Day 21 - "I wish I'd done this sooner"
+
+**Subject:** "I wish I'd done this sooner"
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background-color: #f6f9fc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f6f9fc;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; max-width: 600px; margin: 0 auto;">
+
+          <!-- Logo Section -->
+          <tr>
+            <td align="center" style="padding: 32px 20px 0;">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: 8px;">
+                    <img src="https://groomroute.com/images/app-icon-192.png" width="32" height="32" alt="GroomRoute" style="border-radius: 6px;">
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <span style="color: #1a1a1a; font-size: 28px; font-weight: bold;">Groom<span style="color: #A5744A;">Route</span></span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content Section -->
+          <tr>
+            <td style="padding: 0 48px;">
+
+              <h1 style="color: #1a1a1a; font-size: 28px; font-weight: bold; text-align: center; margin: 32px 0 24px;">"I wish I'd done this sooner"</h1>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                Hi {{firstName}},
+              </p>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                That's what groomers tell us after setting up online booking.
+              </p>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0;">
+                The back-and-forth to schedule appointments is one of the most draining parts of running a mobile grooming business. Every text, every call, every "what time works for you?" takes energy.
+              </p>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: bold; margin: 24px 0 12px;">
+                Here's what online booking gives you:
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 16px 0;">
+                <tr>
+                  <td style="padding: 8px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>24/7 availability</strong> - Clients book while you're grooming, sleeping, or on vacation</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>Zero back-and-forth</strong> - They see your openings and pick one</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>Smarter scheduling</strong> - Bookings respect your service areas and days</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0;">
+                    <span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>Protected energy</strong> - Your workload limits prevent overbooking</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Testimonial Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 12px; margin: 24px 0;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <p style="color: #1a1a1a; font-size: 14px; font-weight: 600; margin: 0 0 8px 0;">One groomer's experience:</p>
+                    <p style="color: #525f7f; font-size: 15px; line-height: 24px; margin: 0 0 12px 0; font-style: italic;">
+                      "I used to spend my lunch break returning calls about scheduling. Now I actually eat lunch. Clients love that they can book anytime, and I love that I don't have to think about it."
+                    </p>
+                    <p style="color: #1a1a1a; font-size: 14px; font-weight: 600; margin: 0;">— Michelle R.</p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="https://groomroute.com/dashboard/settings/booking" style="background-color: #A5744A; border-radius: 8px; color: #ffffff; font-size: 16px; font-weight: bold; text-decoration: none; display: inline-block; padding: 14px 32px;">
+                      Turn On Online Booking
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="color: #525f7f; font-size: 16px; line-height: 26px; margin: 16px 0; text-align: center;">
+                Takes 60 seconds. Try it for a week and see what you think.
+              </p>
+
+              <p style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin: 0 0 24px;">
+                The GroomRoute Team
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding: 32px 48px;">
+              <p style="color: #8898aa; font-size: 12px; line-height: 16px; margin: 8px 0;">
+                GroomRoute - The scheduling system built only for mobile groomers
+              </p>
+              <p style="color: #8898aa; font-size: 12px; line-height: 16px; margin: 8px 0;">
+                <a href="https://groomroute.com/privacy" style="color: #8898aa; text-decoration: underline;">Privacy Policy</a>
+                |
+                <a href="https://groomroute.com/terms" style="color: #8898aa; text-decoration: underline;">Terms of Service</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+```
+
+---
+
 ## Design Reference
 
 ### Colors
@@ -3811,6 +4462,8 @@ Use these Loops merge tags in templates:
 - `{{firstName}}` - User's first name
 - `{{email}}` - User's email address
 - `{{businessName}}` - Business name (if available)
+- `{{bookingUrl}}` - User's online booking page URL (for booking-enabled emails)
+- `{{bookingSlug}}` - User's booking slug (e.g., "johns-grooming")
 
 ---
 
@@ -3821,3 +4474,17 @@ Use these Loops merge tags in templates:
 3. **Replace placeholder URLs** if needed (all currently point to groomroute.com)
 4. **Update the "What's New" section** in the winback email with actual recent features
 5. **NPS links** include `{{email}}` - verify this works in Loops or adjust the merge tag syntax
+
+## Transactional Emails (Sent via Resend, not Loops)
+
+These emails are sent directly from the app using Resend and React Email components:
+
+| Email | File | Trigger |
+|-------|------|---------|
+| Welcome | `emails/WelcomeEmail.tsx` | User registration |
+| Password Reset | `emails/PasswordResetEmail.tsx` | Password reset request |
+| Team Invite | `emails/TeamInviteEmail.tsx` | Team member invitation |
+| PWA Install Reminder | `emails/PWAInstallReminderEmail.tsx` | 5 days after checkout (can be moved to Loops) |
+| Booking Confirmation | `emails/BookingConfirmationEmail.tsx` | Client books via public booking page |
+
+**Note:** The BookingConfirmationEmail is sent to **clients** (not groomers) when they book through the public booking page. It confirms their appointment details.
