@@ -604,17 +604,6 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="card bg-white shadow-lg hover:shadow-xl transition-shadow">
-              <div className="card-body">
-                <div className="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center mb-4">
-                  <Clock className="h-6 w-6 text-rose-600" />
-                </div>
-                <h3 className="card-title text-lg">On My Way</h3>
-                <p className="text-gray-600 text-sm">
-                  Tap once - your client gets a message with your ETA. They&apos;ll tell their friends about the groomer who always lets them know when to expect you.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
