@@ -1,5 +1,6 @@
 import { google } from "googleapis";
 import { prisma } from "./prisma";
+import { AppointmentType } from "@prisma/client";
 
 const SCOPES = ["https://www.googleapis.com/auth/calendar.events"];
 
@@ -317,4 +318,166 @@ export async function disconnectGoogleCalendar(
     where: { accountId },
     data: { googleCalendarEventId: null },
   });
+}
+
+// ============================================
+// IMPORT FROM GOOGLE CALENDAR
+// ============================================
+
+export interface GoogleCalendarEvent {
+  id: string;
+  summary: string | null;
+  description: string | null;
+  location: string | null;
+  start: Date;
+  end: Date;
+  // Parsed fields for easier matching
+  parsedClientName: string | null;
+  parsedAddress: string | null;
+  durationMinutes: number;
+  alreadyImported: boolean;
+}
+
+// Fetch events from Google Calendar for import
+export async function fetchCalendarEvents(
+  accountId: string,
+  startDate: Date,
+  endDate: Date
+): Promise<GoogleCalendarEvent[]> {
+  const { calendar, calendarId } = await getCalendarClient(accountId);
+
+  // Get existing imported event IDs to mark as already imported
+  const existingAppointments = await prisma.appointment.findMany({
+    where: {
+      accountId,
+      googleCalendarEventId: { not: null },
+    },
+    select: { googleCalendarEventId: true },
+  });
+  const importedEventIds = new Set(
+    existingAppointments.map((a) => a.googleCalendarEventId)
+  );
+
+  const response = await calendar.events.list({
+    calendarId,
+    timeMin: startDate.toISOString(),
+    timeMax: endDate.toISOString(),
+    singleEvents: true,
+    orderBy: "startTime",
+    maxResults: 250,
+  });
+
+  const events = response.data.items || [];
+
+  return events
+    .filter((event) => {
+      // Only include events with a start time (not all-day events without time)
+      return event.start?.dateTime;
+    })
+    .map((event) => {
+      const start = new Date(event.start!.dateTime!);
+      const end = new Date(event.end?.dateTime || event.start!.dateTime!);
+      const durationMinutes = Math.round((end.getTime() - start.getTime()) / 60000);
+
+      // Try to parse client name from summary
+      // Common formats: "Client Name", "Service - Client Name", "Client Name - Service"
+      let parsedClientName: string | null = null;
+      if (event.summary) {
+        // Try to extract name from common patterns
+        const summary = event.summary;
+        // Pattern: "Something - Name (info)" or "Name - Something"
+        const dashMatch = summary.match(/^(.+?)\s*-\s*(.+)$/);
+        if (dashMatch) {
+          // Take the longer part as likely the client name
+          parsedClientName = dashMatch[1].length > dashMatch[2].length
+            ? dashMatch[1].trim()
+            : dashMatch[2].trim();
+          // Remove parenthetical info
+          parsedClientName = parsedClientName.replace(/\s*\([^)]*\)\s*$/, "").trim();
+        } else {
+          parsedClientName = summary.trim();
+        }
+      }
+
+      return {
+        id: event.id!,
+        summary: event.summary || null,
+        description: event.description || null,
+        location: event.location || null,
+        start,
+        end,
+        parsedClientName,
+        parsedAddress: event.location || null,
+        durationMinutes,
+        alreadyImported: event.id ? importedEventIds.has(event.id) : false,
+      };
+    });
+}
+
+// Import a single event as an appointment
+export interface ImportEventOptions {
+  eventId: string;
+  customerId: string;
+  petId?: string;
+  groomerId: string;
+  appointmentType?: string;
+  serviceMinutes?: number;
+  notes?: string;
+}
+
+export async function importCalendarEvent(
+  accountId: string,
+  options: ImportEventOptions
+): Promise<{ success: boolean; appointmentId?: string; error?: string }> {
+  try {
+    const { calendar, calendarId } = await getCalendarClient(accountId);
+
+    // Fetch the specific event
+    const eventResponse = await calendar.events.get({
+      calendarId,
+      eventId: options.eventId,
+    });
+    const event = eventResponse.data;
+
+    if (!event.start?.dateTime) {
+      return { success: false, error: "Event has no start time" };
+    }
+
+    const startAt = new Date(event.start.dateTime);
+    const endAt = event.end?.dateTime ? new Date(event.end.dateTime) : startAt;
+    const defaultDuration = Math.round((endAt.getTime() - startAt.getTime()) / 60000);
+
+    // Check if already imported
+    const existing = await prisma.appointment.findFirst({
+      where: {
+        accountId,
+        googleCalendarEventId: options.eventId,
+      },
+    });
+
+    if (existing) {
+      return { success: false, error: "Event already imported" };
+    }
+
+    // Create the appointment
+    const appointment = await prisma.appointment.create({
+      data: {
+        accountId,
+        customerId: options.customerId,
+        petId: options.petId || null,
+        groomerId: options.groomerId,
+        startAt,
+        appointmentType: (options.appointmentType as AppointmentType) || "FULL_GROOM",
+        serviceMinutes: options.serviceMinutes || defaultDuration || 60,
+        status: "BOOKED",
+        notes: options.notes || event.description || null,
+        googleCalendarEventId: options.eventId,
+      },
+    });
+
+    return { success: true, appointmentId: appointment.id };
+  } catch (error) {
+    console.error("Failed to import calendar event:", error);
+    return { success: false, error: "Failed to import event" };
+  }
 }

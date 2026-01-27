@@ -12,13 +12,13 @@ export async function GET(request: NextRequest) {
     // Handle user denying access
     if (error) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?calendar_error=access_denied`
+        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/integrations?calendar_error=access_denied`
       );
     }
 
     if (!code || !state) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?calendar_error=invalid_request`
+        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/integrations?calendar_error=invalid_request`
       );
     }
 
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     if (!tokens.refresh_token) {
       console.error("No refresh token received from Google");
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?calendar_error=no_refresh_token`
+        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/integrations?calendar_error=no_refresh_token`
       );
     }
 
@@ -46,14 +46,14 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Redirect to settings with success message
+    // Redirect to integrations page with success message
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?calendar_connected=true`
+      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/integrations?calendar_connected=true`
     );
   } catch (error) {
     console.error("Google Calendar callback error:", error);
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?calendar_error=token_exchange_failed`
+      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/integrations?calendar_error=token_exchange_failed`
     );
   }
 }

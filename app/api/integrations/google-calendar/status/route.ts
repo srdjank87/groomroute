@@ -13,12 +13,16 @@ export async function GET() {
     const account = await prisma.account.findUnique({
       where: { id: session.user.accountId },
       select: {
+        googleCalendarAccessRequested: true,
+        googleCalendarApproved: true,
         googleCalendarEnabled: true,
         googleCalendarId: true,
       },
     });
 
     return NextResponse.json({
+      accessRequested: account?.googleCalendarAccessRequested ?? null,
+      approved: account?.googleCalendarApproved ?? false,
       connected: account?.googleCalendarEnabled ?? false,
       calendarId: account?.googleCalendarId ?? null,
     });

@@ -76,6 +76,8 @@ model Account {
   fbTrackingData     Json?            // { fbc, fbp, userAgent, clientIp }
 
   // Google Calendar integration
+  googleCalendarAccessRequested DateTime?  // When user requested access (before Google verification)
+  googleCalendarApproved    Boolean @default(false)  // Admin approved for test user access
   googleCalendarEnabled     Boolean @default(false)
   googleCalendarId          String?  // Calendar ID to sync to (usually "primary")
   googleAccessToken         String?  @db.Text

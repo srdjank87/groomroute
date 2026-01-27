@@ -261,6 +261,13 @@ export default async function AdminDashboard() {
               <Activity className="w-5 h-5 text-gray-600" />
               <span className="font-medium text-gray-900">Event Log</span>
             </Link>
+            <Link
+              href="/admin/calendar-requests"
+              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              <Calendar className="w-5 h-5 text-gray-600" />
+              <span className="font-medium text-gray-900">Calendar Requests</span>
+            </Link>
             <a
               href="https://us.posthog.com"
               target="_blank"
