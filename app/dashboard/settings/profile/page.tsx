@@ -134,10 +134,10 @@ export default function ProfileSettingsPage() {
                 <p className="font-medium mb-1">How it works:</p>
                 <p>Each pet you groom has an intensity level you assign:</p>
                 <ul className="mt-1 space-y-0.5">
-                  <li><span className="inline-block w-20 font-medium text-emerald-600">Light (1)</span> — Short coats, small cooperative dogs, bath-only</li>
-                  <li><span className="inline-block w-20 font-medium text-blue-600">Moderate (2)</span> — Average coat maintenance, typical behavior</li>
-                  <li><span className="inline-block w-20 font-medium text-amber-600">Demanding (3)</span> — Doodles, double coats, large dogs</li>
-                  <li><span className="inline-block w-20 font-medium text-red-600">Intensive (4)</span> — Matted coats, reactive dogs, very large + heavy coat</li>
+                  <li><span className="inline-block w-20 font-medium text-emerald-600">Light (1)</span> - Short coats, small cooperative dogs, bath-only</li>
+                  <li><span className="inline-block w-20 font-medium text-blue-600">Moderate (2)</span> - Average coat maintenance, typical behavior</li>
+                  <li><span className="inline-block w-20 font-medium text-amber-600">Demanding (3)</span> - Doodles, double coats, large dogs</li>
+                  <li><span className="inline-block w-20 font-medium text-red-600">Intensive (4)</span> - Matted coats, reactive dogs, very large + heavy coat</li>
                 </ul>
                 <p className="mt-2">
                   Your daily limit is the total intensity you can handle. Default of 12 = roughly 6 moderate grooms, or 4 demanding grooms, or 3 intensive grooms.
@@ -182,9 +182,9 @@ export default function ProfileSettingsPage() {
               {dailyIntensityLimit >= 12 ? (
                 <>You can handle roughly {Math.floor(dailyIntensityLimit / 2)} moderate grooms, or {Math.floor(dailyIntensityLimit / 3)} demanding grooms per day.</>
               ) : dailyIntensityLimit >= 8 ? (
-                <>A lighter workload — roughly {Math.floor(dailyIntensityLimit / 2)} moderate grooms, or {Math.floor(dailyIntensityLimit / 3)} demanding grooms.</>
+                <>A lighter workload - roughly {Math.floor(dailyIntensityLimit / 2)} moderate grooms, or {Math.floor(dailyIntensityLimit / 3)} demanding grooms.</>
               ) : (
-                <>A very light day — roughly {Math.floor(dailyIntensityLimit / 2)} moderate grooms.</>
+                <>A very light day - roughly {Math.floor(dailyIntensityLimit / 2)} moderate grooms.</>
               )}
             </p>
           </div>

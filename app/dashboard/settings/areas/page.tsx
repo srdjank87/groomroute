@@ -547,7 +547,7 @@ export default function SettingsAreasPage() {
                         {DAY_NAMES[dayOfWeek]}
                       </span>
                       <span className={`text-sm font-semibold mt-1 truncate max-w-full ${dayData ? "" : ""}`}>
-                        {dayData ? dayData.areaName : "—"}
+                        {dayData ? dayData.areaName : "-"}
                       </span>
                     </button>
                   );
@@ -660,7 +660,7 @@ export default function SettingsAreasPage() {
 
                           {/* Day off indicator */}
                           {isCurrentMonth && !areaData && (
-                            <span className="text-[10px] text-gray-400 block mt-0.5 sm:mt-1">—</span>
+                            <span className="text-[10px] text-gray-400 block mt-0.5 sm:mt-1">-</span>
                           )}
                         </button>
                       );

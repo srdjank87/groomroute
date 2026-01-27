@@ -546,7 +546,7 @@ export default function AppointmentsPage() {
             {statusFilter !== "ALL"
               ? `No ${STATUS_OPTIONS.find(s => s.value === statusFilter)?.label.toLowerCase()} appointments for ${format(new Date(selectedDate + 'T00:00:00'), "MMMM d, yyyy")}`
               : isToday
-                ? "A fresh slate awaits — book some appointments or enjoy a well-deserved break"
+                ? "A fresh slate awaits - book some appointments or enjoy a well-deserved break"
                 : `Nothing scheduled for ${format(new Date(selectedDate + 'T00:00:00'), "MMMM d, yyyy")} yet`
             }
           </p>
@@ -718,7 +718,7 @@ export default function AppointmentsPage() {
             <p className="text-gray-600 mb-4">
               {otherStatusFilter !== "ALL"
                 ? `No ${STATUS_OPTIONS.find(s => s.value === otherStatusFilter)?.label.toLowerCase()} appointments on other dates`
-                : "No upcoming appointments on your calendar — time to fill some slots!"
+                : "No upcoming appointments on your calendar - time to fill some slots!"
               }
             </p>
             <Link

@@ -502,7 +502,7 @@ export default function OnboardingPage() {
                       }`}
                     >
                       <span className="font-medium text-gray-900">{option.label}</span>
-                      <span className="text-sm text-gray-500 ml-2">— {option.description}</span>
+                      <span className="text-sm text-gray-500 ml-2">- {option.description}</span>
                       {largeDogLimit === option.value && (
                         <span className="float-right text-[#A5744A]">✓</span>
                       )}

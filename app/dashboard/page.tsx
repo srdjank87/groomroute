@@ -1265,7 +1265,7 @@ function DashboardContent() {
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Your day is open</h2>
           <p className="text-gray-600 mb-2">
-            No appointments scheduled — a chance to catch up, plan ahead, or simply rest.
+            No appointments scheduled - a chance to catch up, plan ahead, or simply rest.
           </p>
           <p className="text-slate-500 text-sm italic mb-6">
             &ldquo;A clear schedule is an opportunity, not a problem.&rdquo;
@@ -1510,7 +1510,7 @@ function DashboardContent() {
                 <p className="text-[10px] sm:text-xs text-emerald-700 font-medium">Est. Finish</p>
               </div>
               <p className="text-lg sm:text-xl font-bold text-emerald-700">
-                {performanceData.today.estimatedFinish || "—"}
+                {performanceData.today.estimatedFinish || "-"}
               </p>
             </div>
             {/* Large Dogs */}
@@ -1674,7 +1674,7 @@ function DashboardContent() {
             message = `${largeDogCount} large dogs groomed. Give your back and shoulders some love.`;
             emoji = "💪";
           } else if (workloadLevel === 'heavy' || workloadLevel === 'overloaded') {
-            title = "Busy day — take care of yourself";
+            title = "Busy day - take care of yourself";
             message = "A quick stretch or reset can help you finish strong.";
             emoji = "🌟";
           } else if (completedCount >= 3) {
@@ -1788,7 +1788,7 @@ function DashboardContent() {
                   </button>
                 </div>
                 <div className="p-4">
-                  <p className="text-gray-600 mb-4">These things happen — let&apos;s log it and move on.</p>
+                  <p className="text-gray-600 mb-4">These things happen - let&apos;s log it and move on.</p>
 
                   <div className="space-y-2 mb-4">
                     <label className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${skipReason === "CANCELLED" ? "border-amber-500 bg-amber-50" : "hover:bg-gray-50"}`}>
@@ -1802,7 +1802,7 @@ function DashboardContent() {
                       />
                       <div>
                         <p className="font-medium">Customer needed to cancel</p>
-                        <p className="text-sm text-gray-500">Life happens — they&apos;ll reschedule when ready</p>
+                        <p className="text-sm text-gray-500">Life happens - they&apos;ll reschedule when ready</p>
                       </div>
                     </label>
 
@@ -2026,7 +2026,7 @@ function DashboardContent() {
                       {stats.remainingAppointments.map((apt, i) => (
                         <li key={i} className="text-sm text-gray-600 flex items-center gap-2">
                           <span className="w-2 h-2 bg-amber-400 rounded-full"></span>
-                          {apt.customerName} — {formatTime(apt.startAt)}
+                          {apt.customerName} - {formatTime(apt.startAt)}
                         </li>
                       ))}
                     </ul>
