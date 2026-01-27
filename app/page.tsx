@@ -687,16 +687,10 @@ export default function Home() {
           <h2 className="text-2xl lg:text-3xl font-bold mb-4 text-gray-900">
             Your clients will notice.
           </h2>
-          <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             When you show up on time, every time. When you communicate proactively instead of scrambling.
             When you seem calm instead of frazzled.
           </p>
-          <div className="inline-flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg border border-blue-100">
-            <div className="text-left">
-              <p className="text-gray-900 font-medium">&quot;She&apos;s always so organized.&quot;</p>
-              <p className="text-sm text-gray-500">What your clients will say about you</p>
-            </div>
-          </div>
         </div>
       </section>
 
