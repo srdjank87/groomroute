@@ -106,9 +106,23 @@ const BREED_INTENSITY_PATTERNS: {
   { pattern: /australian\s*shepherd|aussie/i, intensity: "DEMANDING", reason: "double coat with feathering" },
   { pattern: /german\s*shepherd/i, intensity: "DEMANDING", reason: "double coat shedding" },
   { pattern: /border\s*collie/i, intensity: "DEMANDING", reason: "double coat" },
-  { pattern: /persian/i, intensity: "DEMANDING", reason: "long dense coat" }, // Cat
+  // DEMANDING cats - long/dense coats requiring significant work
+  { pattern: /persian/i, intensity: "DEMANDING", reason: "long dense coat" },
   { pattern: /maine\s*coon/i, intensity: "DEMANDING", reason: "large cat with long coat" },
   { pattern: /ragdoll/i, intensity: "DEMANDING", reason: "semi-long silky coat" },
+  { pattern: /himalayan/i, intensity: "DEMANDING", reason: "long dense coat" },
+  { pattern: /norwegian\s*forest/i, intensity: "DEMANDING", reason: "long thick double coat" },
+  { pattern: /siberian/i, intensity: "DEMANDING", reason: "long triple coat" },
+  { pattern: /birman/i, intensity: "DEMANDING", reason: "semi-long silky coat" },
+  { pattern: /turkish\s*angora/i, intensity: "DEMANDING", reason: "long silky coat" },
+  { pattern: /british\s*longhair/i, intensity: "DEMANDING", reason: "dense long coat" },
+  { pattern: /balinese/i, intensity: "DEMANDING", reason: "long silky coat" },
+  { pattern: /somali/i, intensity: "DEMANDING", reason: "long ticked coat" },
+  { pattern: /turkish\s*van/i, intensity: "DEMANDING", reason: "semi-long water-resistant coat" },
+  { pattern: /nebelung/i, intensity: "DEMANDING", reason: "long blue double coat" },
+  { pattern: /laperm/i, intensity: "DEMANDING", reason: "curly coat needs careful handling" },
+  { pattern: /selkirk\s*rex/i, intensity: "DEMANDING", reason: "curly coat needs careful handling" },
+  { pattern: /ragamuffin/i, intensity: "DEMANDING", reason: "long silky coat" },
 
   // MODERATE breeds - standard grooms (explicitly listed for clarity)
   { pattern: /labrador|lab($|\s)/i, intensity: "MODERATE", reason: "short double coat" },
@@ -132,6 +146,17 @@ const BREED_INTENSITY_PATTERNS: {
   { pattern: /shiba/i, intensity: "MODERATE", reason: "double coat, small size" },
   { pattern: /mix|mutt|mixed/i, intensity: "MODERATE", reason: "mixed breed" },
 
+  // MODERATE cats - medium maintenance coats
+  { pattern: /exotic\s*shorthair/i, intensity: "MODERATE", reason: "dense plush coat" },
+  { pattern: /british\s*shorthair/i, intensity: "MODERATE", reason: "dense plush coat" },
+  { pattern: /scottish\s*fold/i, intensity: "MODERATE", reason: "dense double coat" },
+  { pattern: /manx/i, intensity: "MODERATE", reason: "dense double coat" },
+  { pattern: /american\s*shorthair/i, intensity: "MODERATE", reason: "dense working coat" },
+  { pattern: /chartreux/i, intensity: "MODERATE", reason: "dense woolly coat" },
+  { pattern: /tonkinese/i, intensity: "MODERATE", reason: "medium maintenance coat" },
+  { pattern: /snowshoe/i, intensity: "MODERATE", reason: "medium coat" },
+  { pattern: /domestic\s*(medium|long)/i, intensity: "MODERATE", reason: "medium to long coat" },
+
   // LIGHT breeds - quick easy grooms
   { pattern: /chihuahua/i, intensity: "LIGHT", reason: "tiny with short coat" },
   { pattern: /italian\s*greyhound/i, intensity: "LIGHT", reason: "tiny with minimal coat" },
@@ -142,8 +167,25 @@ const BREED_INTENSITY_PATTERNS: {
   { pattern: /rat\s*terrier/i, intensity: "LIGHT", reason: "small with short coat" },
   { pattern: /hairless/i, intensity: "LIGHT", reason: "minimal grooming needed" },
   { pattern: /chinese\s*crested/i, intensity: "LIGHT", reason: "minimal coat" },
-  { pattern: /siamese/i, intensity: "LIGHT", reason: "short smooth coat" }, // Cat
-  { pattern: /domestic\s*short/i, intensity: "LIGHT", reason: "short easy coat" }, // Cat
+  // LIGHT cats - minimal grooming needs
+  { pattern: /siamese/i, intensity: "LIGHT", reason: "short smooth coat" },
+  { pattern: /domestic\s*short/i, intensity: "LIGHT", reason: "short easy coat" },
+  { pattern: /bengal/i, intensity: "LIGHT", reason: "short sleek coat" },
+  { pattern: /abyssinian/i, intensity: "LIGHT", reason: "short ticked coat" },
+  { pattern: /burmese/i, intensity: "LIGHT", reason: "short satin coat" },
+  { pattern: /russian\s*blue/i, intensity: "LIGHT", reason: "short dense coat, easy care" },
+  { pattern: /bombay/i, intensity: "LIGHT", reason: "short sleek coat" },
+  { pattern: /oriental\s*(shorthair)?/i, intensity: "LIGHT", reason: "short smooth coat" },
+  { pattern: /cornish\s*rex/i, intensity: "LIGHT", reason: "short wavy coat" },
+  { pattern: /devon\s*rex/i, intensity: "LIGHT", reason: "short wavy coat" },
+  { pattern: /sphynx/i, intensity: "LIGHT", reason: "hairless, minimal grooming" },
+  { pattern: /korat/i, intensity: "LIGHT", reason: "short single coat" },
+  { pattern: /singapura/i, intensity: "LIGHT", reason: "short ticked coat" },
+  { pattern: /ocicat/i, intensity: "LIGHT", reason: "short spotted coat" },
+  { pattern: /egyptian\s*mau/i, intensity: "LIGHT", reason: "short spotted coat" },
+  { pattern: /havana\s*brown/i, intensity: "LIGHT", reason: "short smooth coat" },
+  { pattern: /american\s*curl/i, intensity: "LIGHT", reason: "short to medium coat" },
+  { pattern: /japanese\s*bobtail/i, intensity: "LIGHT", reason: "short to medium coat" },
 ];
 
 // Weight thresholds for intensity adjustment (in lbs)
