@@ -189,13 +189,13 @@ export default function BookingSettingsPage() {
                 value={bookingSlug}
                 onChange={(e) => handleSlugChange(e.target.value)}
                 placeholder="your-name-grooming"
-                className="input input-bordered w-full text-sm"
+                className="input w-full text-sm border-2 border-gray-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
               />
             </div>
             {/* Desktop: inline layout */}
             <div className="hidden sm:flex items-center gap-2">
-              <div className="flex-1 flex items-center bg-gray-50 border rounded-lg overflow-hidden">
-                <span className="px-3 py-2.5 text-gray-500 text-sm bg-gray-100 border-r whitespace-nowrap">
+              <div className="flex-1 flex items-center bg-white border-2 border-gray-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500">
+                <span className="px-3 py-2.5 text-gray-500 text-sm bg-gray-100 border-r border-gray-300 whitespace-nowrap">
                   groomroute.com/book/
                 </span>
                 <input
@@ -203,7 +203,7 @@ export default function BookingSettingsPage() {
                   value={bookingSlug}
                   onChange={(e) => handleSlugChange(e.target.value)}
                   placeholder="your-name-grooming"
-                  className="flex-1 px-3 py-2.5 bg-transparent outline-none text-sm min-w-0"
+                  className="flex-1 px-3 py-2.5 bg-white outline-none text-sm min-w-0"
                 />
               </div>
             </div>
