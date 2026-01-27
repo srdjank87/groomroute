@@ -171,7 +171,7 @@ export default function Home() {
                 <XCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-gray-900">30+ minutes between stops</p>
-                  <p className="text-sm text-gray-600">A route that zigzags across town — hours lost and a day that never settles.</p>
+                  <p className="text-sm text-gray-600">A route that zigzags across town - hours lost and a day that never settles.</p>
                 </div>
               </div>
             </div>
