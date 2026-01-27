@@ -181,17 +181,29 @@ export default function BookingSettingsPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Custom URL Slug
             </label>
-            <div className="flex items-center gap-2">
+            {/* Mobile: stacked layout */}
+            <div className="sm:hidden">
+              <p className="text-xs text-gray-500 mb-1.5">groomroute.com/book/</p>
+              <input
+                type="text"
+                value={bookingSlug}
+                onChange={(e) => handleSlugChange(e.target.value)}
+                placeholder="your-name-grooming"
+                className="input input-bordered w-full text-sm"
+              />
+            </div>
+            {/* Desktop: inline layout */}
+            <div className="hidden sm:flex items-center gap-2">
               <div className="flex-1 flex items-center bg-gray-50 border rounded-lg overflow-hidden">
-                <span className="px-3 py-2.5 text-gray-500 text-sm bg-gray-100 border-r">
-                  {typeof window !== "undefined" ? window.location.origin : ""}/book/
+                <span className="px-3 py-2.5 text-gray-500 text-sm bg-gray-100 border-r whitespace-nowrap">
+                  groomroute.com/book/
                 </span>
                 <input
                   type="text"
                   value={bookingSlug}
                   onChange={(e) => handleSlugChange(e.target.value)}
                   placeholder="your-name-grooming"
-                  className="flex-1 px-3 py-2.5 bg-transparent outline-none text-sm"
+                  className="flex-1 px-3 py-2.5 bg-transparent outline-none text-sm min-w-0"
                 />
               </div>
             </div>
@@ -212,7 +224,42 @@ export default function BookingSettingsPage() {
               <p className="text-sm text-teal-800 font-medium mb-2">
                 Your booking link:
               </p>
-              <div className="flex items-center gap-2">
+              {/* Mobile: stacked layout */}
+              <div className="sm:hidden space-y-2">
+                <code className="block text-sm bg-white px-3 py-2 rounded border text-teal-700 break-all">
+                  {bookingUrl}
+                </code>
+                <div className="flex gap-2">
+                  <button
+                    onClick={copyBookingUrl}
+                    disabled={!bookingEnabled}
+                    className="btn btn-sm flex-1 gap-1"
+                    title={bookingEnabled ? "Copy URL" : "Enable booking first"}
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-4 w-4" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                  <Link
+                    href={bookingEnabled ? `/book/${bookingSlug}` : "#"}
+                    target="_blank"
+                    className={`btn btn-sm flex-1 gap-1 ${!bookingEnabled ? "btn-disabled" : ""}`}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Preview
+                  </Link>
+                </div>
+              </div>
+              {/* Desktop: inline layout */}
+              <div className="hidden sm:flex items-center gap-2">
                 <code className="flex-1 text-sm bg-white px-3 py-2 rounded border text-teal-700 truncate">
                   {bookingUrl}
                 </code>
