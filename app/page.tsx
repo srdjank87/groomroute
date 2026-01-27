@@ -134,7 +134,7 @@ export default function Home() {
       </section>
 
       {/* USE WHATEVER YOU ALREADY USE - Early Clarification */}
-      <section className="py-10 lg:py-12 px-6 bg-white border-b border-gray-100">
+      <section className="py-10 lg:py-12 px-6 bg-amber-50/40">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl lg:text-3xl font-bold mb-4 text-gray-900">
             Use whatever you already use to book clients.
