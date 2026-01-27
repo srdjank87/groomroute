@@ -120,7 +120,10 @@ export default function BookingSettingsPage() {
     );
   }
 
-  const bookingUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/book/${bookingSlug}`;
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const bookingUrl = `${origin}/book/${bookingSlug}`;
+  // Display URL without www. for cleaner appearance
+  const displayUrl = bookingUrl.replace("://www.", "://");
   const hasValidSlug = bookingSlug && !slugError;
 
   return (
@@ -167,7 +170,7 @@ export default function BookingSettingsPage() {
             type="checkbox"
             checked={bookingEnabled}
             onChange={(e) => setBookingEnabled(e.target.checked)}
-            className="toggle toggle-lg toggle-success"
+            className="toggle toggle-lg toggle-success border-2 border-gray-300 checked:border-emerald-500"
           />
         </div>
       </div>
@@ -189,7 +192,7 @@ export default function BookingSettingsPage() {
                 value={bookingSlug}
                 onChange={(e) => handleSlugChange(e.target.value)}
                 placeholder="your-name-grooming"
-                className="input w-full text-sm border-2 border-gray-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                className="input w-full text-sm border-2 border-gray-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 pl-4"
               />
             </div>
             {/* Desktop: inline layout */}
@@ -203,7 +206,7 @@ export default function BookingSettingsPage() {
                   value={bookingSlug}
                   onChange={(e) => handleSlugChange(e.target.value)}
                   placeholder="your-name-grooming"
-                  className="flex-1 px-3 py-2.5 bg-white outline-none text-sm min-w-0"
+                  className="flex-1 pl-4 pr-3 py-2.5 bg-white outline-none text-sm min-w-0"
                 />
               </div>
             </div>
@@ -227,7 +230,7 @@ export default function BookingSettingsPage() {
               {/* Mobile: stacked layout */}
               <div className="sm:hidden space-y-2">
                 <code className="block text-sm bg-white px-3 py-2 rounded border text-teal-700 break-all">
-                  {bookingUrl}
+                  {displayUrl}
                 </code>
                 <div className="flex gap-2">
                   <button
@@ -261,7 +264,7 @@ export default function BookingSettingsPage() {
               {/* Desktop: inline layout */}
               <div className="hidden sm:flex items-center gap-2">
                 <code className="flex-1 text-sm bg-white px-3 py-2 rounded border text-teal-700 truncate">
-                  {bookingUrl}
+                  {displayUrl}
                 </code>
                 <button
                   onClick={copyBookingUrl}
@@ -323,6 +326,13 @@ export default function BookingSettingsPage() {
               They pick a date and time, enter their details, and the booking appears on your calendar
             </p>
           </div>
+        </div>
+
+        {/* Pro plan note */}
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <p className="text-xs text-gray-500">
+            <span className="font-medium">Team accounts:</span> Each groomer on your team gets their own booking page with a unique URL. Configure each groomer&apos;s booking settings from their profile.
+          </p>
         </div>
       </div>
 
