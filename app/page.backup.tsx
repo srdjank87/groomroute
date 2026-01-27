@@ -78,8 +78,8 @@ export default function Home() {
             </h1>
 
             <p className="text-base sm:text-lg lg:text-2xl mb-4 sm:mb-6 leading-relaxed max-w-3xl mx-auto text-gray-700">
-              GroomRoute takes over after your clients are booked&nbsp;—&nbsp;<br className="hidden lg:block" />
-              organizing routes, protecting your energy, and keeping your day on track.
+              The scheduling system built only for mobile groomers.&nbsp;<br className="hidden lg:block" />
+              Keep routes tight, days predictable, and your energy protected.
             </p>
 
             {/* Hero image - positioned below subheadline */}
@@ -130,25 +130,6 @@ export default function Home() {
             </div>
             <p className="text-xs sm:text-sm text-gray-500">14-day free trial. No commitment. Cancel anytime.</p>
           </div>
-        </div>
-      </section>
-
-      {/* USE WHATEVER YOU ALREADY USE - Early Clarification */}
-      <section className="py-10 lg:py-12 px-6 bg-white border-b border-gray-100">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl lg:text-3xl font-bold mb-4 text-gray-900">
-            Use whatever you already use to book clients.
-          </h2>
-          <p className="text-lg text-gray-600 mb-3">
-            GroomRoute doesn&apos;t replace your booking system.
-          </p>
-          <p className="text-lg text-gray-600">
-            It fixes what happens <em>after</em> clients are booked — the routing, the workload,
-            the running late chaos, and the days that leave you exhausted by 3pm.
-          </p>
-          <p className="text-base text-gray-500 mt-4">
-            Most groomers keep their existing booking app and use GroomRoute to make the day actually work.
-          </p>
         </div>
       </section>
 
@@ -214,52 +195,6 @@ export default function Home() {
             <p className="text-2xl lg:text-3xl font-bold text-gray-900">
               But what if you just want a calm, predictable day?
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* WHERE GROOMROUTE FITS - Workflow */}
-      <section className="py-12 lg:py-16 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
-              Where GroomRoute fits in your workflow
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-            {/* Step 1 */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 relative">
-              <div className="absolute -top-4 left-6 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-600">
-                1
-              </div>
-              <h3 className="text-xl font-bold mt-2 mb-3 text-gray-900">Clients get booked</h3>
-              <p className="text-gray-600">
-                Using whatever you already use — your website, booking app, text messages, DMs, or phone calls.
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-[#A5744A] relative">
-              <div className="absolute -top-4 left-6 w-8 h-8 bg-[#A5744A] rounded-full flex items-center justify-center font-bold text-white">
-                2
-              </div>
-              <h3 className="text-xl font-bold mt-2 mb-3 text-gray-900">GroomRoute takes over</h3>
-              <p className="text-gray-600">
-                We organize appointments by area, protect your workload, and plan the best route for your day.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-emerald-400 relative">
-              <div className="absolute -top-4 left-6 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-white">
-                3
-              </div>
-              <h3 className="text-xl font-bold mt-2 mb-3 text-gray-900">You finish calm and on time</h3>
-              <p className="text-gray-600">
-                Less driving. Fewer surprises. No mid-groom texting. Energy left at the end of the day.
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -419,15 +354,15 @@ export default function Home() {
             <div className="bg-gray-50 border-2 border-gray-200 rounded-2xl p-8">
               <h3 className="text-xl font-bold mb-6 text-gray-500 flex items-center gap-2">
                 <XCircle className="h-6 w-6" />
-                What GroomRoute intentionally doesn&apos;t do
+                Left out on purpose
               </h3>
               <ul className="space-y-4">
                 {[
-                  "Client-facing booking portals",
-                  "Lead capture & marketing",
-                  "Intake forms & payments",
+                  "Salon-only features you'll never use",
+                  "Marketing automation stacks",
                   "Complicated reporting dashboards",
                   "Enterprise team management",
+                  "Membership & package complexity",
                   "Features that require a manual",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
@@ -436,12 +371,6 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <p className="text-sm text-gray-600 font-medium">Why?</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Because those don&apos;t fix your day. GroomRoute is built for the part of your business most software ignores: <em>the hours between the first appointment and getting home.</em>
-                </p>
-              </div>
             </div>
           </div>
         </div>
@@ -451,9 +380,6 @@ export default function Home() {
       <section id="features" className="py-12 lg:py-16 px-6 bg-base-200">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-medium mb-4">
-              Built for post-booking chaos
-            </div>
             <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
               One tap. Problem solved.
             </h2>
@@ -966,18 +892,6 @@ export default function Home() {
               Every plan includes a <strong>14-day free trial</strong>. Cancel anytime.
             </p>
           </div>
-
-          {/* Onboarding Reassurance */}
-          <div className="mt-10 max-w-2xl mx-auto">
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center">
-              <p className="text-emerald-800 font-medium mb-2">
-                You don&apos;t need to move everything on day one.
-              </p>
-              <p className="text-emerald-700 text-sm">
-                Most groomers start by adding just their regular clients or a single area day. Setup takes minutes, not hours.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -997,44 +911,6 @@ export default function Home() {
             <p className="text-gray-600">
               No questions asked. No hoops. We&apos;re that confident.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-12 lg:py-16 px-6 bg-white">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl lg:text-3xl font-bold mb-8 text-center text-gray-900">
-            Common questions
-          </h2>
-
-          <div className="space-y-6">
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-bold text-gray-900 mb-2">
-                Do I need to switch my booking app?
-              </h3>
-              <p className="text-gray-600">
-                No. GroomRoute works alongside whatever you already use. Booking gets clients on the calendar — GroomRoute makes the day actually manageable.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-bold text-gray-900 mb-2">
-                How do I get my appointments into GroomRoute?
-              </h3>
-              <p className="text-gray-600">
-                Sync from Google Calendar, import from a spreadsheet, or add appointments manually. Most groomers start with their regulars and add more over time.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-bold text-gray-900 mb-2">
-                What if I already use MoeGo, Groomer.io, or another app?
-              </h3>
-              <p className="text-gray-600">
-                That&apos;s fine. Many groomers keep their booking app for client-facing scheduling and use GroomRoute to organize the actual day. They handle different jobs.
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -1066,7 +942,7 @@ export default function Home() {
             14-day free trial. No commitment. Cancel anytime.
           </p>
           <p className="text-sm text-gray-400 mt-1">
-            Keep your booking app. Sync from Google Calendar. We handle the day.
+            Import from spreadsheets, MoeGo, or start fresh - we&apos;ll help either way.
           </p>
         </div>
       </section>
@@ -1084,7 +960,7 @@ export default function Home() {
             />
             <GroomRouteLogo />
           </div>
-          <p className="max-w-md">Route optimization and day management for mobile groomers.</p>
+          <p className="max-w-md">The scheduling system built only for mobile groomers.</p>
           <p className="max-w-md">Finally, a calm day.</p>
           <div className="flex gap-4 mt-4">
             <Link href="/help" className="link link-hover text-sm">Help Center</Link>
