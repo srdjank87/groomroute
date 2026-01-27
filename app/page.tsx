@@ -145,7 +145,7 @@ export default function Home() {
               A booking page that protects your day.
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Clients book online — within the limits you set for your route, workload, and energy.
+              Clients book online - within the limits you set for your route, workload, and energy.
             </p>
           </div>
 
