@@ -191,7 +191,7 @@ export default function Home() {
                 <XCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-gray-900">Last-minute cancellations</p>
-                  <p className="text-sm text-gray-600">$200-400/month gone, just like that</p>
+                  <p className="text-sm text-gray-600">A booked slot you can&apos;t replace - income lost and a calmer day suddenly broken.</p>
                 </div>
               </div>
             </div>
