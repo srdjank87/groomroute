@@ -19,12 +19,17 @@ interface BookingData {
   address: string;
   lat: number;
   lng: number;
-  zipCode: string;
-  city: string;
-  state: string;
+  zipCode?: string;
+  city?: string;
+  state?: string;
   areaId: string | null;
   areaName: string | null;
   recommendedDays: Array<{ dayOfWeek: number; dayName: string }>;
+  // Pet details
+  petSpecies: "dog" | "cat";
+  petBreed: string;
+  petSize: "small" | "medium" | "large" | "giant";
+  petName?: string;
 }
 
 interface TimeSlot {
@@ -46,6 +51,50 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
+// Client-side duration estimation based on pet characteristics
+// Matches server-side logic in lib/booking-duration.ts
+function estimateDurationMinutes(pet: {
+  species: "dog" | "cat";
+  breed: string;
+  size: "small" | "medium" | "large" | "giant";
+}): number {
+  const DURATION_MAP = {
+    LIGHT: 45,
+    MODERATE: 60,
+    DEMANDING: 90,
+    INTENSIVE: 120,
+  };
+
+  // Breed patterns that indicate more demanding grooms
+  const INTENSIVE_BREEDS = /malamute|newfoundland|saint\s*bernard|great\s*pyrenees|bernese|tibetan\s*mastiff/i;
+  const DEMANDING_BREEDS = /doodle|poo($|\s)|oodle|poodle|bichon|husky|samoyed|chow|akita|collie|sheltie|golden\s*retriever|cocker\s*spaniel|shih\s*tzu|maltese|yorkie|yorkshire|havanese|persian|maine\s*coon|ragdoll|himalayan|norwegian\s*forest|siberian/i;
+  const LIGHT_BREEDS = /chihuahua|greyhound|basenji|hairless|chinese\s*crested|siamese|domestic\s*short|bengal|abyssinian|sphynx/i;
+
+  let intensity: keyof typeof DURATION_MAP = "MODERATE";
+
+  // Check breed first
+  if (INTENSIVE_BREEDS.test(pet.breed)) {
+    intensity = "INTENSIVE";
+  } else if (DEMANDING_BREEDS.test(pet.breed)) {
+    intensity = "DEMANDING";
+  } else if (LIGHT_BREEDS.test(pet.breed)) {
+    intensity = "LIGHT";
+  }
+
+  // Adjust for size (larger = more time)
+  if (pet.species === "dog") {
+    if (pet.size === "giant" && intensity !== "INTENSIVE") {
+      intensity = intensity === "LIGHT" ? "MODERATE" : intensity === "MODERATE" ? "DEMANDING" : "INTENSIVE";
+    } else if (pet.size === "large" && intensity === "LIGHT") {
+      intensity = "MODERATE";
+    } else if (pet.size === "small" && intensity === "MODERATE") {
+      intensity = "LIGHT";
+    }
+  }
+
+  return DURATION_MAP[intensity];
+}
+
 export default function BookingSchedulePage() {
   const params = useParams();
   const router = useRouter();
@@ -64,6 +113,7 @@ export default function BookingSchedulePage() {
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [estimatedDuration, setEstimatedDuration] = useState<number>(60);
 
   useEffect(() => {
     async function init() {
@@ -74,7 +124,23 @@ export default function BookingSchedulePage() {
         return;
       }
 
-      setBookingData(JSON.parse(stored));
+      const data = JSON.parse(stored) as BookingData;
+
+      // Redirect to pet page if pet details are missing
+      if (!data.petSpecies || !data.petBreed || !data.petSize) {
+        router.push(`/book/${slug}/pet`);
+        return;
+      }
+
+      setBookingData(data);
+
+      // Calculate estimated duration from pet details
+      const duration = estimateDurationMinutes({
+        species: data.petSpecies,
+        breed: data.petBreed,
+        size: data.petSize,
+      });
+      setEstimatedDuration(duration);
 
       // Fetch groomer info
       try {
@@ -105,7 +171,7 @@ export default function BookingSchedulePage() {
 
       try {
         const response = await fetch(
-          `/api/book/available-slots?groomerSlug=${slug}&date=${selectedDate}`
+          `/api/book/available-slots?groomerSlug=${slug}&date=${selectedDate}&duration=${estimatedDuration}`
         );
         const data = await response.json();
 
@@ -122,7 +188,7 @@ export default function BookingSchedulePage() {
     }
 
     fetchSlots();
-  }, [selectedDate, slug]);
+  }, [selectedDate, slug, estimatedDuration]);
 
   function generateCalendarDays() {
     const year = currentMonth.getFullYear();
@@ -251,16 +317,20 @@ export default function BookingSchedulePage() {
             </div>
             <div className="w-12 h-1 bg-amber-600 rounded" />
             <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-medium">
-              2
+              <span className="text-xs">&#10003;</span>
+            </div>
+            <div className="w-12 h-1 bg-amber-600 rounded" />
+            <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-medium">
+              3
             </div>
             <div className="w-12 h-1 bg-gray-200 rounded" />
             <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center text-sm font-medium">
-              3
+              4
             </div>
           </div>
 
           <button
-            onClick={() => router.push(`/book/${slug}`)}
+            onClick={() => router.push(`/book/${slug}/pet`)}
             className="flex items-center gap-1 text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="h-4 w-4" />

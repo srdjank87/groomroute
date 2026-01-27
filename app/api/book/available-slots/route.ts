@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const groomerSlug = searchParams.get("groomerSlug");
     const date = searchParams.get("date"); // YYYY-MM-DD format
+    const durationParam = searchParams.get("duration"); // Optional: estimated appointment duration in minutes
 
     if (!groomerSlug) {
       return NextResponse.json(
@@ -100,8 +101,9 @@ export async function GET(req: NextRequest) {
       })
       .sort((a, b) => a.start.getTime() - b.start.getTime());
 
-    // Generate time slots (1 hour default duration for client bookings)
-    const slotDuration = 60; // minutes
+    // Use provided duration or default to 60 minutes
+    // Duration is estimated from pet size/breed on the booking page
+    const slotDuration = durationParam ? Math.max(30, Math.min(180, parseInt(durationParam, 10))) : 60;
     const slots: Array<{
       time: string;
       timeFormatted: string;
@@ -149,6 +151,7 @@ export async function GET(req: NextRequest) {
         start: `${String(workStart).padStart(2, "0")}:00`,
         end: `${String(workEnd).padStart(2, "0")}:00`,
       },
+      slotDuration,
       slots: availableSlots,
       totalSlots: slots.length,
       availableCount: availableSlots.length,

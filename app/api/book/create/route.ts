@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { estimateDuration } from "@/lib/booking-duration";
 
 /**
  * POST /api/book/create
@@ -25,9 +26,29 @@ export async function POST(req: NextRequest) {
       petName,
       petSpecies,
       petBreed,
-      petWeight,
+      petSize, // small, medium, large, giant
       notes,
     } = body;
+
+    // Convert pet size to approximate weight
+    const sizeToWeight: Record<string, number> = {
+      small: 15,
+      medium: 35,
+      large: 65,
+      giant: 100,
+    };
+    const petWeight = petSize ? sizeToWeight[petSize] : null;
+
+    // Estimate appointment duration from pet details
+    let serviceDuration = 60; // default
+    if (petSpecies && petBreed && petSize) {
+      const estimate = estimateDuration({
+        species: petSpecies,
+        breed: petBreed,
+        size: petSize,
+      });
+      serviceDuration = estimate.minutes;
+    }
 
     // Validate required fields
     if (!groomerSlug) {
@@ -88,7 +109,7 @@ export async function POST(req: NextRequest) {
     // Check if time slot is still available
     const [hours, minutes] = time.split(":");
     const startAt = new Date(`${date}T${hours}:${minutes}:00`);
-    const endAt = new Date(startAt.getTime() + 60 * 60 * 1000); // 1 hour duration
+    const endAt = new Date(startAt.getTime() + serviceDuration * 60 * 1000); // Use estimated duration
 
     const conflictingAppointment = await prisma.appointment.findFirst({
       where: {
@@ -215,7 +236,7 @@ export async function POST(req: NextRequest) {
         customerId: customer.id,
         petId: pet.id,
         startAt,
-        serviceMinutes: 60, // Default 1 hour for online bookings
+        serviceMinutes: serviceDuration, // Duration based on pet size/breed
         status: "BOOKED",
         appointmentType: "FULL_GROOM",
         notes: notes || null,

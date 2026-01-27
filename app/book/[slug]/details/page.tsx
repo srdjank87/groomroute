@@ -9,8 +9,6 @@ import {
   Loader2,
   AlertCircle,
   Scissors,
-  Dog,
-  Cat,
   Mail,
   Phone,
 } from "lucide-react";
@@ -19,12 +17,17 @@ interface BookingData {
   address: string;
   lat: number;
   lng: number;
-  zipCode: string;
-  city: string;
-  state: string;
+  zipCode?: string;
+  city?: string;
+  state?: string;
   areaId: string | null;
   selectedDate: string;
   selectedTime: string;
+  // Pet details from earlier step
+  petSpecies: "dog" | "cat";
+  petBreed: string;
+  petSize: "small" | "medium" | "large" | "giant";
+  petName?: string;
 }
 
 interface GroomerInfo {
@@ -44,14 +47,10 @@ export default function BookingDetailsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Form state
+  // Form state - contact info only (pet details come from earlier step)
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [clientPhone, setClientPhone] = useState("");
-  const [petName, setPetName] = useState("");
-  const [petSpecies, setPetSpecies] = useState<"dog" | "cat">("dog");
-  const [petBreed, setPetBreed] = useState("");
-  const [petWeight, setPetWeight] = useState("");
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -103,10 +102,6 @@ export default function BookingDetailsPage() {
       setSubmitError("Please enter your phone number");
       return;
     }
-    if (!petName.trim()) {
-      setSubmitError("Please enter your pet's name");
-      return;
-    }
 
     setIsSubmitting(true);
     setSubmitError(null);
@@ -129,10 +124,11 @@ export default function BookingDetailsPage() {
           areaId: bookingData?.areaId,
           date: bookingData?.selectedDate,
           time: bookingData?.selectedTime,
-          petName: petName.trim(),
-          petSpecies,
-          petBreed: petBreed.trim() || null,
-          petWeight: petWeight ? parseFloat(petWeight) : null,
+          // Pet details from earlier step
+          petName: bookingData?.petName || "Pet",
+          petSpecies: bookingData?.petSpecies,
+          petBreed: bookingData?.petBreed || null,
+          petSize: bookingData?.petSize || null,
           notes: notes.trim() || null,
         }),
       });
@@ -152,7 +148,7 @@ export default function BookingDetailsPage() {
           date: bookingData?.selectedDate,
           time: bookingData?.selectedTime,
           clientName: clientName.trim(),
-          petName: petName.trim(),
+          petName: bookingData?.petName || "your pet",
         })
       );
 
@@ -243,7 +239,11 @@ export default function BookingDetailsPage() {
             </div>
             <div className="w-12 h-1 bg-amber-600 rounded" />
             <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-medium">
-              3
+              <span className="text-xs">&#10003;</span>
+            </div>
+            <div className="w-12 h-1 bg-amber-600 rounded" />
+            <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm font-medium">
+              4
             </div>
           </div>
 
@@ -263,6 +263,9 @@ export default function BookingDetailsPage() {
             </p>
             <p className="text-xs text-amber-700 mt-1">
               {bookingData.address}
+            </p>
+            <p className="text-xs text-amber-700 mt-1">
+              {bookingData.petName ? `${bookingData.petName} (${bookingData.petBreed})` : bookingData.petBreed}
             </p>
           </div>
 
@@ -334,84 +337,6 @@ export default function BookingDetailsPage() {
                       onChange={(e) => setClientPhone(e.target.value)}
                       placeholder="(555) 123-4567"
                       className="input input-bordered w-full pl-10"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Pet Information */}
-            <div>
-              <h3 className="font-medium text-gray-900 mb-3">Pet Info</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Pet Type *
-                  </label>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setPetSpecies("dog")}
-                      className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all ${
-                        petSpecies === "dog"
-                          ? "bg-amber-600 text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                    >
-                      <Dog className="h-5 w-5" />
-                      Dog
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPetSpecies("cat")}
-                      className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all ${
-                        petSpecies === "cat"
-                          ? "bg-amber-600 text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                    >
-                      <Cat className="h-5 w-5" />
-                      Cat
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    Pet Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={petName}
-                    onChange={(e) => setPetName(e.target.value)}
-                    placeholder={petSpecies === "dog" ? "Buddy" : "Whiskers"}
-                    className="input input-bordered w-full"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-1">
-                      Breed
-                    </label>
-                    <input
-                      type="text"
-                      value={petBreed}
-                      onChange={(e) => setPetBreed(e.target.value)}
-                      placeholder={petSpecies === "dog" ? "Golden Retriever" : "Persian"}
-                      className="input input-bordered w-full"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-1">
-                      Weight (lbs)
-                    </label>
-                    <input
-                      type="number"
-                      value={petWeight}
-                      onChange={(e) => setPetWeight(e.target.value)}
-                      placeholder="50"
-                      className="input input-bordered w-full"
                     />
                   </div>
                 </div>

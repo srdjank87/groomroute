@@ -136,7 +136,7 @@ export default function BookingAddressPage() {
       };
 
       sessionStorage.setItem(`booking_${slug}`, JSON.stringify(bookingData));
-      router.push(`/book/${slug}/schedule`);
+      router.push(`/book/${slug}/pet`);
     } catch (err) {
       setAddressError(err instanceof Error ? err.message : "Failed to check address");
     } finally {
@@ -202,6 +202,10 @@ export default function BookingAddressPage() {
             <div className="w-12 h-1 bg-gray-200 rounded" />
             <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center text-sm font-medium">
               3
+            </div>
+            <div className="w-12 h-1 bg-gray-200 rounded" />
+            <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center text-sm font-medium">
+              4
             </div>
           </div>
 
