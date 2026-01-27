@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Shield, Smartphone, CreditCard, ChevronRight, Settings as SettingsIcon, Users, Building2, Calendar } from "lucide-react";
+import { MapPin, Shield, Smartphone, CreditCard, ChevronRight, Settings as SettingsIcon, Users, Building2, Calendar, Globe } from "lucide-react";
 
 const settingsCategories = [
   {
@@ -59,6 +59,16 @@ const settingsCategories = [
     icon: Calendar,
     iconBg: "bg-sky-100",
     iconColor: "text-sky-600",
+  },
+  {
+    name: "Online Booking",
+    description: "Let clients book appointments 24/7 with your booking link",
+    href: "/dashboard/settings/booking",
+    icon: Globe,
+    iconBg: "bg-teal-100",
+    iconColor: "text-teal-600",
+    badge: "New",
+    badgeColor: "bg-teal-100 text-teal-700",
   },
   {
     name: "Billing",

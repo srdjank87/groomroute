@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Shield, Clock, Heart, CheckCircle2, XCircle, X, ChevronRight, Zap, MessageSquare } from "lucide-react";
+import { MapPin, Shield, Clock, Heart, CheckCircle2, XCircle, X, ChevronRight, Zap, MessageSquare, Globe } from "lucide-react";
 import { useState } from "react";
 import { LandingPageAnalytics, trackCTAClick } from "@/components/LandingPageAnalytics";
 
@@ -95,7 +95,11 @@ export default function Home() {
             </div>
 
             {/* Value props */}
-            <div className="flex max-w-3xl mx-auto mb-4 gap-2 sm:gap-4 lg:gap-6 justify-center text-xs sm:text-sm lg:text-base text-gray-600">
+            <div className="flex flex-wrap max-w-3xl mx-auto mb-4 gap-2 sm:gap-4 lg:gap-6 justify-center text-xs sm:text-sm lg:text-base text-gray-600">
+              <span className="flex items-center gap-1 sm:gap-1.5">
+                <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 flex-shrink-0" />
+                24/7 online booking
+              </span>
               <span className="flex items-center gap-1 sm:gap-1.5">
                 <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 flex-shrink-0" />
                 Less driving
@@ -103,10 +107,6 @@ export default function Home() {
               <span className="flex items-center gap-1 sm:gap-1.5">
                 <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 flex-shrink-0" />
                 Energy protected
-              </span>
-              <span className="flex items-center gap-1 sm:gap-1.5">
-                <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 flex-shrink-0" />
-                Fewer surprises
               </span>
             </div>
 
@@ -133,21 +133,56 @@ export default function Home() {
         </div>
       </section>
 
-      {/* USE WHATEVER YOU ALREADY USE - Early Clarification */}
-      <section className="py-10 lg:py-12 px-6 bg-amber-50/40">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl lg:text-3xl font-bold mb-4 text-gray-900">
-            Use whatever you already use to book clients.
-          </h2>
-          <p className="text-lg text-gray-600 mb-3">
-            GroomRoute doesn&apos;t replace your booking system.
-          </p>
-          <p className="text-lg text-gray-600">
-            It fixes what happens <em>after</em> clients are booked - the routing, the workload,
-            the running late chaos, and the days that leave you exhausted by 3pm.
-          </p>
-          <p className="text-base text-gray-500 mt-4">
-            Most groomers keep their existing booking app and use GroomRoute to make the day actually work.
+      {/* EASY ONLINE BOOKING - NEW Feature Highlight */}
+      <section className="py-10 lg:py-12 px-6 bg-gradient-to-r from-teal-50 to-emerald-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-teal-100 text-teal-800 px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <Globe className="h-4 w-4" />
+              New: Easy Online Booking
+            </div>
+            <h2 className="text-2xl lg:text-3xl font-bold mb-4 text-gray-900">
+              Your own booking page. Clients book 24/7.
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              No more back-and-forth texts. Share your personal booking link and let clients pick a time that works for both of you.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl p-5 shadow-md">
+              <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mb-3">
+                <span className="text-xl">🔗</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">Your Booking Link</h3>
+              <p className="text-sm text-gray-600">
+                Get a personalized URL to share via text, email, or social media.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-5 shadow-md">
+              <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mb-3">
+                <span className="text-xl">📍</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">Smart Area Days</h3>
+              <p className="text-sm text-gray-600">
+                Clients see recommended days based on where they live - protecting your route.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-5 shadow-md">
+              <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mb-3">
+                <span className="text-xl">✨</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-1">Zero Friction</h3>
+              <p className="text-sm text-gray-600">
+                Bookings appear on your calendar automatically. No importing, no double-entry.
+              </p>
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Already have a booking app? GroomRoute works alongside it too - sync from Google Calendar or add appointments manually.
           </p>
         </div>
       </section>
@@ -223,19 +258,19 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
-              Where GroomRoute fits in your workflow
+              From booking to calm day - all in one place
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {/* Step 1 */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 relative">
-              <div className="absolute -top-4 left-6 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-600">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-teal-400 relative">
+              <div className="absolute -top-4 left-6 w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center font-bold text-white">
                 1
               </div>
-              <h3 className="text-xl font-bold mt-2 mb-3 text-gray-900">Clients get booked</h3>
+              <h3 className="text-xl font-bold mt-2 mb-3 text-gray-900">Clients book online</h3>
               <p className="text-gray-600">
-                Using whatever you already use - your website, booking app, text messages, DMs, or phone calls.
+                Share your booking link. Clients see available times based on your area days and pick what works.
               </p>
             </div>
 
@@ -244,9 +279,9 @@ export default function Home() {
               <div className="absolute -top-4 left-6 w-8 h-8 bg-[#A5744A] rounded-full flex items-center justify-center font-bold text-white">
                 2
               </div>
-              <h3 className="text-xl font-bold mt-2 mb-3 text-gray-900">GroomRoute takes over</h3>
+              <h3 className="text-xl font-bold mt-2 mb-3 text-gray-900">GroomRoute organizes</h3>
               <p className="text-gray-600">
-                We organize appointments by area, protect your workload, and plan the best route for your day.
+                We cluster appointments by area, protect your workload, and plan the best route for your day.
               </p>
             </div>
 
@@ -425,6 +460,7 @@ export default function Home() {
               </h3>
               <ul className="space-y-4">
                 {[
+                  "Easy online booking page",
                   "Route clustering by neighborhood",
                   "Smart breed difficulty detection",
                   "Large dog limits & working hours",
@@ -448,9 +484,9 @@ export default function Home() {
               </h3>
               <ul className="space-y-4">
                 {[
-                  "Client-facing booking portals",
-                  "Lead capture & marketing",
-                  "Intake forms & payments",
+                  "Lead capture & marketing automation",
+                  "Intake forms & contracts",
+                  "Payment processing & invoicing",
                   "Complicated reporting dashboards",
                   "Enterprise team management",
                   "Features that require a manual",
@@ -464,7 +500,7 @@ export default function Home() {
               <div className="mt-6 pt-4 border-t border-gray-200">
                 <p className="text-sm text-gray-600 font-medium">Why?</p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Because those don&apos;t fix your day. GroomRoute is built for the part of your business most software ignores: <em>the hours between the first appointment and getting home.</em>
+                  Because those don&apos;t fix your day. GroomRoute is built for the part of your business most software ignores: <em>from booking to getting home calm.</em>
                 </p>
               </div>
             </div>
@@ -491,6 +527,18 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Feature cards */}
+            <div className="card bg-white shadow-lg hover:shadow-xl transition-shadow border-2 border-teal-200">
+              <div className="card-body">
+                <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                  <Globe className="h-6 w-6 text-teal-600" />
+                </div>
+                <h3 className="card-title text-lg">Online Booking</h3>
+                <p className="text-gray-600 text-sm">
+                  Your own booking page. Clients enter their address, see your best days for their area, and book instantly. No more back-and-forth texts.
+                </p>
+              </div>
+            </div>
+
             <div className="card bg-white shadow-lg hover:shadow-xl transition-shadow">
               <div className="card-body">
                 <div className="w-12 h-12 bg-[#A5744A]/10 rounded-lg flex items-center justify-center mb-4">
@@ -881,10 +929,10 @@ export default function Home() {
                 <ul className="space-y-3 mb-6 flex-grow">
                   {[
                     "Up to 50 clients",
+                    "Online booking page",
                     "Route optimization",
                     "Area day scheduling",
                     "One-tap navigation",
-                    "Basic client notes",
                     "Email support",
                   ].map((item) => (
                     <li className="flex gap-2 items-start" key={item}>
@@ -928,8 +976,8 @@ export default function Home() {
                   {[
                     "Unlimited clients",
                     "Everything in Starter, plus:",
+                    "Smart booking suggestions",
                     "Workload protection limits",
-                    "Working hours warnings",
                     "Running late notifications",
                     "Pet behavior flags",
                     "Client cancellation history",
@@ -1059,16 +1107,25 @@ export default function Home() {
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-xl p-6">
               <h3 className="font-bold text-gray-900 mb-2">
-                Do I need to switch my booking app?
+                How does the online booking work?
               </h3>
               <p className="text-gray-600">
-                No. GroomRoute works alongside whatever you already use. Booking gets clients on the calendar - GroomRoute makes the day actually manageable.
+                You get a personal booking link (like groomroute.com/book/your-name). Clients enter their address, and we show them your best available days based on when you&apos;re already in their area. They pick a time and the appointment appears on your calendar automatically.
               </p>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6">
               <h3 className="font-bold text-gray-900 mb-2">
-                How do I get my appointments into GroomRoute?
+                Do I need to switch my booking app?
+              </h3>
+              <p className="text-gray-600">
+                No. You can use GroomRoute&apos;s built-in booking page, or keep your existing booking app and sync appointments from Google Calendar. Many groomers use both - the GroomRoute link for new clients and their existing system for regulars.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h3 className="font-bold text-gray-900 mb-2">
+                How do I get my existing appointments into GroomRoute?
               </h3>
               <p className="text-gray-600">
                 Sync from Google Calendar, import from a spreadsheet, or add appointments manually. Most groomers start with their regulars and add more over time.

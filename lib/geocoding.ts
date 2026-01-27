@@ -6,9 +6,13 @@
 
 export interface GeocodingResult {
   success: boolean;
+  status?: string;
   lat?: number;
   lng?: number;
   formattedAddress?: string;
+  zipCode?: string;
+  city?: string;
+  state?: string;
   error?: string;
 }
 
@@ -48,6 +52,7 @@ async function geocodeWithGoogle(address: string): Promise<GeocodingResult> {
   if (data.status !== "OK" || !data.results || data.results.length === 0) {
     return {
       success: false,
+      status: data.status,
       error: data.status === "ZERO_RESULTS" ? "Address not found" : "Geocoding failed",
     };
   }
@@ -55,11 +60,33 @@ async function geocodeWithGoogle(address: string): Promise<GeocodingResult> {
   const result = data.results[0];
   const location = result.geometry.location;
 
+  // Extract address components
+  let zipCode: string | undefined;
+  let city: string | undefined;
+  let state: string | undefined;
+
+  for (const component of result.address_components || []) {
+    const types = component.types || [];
+    if (types.includes("postal_code")) {
+      zipCode = component.long_name;
+    }
+    if (types.includes("locality")) {
+      city = component.long_name;
+    }
+    if (types.includes("administrative_area_level_1")) {
+      state = component.short_name;
+    }
+  }
+
   return {
     success: true,
+    status: "OK",
     lat: location.lat,
     lng: location.lng,
     formattedAddress: result.formatted_address,
+    zipCode,
+    city,
+    state,
   };
 }
 

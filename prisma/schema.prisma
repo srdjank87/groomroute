@@ -133,6 +133,9 @@ model Groomer {
   // Light=1, Moderate=2, Demanding=3, Intensive=4
   // Default 12 = roughly 6 moderate grooms or 4 demanding grooms
   dailyIntensityLimit Int?          @default(12)
+  // Client self-booking
+  bookingSlug         String?       @unique // URL slug for booking page (e.g., "john-smith-grooming")
+  bookingEnabled      Boolean       @default(false) // Toggle to enable/disable public booking
   isActive            Boolean       @default(true)
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt

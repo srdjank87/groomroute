@@ -37,6 +37,8 @@ export async function GET(req: NextRequest) {
         workingHoursEnd: true,
         preferredMessaging: true,
         preferredMaps: true,
+        bookingSlug: true,
+        bookingEnabled: true,
       },
     });
 
@@ -162,6 +164,42 @@ export async function PATCH(req: NextRequest) {
       updateData.preferredMaps = body.preferredMaps;
     }
 
+    if (body.bookingEnabled !== undefined) {
+      updateData.bookingEnabled = Boolean(body.bookingEnabled);
+    }
+
+    if (body.bookingSlug !== undefined) {
+      if (body.bookingSlug === null || body.bookingSlug === "") {
+        updateData.bookingSlug = null;
+      } else {
+        // Validate slug format (lowercase, alphanumeric, hyphens only)
+        const slug = body.bookingSlug.toLowerCase().trim();
+        if (!/^[a-z0-9-]+$/.test(slug)) {
+          return NextResponse.json(
+            { error: "Booking URL can only contain letters, numbers, and hyphens" },
+            { status: 400 }
+          );
+        }
+        if (slug.length < 3 || slug.length > 50) {
+          return NextResponse.json(
+            { error: "Booking URL must be between 3 and 50 characters" },
+            { status: 400 }
+          );
+        }
+        // Check if slug is already taken by another groomer
+        const existingGroomer = await prisma.groomer.findUnique({
+          where: { bookingSlug: slug },
+        });
+        if (existingGroomer && existingGroomer.id !== groomerId) {
+          return NextResponse.json(
+            { error: "This booking URL is already taken" },
+            { status: 400 }
+          );
+        }
+        updateData.bookingSlug = slug;
+      }
+    }
+
     const updatedGroomer = await prisma.groomer.update({
       where: { id: groomerId },
       data: updateData,
@@ -175,6 +213,8 @@ export async function PATCH(req: NextRequest) {
         workingHoursEnd: true,
         preferredMessaging: true,
         preferredMaps: true,
+        bookingSlug: true,
+        bookingEnabled: true,
       },
     });
 
