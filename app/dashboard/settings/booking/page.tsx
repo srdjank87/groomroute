@@ -235,9 +235,7 @@ export default function BookingSettingsPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={copyBookingUrl}
-                    disabled={!bookingEnabled}
                     className="btn btn-sm flex-1 gap-1"
-                    title={bookingEnabled ? "Copy URL" : "Enable booking first"}
                   >
                     {copied ? (
                       <>
@@ -252,9 +250,9 @@ export default function BookingSettingsPage() {
                     )}
                   </button>
                   <Link
-                    href={bookingEnabled ? `/book/${bookingSlug}` : "#"}
+                    href={`/book/${bookingSlug}`}
                     target="_blank"
-                    className={`btn btn-sm flex-1 gap-1 ${!bookingEnabled ? "btn-disabled" : ""}`}
+                    className="btn btn-sm flex-1 gap-1"
                   >
                     <ExternalLink className="h-4 w-4" />
                     Preview
@@ -268,9 +266,7 @@ export default function BookingSettingsPage() {
                 </code>
                 <button
                   onClick={copyBookingUrl}
-                  disabled={!bookingEnabled}
                   className="btn btn-sm gap-1"
-                  title={bookingEnabled ? "Copy URL" : "Enable booking first"}
                 >
                   {copied ? (
                     <>
@@ -285,9 +281,9 @@ export default function BookingSettingsPage() {
                   )}
                 </button>
                 <Link
-                  href={bookingEnabled ? `/book/${bookingSlug}` : "#"}
+                  href={`/book/${bookingSlug}`}
                   target="_blank"
-                  className={`btn btn-sm gap-1 ${!bookingEnabled ? "btn-disabled" : ""}`}
+                  className="btn btn-sm gap-1"
                 >
                   <ExternalLink className="h-4 w-4" />
                   Preview
