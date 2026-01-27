@@ -24,25 +24,20 @@ interface Pet {
   groomIntensity?: GroomIntensity;
 }
 
-// Intensity options with clear descriptions
-const intensityOptions: {
-  value: GroomIntensity;
-  label: string;
-  description: string;
-  examples: string;
-  color: string;
-  bgColor: string;
-}[] = [
+// Intensity options with species-specific examples
+const getIntensityOptions = (species: string) => [
   {
-    value: "LIGHT",
+    value: "LIGHT" as GroomIntensity,
     label: "Light",
     description: "Quick, easy groom",
-    examples: "Short coats, small cooperative dogs, bath-only",
+    examples: species === "cat"
+      ? "Short coats, small cooperative cats, bath-only"
+      : "Short coats, small cooperative dogs, bath-only",
     color: "text-emerald-600",
     bgColor: "bg-emerald-50 border-emerald-200",
   },
   {
-    value: "MODERATE",
+    value: "MODERATE" as GroomIntensity,
     label: "Moderate",
     description: "Standard groom",
     examples: "Average coat maintenance, typical behavior",
@@ -50,24 +45,29 @@ const intensityOptions: {
     bgColor: "bg-blue-50 border-blue-200",
   },
   {
-    value: "DEMANDING",
+    value: "DEMANDING" as GroomIntensity,
     label: "Demanding",
     description: "Heavy groom",
-    examples: "Doodles, double coats, large dogs, wiggly pups",
+    examples: species === "cat"
+      ? "Persians, Maine Coons, long-haired cats"
+      : "Doodles, double coats, large dogs, wiggly pups",
     color: "text-amber-600",
     bgColor: "bg-amber-50 border-amber-200",
   },
   {
-    value: "INTENSIVE",
+    value: "INTENSIVE" as GroomIntensity,
     label: "Intensive",
     description: "Marathon groom",
-    examples: "Matted coats, reactive dogs, very large + heavy coat",
+    examples: species === "cat"
+      ? "Severely matted coats, very fearful or reactive cats"
+      : "Matted coats, reactive dogs, very large + heavy coat",
     color: "text-red-600",
     bgColor: "bg-red-50 border-red-200",
   },
 ];
 
-const behaviorOptions = [
+// Species-specific behavior options
+const dogBehaviorOptions = [
   { value: "FRIENDLY", label: "Friendly", emoji: "😊" },
   { value: "ANXIOUS", label: "Anxious", emoji: "😰" },
   { value: "AGGRESSIVE", label: "Aggressive", emoji: "⚠️" },
@@ -75,13 +75,36 @@ const behaviorOptions = [
   { value: "MUZZLE_REQUIRED", label: "Muzzle Required", emoji: "🏥" },
 ];
 
-const equipmentOptions = [
+const catBehaviorOptions = [
+  { value: "FRIENDLY", label: "Friendly", emoji: "😊" },
+  { value: "ANXIOUS", label: "Anxious", emoji: "😰" },
+  { value: "FEARFUL", label: "Fearful", emoji: "😨" },
+  { value: "SCRATCH_RISK", label: "Scratch Risk", emoji: "🐱" },
+  { value: "BITE_RISK", label: "Bite Risk", emoji: "🦷" },
+];
+
+const getBehaviorOptions = (species: string) =>
+  species === "cat" ? catBehaviorOptions : dogBehaviorOptions;
+
+// Species-specific equipment options
+const dogEquipmentOptions = [
   { value: "MUZZLE", label: "Muzzle" },
   { value: "TABLE_EXTENDER", label: "Table Extender" },
   { value: "HEAVY_DUTY_DRYER", label: "Heavy Duty Dryer" },
   { value: "EXTRA_TOWELS", label: "Extra Towels" },
   { value: "SENSITIVE_SKIN_PRODUCTS", label: "Sensitive Skin Products" },
 ];
+
+const catEquipmentOptions = [
+  { value: "CAT_RESTRAINT_BAG", label: "Cat Restraint Bag" },
+  { value: "E_COLLAR", label: "E-Collar" },
+  { value: "NAIL_CAPS", label: "Nail Caps" },
+  { value: "EXTRA_TOWELS", label: "Extra Towels" },
+  { value: "SENSITIVE_SKIN_PRODUCTS", label: "Sensitive Skin Products" },
+];
+
+const getEquipmentOptions = (species: string) =>
+  species === "cat" ? catEquipmentOptions : dogEquipmentOptions;
 
 export default function EditPetPage() {
   const router = useRouter();
@@ -435,7 +458,7 @@ export default function EditPetPage() {
               Behavior Traits
             </label>
             <div className="flex flex-wrap gap-2">
-              {behaviorOptions.map((option) => (
+              {getBehaviorOptions(formData.species).map((option) => (
                 <button
                   key={option.value}
                   type="button"
@@ -500,8 +523,8 @@ export default function EditPetPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium text-gray-900">
-                        Suggested: <span className={intensityOptions.find(o => o.value === intensitySuggestion.intensity)?.color}>
-                          {intensityOptions.find(o => o.value === intensitySuggestion.intensity)?.label}
+                        Suggested: <span className={getIntensityOptions(formData.species).find(o => o.value === intensitySuggestion.intensity)?.color}>
+                          {getIntensityOptions(formData.species).find(o => o.value === intensitySuggestion.intensity)?.label}
                         </span>
                       </span>
                       <button
@@ -521,7 +544,7 @@ export default function EditPetPage() {
             )}
 
             <div className="grid grid-cols-2 gap-2">
-              {intensityOptions.map((option) => (
+              {getIntensityOptions(formData.species).map((option) => (
                 <button
                   key={option.value}
                   type="button"
@@ -593,7 +616,7 @@ export default function EditPetPage() {
                   Equipment Required
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {equipmentOptions.map((option) => (
+                  {getEquipmentOptions(formData.species).map((option) => (
                     <button
                       key={option.value}
                       type="button"

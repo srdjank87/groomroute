@@ -112,13 +112,25 @@ export default function NewCustomerPage() {
     fetchAreas();
   }, []);
 
-  const behaviorOptions = [
+  // Species-specific behavior options
+  const dogBehaviorOptions = [
     { value: "FRIENDLY", label: "Friendly", emoji: "😊" },
     { value: "ANXIOUS", label: "Anxious", emoji: "😰" },
     { value: "AGGRESSIVE", label: "Aggressive", emoji: "⚠️" },
     { value: "BITE_RISK", label: "Bite Risk", emoji: "🦷" },
     { value: "MUZZLE_REQUIRED", label: "Muzzle Required", emoji: "🏥" },
   ];
+
+  const catBehaviorOptions = [
+    { value: "FRIENDLY", label: "Friendly", emoji: "😊" },
+    { value: "ANXIOUS", label: "Anxious", emoji: "😰" },
+    { value: "FEARFUL", label: "Fearful", emoji: "😨" },
+    { value: "SCRATCH_RISK", label: "Scratch Risk", emoji: "🐱" },
+    { value: "BITE_RISK", label: "Bite Risk", emoji: "🦷" },
+  ];
+
+  const getBehaviorOptions = () =>
+    formData.species === "cat" ? catBehaviorOptions : dogBehaviorOptions;
 
   const toggleBehaviorFlag = (flag: string) => {
     setFormData((prev) => ({
@@ -659,7 +671,7 @@ export default function NewCustomerPage() {
                   Behavior
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {behaviorOptions.map((option) => (
+                  {getBehaviorOptions().map((option) => (
                     <button
                       key={option.value}
                       type="button"
