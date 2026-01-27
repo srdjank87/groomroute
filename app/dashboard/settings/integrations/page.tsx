@@ -403,7 +403,7 @@ export default function IntegrationsPage() {
             <div className="flex items-center gap-2 text-amber-700">
               <CheckCircle2 className="h-5 w-5" />
               <span className="text-sm font-medium">
-                Request submitted - we'll email you when ready
+                Request submitted - we&apos;ll email you when ready
               </span>
             </div>
           ) : (
@@ -447,7 +447,7 @@ export default function IntegrationsPage() {
               </h3>
               <p className="text-sm text-amber-800">
                 Google Calendar integration is in beta while we complete
-                Google's app verification process. We manually add each user to
+                Google&apos;s app verification process. We manually add each user to
                 our approved list - this usually takes less than 24 hours. Once
                 approved, you can connect your calendar and start syncing.
               </p>
