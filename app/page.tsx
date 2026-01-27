@@ -333,8 +333,9 @@ export default function Home() {
                 </div>
 
                 <p className="text-gray-600 text-sm mb-4">
-                  Set your limits. Max 3 large dogs today. No appointments after 5pm.
-                  The system warns you before you overcommit.
+                  GroomRoute knows that 4 doodles isn&apos;t the same as 4 chihuahuas.
+                  Set your limits - max large dogs, no back-to-back giants, hard stop at 5pm.
+                  Get warned <em>before</em> you overcommit.
                 </p>
 
                 {/* Screenshot as footnote */}
@@ -368,9 +369,21 @@ export default function Home() {
                   </p>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-4">
-                  When things go sideways - cancellations, running late, traffic - GroomRoute has your back with one-tap solutions.
-                </p>
+                {/* Concrete scenarios */}
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-start gap-2 text-sm">
+                    <span className="text-blue-500 font-bold">→</span>
+                    <span className="text-gray-600"><strong>Client cancels at 10am?</strong> One tap finds a nearby fill-in from your waitlist.</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <span className="text-blue-500 font-bold">→</span>
+                    <span className="text-gray-600"><strong>Running 20 minutes late?</strong> One tap updates all remaining clients with new ETAs.</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <span className="text-blue-500 font-bold">→</span>
+                    <span className="text-gray-600"><strong>Giant doodle took forever?</strong> One tap reshuffles your afternoon.</span>
+                  </div>
+                </div>
 
                 {/* Screenshot as footnote */}
                 <div className="bg-gray-100 rounded-lg p-1.5">
@@ -509,7 +522,7 @@ export default function Home() {
                 </div>
                 <h3 className="card-title text-lg">Running Late</h3>
                 <p className="text-gray-600 text-sm">
-                  One tap notifies all affected clients. Stay professional without panic texting.
+                  Tap &quot;Running 15 minutes late&quot; - every remaining client gets a professional message with their updated time. No panic texting while elbow-deep in a doodle.
                 </p>
               </div>
             </div>
@@ -533,7 +546,7 @@ export default function Home() {
                 </div>
                 <h3 className="card-title text-lg">Skip with Reason</h3>
                 <p className="text-gray-600 text-sm">
-                  Cancellation or no-show? One tap logs it, warns you about problem clients, and moves on.
+                  Client no-shows or cancels last minute? Tap, select reason, done. GroomRoute tracks patterns - you&apos;ll see a warning before booking a serial canceller again.
                 </p>
               </div>
             </div>
@@ -545,7 +558,7 @@ export default function Home() {
                 </div>
                 <h3 className="card-title text-lg">On My Way</h3>
                 <p className="text-gray-600 text-sm">
-                  One tap lets your client know you&apos;re heading over. Build trust without extra effort.
+                  Tap once - your client gets a message with your ETA. They&apos;ll tell their friends about the groomer who always lets them know when to expect you.
                 </p>
               </div>
             </div>
@@ -612,11 +625,34 @@ export default function Home() {
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Energy left at the end of the day</span>
                 </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Clients notice you&apos;re always on time, always professional</span>
+                </div>
               </div>
 
               <div className="mt-6 pt-6 border-t border-emerald-200 text-center">
-                <p className="text-emerald-700 font-semibold">Result: Calm days, sustainable career</p>
+                <p className="text-emerald-700 font-semibold">Result: Calm days, happy clients, sustainable career</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CLIENTS NOTICE - Professional Reliability */}
+      <section className="py-10 lg:py-12 px-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl lg:text-3xl font-bold mb-4 text-gray-900">
+            Your clients will notice.
+          </h2>
+          <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+            When you show up on time, every time. When you communicate proactively instead of scrambling.
+            When you seem calm instead of frazzled.
+          </p>
+          <div className="inline-flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg border border-blue-100">
+            <div className="text-left">
+              <p className="text-gray-900 font-medium">&quot;She&apos;s always so organized.&quot;</p>
+              <p className="text-sm text-gray-500">What your clients will say about you</p>
             </div>
           </div>
         </div>
@@ -1045,6 +1081,15 @@ export default function Home() {
               </h3>
               <p className="text-gray-600">
                 That&apos;s fine. Many groomers keep their booking app for client-facing scheduling and use GroomRoute to organize the actual day. They handle different jobs.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h3 className="font-bold text-gray-900 mb-2">
+                What do my clients see when I tap &quot;Running Late&quot; or &quot;On My Way&quot;?
+              </h3>
+              <p className="text-gray-600">
+                They get a clean, professional text message with your updated ETA. No &quot;Sent via GroomRoute&quot; branding - it looks like you took the time to message them personally. Because you did, just faster.
               </p>
             </div>
           </div>
