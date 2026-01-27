@@ -1143,7 +1143,7 @@ export default function Home() {
                 What if I already use MoeGo, Groomer.io, or another app?
               </h3>
               <p className="text-gray-600">
-                That&apos;s fine. Many groomers keep their booking app for client-facing scheduling and use GroomRoute to organize the actual day. They handle different jobs.
+                You can switch to GroomRoute&apos;s built-in booking page, or keep your current system and just use GroomRoute for route optimization. Import your clients and you&apos;re set either way.
               </p>
             </div>
 
