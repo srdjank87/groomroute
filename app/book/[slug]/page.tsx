@@ -3,12 +3,21 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MapPin, ArrowRight, Loader2, AlertCircle, Scissors } from "lucide-react";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
 
 interface GroomerInfo {
   id: string;
   name: string;
   workingHoursStart: string;
   workingHoursEnd: string;
+}
+
+interface GeocodedLocation {
+  lat: number;
+  lng: number;
+  zipCode?: string;
+  city?: string;
+  state?: string;
 }
 
 export default function BookingAddressPage() {
@@ -21,6 +30,7 @@ export default function BookingAddressPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [address, setAddress] = useState("");
+  const [geocodedLocation, setGeocodedLocation] = useState<GeocodedLocation | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
 
@@ -46,6 +56,26 @@ export default function BookingAddressPage() {
     }
   }, [slug]);
 
+  // Extract address components from Google Places result
+  function extractAddressComponents(place: google.maps.places.PlaceResult): Partial<GeocodedLocation> {
+    const components: Partial<GeocodedLocation> = {};
+
+    for (const component of place.address_components || []) {
+      const types = component.types || [];
+      if (types.includes("postal_code")) {
+        components.zipCode = component.long_name;
+      }
+      if (types.includes("locality")) {
+        components.city = component.long_name;
+      }
+      if (types.includes("administrative_area_level_1")) {
+        components.state = component.short_name;
+      }
+    }
+
+    return components;
+  }
+
   async function handleCheckAddress() {
     if (!address.trim()) {
       setAddressError("Please enter your address");
@@ -56,13 +86,24 @@ export default function BookingAddressPage() {
     setAddressError(null);
 
     try {
+      // If we have pre-geocoded coordinates from autocomplete, include them
+      const requestBody: Record<string, unknown> = {
+        address: address.trim(),
+        groomerSlug: slug,
+      };
+
+      if (geocodedLocation) {
+        requestBody.lat = geocodedLocation.lat;
+        requestBody.lng = geocodedLocation.lng;
+        requestBody.zipCode = geocodedLocation.zipCode;
+        requestBody.city = geocodedLocation.city;
+        requestBody.state = geocodedLocation.state;
+      }
+
       const response = await fetch("/api/book/check-address", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          address: address.trim(),
-          groomerSlug: slug,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
@@ -181,29 +222,45 @@ export default function BookingAddressPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Your Address
               </label>
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => {
-                  setAddress(e.target.value);
-                  setAddressError(null);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleCheckAddress();
-                  }
-                }}
-                placeholder="123 Main St, City, State ZIP"
-                className={`input input-bordered w-full ${
-                  addressError ? "input-error" : ""
-                }`}
-              />
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400 z-10 pointer-events-none" />
+                <AddressAutocomplete
+                  value={address}
+                  onChange={(newAddress) => {
+                    setAddress(newAddress);
+                    setAddressError(null);
+                    setGeocodedLocation(null); // Reset when typing manually
+                  }}
+                  onPlaceSelected={(place) => {
+                    if (place.geometry?.location && place.formatted_address) {
+                      const lat = place.geometry.location.lat();
+                      const lng = place.geometry.location.lng();
+                      const components = extractAddressComponents(place);
+
+                      setAddress(place.formatted_address);
+                      setGeocodedLocation({
+                        lat,
+                        lng,
+                        ...components,
+                      });
+                      setAddressError(null);
+                    }
+                  }}
+                  placeholder="Start typing your address..."
+                  className={`input input-bordered w-full pl-10 ${
+                    addressError ? "input-error" : ""
+                  }`}
+                />
+              </div>
               {addressError && (
                 <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                   <AlertCircle className="h-4 w-4" />
                   {addressError}
                 </p>
               )}
+              <p className="text-xs text-gray-500 mt-1">
+                Select an address from the dropdown for best results
+              </p>
             </div>
 
             <button

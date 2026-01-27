@@ -15,11 +15,12 @@ const DAY_NAMES = [
 /**
  * POST /api/book/check-address
  * Public endpoint - Check if address is in groomer's service area and get recommended days
+ * Accepts optional pre-geocoded coordinates from client-side Google Places API
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { address, groomerSlug } = body;
+    const { address, groomerSlug, lat, lng, zipCode, city, state } = body;
 
     if (!address) {
       return NextResponse.json(
@@ -59,8 +60,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Geocode the address
-    const geocodeResult = await geocodeAddress(address);
+    // Use pre-geocoded data if available, otherwise geocode server-side
+    let geocodeResult: {
+      success: boolean;
+      lat?: number;
+      lng?: number;
+      formattedAddress?: string;
+      zipCode?: string;
+      city?: string;
+      state?: string;
+    };
+
+    if (lat && lng && zipCode) {
+      // Use pre-geocoded data from client
+      geocodeResult = {
+        success: true,
+        lat,
+        lng,
+        formattedAddress: address,
+        zipCode,
+        city,
+        state,
+      };
+    } else {
+      // Geocode server-side
+      geocodeResult = await geocodeAddress(address);
+    }
 
     if (!geocodeResult.success || !geocodeResult.zipCode) {
       return NextResponse.json({
