@@ -142,10 +142,10 @@ export default function Home() {
               New: Easy Online Booking
             </div>
             <h2 className="text-2xl lg:text-3xl font-bold mb-4 text-gray-900">
-              Your own booking page. Clients book 24/7.
+              A booking page that protects your day.
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              No more back-and-forth texts. Share your personal booking link and let clients pick a time that works for both of you.
+              Clients book online — within the limits you set for your route, workload, and energy.
             </p>
           </div>
 
@@ -434,6 +434,11 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          <p className="text-center text-gray-600 mt-10 text-lg font-medium">
+            Most booking tools stop once the appointment is placed.<br />
+            <span className="text-[#A5744A]">GroomRoute is just getting started.</span>
+          </p>
         </div>
       </section>
 
@@ -976,6 +981,7 @@ export default function Home() {
                   {[
                     "Unlimited clients",
                     "Everything in Starter, plus:",
+                    "Calm-first booking rules",
                     "Smart booking suggestions",
                     "Workload protection limits",
                     "Running late notifications",
