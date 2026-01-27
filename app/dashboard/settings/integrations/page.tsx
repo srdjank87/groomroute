@@ -368,7 +368,7 @@ export default function IntegrationsPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={openImportModal}
-                className="btn btn-sm bg-sky-500 hover:bg-sky-600 text-white border-0"
+                className="btn btn-sm px-4 bg-sky-500 hover:bg-sky-600 text-white border-0"
               >
                 <Download className="h-4 w-4 mr-1" />
                 Import Events
@@ -390,7 +390,7 @@ export default function IntegrationsPage() {
             <button
               onClick={handleConnect}
               disabled={isConnecting}
-              className="btn btn-sm bg-sky-500 hover:bg-sky-600 text-white border-0"
+              className="btn btn-sm px-4 bg-sky-500 hover:bg-sky-600 text-white border-0"
             >
               {isConnecting ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-1" />
@@ -410,7 +410,7 @@ export default function IntegrationsPage() {
             <button
               onClick={handleRequestAccess}
               disabled={isRequesting}
-              className="btn btn-sm bg-sky-500 hover:bg-sky-600 text-white border-0"
+              className="btn btn-sm px-4 bg-sky-500 hover:bg-sky-600 text-white border-0"
             >
               {isRequesting ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-1" />
