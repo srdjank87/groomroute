@@ -126,6 +126,19 @@ export default function BookingSettingsPage() {
   const displayUrl = bookingUrl.replace("://www.", "://");
   const hasValidSlug = bookingSlug && !slugError;
 
+  // Check for unsaved changes
+  const hasUnsavedChanges =
+    settings?.bookingEnabled !== bookingEnabled ||
+    (settings?.bookingSlug || "") !== bookingSlug;
+
+  function handlePreview() {
+    if (hasUnsavedChanges) {
+      toast.error("Please save your changes first");
+      return;
+    }
+    window.open(`/book/${bookingSlug}`, "_blank");
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       {/* Header */}
@@ -249,14 +262,13 @@ export default function BookingSettingsPage() {
                       </>
                     )}
                   </button>
-                  <Link
-                    href={`/book/${bookingSlug}`}
-                    target="_blank"
+                  <button
+                    onClick={handlePreview}
                     className="btn btn-sm flex-1 gap-1"
                   >
                     <ExternalLink className="h-4 w-4" />
                     Preview
-                  </Link>
+                  </button>
                 </div>
               </div>
               {/* Desktop: inline layout */}
@@ -280,14 +292,13 @@ export default function BookingSettingsPage() {
                     </>
                   )}
                 </button>
-                <Link
-                  href={`/book/${bookingSlug}`}
-                  target="_blank"
+                <button
+                  onClick={handlePreview}
                   className="btn btn-sm gap-1"
                 >
                   <ExternalLink className="h-4 w-4" />
                   Preview
-                </Link>
+                </button>
               </div>
             </div>
           )}
@@ -333,7 +344,10 @@ export default function BookingSettingsPage() {
       </div>
 
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex items-center justify-end gap-3">
+        {hasUnsavedChanges && (
+          <span className="text-sm text-amber-600">Unsaved changes</span>
+        )}
         <button
           onClick={handleSave}
           disabled={isSaving || (bookingEnabled && slugError !== null)}
