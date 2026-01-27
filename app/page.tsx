@@ -281,31 +281,35 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1: Area Days */}
             <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 overflow-hidden flex flex-col">
-              <div className="p-6 pb-4">
-                <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center mb-4">
-                  <MapPin className="h-7 w-7 text-emerald-600" />
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <MapPin className="h-6 w-6 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Area Days</h3>
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-gray-900">Area Days</h3>
-                <p className="text-gray-600 text-sm mb-3">
+
+                {/* The Result - Visual Anchor */}
+                <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4 mb-4">
+                  <p className="text-lg font-bold text-emerald-800">
+                    Appointments 5-15 minutes apart instead of 30+
+                  </p>
+                </div>
+
+                <p className="text-gray-600 text-sm mb-4">
                   Assign neighborhoods to specific days. Monday is North Side. Tuesday and Friday are Downtown.
                   Stop zigzagging across town.
                 </p>
-                <div className="bg-emerald-50 rounded-lg p-2.5">
-                  <p className="text-xs text-emerald-800">
-                    <span className="font-semibold">The result:</span> Appointments 5-15 minutes apart instead of 30+
-                  </p>
-                </div>
-              </div>
-              <div className="mt-auto px-4 pb-4">
-                <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
+
+                {/* Screenshot as footnote */}
+                <div className="bg-gray-100 rounded-lg p-1.5">
                   <Image
                     src="/images/area_days.jpg"
-                    alt="Area Days feature - assign neighborhoods to specific days"
+                    alt="Area Days feature"
                     width={300}
-                    height={400}
-                    quality={100}
-                    className="rounded-lg w-full shadow-md"
-                    unoptimized
+                    height={200}
+                    quality={85}
+                    className="rounded-md w-full opacity-90"
                   />
                 </div>
               </div>
@@ -313,31 +317,35 @@ export default function Home() {
 
             {/* Step 2: Workload Protection */}
             <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 overflow-hidden flex flex-col">
-              <div className="p-6 pb-4">
-                <div className="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
-                  <Shield className="h-7 w-7 text-amber-600" />
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                    <Shield className="h-6 w-6 text-amber-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Workload Protection</h3>
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-gray-900">Workload Protection</h3>
-                <p className="text-gray-600 text-sm mb-3">
+
+                {/* The Result - Visual Anchor */}
+                <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 mb-4">
+                  <p className="text-lg font-bold text-amber-800">
+                    Days that don&apos;t wreck your body or your sanity
+                  </p>
+                </div>
+
+                <p className="text-gray-600 text-sm mb-4">
                   Set your limits. Max 3 large dogs today. No appointments after 5pm.
                   The system warns you before you overcommit.
                 </p>
-                <div className="bg-amber-50 rounded-lg p-2.5">
-                  <p className="text-xs text-amber-800">
-                    <span className="font-semibold">The result:</span> Days that don&apos;t wreck your body or your sanity
-                  </p>
-                </div>
-              </div>
-              <div className="mt-auto px-4 pb-4">
-                <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
+
+                {/* Screenshot as footnote */}
+                <div className="bg-gray-100 rounded-lg p-1.5">
                   <Image
                     src="/images/workload_protection.jpg"
-                    alt="Workload Protection feature - set daily limits and get warnings"
+                    alt="Workload Protection feature"
                     width={300}
-                    height={400}
-                    quality={100}
-                    className="rounded-lg w-full shadow-md"
-                    unoptimized
+                    height={200}
+                    quality={85}
+                    className="rounded-md w-full opacity-90"
                   />
                 </div>
               </div>
@@ -345,30 +353,34 @@ export default function Home() {
 
             {/* Step 3: Day-of Rescue */}
             <div className="bg-white rounded-2xl shadow-lg border border-emerald-100 overflow-hidden flex flex-col">
-              <div className="p-6 pb-4">
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <Heart className="h-7 w-7 text-blue-600" />
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <Heart className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Day-of Rescue</h3>
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-gray-900">Day-of Rescue</h3>
-                <p className="text-gray-600 text-sm mb-3">
-                  When things go sideways - cancellations, running late, traffic - GroomRoute has your back with one-tap solutions.
-                </p>
-                <div className="bg-blue-50 rounded-lg p-2.5">
-                  <p className="text-xs text-blue-800">
-                    <span className="font-semibold">The result:</span> Problems handled without stress spirals
+
+                {/* The Result - Visual Anchor */}
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-4">
+                  <p className="text-lg font-bold text-blue-800">
+                    Problems handled without stress spirals
                   </p>
                 </div>
-              </div>
-              <div className="mt-auto px-4 pb-4">
-                <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-xl p-2 shadow-inner">
+
+                <p className="text-gray-600 text-sm mb-4">
+                  When things go sideways - cancellations, running late, traffic - GroomRoute has your back with one-tap solutions.
+                </p>
+
+                {/* Screenshot as footnote */}
+                <div className="bg-gray-100 rounded-lg p-1.5">
                   <Image
                     src="/images/day_rescue.jpg"
-                    alt="Day-of Rescue feature - one-tap solutions for problems"
+                    alt="Day-of Rescue feature"
                     width={300}
-                    height={400}
-                    quality={100}
-                    className="rounded-lg w-full shadow-md"
-                    unoptimized
+                    height={200}
+                    quality={85}
+                    className="rounded-md w-full opacity-90"
                   />
                 </div>
               </div>
