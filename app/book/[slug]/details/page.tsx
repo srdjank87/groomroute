@@ -274,10 +274,10 @@ export default function BookingDetailsPage() {
               <User className="h-8 w-8 text-amber-600" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Your details
+              Contact details
             </h2>
             <p className="text-gray-600">
-              Tell us about you and your pet
+              How can we reach you?
             </p>
           </div>
 
