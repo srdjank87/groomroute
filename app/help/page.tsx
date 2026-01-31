@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, MapPin, Calendar, Users, Route, Clock, MessageSquare, Shield, Settings, HelpCircle, Mail } from "lucide-react";
+import { ChevronRight, MapPin, Calendar, Users, Route, Clock, MessageSquare, Shield, Settings, HelpCircle, Mail, Globe, Heart, CalendarSync, UserPlus } from "lucide-react";
 
 const GroomRouteLogo = () => (
   <span>Groom<span style={{ color: '#A5744A' }}>Route</span></span>
@@ -58,6 +58,22 @@ export default function HelpPage() {
             <a href="#appointments" className="p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-center">
               <Calendar className="h-6 w-6 text-[#A5744A] mx-auto mb-2" />
               <span className="text-sm font-medium text-gray-900">Appointments</span>
+            </a>
+            <a href="#booking" className="p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-center">
+              <Globe className="h-6 w-6 text-[#A5744A] mx-auto mb-2" />
+              <span className="text-sm font-medium text-gray-900">Online Booking</span>
+            </a>
+            <a href="#calm" className="p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-center">
+              <Heart className="h-6 w-6 text-[#A5744A] mx-auto mb-2" />
+              <span className="text-sm font-medium text-gray-900">Calm Center</span>
+            </a>
+            <a href="#workload" className="p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-center">
+              <Shield className="h-6 w-6 text-[#A5744A] mx-auto mb-2" />
+              <span className="text-sm font-medium text-gray-900">Workload</span>
+            </a>
+            <a href="#calendar" className="p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-center">
+              <CalendarSync className="h-6 w-6 text-[#A5744A] mx-auto mb-2" />
+              <span className="text-sm font-medium text-gray-900">Google Calendar</span>
             </a>
             <a href="#contact" className="p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-center">
               <Mail className="h-6 w-6 text-[#A5744A] mx-auto mb-2" />
@@ -227,11 +243,11 @@ export default function HelpPage() {
 
             <details className="bg-white rounded-xl border p-4 group">
               <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
-                What is the large dog limit?
+                What is workload protection?
                 <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
               </summary>
               <p className="text-gray-600 mt-3 text-sm">
-                If you set a large dog limit in your profile (Settings &rarr; Profile), GroomRoute will warn you when booking appointments that would exceed your limit for the day. Large dogs (over 50 lbs) can be physically demanding, so this helps protect your energy.
+                GroomRoute tracks the physical intensity of each pet you groom. A day of 4 doodles is very different from 4 chihuahuas. Each pet gets an intensity level (Light, Moderate, Demanding, or Intensive), and your daily total is tracked against your personal limit. You&apos;ll see warnings when your day is getting too heavy. Set your daily limit in Settings &rarr; Profile.
               </p>
             </details>
 
@@ -290,8 +306,199 @@ export default function HelpPage() {
         </div>
       </section>
 
+      {/* Online Booking */}
+      <section id="booking" className="py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Globe className="h-6 w-6 text-[#A5744A]" />
+            Online Booking
+          </h2>
+
+          <div className="space-y-4">
+            <details className="bg-white rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                How do I set up my booking page?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                Go to Settings &rarr; Online Booking and toggle it on. You&apos;ll get a unique booking link (e.g., groomroute.com/book/your-name) that you can share with clients. They can enter their address, pick a date, and book an appointment without any back-and-forth texting.
+              </p>
+            </details>
+
+            <details className="bg-white rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                How does the booking flow work for clients?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                Clients go through 4 steps: (1) Enter their address - GroomRoute checks if they&apos;re in your service area and suggests the best days, (2) Tell us about their pet - breed and size help estimate appointment duration, (3) Pick a date and time - only shows slots that are actually available, (4) Enter their contact info. The appointment then appears on your dashboard automatically.
+              </p>
+            </details>
+
+            <details className="bg-white rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                Can I customize my booking URL?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                Yes! In Settings &rarr; Online Booking, you can edit your booking slug to something memorable. This is what appears in your booking URL after /book/.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      {/* Calm Center */}
+      <section id="calm" className="py-12 px-4 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Heart className="h-6 w-6 text-[#A5744A]" />
+            Calm Center
+          </h2>
+
+          <div className="space-y-4">
+            <details className="bg-gray-50 rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                What is the Calm Center?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                The Calm Center is your one-tap toolkit for handling the chaos of a grooming day. Running behind? No-show? Need to lighten your load? Instead of panic-texting clients individually, the Calm Center gives you quick actions that handle everything in one tap.
+              </p>
+            </details>
+
+            <details className="bg-gray-50 rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                How does &quot;Running Late&quot; work?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                Tap &quot;Running Behind&quot; in the Calm Center, select how late you are, and GroomRoute generates professional messages for all your remaining clients with their updated estimated arrival times. No need to text each person individually.
+              </p>
+            </details>
+
+            <details className="bg-gray-50 rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                What other quick actions are available?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                <strong>Lighten Day</strong> - Move non-essential appointments to a lighter day<br />
+                <strong>Protect Evening</strong> - Shift late appointments to keep your evening free<br />
+                <strong>No Show</strong> - Handle a no-show and mark the client&apos;s record<br />
+                <strong>Take a Breather</strong> - Schedule a quick break between appointments<br />
+                <strong>Upset Customer</strong> - Get a pre-written empathetic response<br />
+                <strong>Reply Help</strong> - AI-assisted message drafting for tricky situations
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      {/* Workload Protection */}
+      <section id="workload" className="py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Shield className="h-6 w-6 text-[#A5744A]" />
+            Workload Protection
+          </h2>
+
+          <div className="space-y-4">
+            <details className="bg-white rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                What are groom intensity levels?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                Every pet gets an intensity level based on breed, size, and coat type:<br /><br />
+                <strong>Light</strong> (1 point) - Small dogs, short coats (e.g., Chihuahua, French Bulldog)<br />
+                <strong>Moderate</strong> (2 points) - Standard grooms (e.g., Shih Tzu, Cocker Spaniel)<br />
+                <strong>Demanding</strong> (3 points) - Double coats, large breeds (e.g., Goldendoodle, Husky)<br />
+                <strong>Intensive</strong> (4 points) - Giant breeds, matted coats, reactive dogs<br /><br />
+                GroomRoute suggests an intensity level based on the breed, but you can always override it.
+              </p>
+            </details>
+
+            <details className="bg-white rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                How does the daily intensity limit work?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                You set a daily intensity limit in Settings &rarr; Profile (default is 12 points). As you book appointments, GroomRoute adds up the intensity points. You&apos;ll see warnings when your day is getting heavy, and your dashboard shows your current workload level (light, moderate, busy, heavy, or overloaded).
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      {/* Google Calendar */}
+      <section id="calendar" className="py-12 px-4 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <CalendarSync className="h-6 w-6 text-[#A5744A]" />
+            Google Calendar
+          </h2>
+
+          <div className="space-y-4">
+            <details className="bg-gray-50 rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                How do I connect Google Calendar?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                Go to Settings &rarr; Integrations and click &quot;Request Access&quot; for Google Calendar. Once approved, you&apos;ll be able to connect your Google account and choose which calendar to sync with. Appointments you create in GroomRoute will appear in your Google Calendar, and vice versa.
+              </p>
+            </details>
+
+            <details className="bg-gray-50 rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                Can I import existing appointments from Google Calendar?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                Yes! After connecting, you can import events from Google Calendar in bulk. GroomRoute will show you a preview of the events before importing so you can choose which ones to bring in. This is a great way to get started if your schedule is already in Google Calendar.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      {/* Team Management */}
+      <section id="team" className="py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <UserPlus className="h-6 w-6 text-[#A5744A]" />
+            Team Management
+          </h2>
+
+          <div className="space-y-4">
+            <details className="bg-white rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                How do I add team members?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                Team management is available on the Pro plan. Go to Settings &rarr; Team and click &quot;Invite Member&quot;. Enter their email and select a role (Admin or Groomer). They&apos;ll receive an email invitation to create their account and join your team.
+              </p>
+            </details>
+
+            <details className="bg-white rounded-xl border p-4 group">
+              <summary className="font-medium text-gray-900 cursor-pointer flex items-center justify-between">
+                What&apos;s the difference between Admin and Groomer roles?
+                <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
+              </summary>
+              <p className="text-gray-600 mt-3 text-sm">
+                <strong>Admin</strong> - Full access to everything: billing, settings, all groomers&apos; schedules, analytics, and team management.<br />
+                <strong>Groomer</strong> - Can view and manage their own schedule, route, and clients. Cannot access billing, team settings, or other groomers&apos; data.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
       {/* Account & Billing */}
-      <section className="py-12 px-4">
+      <section className="py-12 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
             <Settings className="h-6 w-6 text-[#A5744A]" />
@@ -315,7 +522,7 @@ export default function HelpPage() {
                 <ChevronRight className="h-5 w-5 text-gray-400 group-open:rotate-90 transition-transform" />
               </summary>
               <p className="text-gray-600 mt-3 text-sm">
-                Go to Settings &rarr; Billing and click &quot;Manage Subscription&quot;. This will open the Stripe customer portal where you can cancel. Your access continues until the end of your current billing period.
+                Go to Settings &rarr; Billing and click &quot;Cancel subscription&quot; at the bottom of the page. We&apos;ll ask a few quick questions to understand what wasn&apos;t working - your feedback helps us improve. Your access continues until the end of your current billing period.
               </p>
             </details>
 
