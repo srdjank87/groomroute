@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       type: "subscription_canceled",
       accountId: session.user.accountId,
       accountName: account.name,
-      userEmail: session.user.email,
+      userEmail: session.user.email || undefined,
       description: `Cancellation requested for "${account.name}" (active until ${account.currentPeriodEnd?.toLocaleDateString()})`,
       metadata: {
         plan: account.subscriptionPlan,
