@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, CreditCard, Calendar, ExternalLink, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import CancelSubscriptionModal from "@/components/CancelSubscriptionModal";
 
 interface Subscription {
   subscriptionPlan: "TRIAL" | "STARTER" | "GROWTH" | "PRO";
@@ -36,6 +37,7 @@ export default function BillingSettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
   const [changingPlan, setChangingPlan] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   useEffect(() => {
     fetchSubscription();
@@ -456,6 +458,28 @@ export default function BillingSettingsPage() {
           Save 17% with annual billing. Plan changes are prorated automatically.
         </p>
       </div>
+
+      {/* Cancel Subscription */}
+      {subscription?.stripeSubscriptionId && subscription.subscriptionStatus === "ACTIVE" && (
+        <div className="mt-6 bg-white rounded-xl border p-6">
+          <h2 className="font-semibold text-gray-900 mb-2">Cancel Subscription</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            If GroomRoute isn&apos;t working for you, we&apos;d love to understand why before you go.
+          </p>
+          <button
+            onClick={() => setShowCancelModal(true)}
+            className="btn btn-ghost text-red-600 hover:bg-red-50 border-red-200"
+          >
+            Cancel subscription
+          </button>
+        </div>
+      )}
+
+      <CancelSubscriptionModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        periodEnd={subscription?.currentPeriodEnd || null}
+      />
     </div>
   );
 }

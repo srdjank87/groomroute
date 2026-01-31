@@ -67,6 +67,7 @@ model Account {
   areaDayAssignments AreaDayAssignment[]
   areaDateOverrides  AreaDateOverride[]
   teamInvitations    TeamInvitation[]
+  cancellationInterviews CancellationInterview[]
 
   // Pro plan seat tracking (populated from Stripe subscription metadata)
   adminSeats         Int              @default(1)  // Total admin seats purchased (min 1)
@@ -620,6 +621,22 @@ model AdminEvent {
   createdAt   DateTime @default(now())
 
   @@index([type])
+  @@index([accountId])
+  @@index([createdAt])
+}
+
+// AI-powered cancellation exit interview
+model CancellationInterview {
+  id            String   @id @default(cuid())
+  accountId     String
+  account       Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  messages      Json     // Full conversation history [{role, content}]
+  rootCause     String?  // AI-extracted root cause summary
+  categories    String[] // e.g. ["pricing", "setup_difficulty", "missing_feature"]
+  wasRetained   Boolean  @default(false)
+  canceledAt    DateTime?
+  createdAt     DateTime @default(now())
+
   @@index([accountId])
   @@index([createdAt])
 }
