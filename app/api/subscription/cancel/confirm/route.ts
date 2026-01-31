@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     await logAdminEvent({
-      type: "cancellation_requested",
+      type: "subscription_canceled",
       accountId: session.user.accountId,
       accountName: account.name,
       userEmail: session.user.email,
