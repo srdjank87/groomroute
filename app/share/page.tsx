@@ -84,7 +84,7 @@ function ShareContent() {
 
         {/* Share options */}
         <div className="space-y-3">
-          {typeof navigator !== "undefined" && navigator.share && (
+          {typeof navigator !== "undefined" && "share" in navigator && (
             <button
               onClick={handleNativeShare}
               className="btn w-full bg-[#A5744A] hover:bg-[#8B6239] text-white border-0 gap-2"
