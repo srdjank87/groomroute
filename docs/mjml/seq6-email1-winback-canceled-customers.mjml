@@ -1,0 +1,55 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-all font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif" />
+      <mj-text font-size="16px" line-height="26px" color="#525f7f" />
+      <mj-body background-color="#f6f9fc" />
+    </mj-attributes>
+    <mj-style>
+      .check { color: #10b981; font-weight: bold; margin-right: 8px; }
+      .bullet { color: #A5744A; font-weight: bold; margin-right: 8px; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f6f9fc">
+    <!-- Logo -->
+    <mj-section background-color="#ffffff" padding="32px 20px 0">
+      <mj-column>
+        <mj-image src="https://groomroute.com/images/app-icon-192.png" width="32px" height="32px" border-radius="6px" align="center" />
+        <mj-text align="center" font-size="28px" font-weight="bold" color="#1a1a1a" padding="8px 0 0">
+          Groom<span style="color: #A5744A;">Route</span>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Content -->
+    <mj-section background-color="#ffffff" padding="0 48px">
+      <mj-column>
+        <mj-text align="center" font-size="28px" font-weight="bold" color="#1a1a1a" padding="32px 0 24px">A lot has changed</mj-text>
+        <mj-text color="#525f7f" padding="16px 0">Hi {{firstName}},</mj-text>
+        <mj-text color="#525f7f" padding="16px 0">It's been a couple months since you left GroomRoute. We've been busy making things better:</mj-text>
+        <mj-text color="#525f7f" font-size="15px" line-height="24px" padding="0"><div style="background-color: #f8fafc; border-radius: 12px; padding: 20px 24px;">What's New:</div></mj-text>
+        <mj-text color="#525f7f" padding="16px 0">We'd love to have you back. As a returning customer, here's a special offer:</mj-text>
+        <mj-text color="#8B6239" font-size="15px" line-height="24px" padding="0"><div style="background-color: #fef7f0; border-radius: 12px; border: 1px solid #f5e6d8; padding: 20px 24px;">Get 50% off your first month back<br/>Use code: <strong>WELCOMEBACK50</strong></div></mj-text>
+        <mj-button background-color="#A5744A" border-radius="8px" font-size="16px" font-weight="bold" href="https://groomroute.com/comeback" padding="32px 0" inner-padding="14px 32px">Reactivate Your Account</mj-button>
+        <mj-text color="#525f7f" padding="16px 0">No pressure - but if you're still doing mobile grooming, we think you'll love the improvements we've made.</mj-text>
+        <mj-text font-size="16px" font-weight="600" color="#1a1a1a" padding="0 0 24px">The GroomRoute Team</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#ffffff" padding="32px 48px">
+      <mj-column>
+        <mj-text align="center" font-size="12px" line-height="16px" color="#8898aa">
+          GroomRoute - The scheduling system built only for mobile groomers
+        </mj-text>
+        <mj-text align="center" font-size="12px" line-height="16px" color="#8898aa">
+          <a href="https://groomroute.com/privacy" style="color: #8898aa; text-decoration: underline;">Privacy Policy</a>
+          |
+          <a href="https://groomroute.com/terms" style="color: #8898aa; text-decoration: underline;">Terms of Service</a>
+          |
+          <a href="{unsubscribe_link}" style="color: #8898aa; text-decoration: underline;">Unsubscribe</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

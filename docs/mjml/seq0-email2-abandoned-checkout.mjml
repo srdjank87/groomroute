@@ -1,0 +1,55 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-all font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif" />
+      <mj-text font-size="16px" line-height="26px" color="#525f7f" />
+      <mj-body background-color="#f6f9fc" />
+    </mj-attributes>
+    <mj-style>
+      .check { color: #10b981; font-weight: bold; margin-right: 8px; }
+      .bullet { color: #A5744A; font-weight: bold; margin-right: 8px; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f6f9fc">
+    <!-- Logo -->
+    <mj-section background-color="#ffffff" padding="32px 20px 0">
+      <mj-column>
+        <mj-image src="https://groomroute.com/images/app-icon-192.png" width="32px" height="32px" border-radius="6px" align="center" />
+        <mj-text align="center" font-size="28px" font-weight="bold" color="#1a1a1a" padding="8px 0 0">
+          Groom<span style="color: #A5744A;">Route</span>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Content -->
+    <mj-section background-color="#ffffff" padding="0 48px">
+      <mj-column>
+        <mj-text align="center" font-size="28px" font-weight="bold" color="#1a1a1a" padding="32px 0 24px">Still thinking about it?</mj-text>
+        <mj-text color="#525f7f" padding="16px 0">Hi {{firstName}},</mj-text>
+        <mj-text color="#525f7f" padding="16px 0">We noticed you started signing up for GroomRoute yesterday but haven't finished yet.</mj-text>
+        <mj-text color="#525f7f" padding="16px 0"><strong>Here's what other mobile groomers are saying:</strong></mj-text>
+        <mj-text color="#525f7f" font-size="15px" line-height="24px" padding="0"><div style="background-color: #f8fafc; border-radius: 12px; padding: 20px 24px;">"I used to spend 45 minutes every morning figuring out my route. Now it takes me 30 seconds."<br/>— Sarah M.<br/>"I finally have time to eat lunch between appointments."<br/>— Mike T.<br/>"My clients love that I'm never late anymore."<br/>— Jennifer K.</div></mj-text>
+        <mj-text color="#166534" font-size="15px" line-height="24px" padding="0"><div style="background-color: #f0fdf4; border-radius: 12px; border: 1px solid #dcfce7; padding: 20px 24px;">Your trial is completely <strong>free for 14 days</strong>. No tricks, no hassle.</div></mj-text>
+        <mj-button background-color="#A5744A" border-radius="8px" font-size="16px" font-weight="bold" href="https://groomroute.com/signup?email={{email}}" padding="32px 0" inner-padding="14px 32px">Start My Free Trial</mj-button>
+        <mj-text color="#525f7f" padding="16px 0">If something's holding you back, just reply to this email. I'd love to help.</mj-text>
+        <mj-text font-size="16px" font-weight="600" color="#1a1a1a" padding="0 0 24px">The GroomRoute Team</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#ffffff" padding="32px 48px">
+      <mj-column>
+        <mj-text align="center" font-size="12px" line-height="16px" color="#8898aa">
+          GroomRoute - The scheduling system built only for mobile groomers
+        </mj-text>
+        <mj-text align="center" font-size="12px" line-height="16px" color="#8898aa">
+          <a href="https://groomroute.com/privacy" style="color: #8898aa; text-decoration: underline;">Privacy Policy</a>
+          |
+          <a href="https://groomroute.com/terms" style="color: #8898aa; text-decoration: underline;">Terms of Service</a>
+          |
+          <a href="{unsubscribe_link}" style="color: #8898aa; text-decoration: underline;">Unsubscribe</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

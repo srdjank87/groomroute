@@ -1,0 +1,60 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-all font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif" />
+      <mj-text font-size="16px" line-height="26px" color="#525f7f" />
+      <mj-body background-color="#f6f9fc" />
+    </mj-attributes>
+    <mj-style>
+      .check { color: #10b981; font-weight: bold; margin-right: 8px; }
+      .bullet { color: #A5744A; font-weight: bold; margin-right: 8px; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f6f9fc">
+    <!-- Logo -->
+    <mj-section background-color="#ffffff" padding="32px 20px 0">
+      <mj-column>
+        <mj-image src="https://groomroute.com/images/app-icon-192.png" width="32px" height="32px" border-radius="6px" align="center" />
+        <mj-text align="center" font-size="28px" font-weight="bold" color="#1a1a1a" padding="8px 0 0">
+          Groom<span style="color: #A5744A;">Route</span>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Content -->
+    <mj-section background-color="#ffffff" padding="0 48px">
+      <mj-column>
+        <mj-text align="center" font-size="28px" font-weight="bold" color="#1a1a1a" padding="32px 0 24px">"I wish I'd done this sooner"</mj-text>
+        <mj-text color="#525f7f" padding="16px 0">Hi {{firstName}},</mj-text>
+        <mj-text color="#525f7f" padding="16px 0">That's what groomers tell us after setting up online booking.</mj-text>
+        <mj-text color="#525f7f" padding="16px 0">The back-and-forth to schedule appointments is one of the most draining parts of running a mobile grooming business. Every text, every call, every "what time works for you?" takes energy.</mj-text>
+        <mj-text font-size="16px" font-weight="bold" color="#1a1a1a" padding="24px 0 12px">Here's what online booking gives you:</mj-text>
+        <mj-text color="#525f7f" font-size="15px" line-height="28px" padding="16px 0"><span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>24/7 availability</strong> - Clients book while you're grooming, sleeping, or on vacation</span><br/><span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>Zero back-and-forth</strong> - They see your openings and pick one</span><br/><span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>Smarter scheduling</strong> - Bookings respect your service areas and days</span><br/><span style="color: #10b981; font-weight: bold; margin-right: 8px;">✓</span>
+                    <span style="color: #525f7f; font-size: 15px;"><strong>Protected energy</strong> - Your workload limits prevent overbooking</span></mj-text>
+        <mj-text color="#525f7f" font-size="15px" line-height="24px" padding="0"><div style="background-color: #f8fafc; border-radius: 12px; padding: 20px 24px;">One groomer's experience:<br/>"I used to spend my lunch break returning calls about scheduling. Now I actually eat lunch. Clients love that they can book anytime, and I love that I don't have to think about it."<br/>— Michelle R.</div></mj-text>
+        <mj-button background-color="#A5744A" border-radius="8px" font-size="16px" font-weight="bold" href="https://groomroute.com/dashboard/settings/booking" padding="32px 0" inner-padding="14px 32px">Turn On Online Booking</mj-button>
+        <mj-text align="center" color="#525f7f" padding="16px 0">Takes 60 seconds. Try it for a week and see what you think.</mj-text>
+        <mj-text font-size="16px" font-weight="600" color="#1a1a1a" padding="0 0 24px">The GroomRoute Team</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#ffffff" padding="32px 48px">
+      <mj-column>
+        <mj-text align="center" font-size="12px" line-height="16px" color="#8898aa">
+          GroomRoute - The scheduling system built only for mobile groomers
+        </mj-text>
+        <mj-text align="center" font-size="12px" line-height="16px" color="#8898aa">
+          <a href="https://groomroute.com/privacy" style="color: #8898aa; text-decoration: underline;">Privacy Policy</a>
+          |
+          <a href="https://groomroute.com/terms" style="color: #8898aa; text-decoration: underline;">Terms of Service</a>
+          |
+          <a href="{unsubscribe_link}" style="color: #8898aa; text-decoration: underline;">Unsubscribe</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

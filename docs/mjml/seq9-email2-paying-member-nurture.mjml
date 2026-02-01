@@ -1,0 +1,56 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-all font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif" />
+      <mj-text font-size="16px" line-height="26px" color="#525f7f" />
+      <mj-body background-color="#f6f9fc" />
+    </mj-attributes>
+    <mj-style>
+      .check { color: #10b981; font-weight: bold; margin-right: 8px; }
+      .bullet { color: #A5744A; font-weight: bold; margin-right: 8px; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f6f9fc">
+    <!-- Logo -->
+    <mj-section background-color="#ffffff" padding="32px 20px 0">
+      <mj-column>
+        <mj-image src="https://groomroute.com/images/app-icon-192.png" width="32px" height="32px" border-radius="6px" align="center" />
+        <mj-text align="center" font-size="28px" font-weight="bold" color="#1a1a1a" padding="8px 0 0">
+          Groom<span style="color: #A5744A;">Route</span>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Content -->
+    <mj-section background-color="#ffffff" padding="0 48px">
+      <mj-column>
+        <mj-text align="center" font-size="28px" font-weight="bold" color="#1a1a1a" padding="32px 0 24px">3 features you might have missed</mj-text>
+        <mj-text color="#525f7f" padding="16px 0">Hi {{firstName}},</mj-text>
+        <mj-text color="#525f7f" padding="16px 0">Now that you're all set up, here are 3 power-user features that can save you even more time:</mj-text>
+        <mj-text color="#525f7f" font-size="15px" line-height="24px" padding="0"><div style="background-color: #f8fafc; border-radius: 12px; padding: 20px 24px;">1. Quick Reschedule<br/>Drag and drop appointments on your calendar to reschedule instantly. No need to delete and recreate.</div></mj-text>
+        <mj-text color="#525f7f" font-size="15px" line-height="24px" padding="0"><div style="background-color: #f8fafc; border-radius: 12px; padding: 20px 24px;">2. Pet Notes<br/>Add grooming notes to each pet's profile (temperament, preferred cuts, special instructions). They'll show up automatically on appointment day.</div></mj-text>
+        <mj-text color="#525f7f" font-size="15px" line-height="24px" padding="0"><div style="background-color: #f8fafc; border-radius: 12px; padding: 20px 24px;">3. Navigation Integration<br/>After optimizing your route, tap any address to open it directly in your preferred maps app. One-tap navigation to every stop.</div></mj-text>
+        <mj-button background-color="#A5744A" border-radius="8px" font-size="16px" font-weight="bold" href="https://groomroute.com/dashboard" padding="32px 0" inner-padding="14px 32px">Open GroomRoute</mj-button>
+        <mj-text align="center" color="#525f7f" padding="16px 0">Which feature will you try first?</mj-text>
+        <mj-divider border-color="#e6ebf1" border-width="1px" padding="32px 0" />
+        <mj-text font-size="16px" font-weight="600" color="#1a1a1a" padding="0 0 24px">The GroomRoute Team</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#ffffff" padding="32px 48px">
+      <mj-column>
+        <mj-text align="center" font-size="12px" line-height="16px" color="#8898aa">
+          GroomRoute - The scheduling system built only for mobile groomers
+        </mj-text>
+        <mj-text align="center" font-size="12px" line-height="16px" color="#8898aa">
+          <a href="https://groomroute.com/privacy" style="color: #8898aa; text-decoration: underline;">Privacy Policy</a>
+          |
+          <a href="https://groomroute.com/terms" style="color: #8898aa; text-decoration: underline;">Terms of Service</a>
+          |
+          <a href="{unsubscribe_link}" style="color: #8898aa; text-decoration: underline;">Unsubscribe</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
