@@ -35,6 +35,7 @@ interface LoopsContact {
   hasCreatedAppointment?: boolean; // Exit: No appointments sequence
   hasOptimizedRoute?: boolean; // Exit: Route optimization nudge sequence
   hasInstalledPwa?: boolean; // Exit: PWA reminder sequence
+  hasEnabledBooking?: boolean; // Exit: Booking setup nudge sequence
   isActive?: boolean; // Exit: Re-engagement sequence (reset by cron)
   hasPaymentFailed?: boolean; // Trigger/Exit: Payment failed sequence
   hasResubscribed?: boolean; // Exit: Winback sequence
@@ -483,6 +484,47 @@ export async function loopsOnPaymentSucceeded(
     eventName: "payment_succeeded",
     eventProperties: {
       accountId,
+    },
+  });
+}
+
+/**
+ * Called when groomer enables their online booking page
+ * Exits: "Booking setup nudge" sequence (via hasEnabledBooking property)
+ */
+export async function loopsOnBookingEnabled(
+  email: string,
+  accountId: string
+): Promise<void> {
+  await upsertLoopsContact({
+    email,
+    hasEnabledBooking: true,
+  });
+
+  await sendLoopsEvent({
+    email,
+    eventName: "booking_enabled",
+    eventProperties: {
+      accountId,
+    },
+  });
+}
+
+/**
+ * Called when a client books through the public booking page
+ * Notifies the groomer (not the client) that they received a booking
+ */
+export async function loopsOnBookingReceived(
+  groomerEmail: string,
+  accountId: string,
+  clientName: string
+): Promise<void> {
+  await sendLoopsEvent({
+    email: groomerEmail,
+    eventName: "booking_received",
+    eventProperties: {
+      accountId,
+      clientName,
     },
   });
 }

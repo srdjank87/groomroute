@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { estimateDuration } from "@/lib/booking-duration";
+import { loopsOnBookingReceived, loopsOnFirstCustomerAdded, loopsOnFirstAppointmentCreated } from "@/lib/loops";
+import { checkAndTrackFirstAction } from "@/lib/posthog-server";
 
 /**
  * POST /api/book/create
@@ -242,6 +244,34 @@ export async function POST(req: NextRequest) {
         notes: notes || null,
       },
     });
+
+    // Notify groomer via Loops (async, don't block response)
+    const adminUser = await prisma.user.findFirst({
+      where: { accountId: groomer.accountId, role: "ADMIN" },
+      select: { email: true },
+    });
+
+    if (adminUser?.email) {
+      // Send booking received event
+      loopsOnBookingReceived(adminUser.email, groomer.accountId, clientName).catch((err) =>
+        console.error("Loops booking_received event failed:", err)
+      );
+
+      // Check if this is the first customer or appointment for onboarding sequences
+      const customerCount = await prisma.customer.count({ where: { accountId: groomer.accountId } });
+      if (customerCount === 1) {
+        loopsOnFirstCustomerAdded(adminUser.email, groomer.accountId).catch((err) =>
+          console.error("Loops customer_added event failed:", err)
+        );
+      }
+
+      const isFirstAction = await checkAndTrackFirstAction(groomer.accountId, "appointment_created");
+      if (isFirstAction) {
+        loopsOnFirstAppointmentCreated(adminUser.email, groomer.accountId).catch((err) =>
+          console.error("Loops appointment_created event failed:", err)
+        );
+      }
+    }
 
     return NextResponse.json({
       success: true,

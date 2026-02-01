@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getUserGroomerId } from "@/lib/get-user-groomer";
+import { loopsOnBookingEnabled } from "@/lib/loops";
 
 /**
  * GET /api/groomer/settings
@@ -217,6 +218,13 @@ export async function PATCH(req: NextRequest) {
         bookingEnabled: true,
       },
     });
+
+    // Notify Loops when booking is enabled
+    if (body.bookingEnabled === true && session.user.email) {
+      loopsOnBookingEnabled(session.user.email, session.user.accountId).catch((err) =>
+        console.error("Loops booking_enabled event failed:", err)
+      );
+    }
 
     return NextResponse.json({
       success: true,
