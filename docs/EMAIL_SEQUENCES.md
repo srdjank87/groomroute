@@ -30,7 +30,7 @@ Before setting up sequences, ensure these events are being sent to Loops:
 ## Sequence 0: Abandoned Checkout
 
 Trigger: signed_up event
-Exit Condition: hasCompletedCheckout = true (Audience Filter)
+Audience Filter: Set hasCompletedCheckout = false (exits when user completes checkout)
 Goal: Get users who signed up but didn't complete Stripe checkout to start their trial
 
 ### Email 1: 1 Hour After Signup
@@ -148,7 +148,7 @@ The GroomRoute Team
 ## Sequence 0.5: Trial Ending Reminder
 
 Trigger: checkout_completed event + 10 day delay
-Exit Condition: trial_converted event (user already paid)
+Audience Filter: Set userGroup = trial (exits when user converts to paying)
 Goal: Transparent billing reminder that builds trust and reduces disputes
 
 This single email goes out ~10-12 days into the trial, before auto-billing. It reduces support tickets, charge disputes, and angry cancellations while actually helping conversion through transparency.
@@ -192,7 +192,7 @@ P.S. If GroomRoute has been saving you time, you don't need to do anything â€” y
 ## Sequence 1: Onboarding - No Clients Added
 
 Trigger: checkout_completed event
-Exit Condition: hasAddedClient = false (Audience Filter)
+Audience Filter: Set hasAddedClient = false (exits when user adds their first client)
 Goal: Get users to add their first client
 
 ### Email 1: Day 1 (24 hours after checkout)
@@ -280,7 +280,7 @@ GroomRoute Co-founder
 ## Sequence 2: Onboarding - No Appointments Scheduled
 
 Trigger: customer_added event (first customer)
-Exit Condition: appointment_created event received
+Audience Filter: Set hasCreatedAppointment = false (exits when user creates first appointment)
 Goal: Get users to schedule their first appointment
 
 ### Email 1: Day 1 (24 hours after first customer added)
@@ -341,7 +341,7 @@ The GroomRoute Team
 ## Sequence 3: First Route Optimization Nudge
 
 Trigger: appointment_created event (when they have 2+ appointments on same day)
-Exit Condition: route_optimized event
+Audience Filter: Set hasOptimizedRoute = false (exits when user optimizes first route)
 Goal: Get users to experience the core value - route optimization
 
 ### Email 1: Same day or next day
@@ -379,7 +379,7 @@ The GroomRoute Team
 ## Sequence 4: PWA Installation Reminder
 
 Trigger: checkout_completed event + 5 days delay (configure in Loops)
-Exit Condition: pwa_installed event
+Audience Filter: Set hasInstalledPwa = false (exits when user installs PWA)
 Goal: Get users to install the mobile app
 
 ### Email 1: 5 Days After Checkout
@@ -423,7 +423,7 @@ The GroomRoute Team
 ## Sequence 5: Re-engagement (Inactive Users)
 
 Trigger: No login for 7 days (track via lastActiveAt in database)
-Exit Condition: User logs in (send user_active event)
+Audience Filter: Set isActive = false (exits when user logs in and isActive flips to true)
 Goal: Bring back inactive users
 
 ### Email 1: 7 Days Inactive
@@ -479,7 +479,7 @@ GroomRoute Co-Founder
 ## Sequence 6: Winback (Canceled Customers)
 
 Trigger: subscription_canceled event + 60 day delay
-Exit Condition: resubscribed event
+Audience Filter: Set hasResubscribed = false (exits when user resubscribes)
 Goal: Win back churned customers
 
 *Note: This is already configured in the Loops integration.*
@@ -539,7 +539,7 @@ The GroomRoute Team
 ## Sequence 7: Payment Failed
 
 Trigger: payment_failed event (add to Stripe webhook)
-Exit Condition: payment_succeeded event
+Audience Filter: Set hasPaymentFailed = true (exits when payment succeeds and hasPaymentFailed flips to false)
 Goal: Recover failed payments
 
 ### Email 1: Immediately
@@ -597,7 +597,7 @@ The GroomRoute Team
 ## Sequence 8: NPS/Feedback Request
 
 Trigger: 30 days after trial_converted
-Exit Condition: Survey completed (track via link click or webhook)
+Audience Filter: None (single send, no exit condition needed)
 Goal: Gather feedback and identify promoters
 
 ### Email 1: 30 Days After First Payment
@@ -628,7 +628,7 @@ The GroomRoute Team
 ## Sequence 9: Paying Member Nurture
 
 Trigger: trial_converted event
-Exit Condition: None (ongoing nurture sequence)
+Audience Filter: None (ongoing nurture sequence, no exit condition)
 Goal: Engage paying customers, provide value, build loyalty, and encourage referrals
 
 This is a long-term nurture sequence that starts when a trial converts to a paid subscription. It provides ongoing value through tips, education, and community building.
@@ -989,7 +989,7 @@ The GroomRoute Team
 ## Sequence 10: Online Booking Enabled
 
 Trigger: booking_enabled event
-Exit Condition: None (single email)
+Audience Filter: None (single email, no exit condition)
 Goal: Congratulate user on enabling online booking, teach them how to share their booking link
 
 ### Email 1: Immediately after enabling
@@ -1037,7 +1037,7 @@ P.S. You can customize your booking URL and turn it off anytime from Settings â†
 ## Sequence 11: First Booking Received
 
 Trigger: booking_received event (first time only)
-Exit Condition: None (single celebration email)
+Audience Filter: Set hasReceivedBooking = false (only sends once, exits after first booking)
 Goal: Celebrate first online booking, reinforce the value
 
 ### Email 1: Immediately after first booking
@@ -1082,7 +1082,7 @@ The GroomRoute Team
 ## Sequence 12: Online Booking Nudge (For users who haven't enabled it)
 
 Trigger: trial_converted event + 14 day delay
-Exit Condition: hasEnabledBooking = true (Audience Filter)
+Audience Filter: Set hasEnabledBooking = false (exits when user enables online booking)
 Goal: Encourage users to try online booking
 
 ### Email 1: 14 Days After Converting to Paid
