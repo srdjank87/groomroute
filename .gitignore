@@ -38,3 +38,8 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Email docs and templates
+/docs/EMAIL_SEQUENCES.md
+/docs/mjml/
+/docs/mjml-zips/
