@@ -118,7 +118,7 @@ function FeedbackForm() {
         {/* Comment */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Anything you'd like to share? (optional)
+            Anything you&apos;d like to share? (optional)
           </label>
           <textarea
             value={comment}
