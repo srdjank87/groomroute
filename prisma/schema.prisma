@@ -68,6 +68,7 @@ model Account {
   areaDateOverrides  AreaDateOverride[]
   teamInvitations    TeamInvitation[]
   cancellationInterviews CancellationInterview[]
+  npsFeedback            NpsFeedback[]
 
   // Pro plan seat tracking (populated from Stripe subscription metadata)
   adminSeats         Int              @default(1)  // Total admin seats purchased (min 1)
@@ -636,6 +637,19 @@ model CancellationInterview {
   wasRetained   Boolean  @default(false)
   canceledAt    DateTime?
   createdAt     DateTime @default(now())
+
+  @@index([accountId])
+  @@index([createdAt])
+}
+
+model NpsFeedback {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  email     String
+  score     Int      // 1-10
+  comment   String?  // Optional free-text feedback
+  createdAt DateTime @default(now())
 
   @@index([accountId])
   @@index([createdAt])
