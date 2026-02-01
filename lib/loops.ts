@@ -36,10 +36,13 @@ interface LoopsContact {
   hasOptimizedRoute?: boolean; // Exit: Route optimization nudge sequence
   hasInstalledPwa?: boolean; // Exit: PWA reminder sequence
   hasEnabledBooking?: boolean; // Exit: Booking setup nudge sequence
+  hasReceivedBooking?: boolean; // Exit: First booking received (first time only)
   isActive?: boolean; // Exit: Re-engagement sequence (reset by cron)
   hasPaymentFailed?: boolean; // Trigger/Exit: Payment failed sequence
   hasResubscribed?: boolean; // Exit: Winback sequence
   lastActiveAt?: string; // ISO date string for activity tracking
+  bookingUrl?: string; // User's online booking page URL
+  bookingSlug?: string; // User's booking slug
 }
 
 interface LoopsEventPayload {
@@ -494,11 +497,16 @@ export async function loopsOnPaymentSucceeded(
  */
 export async function loopsOnBookingEnabled(
   email: string,
-  accountId: string
+  accountId: string,
+  bookingSlug?: string
 ): Promise<void> {
   await upsertLoopsContact({
     email,
     hasEnabledBooking: true,
+    ...(bookingSlug && {
+      bookingSlug,
+      bookingUrl: `https://groomroute.com/book/${bookingSlug}`,
+    }),
   });
 
   await sendLoopsEvent({
@@ -519,6 +527,11 @@ export async function loopsOnBookingReceived(
   accountId: string,
   clientName: string
 ): Promise<void> {
+  await upsertLoopsContact({
+    email: groomerEmail,
+    hasReceivedBooking: true,
+  });
+
   await sendLoopsEvent({
     email: groomerEmail,
     eventName: "booking_received",

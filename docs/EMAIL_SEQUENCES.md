@@ -1359,8 +1359,8 @@ When the user adds their first client, `hasAddedClient` is set to `true` by our 
 - [x] Send subscription_canceled event + set hasResubscribed=false ✓ Implemented
 - [x] Send resubscribed event + set hasResubscribed=true ✓ Implemented
 - [x] Create cron job to set isActive=false for users inactive 7+ days ✓ Implemented
-- [ ] Send booking_enabled event + set hasEnabledBooking=true + set bookingUrl when groomer enables online booking
-- [ ] Send booking_received event + set hasReceivedBooking=true when first booking is received from public page
+- [x] Send booking_enabled event + set hasEnabledBooking=true + set bookingUrl/bookingSlug when groomer enables online booking ✓ Implemented
+- [x] Send booking_received event + set hasReceivedBooking=true when first booking is received from public page ✓ Implemented
 
 ### Environment Variables:
 

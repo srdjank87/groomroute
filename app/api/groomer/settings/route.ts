@@ -221,7 +221,7 @@ export async function PATCH(req: NextRequest) {
 
     // Notify Loops when booking is enabled
     if (body.bookingEnabled === true && session.user.email) {
-      loopsOnBookingEnabled(session.user.email, session.user.accountId).catch((err) =>
+      loopsOnBookingEnabled(session.user.email, session.user.accountId, updatedGroomer.bookingSlug || undefined).catch((err) =>
         console.error("Loops booking_enabled event failed:", err)
       );
     }
