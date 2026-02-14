@@ -22,7 +22,7 @@ interface LoopsContact {
   accountId?: string;
   businessName?: string;
   plan?: string;
-  planPrice?: string; // e.g., "$29" - for trial ending reminder
+  planPrice?: string; // e.g., "$79/month" or "$950/year" - for trial ending reminder
   cancelDate?: string;
   phone?: string; // For SMS marketing
   trialEndDate?: string; // ISO date string for trial ending reminder
@@ -211,6 +211,10 @@ export async function loopsOnCheckoutCompleted(
     hasCreatedAppointment: false,
     hasOptimizedRoute: false,
     hasInstalledPwa: false,
+    hasEnabledBooking: false,
+    hasReceivedBooking: false,
+    hasResubscribed: false,
+    hasPaymentFailed: false,
     isActive: true,
     lastActiveAt: new Date().toISOString(),
     // Trial reminder properties
