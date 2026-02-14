@@ -19,7 +19,7 @@ const EVENTS: EventConfig[] = [
     fields: [
       { key: "name", label: "Full Name", defaultValue: "Test User" },
       { key: "businessName", label: "Business Name", defaultValue: "Test Grooming" },
-      { key: "plan", label: "Plan", defaultValue: "monthly" },
+      { key: "plan", label: "Plan (STARTER/GROWTH/PRO)", defaultValue: "GROWTH" },
       { key: "accountId", label: "Account ID", defaultValue: "test-123" },
     ],
   },
@@ -28,10 +28,10 @@ const EVENTS: EventConfig[] = [
     label: "Checkout Completed",
     description: "User completes Stripe checkout (exits abandoned checkout, triggers onboarding)",
     fields: [
-      { key: "plan", label: "Plan", defaultValue: "monthly" },
+      { key: "plan", label: "Plan (STARTER/GROWTH/PRO)", defaultValue: "GROWTH" },
       { key: "accountId", label: "Account ID", defaultValue: "test-123" },
       { key: "phone", label: "Phone", defaultValue: "", optional: true },
-      { key: "planPrice", label: "Plan Price", defaultValue: "$29", optional: true },
+      { key: "planPrice", label: "Plan Price", defaultValue: "$79", optional: true },
       { key: "trialEndDate", label: "Trial End Date", defaultValue: new Date(Date.now() + 14 * 86400000).toISOString().split("T")[0], optional: true },
       { key: "cardLast4", label: "Card Last 4", defaultValue: "4242", optional: true },
     ],
@@ -41,7 +41,7 @@ const EVENTS: EventConfig[] = [
     label: "Trial Converted",
     description: "Trial converts to paid subscription",
     fields: [
-      { key: "plan", label: "Plan", defaultValue: "monthly" },
+      { key: "plan", label: "Plan (STARTER/GROWTH/PRO)", defaultValue: "GROWTH" },
       { key: "accountId", label: "Account ID", defaultValue: "test-123" },
     ],
   },
@@ -50,7 +50,7 @@ const EVENTS: EventConfig[] = [
     label: "Subscription Canceled",
     description: "Subscription canceled (triggers winback sequence after 60 days)",
     fields: [
-      { key: "previousPlan", label: "Previous Plan", defaultValue: "monthly" },
+      { key: "previousPlan", label: "Previous Plan (STARTER/GROWTH/PRO)", defaultValue: "GROWTH" },
       { key: "accountId", label: "Account ID", defaultValue: "test-123" },
     ],
   },
@@ -59,7 +59,7 @@ const EVENTS: EventConfig[] = [
     label: "Resubscribed",
     description: "Churned customer resubscribes (exits winback sequence)",
     fields: [
-      { key: "plan", label: "Plan", defaultValue: "monthly" },
+      { key: "plan", label: "Plan (STARTER/GROWTH/PRO)", defaultValue: "GROWTH" },
       { key: "accountId", label: "Account ID", defaultValue: "test-123" },
       { key: "phone", label: "Phone", defaultValue: "", optional: true },
     ],
